@@ -4,13 +4,12 @@
 #include "glsDraw.h"
 #include "Timer.h"
 
-
 //-----------------------------------------------------------------------------
 // glsDraw shader
-class glsShaderDraw : public glsShaderBase
+class glsShaderDrawBase : public glsShaderBase
 {
 public:
-	glsShaderDraw(void);
+//	glsShaderDrawBase(void);
 
 	//attribute location
 	GLuint position;
@@ -22,15 +21,39 @@ public:
 
 
 //-----------------------------------------------------------------------------
+// glsDraw shader
+class glsShaderDraw : public glsShaderDrawBase
+{
+public:
+	glsShaderDraw(void);
+
+};
+
+//-----------------------------------------------------------------------------
+// glsDraw shader
+class glsShaderDrawU : public glsShaderDrawBase
+{
+public:
+	glsShaderDrawU(void);
+
+};
+
+
+
+//-----------------------------------------------------------------------------
 //global 
 glsShaderDraw* shaderDraw = 0;
+glsShaderDrawU* shaderDrawU = 0;
 
 void glsDrawInit(void){
 	shaderDraw = new glsShaderDraw();
+	shaderDrawU = new glsShaderDrawU();
+
 }
 
 void glsDrawTerminate(void){
 	delete shaderDraw;
+	delete shaderDrawU;
 }
 
 
@@ -39,7 +62,7 @@ void glsDrawTerminate(void){
 //-----------------------------------------------------------------------------
 //glsShaderDraw
 glsShaderDraw::glsShaderDraw(void)
-	:glsShaderBase()
+	:glsShaderDrawBase()
 {
 
 	const char vertexShaderCode[] = 
@@ -63,13 +86,58 @@ glsShaderDraw::glsShaderDraw(void)
 "void main(void)\n"
 "{\n"
 "	vec4 data = texture(texSrc, gl_FragCoord.xy);\n"
-"	dst = vec4(data.r/scl,data.g/scl,data.b/scl,1.0);\n"
+"	dst = vec4(data.r*scl,data.g*scl,data.b*scl,1.0);\n"
 "//	dst = vec4(0.5,0.0,0.0,1.0);\n"
 "\n"
 "}\n"
 ;
 	
 	
+
+	// Create and compile our GLSL program from the shaders
+	LoadShadersCode(vertexShaderCode, fragmentShaderCode);
+
+	// Attribute & Uniform location
+	position = glGetAttribLocation(program, "position");
+	texSrc = glGetUniformLocation(program, "texSrc");
+	f_scl = glGetUniformLocation(program, "scl");
+}
+
+
+//-----------------------------------------------------------------------------
+//glsShaderDrawU
+glsShaderDrawU::glsShaderDrawU(void)
+	:glsShaderDrawBase()
+{
+
+	const char vertexShaderCode[] =
+		"#version 330 core\n"
+		"layout (location = 0)in  vec2 position;\n"
+		"void main(void)\n"
+		"{\n"
+		"   gl_Position  = vec4(position,0.0,1.0);\n"
+		"}\n"
+		;
+
+
+	const char fragmentShaderCode[] =
+		"#version 330 core\n"
+		"precision highp float;\n"
+		"uniform usampler2DRect	texSrc;\n"
+		"uniform float	scl;\n"
+		"\n"
+		"layout (location = 0) out vec4 dst;\n"
+		"\n"
+		"void main(void)\n"
+		"{\n"
+		"	vec4 data = vec4(texture(texSrc, gl_FragCoord.xy));\n"
+		"	dst = vec4(data.r*scl,data.g*scl,data.b*scl,1.0);\n"
+		"//	dst = vec4(0.5,0.0,0.0,1.0);\n"
+		"\n"
+		"}\n"
+		;
+
+
 
 	// Create and compile our GLSL program from the shaders
 	LoadShadersCode(vertexShaderCode, fragmentShaderCode);
@@ -112,7 +180,7 @@ static Size getTextureSize(GLuint tex){
 //---------------------------------------------------------------------------
 //
 static void glsDrawProcess(
-	const glsShaderDraw* shader,	//progmra ID
+	const glsShaderDrawBase* shader,	//progmra ID
 	const GLuint& texSrc,			//src texture IDs
 	const float scl					// scaling 
 	)
@@ -198,16 +266,23 @@ static void glsDrawProcess(
 //-----------------------------------------------------------------------------
 // execute Draw 
 void glsDraw(glsMat& texture){
-
 	// Clear the screen
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-//	glClearColor(0.0f, 0.4f, 0.4f, 1.0f);
 	glClearDepth(1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	float scl = 1.0;
-	if (texture.internalFormat == GL_RGB8UI) scl = 1.0f / 256.0f;
-	glsDrawProcess(shaderDraw, texture.texArray[0], scl);
+	glsShaderDrawBase* shader = 0;
+	float scl = 0;
+
+	switch (texture.internalFormat){
+	case(GL_RGB32F) : shader = shaderDraw; scl = 1.0f; break;
+	case(GL_RGB16UI) : shader = shaderDrawU; scl = 1.0f / 65536.0f; break;
+	case(GL_RGB8UI) : shader = shaderDrawU; scl = 1.0f / 256.0f; break;
+	default: assert(0);		//not implement
+	}
+
+	glsDrawProcess(shader, texture.texArray[0], scl);
+
 }
 
 

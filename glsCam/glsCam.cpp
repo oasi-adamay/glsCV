@@ -45,7 +45,7 @@ int _tmain(int argc, _TCHAR* argv[])
 		cv::flip(frame, frame, 0);				// è„â∫îΩì]
 		cvtColor(frame, frame, CV_BGR2RGB);		//channel order
 
-		frame.convertTo(frame, CV_32FC3,1.0/256.0);
+//		frame.convertTo(frame, CV_32FC3,1.0/256.0);
 
 		glsMat glsFrame(frame);
 		glsDraw(glsFrame);

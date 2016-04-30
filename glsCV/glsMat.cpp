@@ -4,6 +4,11 @@
 #include "glsMat.h"
 #include "Timer.h"
 
+#ifdef DEBUG
+#define _TMR_(...)  Timer tmr(__VA_ARGS__)
+#else
+#define _TMR_(...)
+#endif
 
 
 #define _USE_PBO_UP
@@ -122,7 +127,7 @@ GLuint glsMat::at(const int y, const int x){
 //-----------------------------------------------------------------------------
 //Upload texture from cv::Mat to GL texture
 void glsMat::CopyFrom(const Mat&src){
-	Timer tmr("-upload :\t");
+	_TMR_("-upload :\t");
 
 	CV_Assert(convFmtCV2GL(src.type()) == internalFormat);
 	CV_Assert(src.cols == width);
@@ -201,7 +206,7 @@ void glsMat::CopyFrom(const Mat&src){
 }
 
 void glsMat::CopyTo(Mat&dst){
-	Timer tmr("-download:\t");
+	_TMR_("-download:\t");
 
 	dst = Mat(Size(width, height), convFmtGL2CV(internalFormat));
 

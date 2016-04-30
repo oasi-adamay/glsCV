@@ -34,7 +34,109 @@ namespace UnitTest_glsCV
 		return false;
 	}
 
+	template <typename T>
+	int test_glsBasicOperationT(const int cvtype,const int width, const int height, int flags){
+		int errNum = 0;
 
+		Mat imgSrc0 = Mat(Size(width, height), cvtype);
+		Mat imgSrc1 = Mat(Size(width, height), cvtype);
+		Mat imgDst = Mat::zeros(imgSrc0.size(), imgSrc0.type());
+		Mat imgRef = Mat::zeros(imgSrc0.size(), imgSrc0.type());
+		Scalar scalar;
+
+		cout << "Size:" << imgSrc0.size() << endl;
+
+		//---------------------------------
+		//init Src image
+		{
+
+			RNG rng(0xFFFFFFFF);
+			for (int y = 0; y < imgSrc0.rows; y++){
+				for (int x = 0; x < imgSrc0.cols; x++){
+					T* pSrc0 = imgSrc0.ptr<T>(y, x);
+					T* pSrc1 = imgSrc1.ptr<T>(y, x);
+					for (int ch = 0; ch < imgSrc0.channels(); ch++){
+						*pSrc0++ = randu<T>();
+						*pSrc1++ = randu<T>();
+					}
+				}
+			}
+
+			//prevent div by 0
+			for (int y = 0; y < imgSrc1.rows; y++){
+				for (int x = 0; x < imgSrc1.cols; x++){
+					T* pSrc1 = imgSrc1.ptr<T>(y, x);
+					for (int ch = 0; ch < imgSrc0.channels(); ch++){
+						if (fabs((float)(*pSrc1)) < FLT_MIN) *pSrc1++ = 1;
+					}
+				}
+			}
+
+			scalar[0] = (float)rng.gaussian(1.0);
+			scalar[1] = (float)rng.gaussian(1.0);
+			scalar[2] = (float)rng.gaussian(1.0);
+			scalar[3] = (float)rng.gaussian(1.0);
+
+		}
+
+		//---------------------------------
+		switch (flags){
+		case(0) : cv::add(imgSrc0, imgSrc1, imgRef); break;
+		case(1) : cv::subtract(imgSrc0, imgSrc1, imgRef); break;
+		case(2) : cv::multiply(imgSrc0, imgSrc1, imgRef); break;
+		case(3) : cv::divide(imgSrc0, imgSrc1, imgRef); break;
+		case(4) : cv::add(scalar, imgSrc1, imgRef); break;
+		case(5) : cv::subtract(scalar, imgSrc1, imgRef); break;
+		case(6) : cv::multiply(scalar, imgSrc1, imgRef); break;
+		case(7) : cv::divide(scalar, imgSrc1, imgRef); break;
+		case(8) : cv::min(imgSrc0, imgSrc1, imgRef); break;
+		case(9) : cv::max(imgSrc0, imgSrc1, imgRef); break;
+		case(10) : cv::min(scalar, imgSrc1, imgRef); break;
+		case(11) : cv::max(scalar, imgSrc1, imgRef); break;
+		};
+
+		//---------------------------------
+		switch (flags){
+		case(0) : glsAdd(imgSrc0, imgSrc1, imgDst); break;
+		case(1) : glsSubtract(imgSrc0, imgSrc1, imgDst); break;
+		case(2) : glsMultiply(imgSrc0, imgSrc1, imgDst); break;
+		case(3) : glsDivide(imgSrc0, imgSrc1, imgDst); break;
+		case(4) : glsAdd(scalar, imgSrc1, imgDst); break;
+		case(5) : glsSubtract(scalar, imgSrc1, imgDst); break;
+		case(6) : glsMultiply(scalar, imgSrc1, imgDst); break;
+		case(7) : glsDivide(scalar, imgSrc1, imgDst); break;
+		case(8) : glsMin(imgSrc0, imgSrc1, imgDst); break;
+		case(9) : glsMax(imgSrc0, imgSrc1, imgDst); break;
+		case(10) : glsMin(scalar, imgSrc1, imgDst); break;
+		case(11) : glsMax(scalar, imgSrc1, imgDst); break;
+		};
+
+
+		//verify
+		{
+			//verify
+			for (int y = 0; y < imgRef.rows; y++){
+				for (int x = 0; x < imgRef.cols; x++){
+					T* pRef = imgRef.ptr<T>(y, x);
+					T* pDst = imgDst.ptr<T>(y, x);
+					for (int ch = 0; ch < imgRef.channels(); ch++){
+						T ref = *pRef++;
+						T dst = *pDst++;
+						if (ref != dst){
+							cout << cv::format("(%4d,%4d,%4d)\t", y, x, ch);
+							cout << ref << "\t";
+							cout << dst << "\t";
+							cout << endl;
+							errNum++;
+						}
+					}
+				}
+			}
+		}
+		cout << "errNum:" << errNum << endl;
+
+		return errNum;
+	}
 
 	int test_glsBasicOperation(const int width, const int height, const int flags){
 		int ULPS = 4096;
@@ -174,7 +276,7 @@ namespace UnitTest_glsCV
 			cout << __FUNCTION__ << endl;
 			const int width = 32;
 			const int height = 32;
-			int errNum = test_glsBasicOperation(width, height, 0);
+			int errNum = test_glsBasicOperationT<float>(CV_32FC1,width, height, 0);
 			Assert::AreEqual(0, errNum);
 		}
 
@@ -183,7 +285,7 @@ namespace UnitTest_glsCV
 			cout << __FUNCTION__ << endl;
 			const int width = 32;
 			const int height = 32;
-			int errNum = test_glsBasicOperation(width, height, 1);
+			int errNum = test_glsBasicOperationT<float>(CV_32FC1, width, height, 1);
 			Assert::AreEqual(0, errNum);
 		}
 
@@ -193,7 +295,7 @@ namespace UnitTest_glsCV
 			cout << __FUNCTION__ << endl;
 			const int width = 32;
 			const int height = 32;
-			int errNum = test_glsBasicOperation(width,height,2);
+			int errNum = test_glsBasicOperationT<float>(CV_32FC1, width, height, 2);
 			Assert::AreEqual(0, errNum);
 		}
 
@@ -202,6 +304,7 @@ namespace UnitTest_glsCV
 			cout << __FUNCTION__ << endl;
 			const int width = 32;
 			const int height = 32;
+//			int errNum = test_glsBasicOperationT<float>(CV_32FC1, width, height, 3);
 			int errNum = test_glsBasicOperation(width, height, 3);
 			Assert::AreEqual(0, errNum);
 		}
@@ -211,7 +314,8 @@ namespace UnitTest_glsCV
 			cout << __FUNCTION__ << endl;
 			const int width = 32;
 			const int height = 32;
-			int errNum = test_glsBasicOperation(width, height, 4);
+			int errNum = test_glsBasicOperationT<float>(CV_32FC1, width, height, 4);
+//			int errNum = test_glsBasicOperation(width, height, 4);
 			Assert::AreEqual(0, errNum);
 		}
 
@@ -220,7 +324,8 @@ namespace UnitTest_glsCV
 			cout << __FUNCTION__ << endl;
 			const int width = 32;
 			const int height = 32;
-			int errNum = test_glsBasicOperation(width, height, 5);
+			int errNum = test_glsBasicOperationT<float>(CV_32FC1, width, height, 5);
+//			int errNum = test_glsBasicOperation(width, height, 5);
 			Assert::AreEqual(0, errNum);
 		}
 
@@ -230,7 +335,8 @@ namespace UnitTest_glsCV
 			cout << __FUNCTION__ << endl;
 			const int width = 32;
 			const int height = 32;
-			int errNum = test_glsBasicOperation(width, height, 6);
+			int errNum = test_glsBasicOperationT<float>(CV_32FC1, width, height, 6);
+//			int errNum = test_glsBasicOperation(width, height, 6);
 			Assert::AreEqual(0, errNum);
 		}
 
@@ -248,7 +354,8 @@ namespace UnitTest_glsCV
 			cout << __FUNCTION__ << endl;
 			const int width = 32;
 			const int height = 32;
-			int errNum = test_glsBasicOperation(width, height, 8);
+			int errNum = test_glsBasicOperationT<float>(CV_32FC1, width, height, 8);
+//			int errNum = test_glsBasicOperation(width, height, 8);
 			Assert::AreEqual(0, errNum);
 		}
 
@@ -257,7 +364,8 @@ namespace UnitTest_glsCV
 			cout << __FUNCTION__ << endl;
 			const int width = 32;
 			const int height = 32;
-			int errNum = test_glsBasicOperation(width, height, 9);
+			int errNum = test_glsBasicOperationT<float>(CV_32FC1, width, height, 9);
+//			int errNum = test_glsBasicOperation(width, height, 9);
 			Assert::AreEqual(0, errNum);
 		}
 
@@ -266,7 +374,8 @@ namespace UnitTest_glsCV
 			cout << __FUNCTION__ << endl;
 			const int width = 32;
 			const int height = 32;
-			int errNum = test_glsBasicOperation(width, height, 10);
+			int errNum = test_glsBasicOperationT<float>(CV_32FC1, width, height, 10);
+//			int errNum = test_glsBasicOperation(width, height, 10);
 			Assert::AreEqual(0, errNum);
 		}
 
@@ -275,7 +384,8 @@ namespace UnitTest_glsCV
 			cout << __FUNCTION__ << endl;
 			const int width = 32;
 			const int height = 32;
-			int errNum = test_glsBasicOperation(width, height, 11);
+			int errNum = test_glsBasicOperationT<float>(CV_32FC1, width, height, 11);
+//			int errNum = test_glsBasicOperation(width, height, 11);
 			Assert::AreEqual(0, errNum);
 		}
 
