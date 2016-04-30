@@ -4,6 +4,34 @@
 #include "glsBasicOperation.h"
 
 
+class glsShaderScalarOperation : public glsShaderBase
+{
+public:
+	glsShaderScalarOperation(void);
+
+	//attribute location
+	GLuint position;
+	//uniform  location
+	GLuint texSrc;
+	GLuint v4_scalar;
+	GLuint i_flags;
+};
+
+
+
+class glsShaderBinaryOperation : public glsShaderBase
+{
+public:
+	glsShaderBinaryOperation(void);
+
+	//attribute location
+	GLuint position;
+	//uniform  location
+	GLuint texSrc0;
+	GLuint texSrc1;
+	GLuint i_flags;
+};
+
 
 //-----------------------------------------------------------------------------
 //global 
@@ -430,79 +458,101 @@ void glslBinaryOperation(
 
 //スカラと配列の 要素毎の和を求めます．
 void glsAdd(const vec4& scalar, const glsMat& src, glsMat& dst){
+	assert(src.type == GL_FLOAT);
 	glslScalarOperation(shaderScalarOperation, scalar, src.texArray, dst.texArray, OPCODE_ADD);
 }
 
 //2 つの配列同士の 要素毎の和を求めます
 void glsAdd(const glsMat& src0, const glsMat& src1, glsMat& dst)
 {
+	assert(src0.type == GL_FLOAT);
+	assert(src1.type == GL_FLOAT);
 	glslBinaryOperation(shaderBinaryOperation, src0.texArray, src1.texArray, dst.texArray, OPCODE_ADD);
 }
 
 
 //スカラと配列の 要素毎の差を求めます．
 void glsSubtract(const vec4& scalar, const glsMat& src, glsMat& dst){
+	assert(src.type == GL_FLOAT);
 	glslScalarOperation(shaderScalarOperation, scalar, src.texArray, dst.texArray, OPCODE_SUB);
 }
 
 //2 つの配列同士の 要素毎の差を求めます
 void glsSubtract(const glsMat& src0, const glsMat& src1, glsMat& dst)
 {
+	assert(src0.type == GL_FLOAT);
+	assert(src1.type == GL_FLOAT);
 	glslBinaryOperation(shaderBinaryOperation, src0.texArray, src1.texArray, dst.texArray, OPCODE_SUB);
 }
 
 
 //スカラと配列の 要素毎の積を求めます．
 void glsMultiply(const vec4& scalar, const glsMat& src, glsMat& dst){
+	assert(src.type == GL_FLOAT);
 	glslScalarOperation(shaderScalarOperation, scalar, src.texArray, dst.texArray, OPCODE_MUL);
 }
 
 //2 つの配列同士の 要素毎の積を求めます
 void glsMultiply(const glsMat& src0, const glsMat& src1, glsMat& dst)
 {
+	assert(src0.type == GL_FLOAT);
+	assert(src1.type == GL_FLOAT);
 	glslBinaryOperation(shaderBinaryOperation, src0.texArray, src1.texArray, dst.texArray, OPCODE_MUL);
 }
 
 //スカラと配列の 要素毎の商を求めます．
 void glsDivide(const vec4& scalar, const glsMat& src, glsMat& dst){
+	assert(src.type == GL_FLOAT);
 	glslScalarOperation(shaderScalarOperation, scalar, src.texArray, dst.texArray, OPCODE_DIV);
 }
 
 
 //2 つの配列同士の  要素毎の商を求めます．
 void glsDivide(const glsMat& src0, const glsMat& src1, glsMat& dst){
+	assert(src0.type == GL_FLOAT);
+	assert(src1.type == GL_FLOAT);
 	glslBinaryOperation(shaderBinaryOperation, src0.texArray, src1.texArray, dst.texArray, OPCODE_DIV);
 }
 
 //スカラと配列の 要素毎の最小値を求めます．
 void glsMin(const vec4& scalar, const glsMat& src, glsMat& dst){
+	assert(src.type == GL_FLOAT);
 	glslScalarOperation(shaderScalarOperation, scalar, src.texArray, dst.texArray, OPCODE_MIN);
 }
 
 //2 つの配列同士の  要素毎の最小値を求めます．
 void glsMin(const glsMat& src0, const glsMat& src1, glsMat& dst){
+	assert(src0.type == GL_FLOAT);
+	assert(src1.type == GL_FLOAT);
 	glslBinaryOperation(shaderBinaryOperation, src0.texArray, src1.texArray, dst.texArray, OPCODE_MIN);
 }
 
 //スカラと配列の 要素毎の最大値を求めます．
 void glsMax(const vec4& scalar, const glsMat& src, glsMat& dst){
+	assert(src.type == GL_FLOAT);
 	glslScalarOperation(shaderScalarOperation, scalar, src.texArray, dst.texArray, OPCODE_MAX);
 }
 
 //2 つの配列同士の  要素毎の最大値を求めます．
 void glsMax(const glsMat& src0, const glsMat& src1, glsMat& dst){
+	assert(src0.type == GL_FLOAT);
+	assert(src1.type == GL_FLOAT);
 	glslBinaryOperation(shaderBinaryOperation, src0.texArray, src1.texArray, dst.texArray, OPCODE_MAX);
 }
 
 //2 つのフーリエスペクトル同士の要素毎の乗算を行います．
 //conj = ture の場合、2 番目の配列を複素共役に変更できます．
 void glsMulSpectrums(const glsMat& src0, const glsMat& src1, glsMat& dst, bool conj){
+	assert(src0.internalFormat == GL_RG32F);
+	assert(src1.internalFormat == GL_RG32F);
 	if (conj)glslBinaryOperation(shaderBinaryOperation, src0.texArray, src1.texArray, dst.texArray, OPCODE_MUL_SPCETRUM_CONJ);
 	else glslBinaryOperation(shaderBinaryOperation, src0.texArray, src1.texArray, dst.texArray, OPCODE_MUL_SPCETRUM);
 }
 
 //2 つのフーリエスペクトル同士の  要素毎の位相限定相関を求めます．
 void glsMulSpectrumsPhaseOnly(const glsMat& src0, const glsMat& src1, glsMat& dst){
+	assert(src0.internalFormat == GL_RG32F);
+	assert(src1.internalFormat == GL_RG32F);
 	glslBinaryOperation(shaderBinaryOperation, src0.texArray, src1.texArray, dst.texArray, OPCODE_MUL_SPCETRUM_POC);
 }
 

@@ -5,33 +5,6 @@
 #include "glsMat.h"
 
 
-class glsShaderScalarOperation : public glsShaderBase
-{
-public:
-	glsShaderScalarOperation(void);
-
-	//attribute location
-	GLuint position;
-	//uniform  location
-	GLuint texSrc;
-	GLuint v4_scalar;
-	GLuint i_flags;
-};
-
-
-
-class glsShaderBinaryOperation : public glsShaderBase
-{
-public:
-	glsShaderBinaryOperation(void);
-
-	//attribute location
-	GLuint position;
-	//uniform  location
-	GLuint texSrc0;
-	GLuint texSrc1;
-	GLuint i_flags;
-};
 
 
 
