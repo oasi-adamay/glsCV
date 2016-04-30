@@ -43,12 +43,16 @@ int _tmain(int argc, _TCHAR* argv[])
 		imshow("[OCV]", frame.clone());
 
 		cv::flip(frame, frame, 0);				// è„â∫îΩì]
-		cvtColor(frame, frame, CV_BGR2RGB);		//channel order
-
-//		frame.convertTo(frame, CV_32FC3,1.0/256.0);
+//		cvtColor(frame, frame, CV_BGR2RGB);		//channel order
+		cvtColor(frame, frame, CV_BGR2GRAY);	//to gray
 
 		glsMat glsFrame(frame);
+//		glsMat glsFrameFlt(glsFrame.width, glsFrame.height,GL_RGB32F);
+//		glsConvert(glsFrame, glsFrameFlt, 1.0f / 256.0f);
+
 		glsDraw(glsFrame);
+//		glsDraw(glsFrameFlt);
+
 		glfwSwapBuffers(window);  // Swap buffers
 		glfwPollEvents();
 	}

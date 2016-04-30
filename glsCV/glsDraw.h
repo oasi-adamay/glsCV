@@ -10,7 +10,7 @@
 void glsDrawInit(void);
 void glsDrawTerminate(void);
 
-void glsDraw(glsMat& texture);
+void glsDraw(glsMat& src);
 
 
 
