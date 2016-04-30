@@ -35,7 +35,9 @@ void glsMulSpectrums(const glsMat& src0, const glsMat& src1, glsMat& dst, bool c
 void glsMulSpectrumsPhaseOnly(const glsMat& src0, const glsMat& src1, glsMat& dst);
 void glsMagSpectrums(const glsMat& src, glsMat& dst);
 
-
+void glsLog(const glsMat& src, glsMat& dst);
+void glsExp(const glsMat& src, glsMat& dst);
+void glsPow(const glsMat& src, const float& power, glsMat& dst);
 
 
 
@@ -62,6 +64,11 @@ void glsMulSpectrums(const Mat& src0, const Mat& src1, Mat& dst, bool conj = fal
 void glsMulSpectrumsPhaseOnly(const Mat& src0, const Mat& src1, Mat& dst);
 void glsMagSpectrums(const Mat& src, Mat& dst);
 
+void glsLog(const Mat& src, Mat& dst);
+void glsExp(const Mat& src, Mat& dst);
+void glsPow(const Mat& src, const float& power, Mat& dst);
+
+	
 
 
 #endif

@@ -65,10 +65,13 @@ namespace UnitTest_glsCV
 		MUL_SPECTRUMS_CONJ,
 		MUL_SPECTRUMS_POC,
 		MAG_SPECTRUMS,
+		LOG,
+		EXP,
+		POW,
 	};
 
 	template <typename T>
-	int test_glsBasicOperationT(const int cvtype, int flags, int maxUlps = 1){
+	int test_glsBasicOperationT(const int cvtype, int flags, int maxUlps = 2){
 		const int width = 32;
 		const int height = 24;
 
@@ -188,7 +191,6 @@ namespace UnitTest_glsCV
 			glsMulSpectrumsPhaseOnly(imgSrc0, imgSrc1, imgDst);
 			break;
 		case(E_TEST::MAG_SPECTRUMS) :
-			Mat mag;
 			cv::magnitude(imgSrc0, imgSrc1, imgRef);
 			{
 				vector<Mat> tmp(2);
@@ -199,6 +201,20 @@ namespace UnitTest_glsCV
 				glsMagSpectrums(imgSrc, imgDst);
 			}
 			break;
+		case(E_TEST::LOG) :
+			cv::log(imgSrc1, imgRef);
+			glsLog(imgSrc1, imgDst);
+			break;
+		case(E_TEST::EXP) :
+			cv::exp(imgSrc1, imgRef);
+			glsExp(imgSrc1, imgDst);
+			break;
+		case(E_TEST::POW) :
+			float power = (float)scalar[0];
+			cv::pow(imgSrc1, power, imgRef);
+			glsPow(imgSrc1, power, imgDst);
+			break;
+
 		};
 
 
@@ -347,6 +363,26 @@ namespace UnitTest_glsCV
 			Assert::AreEqual(0, errNum);
 		}
 
+		TEST_METHOD(TestMethod_glsLog)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_glsBasicOperationT<float>(CV_32FC1, E_TEST::LOG,64);
+			Assert::AreEqual(0, errNum);
+		}
+
+		TEST_METHOD(TestMethod_glsExp)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_glsBasicOperationT<float>(CV_32FC1, E_TEST::EXP);
+			Assert::AreEqual(0, errNum);
+		}
+
+		TEST_METHOD(TestMethod_glsPow)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_glsBasicOperationT<float>(CV_32FC1, E_TEST::POW);
+			Assert::AreEqual(0, errNum);
+		}
 
 
 	};

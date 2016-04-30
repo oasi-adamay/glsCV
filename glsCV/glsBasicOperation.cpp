@@ -58,8 +58,9 @@ void glsBasicOperationTerminate(void){
 #define OPCODE_MUL_SPCETRUM_CONJ 7
 #define OPCODE_MUL_SPCETRUM_POC  8
 #define OPCODE_MAG_SPCETRUM		 9
-
-
+#define OPCODE_LOG 10
+#define OPCODE_EXP 11
+#define OPCODE_POW 12
 
 static const char vertexShaderCode[] =
 "#version 330 core\n"
@@ -102,6 +103,15 @@ glsShaderScalarOperation::glsShaderScalarOperation(void){
 		"		break;\n"
 		"	case(9)://OPCODE_MAG_SPCETRUM \n"
 		"		dst.r = sqrt(src.r*src.r +  src.g*src.g);\n"
+		"		break;\n"
+		"	case(10)://OPCODE_LOG \n"
+		"		dst = log(abs(src));\n"
+		"		break;\n"
+		"	case(11)://OPCODE_EXP \n"
+		"		dst = exp(src);\n"
+		"		break;\n"
+		"	case(12)://OPCODE_POW \n"
+		"		dst = pow(src,scalar);\n"
 		"		break;\n"
 		"	default: dst = src;\n"
 		"   }\n"
@@ -567,6 +577,28 @@ void glsMagSpectrums(const glsMat& src, glsMat& dst){
 	glslScalarOperation(shaderScalarOperation, scalar, src.texArray, dst.texArray, OPCODE_MAG_SPCETRUM);
 }
 
+//各配列要素の絶対値の自然対数を求めます．
+void glsLog(const glsMat& src, glsMat& dst){
+	assert(src.type == GL_FLOAT);
+	vec4 scalar(1.0, 1.0, 1.0, 1.0);
+	glslScalarOperation(shaderScalarOperation, scalar, src.texArray, dst.texArray, OPCODE_LOG);
+}
+
+//各配列要素を指数として，自然対数の底（ネイピア数）e のべき乗を求めます．
+void glsExp(const glsMat& src, glsMat& dst){
+	assert(src.type == GL_FLOAT);
+	vec4 scalar(1.0, 1.0, 1.0, 1.0);
+	glslScalarOperation(shaderScalarOperation, scalar, src.texArray, dst.texArray, OPCODE_EXP);
+}
+
+//各配列要素を累乗します．
+void glsPow(const glsMat& src, const float& power, glsMat& dst){
+	assert(src.type == GL_FLOAT);
+	vec4 scalar(power, power, power, power);
+	glslScalarOperation(shaderScalarOperation, scalar, src.texArray, dst.texArray, OPCODE_POW);
+}
+
+
 
 
 
@@ -806,6 +838,30 @@ void glsMagSpectrums(const Mat& src, Mat& dst){
 	glsMagSpectrums(_src, _dst);
 	_dst.CopyTo(dst);	//download
 }
+
+void glsLog(const Mat& src, Mat& dst){
+	glsMat _src(src, false);
+	glsMat _dst(src, false);
+	_src.CopyFrom(src);					//upload
+	glsLog(_src, _dst);					//execute
+	_dst.CopyTo(dst);					//download
+}
+void glsExp(const Mat& src, Mat& dst){
+	glsMat _src(src, false);
+	glsMat _dst(src, false);
+	_src.CopyFrom(src);					//upload
+	glsExp(_src, _dst);					//execute
+	_dst.CopyTo(dst);					//download
+}
+void glsPow(const Mat& src, const float& power, Mat& dst){
+	glsMat _src(src, false);
+	glsMat _dst(src, false);
+	_src.CopyFrom(src);					//upload
+	glsPow(_src, power, _dst);					//execute
+	_dst.CopyTo(dst);					//download
+
+}
+
 
 
 
