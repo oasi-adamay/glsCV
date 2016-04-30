@@ -48,6 +48,25 @@ namespace UnitTest_glsCV
 		return AlmostEqualUlpsAbsEps(val0, val1, maxUlps, FLT_MIN);
 	}
 
+	enum E_TEST {
+		ADD,
+		SUB,
+		MUL,
+		DIV,
+		MIN,
+		MAX,
+		ADD_S,
+		SUB_S,
+		MUL_S,
+		DIV_S,
+		MIN_S,
+		MAX_S,
+		MUL_SPECTRUMS,
+		MUL_SPECTRUMS_CONJ,
+		MUL_SPECTRUMS_POC,
+		MAG_SPECTRUMS,
+	};
+
 	template <typename T>
 	int test_glsBasicOperationT(const int cvtype, int flags, int maxUlps = 1){
 		const int width = 32;
@@ -98,51 +117,88 @@ namespace UnitTest_glsCV
 
 		//---------------------------------
 		switch (flags){
-		case(0) : cv::add(imgSrc0, imgSrc1, imgRef); break;
-		case(1) : cv::subtract(imgSrc0, imgSrc1, imgRef); break;
-		case(2) : cv::multiply(imgSrc0, imgSrc1, imgRef); break;
-		case(3) : cv::divide(imgSrc0, imgSrc1, imgRef); break;
-		case(4) : cv::add(scalar, imgSrc1, imgRef); break;
-		case(5) : cv::subtract(scalar, imgSrc1, imgRef); break;
-		case(6) : cv::multiply(scalar, imgSrc1, imgRef); break;
-		case(7) : cv::divide(scalar, imgSrc1, imgRef); break;
-		case(8) : cv::min(imgSrc0, imgSrc1, imgRef); break;
-		case(9) : cv::max(imgSrc0, imgSrc1, imgRef); break;
-		case(10) : cv::min(scalar, imgSrc1, imgRef); break;
-		case(11) : cv::max(scalar, imgSrc1, imgRef); break;
-		case(12) : cv::mulSpectrums(imgSrc0, imgSrc1, imgRef, 0, false); break;
-		case(13) : cv::mulSpectrums(imgSrc0, imgSrc1, imgRef, 0, true); break;
-		case(14) :
-			Mat corr;
-			cv::mulSpectrums(imgSrc0, imgSrc1, corr, 0, true);
-			vector<Mat> tmp(2);
-			cv::split(corr, tmp);
-			Mat mag;
-			cv::magnitude(tmp[0], tmp[1], mag);
-			cv::divide(tmp[0], mag, tmp[0]);
-			cv::divide(tmp[1], mag, tmp[1]);
-			cv::merge(tmp, imgRef);
+		case(E_TEST::ADD) :
+			cv::add(imgSrc0, imgSrc1, imgRef); 
+			glsAdd(imgSrc0, imgSrc1, imgDst);
 			break;
-		};
-
-		//---------------------------------
-		switch (flags){
-		case(0) : glsAdd(imgSrc0, imgSrc1, imgDst); break;
-		case(1) : glsSubtract(imgSrc0, imgSrc1, imgDst); break;
-		case(2) : glsMultiply(imgSrc0, imgSrc1, imgDst); break;
-		case(3) : glsDivide(imgSrc0, imgSrc1, imgDst); break;
-		case(4) : glsAdd(scalar, imgSrc1, imgDst); break;
-		case(5) : glsSubtract(scalar, imgSrc1, imgDst); break;
-		case(6) : glsMultiply(scalar, imgSrc1, imgDst); break;
-		case(7) : glsDivide(scalar, imgSrc1, imgDst); break;
-		case(8) : glsMin(imgSrc0, imgSrc1, imgDst); break;
-		case(9) : glsMax(imgSrc0, imgSrc1, imgDst); break;
-		case(10) : glsMin(scalar, imgSrc1, imgDst); break;
-		case(11) : glsMax(scalar, imgSrc1, imgDst); break;
-		case(12) : glsMulSpectrums(imgSrc0, imgSrc1, imgDst, false); break;
-		case(13) : glsMulSpectrums(imgSrc0, imgSrc1, imgDst, true); break;
-		case(14) : glsMulSpectrumsPhaseOnly(imgSrc0, imgSrc1, imgDst); break;
-
+		case(E_TEST::SUB):
+			cv::subtract(imgSrc0, imgSrc1, imgRef); 
+			glsSubtract(imgSrc0, imgSrc1, imgDst); 
+			break;
+		case(E_TEST::MUL) :
+			cv::multiply(imgSrc0, imgSrc1, imgRef); 
+			glsMultiply(imgSrc0, imgSrc1, imgDst);
+			break;
+		case(E_TEST::DIV) :
+			cv::divide(imgSrc0, imgSrc1, imgRef); 
+			glsDivide(imgSrc0, imgSrc1, imgDst);
+			break;
+		case(E_TEST::ADD_S) :
+			cv::add(scalar, imgSrc1, imgRef); 
+			glsAdd(scalar, imgSrc1, imgDst);
+			break;
+		case(E_TEST::SUB_S) :
+			cv::subtract(scalar, imgSrc1, imgRef);
+			glsSubtract(scalar, imgSrc1, imgDst);
+			break;
+		case(E_TEST::MUL_S) :
+			cv::multiply(scalar, imgSrc1, imgRef); 
+			glsMultiply(scalar, imgSrc1, imgDst);
+			break;
+		case(E_TEST::DIV_S) :
+			cv::divide(scalar, imgSrc1, imgRef);
+			glsDivide(scalar, imgSrc1, imgDst);
+			break;
+		case(E_TEST::MIN) :
+			cv::min(imgSrc0, imgSrc1, imgRef); 
+			glsMin(imgSrc0, imgSrc1, imgDst);
+			break;
+		case(E_TEST::MAX) :
+			cv::max(imgSrc0, imgSrc1, imgRef);
+			glsMax(imgSrc0, imgSrc1, imgDst);
+			break;
+		case(E_TEST::MIN_S) :
+			cv::min(scalar, imgSrc1, imgRef); 
+			glsMin(scalar, imgSrc1, imgDst);
+			break;
+		case(E_TEST::MAX_S) :
+			cv::max(scalar, imgSrc1, imgRef); 
+			glsMax(scalar, imgSrc1, imgDst);
+			break;
+		case(E_TEST::MUL_SPECTRUMS) :
+			cv::mulSpectrums(imgSrc0, imgSrc1, imgRef, 0, false); 
+			glsMulSpectrums(imgSrc0, imgSrc1, imgDst, false);
+			break;
+		case(E_TEST::MUL_SPECTRUMS_CONJ) :
+			cv::mulSpectrums(imgSrc0, imgSrc1, imgRef, 0, true); 
+			glsMulSpectrums(imgSrc0, imgSrc1, imgDst, true);
+			break;
+		case(E_TEST::MUL_SPECTRUMS_POC) :
+			{
+				Mat corr;
+				cv::mulSpectrums(imgSrc0, imgSrc1, corr, 0, true);
+				vector<Mat> tmp(2);
+				cv::split(corr, tmp);
+				Mat mag;
+				cv::magnitude(tmp[0], tmp[1], mag);
+				cv::divide(tmp[0], mag, tmp[0]);
+				cv::divide(tmp[1], mag, tmp[1]);
+				cv::merge(tmp, imgRef);
+			}
+			glsMulSpectrumsPhaseOnly(imgSrc0, imgSrc1, imgDst);
+			break;
+		case(E_TEST::MAG_SPECTRUMS) :
+			Mat mag;
+			cv::magnitude(imgSrc0, imgSrc1, imgRef);
+			{
+				vector<Mat> tmp(2);
+				tmp[0] = imgSrc0;
+				tmp[1] = imgSrc1;
+				Mat imgSrc;
+				cv::merge(tmp, imgSrc);
+				glsMagSpectrums(imgSrc, imgDst);
+			}
+			break;
 		};
 
 
@@ -181,14 +237,14 @@ namespace UnitTest_glsCV
 		TEST_METHOD(TestMethod_glsAdd)
 		{
 			cout << __FUNCTION__ << endl;
-			int errNum = test_glsBasicOperationT<float>(CV_32FC4,0);
+			int errNum = test_glsBasicOperationT<float>(CV_32FC4, E_TEST::ADD);
 			Assert::AreEqual(0, errNum);
 		}
 
 		TEST_METHOD(TestMethod_glsSubtract)
 		{
 			cout << __FUNCTION__ << endl;
-			int errNum = test_glsBasicOperationT<float>(CV_32FC3,1);
+			int errNum = test_glsBasicOperationT<float>(CV_32FC3,E_TEST::SUB);
 			Assert::AreEqual(0, errNum);
 		}
 
@@ -196,28 +252,28 @@ namespace UnitTest_glsCV
 		TEST_METHOD(TestMethod_glsMultiply)
 		{
 			cout << __FUNCTION__ << endl;
-			int errNum = test_glsBasicOperationT<float>(CV_32FC2,2);
+			int errNum = test_glsBasicOperationT<float>(CV_32FC2, E_TEST::MUL);
 			Assert::AreEqual(0, errNum);
 		}
 
 		TEST_METHOD(TestMethod_glsDivide)
 		{
 			cout << __FUNCTION__ << endl;
-			int errNum = test_glsBasicOperationT<float>(CV_32FC1, 3, 4);
+			int errNum = test_glsBasicOperationT<float>(CV_32FC1, E_TEST::DIV, 4);
 			Assert::AreEqual(0, errNum);
 		}
 
 		TEST_METHOD(TestMethod_glsAdd_S)
 		{
 			cout << __FUNCTION__ << endl;
-			int errNum = test_glsBasicOperationT<float>(CV_32FC1, 4);
+			int errNum = test_glsBasicOperationT<float>(CV_32FC1, E_TEST::ADD_S);
 			Assert::AreEqual(0, errNum);
 		}
 
 		TEST_METHOD(TestMethod_glsSubtract_S)
 		{
 			cout << __FUNCTION__ << endl;
-			int errNum = test_glsBasicOperationT<float>(CV_32FC1, 5);
+			int errNum = test_glsBasicOperationT<float>(CV_32FC1, E_TEST::SUB_S);
 			Assert::AreEqual(0, errNum);
 		}
 
@@ -225,63 +281,69 @@ namespace UnitTest_glsCV
 		TEST_METHOD(TestMethod_glsMultiply_S)
 		{
 			cout << __FUNCTION__ << endl;
-			int errNum = test_glsBasicOperationT<float>(CV_32FC1, 6);
+			int errNum = test_glsBasicOperationT<float>(CV_32FC1, E_TEST::MUL_S);
 			Assert::AreEqual(0, errNum);
 		}
 
 		TEST_METHOD(TestMethod_glsDivide_S)
 		{
 			cout << __FUNCTION__ << endl;
-			int errNum = test_glsBasicOperationT<float>(CV_32FC1, 7,4);
+			int errNum = test_glsBasicOperationT<float>(CV_32FC1, E_TEST::DIV_S, 4);
 			Assert::AreEqual(0, errNum);
 		}
 
 		TEST_METHOD(TestMethod_glsMin)
 		{
 			cout << __FUNCTION__ << endl;
-			int errNum = test_glsBasicOperationT<float>(CV_32FC1, 8);
+			int errNum = test_glsBasicOperationT<float>(CV_32FC1, E_TEST::MIN);
 			Assert::AreEqual(0, errNum);
 		}
 
 		TEST_METHOD(TestMethod_glsMax)
 		{
 			cout << __FUNCTION__ << endl;
-			int errNum = test_glsBasicOperationT<float>(CV_32FC1,  9);
+			int errNum = test_glsBasicOperationT<float>(CV_32FC1, E_TEST::MAX);
 			Assert::AreEqual(0, errNum);
 		}
 
 		TEST_METHOD(TestMethod_glsMin_S)
 		{
 			cout << __FUNCTION__ << endl;
-			int errNum = test_glsBasicOperationT<float>(CV_32FC1, 10);
+			int errNum = test_glsBasicOperationT<float>(CV_32FC1, E_TEST::MIN_S);
 			Assert::AreEqual(0, errNum);
 		}
 
 		TEST_METHOD(TestMethod_glsMax_S)
 		{
 			cout << __FUNCTION__ << endl;
-			int errNum = test_glsBasicOperationT<float>(CV_32FC1, 11);
+			int errNum = test_glsBasicOperationT<float>(CV_32FC1, E_TEST::MAX_S);
 			Assert::AreEqual(0, errNum);
 		}
 
 		TEST_METHOD(TestMethod_glsMulSpectrums)
 		{
 			cout << __FUNCTION__ << endl;
-			int errNum = test_glsBasicOperationT<float>(CV_32FC2, 12 , 1024);
+			int errNum = test_glsBasicOperationT<float>(CV_32FC2, E_TEST::MUL_SPECTRUMS, 1024);
 			Assert::AreEqual(0, errNum);
 		}
 
 		TEST_METHOD(TestMethod_glsMulSpectrumsConj)
 		{
 			cout << __FUNCTION__ << endl;
-			int errNum = test_glsBasicOperationT<float>(CV_32FC2, 13 , 128);
+			int errNum = test_glsBasicOperationT<float>(CV_32FC2, E_TEST::MUL_SPECTRUMS_CONJ, 128);
 			Assert::AreEqual(0, errNum);
 		}
 
 		TEST_METHOD(TestMethod_glsMulSpectrumsPhaseOnly)
 		{
 			cout << __FUNCTION__ << endl;
-			int errNum = test_glsBasicOperationT<float>(CV_32FC2, 14 , 128);
+			int errNum = test_glsBasicOperationT<float>(CV_32FC2, E_TEST::MUL_SPECTRUMS_POC, 256);
+			Assert::AreEqual(0, errNum);
+		}
+		TEST_METHOD(TestMethod_glsMagSpectrums)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_glsBasicOperationT<float>(CV_32FC1, E_TEST::MAG_SPECTRUMS);
 			Assert::AreEqual(0, errNum);
 		}
 

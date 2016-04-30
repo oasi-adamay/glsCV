@@ -57,6 +57,7 @@ void glsBasicOperationTerminate(void){
 #define OPCODE_MUL_SPCETRUM		 6
 #define OPCODE_MUL_SPCETRUM_CONJ 7
 #define OPCODE_MUL_SPCETRUM_POC  8
+#define OPCODE_MAG_SPCETRUM		 9
 
 
 
@@ -98,6 +99,9 @@ glsShaderScalarOperation::glsShaderScalarOperation(void){
 		"		dst.g = scalar.g > src.g? scalar.g : src.g;\n"
 		"		dst.b = scalar.b > src.b? scalar.b : src.b;\n"
 		"		dst.a = scalar.a > src.a? scalar.a : src.a;\n"
+		"		break;\n"
+		"	case(9)://OPCODE_MAG_SPCETRUM \n"
+		"		dst.r = sqrt(src.r*src.r +  src.g*src.g);\n"
 		"		break;\n"
 		"	default: dst = src;\n"
 		"   }\n"
@@ -556,7 +560,12 @@ void glsMulSpectrumsPhaseOnly(const glsMat& src0, const glsMat& src1, glsMat& ds
 	glslBinaryOperation(shaderBinaryOperation, src0.texArray, src1.texArray, dst.texArray, OPCODE_MUL_SPCETRUM_POC);
 }
 
-
+//複素行列要素の絶対値の2乗を求めます．
+void glsMagSpectrums(const glsMat& src, glsMat& dst){
+	assert(src.internalFormat == GL_RG32F);
+	vec4 scalar(1.0, 1.0, 1.0, 1.0);
+	glslScalarOperation(shaderScalarOperation, scalar, src.texArray, dst.texArray, OPCODE_MAG_SPCETRUM);
+}
 
 
 
@@ -788,5 +797,15 @@ void glsMulSpectrumsPhaseOnly(const Mat& src0, const Mat& src1, Mat& dst){
 	_dst.CopyTo(dst);	//download
 
 }
+
+void glsMagSpectrums(const Mat& src, Mat& dst){
+	CV_Assert(src.type() == CV_32FC2);
+	glsMat _src(src, false);
+	glsMat _dst(src.cols, src.rows, GL_R32F);
+	_src.CopyFrom(src);	//upload
+	glsMagSpectrums(_src, _dst);
+	_dst.CopyTo(dst);	//download
+}
+
 
 

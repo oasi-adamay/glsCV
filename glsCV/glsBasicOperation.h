@@ -32,8 +32,9 @@ void glsMax(const vec4& scalar, const glsMat& src, glsMat& dst);
 void glsMax(const glsMat& src0, const glsMat& src1, glsMat& dst);
 
 void glsMulSpectrums(const glsMat& src0, const glsMat& src1, glsMat& dst, bool conj = false);
-
 void glsMulSpectrumsPhaseOnly(const glsMat& src0, const glsMat& src1, glsMat& dst);
+void glsMagSpectrums(const glsMat& src, glsMat& dst);
+
 
 
 
@@ -58,8 +59,8 @@ void glsMax(const Vec4f& scalar, const Mat& src, Mat& dst);
 void glsMax(const Mat& src0, const Mat& src1, Mat& dst);
 
 void glsMulSpectrums(const Mat& src0, const Mat& src1, Mat& dst, bool conj = false);
-
 void glsMulSpectrumsPhaseOnly(const Mat& src0, const Mat& src1, Mat& dst);
+void glsMagSpectrums(const Mat& src, Mat& dst);
 
 
 
