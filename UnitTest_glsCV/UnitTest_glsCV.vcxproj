@@ -173,6 +173,7 @@
     </ClCompile>
     <ClCompile Include="UnitTest_Common.cpp" />
     <ClCompile Include="UnitTest_glsBasicOperation.cpp" />
+    <ClCompile Include="UnitTest_glsConvert.cpp" />
     <ClCompile Include="unittest_glsFft.cpp" />
     <ClCompile Include="UnitTest_glsMat.cpp" />
   </ItemGroup>

@@ -150,6 +150,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="glsBasicOperation.cpp" />
+    <ClCompile Include="glsConvert.cpp" />
     <ClCompile Include="glsCV.cpp" />
     <ClCompile Include="glsDraw.cpp" />
     <ClCompile Include="glsFft.cpp" />

@@ -3,6 +3,7 @@
 
 #include "glsMat.h"
 #include "glsShader.h"
+#include "glsConvert.h"
 #include "glsDraw.h"
 #include "glsFft.h"
 #include "glsBasicOperation.h"

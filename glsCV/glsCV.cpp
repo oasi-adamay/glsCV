@@ -82,6 +82,7 @@ GLFWwindow* glsCvInit(const int _width, const int _height){
 
 	}
 
+	glsConvertInit();
 	glsDrawInit();
 	glsBasicOperationInit();
 	glsFftInit();
@@ -92,6 +93,8 @@ GLFWwindow* glsCvInit(const int _width, const int _height){
 //-----------------------------------------------------------------------------
 //Terminate glsFft
 void glsCvTerminate(void){
+
+	glsConvertTerminate();
 	glsDrawTerminate();
 	glsBasicOperationTerminate();
 	glsFftTerminate();

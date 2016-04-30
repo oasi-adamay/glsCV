@@ -19,7 +19,7 @@ int _tmain(int argc, _TCHAR* argv[])
 {
 	const int frameWidth = 640;
 	const int frameHeight = 480;
-	GLFWwindow* window = glsCvInit(frameWidth, frameHeight); 
+	GLFWwindow* window = glsCvInit(frameWidth, frameHeight);
 	
 	
 	// OpenCV によるビデオキャプチャを初期化する
