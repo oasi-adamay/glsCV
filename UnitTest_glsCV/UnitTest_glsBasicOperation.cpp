@@ -79,8 +79,10 @@ namespace UnitTest_glsCV
 
 		Mat imgSrc0 = Mat(Size(width, height), cvtype);
 		Mat imgSrc1 = Mat(Size(width, height), cvtype);
-		Mat imgDst = Mat::zeros(imgSrc0.size(), imgSrc0.type());
-		Mat imgRef = Mat::zeros(imgSrc0.size(), imgSrc0.type());
+//		Mat imgDst = Mat::zeros(imgSrc0.size(), imgSrc0.type());
+//		Mat imgRef = Mat::zeros(imgSrc0.size(), imgSrc0.type());
+		Mat imgDst;
+		Mat imgRef;
 		Scalar scalar;
 
 		cout << "Size:" << imgSrc0.size() << endl;
@@ -191,15 +193,12 @@ namespace UnitTest_glsCV
 			glsMulSpectrumsPhaseOnly(imgSrc0, imgSrc1, imgDst);
 			break;
 		case(E_TEST::MAG_SPECTRUMS) :
-			cv::magnitude(imgSrc0, imgSrc1, imgRef);
 			{
-				vector<Mat> tmp(2);
-				tmp[0] = imgSrc0;
-				tmp[1] = imgSrc1;
-				Mat imgSrc;
-				cv::merge(tmp, imgSrc);
-				glsMagSpectrums(imgSrc, imgDst);
+				vector<Mat> tmp;
+				cv::split(imgSrc1, tmp);
+				cv::magnitude(tmp[0], tmp[1], imgRef);
 			}
+			glsMagSpectrums(imgSrc1, imgDst);
 			break;
 		case(E_TEST::LOG) :
 			cv::log(imgSrc1, imgRef);
@@ -359,7 +358,7 @@ namespace UnitTest_glsCV
 		TEST_METHOD(TestMethod_glsMagSpectrums)
 		{
 			cout << __FUNCTION__ << endl;
-			int errNum = test_glsBasicOperationT<float>(CV_32FC1, E_TEST::MAG_SPECTRUMS);
+			int errNum = test_glsBasicOperationT<float>(CV_32FC2, E_TEST::MAG_SPECTRUMS);
 			Assert::AreEqual(0, errNum);
 		}
 

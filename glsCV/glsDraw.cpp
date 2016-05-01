@@ -294,7 +294,7 @@ void glsDraw(glsMat& src){
 	float scl = 0;
 	int flag = 0;
 
-	switch (src.type){
+	switch (src.glType()){
 	case(GL_FLOAT) :
 		scl = 1.0f;
 		shader = shaderDraw;
@@ -317,7 +317,7 @@ void glsDraw(glsMat& src){
 	default: assert(0);		//not implement
 	}
 
-	switch (src.format){
+	switch (src.glFormat()){
 	case(GL_RED) :
 	case(GL_RED_INTEGER) :
 		flag |= 1;

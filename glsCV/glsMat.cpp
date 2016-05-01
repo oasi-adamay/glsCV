@@ -15,9 +15,7 @@
 #define _USE_PBO_DOWN
 
 glsMat::glsMat(void){
-	internalFormat = 0;
-	format = 0;
-	type = 0;
+	flag = 0;
 	width = 0;
 	height = 0;
 	blkX = 0;
@@ -27,17 +25,17 @@ glsMat::glsMat(void){
 
 glsMat::glsMat(const Size size, const int ocvtype, const Size blkNum){
 
-	createTexture(size.width, size.height, convFmtCV2GL(ocvtype), blkNum.width, blkNum.height);
+	createTexture(size.width, size.height, ocvtype, blkNum.width, blkNum.height);
 }
 
 
-glsMat::glsMat(const int _width, const int _height, GLenum _internalFormat, const int _blkX, const int _blkY){
-	createTexture(_width, _height, _internalFormat, _blkX, _blkY);
+glsMat::glsMat(const int _width, const int _height, int _type, const int _blkX, const int _blkY){
+	createTexture(_width, _height, _type, _blkX, _blkY);
 }
 
 
 glsMat::glsMat(const Mat & cvmat, bool upload){
-	createTexture(cvmat.cols, cvmat.rows, convFmtCV2GL(cvmat.type()), 1, 1);
+	createTexture(cvmat.cols, cvmat.rows, cvmat.type(), 1, 1);
 	if (upload)	CopyFrom(cvmat);
 }
 
@@ -47,11 +45,9 @@ glsMat& glsMat::operator=(const glsMat& rhs){
 		texArray.clear();
 //		refcount.reset();
 	}
-
+	
 	refcount = rhs.refcount;
-	internalFormat = rhs.internalFormat;
-	format = rhs.format;
-	type = rhs.type;
+	flag = rhs.flag;
 	width = rhs.width;
 	height = rhs.height;
 	blkX = rhs.blkX;
@@ -80,58 +76,14 @@ glsMat::~glsMat(void){
 void glsMat::createTexture(
 	const int _width,				//image width
 	const int _height,				//image height
-	GLenum _internalFormat,			//internal format
+	const int _type,				//type(OpenCV)
 	const int _blkX,				// block num X
 	const int _blkY					// block num Y
 	){
 	assert((_width%_blkX) == 0);
 	assert((_height%_blkY) == 0);
 
-	internalFormat = _internalFormat;
-	//https://www.khronos.org/opengles/sdk/docs/man3/html/glTexImage2D.xhtml
-
-	switch (internalFormat){
-	case(GL_R16F) : format = GL_RED; type = GL_FLOAT; break;
-	case(GL_R32F) : format = GL_RED; type = GL_FLOAT; break;
-	case(GL_RG16F) : format = GL_RG; type = GL_FLOAT; break;
-	case(GL_RG32F) : format = GL_RG; type = GL_FLOAT; break;
-	case(GL_RGB16F) : format = GL_RGB; type = GL_FLOAT; break;
-	case(GL_RGB32F) : format = GL_RGB; type = GL_FLOAT; break;
-	case(GL_RGBA16F) : format = GL_RGBA; type = GL_FLOAT; break;
-	case(GL_RGBA32F) : format = GL_RGBA; type = GL_FLOAT; break;
-
-	case(GL_R8UI) : format = GL_RED_INTEGER; type = GL_UNSIGNED_BYTE; break;
-	case(GL_RG8UI) : format = GL_RG_INTEGER; type = GL_UNSIGNED_BYTE; break;
-	case(GL_RGB8UI) : format = GL_RGB_INTEGER; type = GL_UNSIGNED_BYTE; break;
-	case(GL_RGBA8UI) : format = GL_RGBA_INTEGER; type = GL_UNSIGNED_BYTE; break;
-
-	case(GL_R8I) : format = GL_RED_INTEGER; type = GL_BYTE; break;
-	case(GL_RG8I) : format = GL_RG_INTEGER; type = GL_BYTE; break;
-	case(GL_RGB8I) : format = GL_RGB_INTEGER; type = GL_BYTE; break;
-	case(GL_RGBA8I) : format = GL_RGBA_INTEGER; type = GL_BYTE; break;
-
-	case(GL_R16UI) : format = GL_RED_INTEGER; type = GL_UNSIGNED_SHORT; break;
-	case(GL_RG16UI) : format = GL_RG_INTEGER; type = GL_UNSIGNED_SHORT; break;
-	case(GL_RGB16UI) : format = GL_RGB_INTEGER; type = GL_UNSIGNED_SHORT; break;
-	case(GL_RGBA16UI) : format = GL_RGBA_INTEGER; type = GL_UNSIGNED_SHORT; break;
-
-	case(GL_R16I) : format = GL_RED_INTEGER; type = GL_SHORT; break;
-	case(GL_RG16I) : format = GL_RG_INTEGER; type = GL_SHORT; break;
-	case(GL_RGB16I) : format = GL_RGB_INTEGER; type = GL_SHORT; break;
-	case(GL_RGBA16I) : format = GL_RGBA_INTEGER; type = GL_SHORT; break;
-
-	case(GL_R32UI) : format = GL_RED_INTEGER; type = GL_UNSIGNED_INT; break;
-	case(GL_RG32UI) : format = GL_RG_INTEGER; type = GL_UNSIGNED_INT; break;
-	case(GL_RGB32UI) : format = GL_RGB_INTEGER; type = GL_UNSIGNED_INT; break;
-	case(GL_RGBA32UI) : format = GL_RGBA_INTEGER; type = GL_UNSIGNED_INT; break;
-
-	case(GL_R32I) : format = GL_RED_INTEGER; type = GL_INT; break;
-	case(GL_RG32I) : format = GL_RG_INTEGER; type = GL_INT; break;
-	case(GL_RGB32I) : format = GL_RGB_INTEGER; type = GL_INT; break;
-	case(GL_RGBA32I) : format = GL_RGBA_INTEGER; type = GL_INT; break;
-
-	}
-
+	flag = _type;
 
 	width = _width;
 	height = _height;
@@ -153,7 +105,7 @@ void glsMat::createTexture(
 		glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 
 		//create the texture
-		glTexImage2D(GL_TEXTURE_RECTANGLE, 0, internalFormat, texWidth, texHeight, 0, format, type, 0);
+		glTexImage2D(GL_TEXTURE_RECTANGLE, 0, glSizedFormat(), texWidth, texHeight, 0, glFormat(), glType(), 0);
 
 		glBindTexture(GL_TEXTURE_RECTANGLE, 0);
 	}
@@ -172,7 +124,7 @@ GLuint glsMat::at(const int y, const int x){
 void glsMat::CopyFrom(const Mat&src){
 	_TMR_("-upload :\t");
 
-	CV_Assert(convFmtCV2GL(src.type()) == internalFormat);
+	CV_Assert(src.type() == ocvtype());
 	CV_Assert(src.cols == width);
 	CV_Assert(src.rows == height);
 
@@ -220,7 +172,7 @@ void glsMat::CopyFrom(const Mat&src){
 				//Copy pixels from pbo to texture object
 				glBindTexture(GL_TEXTURE_RECTANGLE, texArray[i]);
 				glBindBuffer(GL_PIXEL_UNPACK_BUFFER, pbo[i]); //bind pbo
-				glTexSubImage2D(GL_TEXTURE_RECTANGLE, 0, 0, 0, texWidth, texHeight, format, type, 0);
+				glTexSubImage2D(GL_TEXTURE_RECTANGLE, 0, 0, 0, texWidth, texHeight, glFormat(), glType(), 0);
 				glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
 				glBindTexture(GL_TEXTURE_RECTANGLE, 0);
 			}
@@ -251,7 +203,7 @@ void glsMat::CopyFrom(const Mat&src){
 void glsMat::CopyTo(Mat&dst){
 	_TMR_("-download:\t");
 
-	dst = Mat(Size(width, height), convFmtGL2CV(internalFormat));
+	dst = Mat(Size(width, height), ocvtype());
 
 	// texture
 	const int texWidth = width / blkX;
@@ -279,7 +231,7 @@ void glsMat::CopyTo(Mat&dst){
 				//Copy pixels from texture object to pbo_bank
 				glBindTexture(GL_TEXTURE_RECTANGLE, texArray[i]);
 				glBindBuffer(GL_PIXEL_PACK_BUFFER, pbo[i]); //bind pbo
-				glGetTexImage(GL_TEXTURE_RECTANGLE, 0, format, type, 0);
+				glGetTexImage(GL_TEXTURE_RECTANGLE, 0, glFormat(), glType(), 0);
 				glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
 				glBindTexture(GL_TEXTURE_RECTANGLE, 0);
 
@@ -312,7 +264,7 @@ void glsMat::CopyTo(Mat&dst){
 				void* data = tmp.data;
 
 				glBindTexture(GL_TEXTURE_RECTANGLE, texArray[i]);
-				glGetTexImage(GL_TEXTURE_RECTANGLE, 0, format, type, data);
+				glGetTexImage(GL_TEXTURE_RECTANGLE, 0, glFormat(), glType(), data);
 				glBindTexture(GL_TEXTURE_RECTANGLE, 0);
 
 				Rect rect(x, y, texWidth, texHeight);
@@ -327,7 +279,7 @@ void glsMat::CopyTo(Mat&dst){
 
 
 
-GLenum convFmtCV2GL(int ocvtype){
+GLenum convCVtype2GLsizedFormat(int ocvtype){
 	GLenum format;
 	switch (ocvtype){
 	case(CV_32FC1) : format = GL_R32F; break;
@@ -409,6 +361,51 @@ int convFmtGL2CV(GLenum  format){
 
 	}
 	return ocvtype;
+}
+
+
+
+GLenum convCVtype2GLformat(int ocvtype){
+	GLenum format;
+	int ch = CV_MAT_CN(ocvtype);
+	int depth = CV_MAT_DEPTH(ocvtype);
+	bool isFloat = depth == (CV_32F);
+	if (isFloat){
+		switch (ch){
+			case(1) : format = GL_RED; break;
+			case(2) : format = GL_RG; break;
+			case(3) : format = GL_RGB; break;
+			case(4) : format = GL_RGBA; break;
+			default: assert(0);
+		}
+	}
+	else{
+		switch (ch){
+			case(1) : format = GL_RED_INTEGER; break;
+			case(2) : format = GL_RG_INTEGER; break;
+			case(3) : format = GL_RGB_INTEGER; break;
+			case(4) : format = GL_RGBA_INTEGER; break;
+			default: assert(0);
+		}
+	}
+	return format;
+}
+
+
+GLenum convCVtype2GLtype(int ocvtype){
+	GLenum type;
+	int depth = CV_MAT_DEPTH(ocvtype);
+	switch (depth){
+	case(CV_8U) : type = GL_UNSIGNED_BYTE; break;
+	case(CV_8S) : type = GL_BYTE; break;
+	case(CV_16U) : type = GL_UNSIGNED_SHORT; break;
+	case(CV_16S) : type = GL_SHORT; break;
+//	case(CV_32U) : type = GL_UNSIGNED_INT; break;
+	case(CV_32S) : type = GL_INT; break;
+	case(CV_32F) : type = GL_FLOAT; break;
+	default: assert(0);
+	}
+	return type;
 }
 
 

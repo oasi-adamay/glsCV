@@ -349,7 +349,7 @@ void glsFft(glsMat& texture, int flag){
 		(void*)0			// array buffer offset (Specifies a pointer to the first generic vertex attribute in the array)
 		);
 
-	glsMat texTmp(texture.width, texture.height, texture.internalFormat, texture.blkX, texture.blkY);
+	glsMat texTmp(texture.width, texture.height, texture.ocvtype(), texture.blkX, texture.blkY);
 //	glsMat texTmp(texture,false);
 	GLuint texW = 0;	//twidle
 
@@ -368,7 +368,7 @@ void glsFft(glsMat& texture, int flag){
 			glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 
 			//create the texture
-			glTexImage2D(GL_TEXTURE_RECTANGLE, 0, texture.internalFormat, N / 2, 1, 0, texture.format, texture.type, 0);
+			glTexImage2D(GL_TEXTURE_RECTANGLE, 0, texture.glSizedFormat(), N / 2, 1, 0, texture.glFormat(), texture.glType(), 0);
 
 			glBindTexture(GL_TEXTURE_RECTANGLE, 0);
 		}
@@ -393,7 +393,7 @@ void glsFft(glsMat& texture, int flag){
 		void* data = &w[0];
 
 		glBindTexture(GL_TEXTURE_RECTANGLE, texW);
-		glTexSubImage2D(GL_TEXTURE_RECTANGLE, 0, 0, 0, (GLsizei)w.size(), 1, texture.format, texture.type, data);
+		glTexSubImage2D(GL_TEXTURE_RECTANGLE, 0, 0, 0, (GLsizei)w.size(), 1, texture.glFormat(), texture.glType(), data);
 		glBindTexture(GL_TEXTURE_RECTANGLE, 0);
 	}
 
@@ -462,7 +462,7 @@ void glsFft(const Mat& src, Mat& dst, int flag){
 	int N = src.cols;
 	CV_Assert(IsPow2(N));
 
-	glsMat texture(src.cols, src.rows, convFmtCV2GL(src.type()),2, 2);
+	glsMat texture(src.cols, src.rows, src.type(),2, 2);
 
 	//---------------------------------
 	//upload

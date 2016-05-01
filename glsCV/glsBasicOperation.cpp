@@ -472,128 +472,128 @@ void glslBinaryOperation(
 
 //スカラと配列の 要素毎の和を求めます．
 void glsAdd(const vec4& scalar, const glsMat& src, glsMat& dst){
-	assert(src.type == GL_FLOAT);
+	assert(src.glType() == GL_FLOAT);
 	glslScalarOperation(shaderScalarOperation, scalar, src.texArray, dst.texArray, OPCODE_ADD);
 }
 
 //2 つの配列同士の 要素毎の和を求めます
 void glsAdd(const glsMat& src0, const glsMat& src1, glsMat& dst)
 {
-	assert(src0.type == GL_FLOAT);
-	assert(src1.type == GL_FLOAT);
+	assert(src0.glType() == GL_FLOAT);
+	assert(src1.glType() == GL_FLOAT);
 	glslBinaryOperation(shaderBinaryOperation, src0.texArray, src1.texArray, dst.texArray, OPCODE_ADD);
 }
 
 
 //スカラと配列の 要素毎の差を求めます．
 void glsSubtract(const vec4& scalar, const glsMat& src, glsMat& dst){
-	assert(src.type == GL_FLOAT);
+	assert(src.glType() == GL_FLOAT);
 	glslScalarOperation(shaderScalarOperation, scalar, src.texArray, dst.texArray, OPCODE_SUB);
 }
 
 //2 つの配列同士の 要素毎の差を求めます
 void glsSubtract(const glsMat& src0, const glsMat& src1, glsMat& dst)
 {
-	assert(src0.type == GL_FLOAT);
-	assert(src1.type == GL_FLOAT);
+	assert(src0.glType() == GL_FLOAT);
+	assert(src1.glType() == GL_FLOAT);
 	glslBinaryOperation(shaderBinaryOperation, src0.texArray, src1.texArray, dst.texArray, OPCODE_SUB);
 }
 
 
 //スカラと配列の 要素毎の積を求めます．
 void glsMultiply(const vec4& scalar, const glsMat& src, glsMat& dst){
-	assert(src.type == GL_FLOAT);
+	assert(src.glType() == GL_FLOAT);
 	glslScalarOperation(shaderScalarOperation, scalar, src.texArray, dst.texArray, OPCODE_MUL);
 }
 
 //2 つの配列同士の 要素毎の積を求めます
 void glsMultiply(const glsMat& src0, const glsMat& src1, glsMat& dst)
 {
-	assert(src0.type == GL_FLOAT);
-	assert(src1.type == GL_FLOAT);
+	assert(src0.glType() == GL_FLOAT);
+	assert(src1.glType() == GL_FLOAT);
 	glslBinaryOperation(shaderBinaryOperation, src0.texArray, src1.texArray, dst.texArray, OPCODE_MUL);
 }
 
 //スカラと配列の 要素毎の商を求めます．
 void glsDivide(const vec4& scalar, const glsMat& src, glsMat& dst){
-	assert(src.type == GL_FLOAT);
+	assert(src.glType() == GL_FLOAT);
 	glslScalarOperation(shaderScalarOperation, scalar, src.texArray, dst.texArray, OPCODE_DIV);
 }
 
 
 //2 つの配列同士の  要素毎の商を求めます．
 void glsDivide(const glsMat& src0, const glsMat& src1, glsMat& dst){
-	assert(src0.type == GL_FLOAT);
-	assert(src1.type == GL_FLOAT);
+	assert(src0.glType() == GL_FLOAT);
+	assert(src1.glType() == GL_FLOAT);
 	glslBinaryOperation(shaderBinaryOperation, src0.texArray, src1.texArray, dst.texArray, OPCODE_DIV);
 }
 
 //スカラと配列の 要素毎の最小値を求めます．
 void glsMin(const vec4& scalar, const glsMat& src, glsMat& dst){
-	assert(src.type == GL_FLOAT);
+	assert(src.glType() == GL_FLOAT);
 	glslScalarOperation(shaderScalarOperation, scalar, src.texArray, dst.texArray, OPCODE_MIN);
 }
 
 //2 つの配列同士の  要素毎の最小値を求めます．
 void glsMin(const glsMat& src0, const glsMat& src1, glsMat& dst){
-	assert(src0.type == GL_FLOAT);
-	assert(src1.type == GL_FLOAT);
+	assert(src0.glType() == GL_FLOAT);
+	assert(src1.glType() == GL_FLOAT);
 	glslBinaryOperation(shaderBinaryOperation, src0.texArray, src1.texArray, dst.texArray, OPCODE_MIN);
 }
 
 //スカラと配列の 要素毎の最大値を求めます．
 void glsMax(const vec4& scalar, const glsMat& src, glsMat& dst){
-	assert(src.type == GL_FLOAT);
+	assert(src.glType() == GL_FLOAT);
 	glslScalarOperation(shaderScalarOperation, scalar, src.texArray, dst.texArray, OPCODE_MAX);
 }
 
 //2 つの配列同士の  要素毎の最大値を求めます．
 void glsMax(const glsMat& src0, const glsMat& src1, glsMat& dst){
-	assert(src0.type == GL_FLOAT);
-	assert(src1.type == GL_FLOAT);
+	assert(src0.glType() == GL_FLOAT);
+	assert(src1.glType() == GL_FLOAT);
 	glslBinaryOperation(shaderBinaryOperation, src0.texArray, src1.texArray, dst.texArray, OPCODE_MAX);
 }
 
 //2 つのフーリエスペクトル同士の要素毎の乗算を行います．
 //conj = ture の場合、2 番目の配列を複素共役に変更できます．
 void glsMulSpectrums(const glsMat& src0, const glsMat& src1, glsMat& dst, bool conj){
-	assert(src0.internalFormat == GL_RG32F);
-	assert(src1.internalFormat == GL_RG32F);
+	assert(src0.glSizedFormat() == GL_RG32F);
+	assert(src1.glSizedFormat() == GL_RG32F);
 	if (conj)glslBinaryOperation(shaderBinaryOperation, src0.texArray, src1.texArray, dst.texArray, OPCODE_MUL_SPCETRUM_CONJ);
 	else glslBinaryOperation(shaderBinaryOperation, src0.texArray, src1.texArray, dst.texArray, OPCODE_MUL_SPCETRUM);
 }
 
 //2 つのフーリエスペクトル同士の  要素毎の位相限定相関を求めます．
 void glsMulSpectrumsPhaseOnly(const glsMat& src0, const glsMat& src1, glsMat& dst){
-	assert(src0.internalFormat == GL_RG32F);
-	assert(src1.internalFormat == GL_RG32F);
+	assert(src0.glSizedFormat() == GL_RG32F);
+	assert(src1.glSizedFormat() == GL_RG32F);
 	glslBinaryOperation(shaderBinaryOperation, src0.texArray, src1.texArray, dst.texArray, OPCODE_MUL_SPCETRUM_POC);
 }
 
 //複素行列要素の絶対値の2乗を求めます．
 void glsMagSpectrums(const glsMat& src, glsMat& dst){
-	assert(src.internalFormat == GL_RG32F);
+	assert(src.glSizedFormat() == GL_RG32F);
 	vec4 scalar(1.0, 1.0, 1.0, 1.0);
 	glslScalarOperation(shaderScalarOperation, scalar, src.texArray, dst.texArray, OPCODE_MAG_SPCETRUM);
 }
 
 //各配列要素の絶対値の自然対数を求めます．
 void glsLog(const glsMat& src, glsMat& dst){
-	assert(src.type == GL_FLOAT);
+	assert(src.glType() == GL_FLOAT);
 	vec4 scalar(1.0, 1.0, 1.0, 1.0);
 	glslScalarOperation(shaderScalarOperation, scalar, src.texArray, dst.texArray, OPCODE_LOG);
 }
 
 //各配列要素を指数として，自然対数の底（ネイピア数）e のべき乗を求めます．
 void glsExp(const glsMat& src, glsMat& dst){
-	assert(src.type == GL_FLOAT);
+	assert(src.glType() == GL_FLOAT);
 	vec4 scalar(1.0, 1.0, 1.0, 1.0);
 	glslScalarOperation(shaderScalarOperation, scalar, src.texArray, dst.texArray, OPCODE_EXP);
 }
 
 //各配列要素を累乗します．
 void glsPow(const glsMat& src, const float& power, glsMat& dst){
-	assert(src.type == GL_FLOAT);
+	assert(src.glType() == GL_FLOAT);
 	vec4 scalar(power, power, power, power);
 	glslScalarOperation(shaderScalarOperation, scalar, src.texArray, dst.texArray, OPCODE_POW);
 }
@@ -833,7 +833,7 @@ void glsMulSpectrumsPhaseOnly(const Mat& src0, const Mat& src1, Mat& dst){
 void glsMagSpectrums(const Mat& src, Mat& dst){
 	CV_Assert(src.type() == CV_32FC2);
 	glsMat _src(src, false);
-	glsMat _dst(src.cols, src.rows, GL_R32F);
+	glsMat _dst(src.cols, src.rows, CV_32FC1);
 	_src.CopyFrom(src);	//upload
 	glsMagSpectrums(_src, _dst);
 	_dst.CopyTo(dst);	//download

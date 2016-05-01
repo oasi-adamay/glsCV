@@ -389,7 +389,7 @@ static void glsConvertProcess(
 void glsConvert(const glsMat& src, glsMat& dst, const float scl){
 
 	glsMat _dst = glsMat(src.size(), CV_MAKETYPE(CV_32F, CV_MAT_CN(src.ocvtype())), src.blkNum());
-	assert(_dst.type == GL_FLOAT);
+	assert(_dst.glType() == GL_FLOAT);
 
 	glsShaderConvertBase* shader = 0;
 
@@ -448,7 +448,7 @@ void glsConvert(const glsMat& src, glsMat& dst, const float scl){
 }
 
 void glsCvtColor(const glsMat& src, glsMat& dst, const int code){
-	assert(src.type == GL_FLOAT);
+	assert(src.glType() == GL_FLOAT);
 
 	int ch=1;
 	switch (code){
