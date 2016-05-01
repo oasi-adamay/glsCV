@@ -14,6 +14,23 @@
 #define _USE_PBO_UP
 #define _USE_PBO_DOWN
 
+glsMat::glsMat(void){
+	internalFormat = 0;
+	format = 0;
+	type = 0;
+	width = 0;
+	height = 0;
+	blkX = 0;
+	blkY = 0;
+	texArray.clear();
+}
+
+glsMat::glsMat(const Size size, const int ocvtype, const Size blkNum){
+
+	createTexture(size.width, size.height, convFmtCV2GL(ocvtype), blkNum.width, blkNum.height);
+}
+
+
 glsMat::glsMat(const int _width, const int _height, GLenum _internalFormat, const int _blkX, const int _blkY){
 	createTexture(_width, _height, _internalFormat, _blkX, _blkY);
 }
@@ -24,16 +41,40 @@ glsMat::glsMat(const Mat & cvmat, bool upload){
 	if (upload)	CopyFrom(cvmat);
 }
 
-glsMat::glsMat(const glsMat& src, bool copy){
-	createTexture(src.width, src.height, src.internalFormat, src.blkX, src.blkY);
-	assert(copy == false);	///@TODO Copy tex
+glsMat& glsMat::operator=(const glsMat& rhs){
+	if (refcount.use_count() == 1){
+		glDeleteTextures((GLsizei)texArray.size(), &texArray[0]);
+		texArray.clear();
+//		refcount.reset();
+	}
+
+	refcount = rhs.refcount;
+	internalFormat = rhs.internalFormat;
+	format = rhs.format;
+	type = rhs.type;
+	width = rhs.width;
+	height = rhs.height;
+	blkX = rhs.blkX;
+	blkY = rhs.blkY;
+	texArray = rhs.texArray;
+
+	return *this;
 }
+
+
+//glsMat::glsMat(const glsMat& src, bool copy){
+//	createTexture(src.width, src.height, src.internalFormat, src.blkX, src.blkY);
+//	assert(copy == false);	///@TODO Copy tex
+//}
 
 
 
 
 glsMat::~glsMat(void){
-	glDeleteTextures((GLsizei)texArray.size(), &texArray[0]);
+	if (refcount.use_count()==1){
+		glDeleteTextures((GLsizei)texArray.size(), &texArray[0]);
+		texArray.clear();
+	}
 }
 
 void glsMat::createTexture(
@@ -116,6 +157,8 @@ void glsMat::createTexture(
 
 		glBindTexture(GL_TEXTURE_RECTANGLE, 0);
 	}
+
+	refcount = make_shared<int>(1);
 }
 
 

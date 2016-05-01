@@ -37,6 +37,18 @@ int _tmain(int argc, _TCHAR* argv[])
 	camera.set(CV_CAP_PROP_FRAME_WIDTH, double(capture_width));
 	camera.set(CV_CAP_PROP_FRAME_HEIGHT, double(capture_height));
 
+#if 0
+	{
+		cv::Mat frame;
+		camera >> frame;						// キャプチャ映像から画像を切り出す
+
+		glsMat glsFrame0(frame);
+		glsMat glsFrame1(glsFrame0);
+		glsMat glsFrame2 = glsFrame0;
+		glsMat glsFrame3 = glsFrame0;
+	}
+#endif
+
 	do{
 		cv::Mat frame;
 		camera >> frame;						// キャプチャ映像から画像を切り出す
@@ -44,20 +56,12 @@ int _tmain(int argc, _TCHAR* argv[])
 
 		cv::flip(frame, frame, 0);				// 上下反転
 //		cvtColor(frame, frame, CV_BGR2RGB);		//channel order
-//		cvtColor(frame, frame, CV_BGR2GRAY);	//to gray
 
 		glsMat glsFrame(frame);
-		glsMat glsFrameFlt(glsFrame.width, glsFrame.height,GL_RGB32F);
-		glsMat glsFrameFltRgb(glsFrame.width, glsFrame.height, GL_RGB32F);
-		glsConvert(glsFrame, glsFrameFlt, 1.0f / 256.0f);
-		glsCvtColor(glsFrameFlt, glsFrameFltRgb, CV_BGR2RGB);
+		glsConvert(glsFrame, glsFrame, 1.0f / 256.0f);
+		glsCvtColor(glsFrame, glsFrame, CV_BGR2RGB);
 
-
-//		glsMat glsFrameFlt(glsFrame.width, glsFrame.height,GL_RGB32F);
-
-//		glsDraw(glsFrame);
-//		glsDraw(glsFrameFlt);
-		glsDraw(glsFrameFltRgb);
+		glsDraw(glsFrame);
 
 		glfwSwapBuffers(window);  // Swap buffers
 		glfwPollEvents();

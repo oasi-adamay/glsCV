@@ -349,8 +349,8 @@ void glsFft(glsMat& texture, int flag){
 		(void*)0			// array buffer offset (Specifies a pointer to the first generic vertex attribute in the array)
 		);
 
-//	glsMat texTmp(texture.width, texture.height, texture.internalFormat, texture.blkX, texture.blkY);
-	glsMat texTmp(texture,false);
+	glsMat texTmp(texture.width, texture.height, texture.internalFormat, texture.blkX, texture.blkY);
+//	glsMat texTmp(texture,false);
 	GLuint texW = 0;	//twidle
 
 	//---------------------------------

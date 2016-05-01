@@ -386,21 +386,35 @@ static void glsConvertProcess(
 
 
 //conver texture format
-void glsConvert(const glsMat& src, const glsMat& dst, const float scl){
-	assert(dst.type == GL_FLOAT);
+void glsConvert(const glsMat& src, glsMat& dst, const float scl){
+
+	glsMat _dst = glsMat(src.size(), CV_MAKETYPE(CV_32F, CV_MAT_CN(src.ocvtype())), src.blkNum());
+	assert(_dst.type == GL_FLOAT);
 
 	glsShaderConvertBase* shader = 0;
 
-	switch (src.type){
-	case(GL_FLOAT) : shader = shaderConvert; break;
-	case(GL_UNSIGNED_BYTE) :
-	case(GL_UNSIGNED_SHORT) :
-	case(GL_UNSIGNED_INT) :	shader = shaderConvertU; break;
-	case(GL_BYTE) :
-	case(GL_SHORT) :
-	case(GL_INT) : shader = shaderConvertS; break;
+	//switch (src.type){
+	//case(GL_FLOAT) : shader = shaderConvert; break;
+	//case(GL_UNSIGNED_BYTE) :
+	//case(GL_UNSIGNED_SHORT) :
+	//case(GL_UNSIGNED_INT) :	shader = shaderConvertU; break;
+	//case(GL_BYTE) :
+	//case(GL_SHORT) :
+	//case(GL_INT) : shader = shaderConvertS; break;
+	//default: assert(0);		//not implement
+	//}
+
+	switch (CV_MAT_DEPTH(src.ocvtype())){
+	case(CV_32F) : shader = shaderConvert; break;
+	case(CV_8U) :
+	case(CV_16U) : shader = shaderConvertU; break;
+	case(CV_8S) :
+	case(CV_16S) :
+	case(CV_32S) : shader = shaderConvertS; break;
 	default: assert(0);		//not implement
 	}
+
+
 
 	//FBO 
 	GLuint fbo = 0;
@@ -421,33 +435,64 @@ void glsConvert(const glsMat& src, const glsMat& dst, const float scl){
 
 	for (int i = 0; i < src.texArray.size(); i++){
 		//dst texture
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_RECTANGLE, dst.texArray[i], 0);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_RECTANGLE, _dst.texArray[i], 0);
 		assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
 
 		glsConvertProcess(shader, src.texArray[i], scl);
 	}
 
 	glDeleteFramebuffers(1, &fbo);
+	
+	dst = _dst;
 
 }
 
-void glsCvtColor(const glsMat& src, const glsMat& dst, const int code){
-	assert(dst.type == GL_FLOAT);
+void glsCvtColor(const glsMat& src, glsMat& dst, const int code){
+	assert(src.type == GL_FLOAT);
 
+	int ch=1;
+	switch (code){
+	case(CV_BGR2BGRA) :
+//	case(CV_RGB2RGBA) :
+	case(CV_BGR2RGBA) :
+//	case(CV_RGB2BGRA) :
+	case(CV_BGRA2RGBA) :
+//	case(CV_RGBA2BGRA) :
+	case(CV_GRAY2BGRA) :
+//	case(CV_GRAY2RGBA) :
+		ch = 4; break;
+	case(CV_BGRA2BGR) :
+//	case(CV_RGBA2RGB) :
+	case(CV_RGBA2BGR) :
+//	case(CV_BGRA2RGB) :
+	case(CV_BGR2RGB) :
+//	case(CV_RGB2BGR) :
+	case(CV_GRAY2BGR) :
+//	case(CV_GRAY2RGB) :
+		ch = 3; break;
+	case(CV_BGR2GRAY) :
+	case(CV_RGB2GRAY) :
+	case(CV_BGRA2GRAY) :
+	case(CV_RGBA2GRAY) :
+		ch = 1; break;
+	default:
+		assert(0);
+	}
 
+	glsMat _dst = glsMat(src.size(), CV_MAKETYPE(CV_MAT_DEPTH(src.ocvtype()), ch), src.blkNum());
 
 	glsShaderConvertBase* shader = 0;
 
-	switch (src.type){
-	case(GL_FLOAT) : shader = shaderConvert; break;
-	case(GL_UNSIGNED_BYTE) :
-	case(GL_UNSIGNED_SHORT) :
-	case(GL_UNSIGNED_INT) : shader = shaderConvertU; break;
-	case(GL_BYTE) :
-	case(GL_SHORT) :
-	case(GL_INT) : shader = shaderConvertS; break;
+	switch (CV_MAT_DEPTH(src.ocvtype())){
+	case(CV_32F) : shader = shaderConvert; break;
+	case(CV_8U) :
+	case(CV_16U) : shader = shaderConvertU; break;
+	case(CV_8S) :
+	case(CV_16S) :
+	case(CV_32S) : shader = shaderConvertS; break;
 	default: assert(0);		//not implement
 	}
+
 
 	//FBO 
 	GLuint fbo = 0;
@@ -468,7 +513,7 @@ void glsCvtColor(const glsMat& src, const glsMat& dst, const int code){
 
 	for (int i = 0; i < src.texArray.size(); i++){
 		//dst texture
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_RECTANGLE, dst.texArray[i], 0);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_RECTANGLE, _dst.texArray[i], 0);
 		assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
 		float scl = 1.0f;
 		glsConvertProcess(shader, src.texArray[i], scl, code);
@@ -476,6 +521,7 @@ void glsCvtColor(const glsMat& src, const glsMat& dst, const int code){
 
 	glDeleteFramebuffers(1, &fbo);
 
+	dst = _dst;
 
 }
 

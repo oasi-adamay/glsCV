@@ -85,10 +85,21 @@ namespace UnitTest_glsCV
 		Mat imgDst = Mat::zeros(imgRef.size(), imgRef.type());
 
 		glsMat glsSrc(imgSrc);		//create glsMat and  upload
-		glsMat glsDst(imgRef, false); //create glsMat not upload!
+//		glsMat glsDst(imgRef, false); //create glsMat not upload!
+		glsMat glsDst;
 
 		glsConvert(glsSrc, glsDst, scale);
 		glsDst.CopyTo(imgDst);		// download
+
+		if (imgDst.size() != imgRef.size()){
+			cout << "imgDst.size() != imgRef.size()" << endl;
+			return -1;
+		}
+		if (imgDst.type() != imgRef.type()){
+			cout << "imgDst.type() != imgRef.type()" << endl;
+			return -1;
+		}
+
 
 		//verify
 		int errNum = 0;
@@ -190,10 +201,21 @@ namespace UnitTest_glsCV
 		Mat imgDst = Mat::zeros(imgRef.size(), imgRef.type());
 
 		glsMat glsSrc(imgSrc);		//create glsMat and  upload
-		glsMat glsDst(imgRef, false); //create glsMat not upload!
+//		glsMat glsDst(imgRef, false); //create glsMat not upload!
+		glsMat glsDst;				 
 
 		glsCvtColor(glsSrc, glsDst, code);
 		glsDst.CopyTo(imgDst);		// download
+
+		if (imgDst.size() != imgRef.size()){
+			cout << "imgDst.size() != imgRef.size()" << endl;
+			return -1;
+		}
+		if (imgDst.type() != imgRef.type()){
+			cout << "imgDst.type() != imgRef.type()" << endl;
+			return -1;
+		}
+
 
 		//verify
 		int errNum = 0;
