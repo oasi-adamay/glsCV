@@ -44,14 +44,20 @@ int _tmain(int argc, _TCHAR* argv[])
 
 		cv::flip(frame, frame, 0);				// è„â∫îΩì]
 //		cvtColor(frame, frame, CV_BGR2RGB);		//channel order
-		cvtColor(frame, frame, CV_BGR2GRAY);	//to gray
+//		cvtColor(frame, frame, CV_BGR2GRAY);	//to gray
 
 		glsMat glsFrame(frame);
-//		glsMat glsFrameFlt(glsFrame.width, glsFrame.height,GL_RGB32F);
-//		glsConvert(glsFrame, glsFrameFlt, 1.0f / 256.0f);
+		glsMat glsFrameFlt(glsFrame.width, glsFrame.height,GL_RGB32F);
+		glsMat glsFrameFltRgb(glsFrame.width, glsFrame.height, GL_RGB32F);
+		glsConvert(glsFrame, glsFrameFlt, 1.0f / 256.0f);
+		glsCvtColor(glsFrameFlt, glsFrameFltRgb, CV_BGR2RGB);
 
-		glsDraw(glsFrame);
+
+//		glsMat glsFrameFlt(glsFrame.width, glsFrame.height,GL_RGB32F);
+
+//		glsDraw(glsFrame);
 //		glsDraw(glsFrameFlt);
+		glsDraw(glsFrameFltRgb);
 
 		glfwSwapBuffers(window);  // Swap buffers
 		glfwPollEvents();

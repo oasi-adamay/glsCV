@@ -16,6 +16,7 @@ public:
 	//uniform  location
 	GLuint texSrc;
 	GLuint f_scl;
+	GLuint i_flag;
 };
 
 
@@ -77,6 +78,35 @@ static const char vertexShaderCode[] =
 ;
 
 
+/* Constants for color conversion */
+//	CV_BGR2BGRA = 0,
+//	CV_RGB2RGBA = CV_BGR2BGRA,
+//
+//	CV_BGRA2BGR = 1,
+//	CV_RGBA2RGB = CV_BGRA2BGR,
+//
+//	CV_BGR2RGBA = 2,
+//	CV_RGB2BGRA = CV_BGR2RGBA,
+//
+//	CV_RGBA2BGR = 3,
+//	CV_BGRA2RGB = CV_RGBA2BGR,
+//
+//	CV_BGR2RGB = 4,
+//	CV_RGB2BGR = CV_BGR2RGB,
+//
+//	CV_BGRA2RGBA = 5,
+//	CV_RGBA2BGRA = CV_BGRA2RGBA,
+//
+//	CV_BGR2GRAY = 6,
+//	CV_RGB2GRAY = 7,
+//	CV_GRAY2BGR = 8,
+//	CV_GRAY2RGB = CV_GRAY2BGR,
+//	CV_GRAY2BGRA = 9,
+//	CV_GRAY2RGBA = CV_GRAY2BGRA,
+//	CV_BGRA2GRAY = 10,
+//	CV_RGBA2GRAY = 11,
+
+
 //-----------------------------------------------------------------------------
 //glsShaderConvert
 glsShaderConvert::glsShaderConvert(void)
@@ -87,13 +117,36 @@ glsShaderConvert::glsShaderConvert(void)
 "precision highp float;\n"
 "uniform sampler2DRect	texSrc;\n"
 "uniform float	scl;\n"
-"\n"
+"uniform int	flag;\n"
 "layout (location = 0) out vec4 dst;\n"
-"\n"
 "void main(void)\n"
 "{\n"
 "	vec4 data = texture(texSrc, gl_FragCoord.xy);\n"
-"	dst = vec4(data.r*scl,data.g*scl,data.b*scl,data.a*scl);\n"
+"	vec4 color = vec4(data.r*scl,data.g*scl,data.b*scl,data.a*scl);\n"
+"	float gray;\n"
+"	switch(flag){\n"
+"	case(0)://CV_BGR2BGRA\n"
+"	case(1)://CV_BGRA2BGR\n"
+"		color = vec4(color.r,color.g,color.b,1.0);break;\n"
+"	case(2)://CV_BGR2RGBA\n"
+"	case(3)://CV_RGBA2BGR\n"
+"	case(4)://CV_BGR2RGB\n"
+"	case(5)://CV_BGRA2RGBA\n"
+"		color = vec4(color.b,color.g,color.r,1.0);break;\n"
+"	case(6)://CV_BGR2GRAY\n"
+"		gray = color.b * 0.299 + color.g * 0.587 + color.r * 0.114;\n"
+"		color = vec4(gray,gray,gray,1.0);break;\n"
+"	case(7)://CV_RGB2GRAY\n"
+"		gray = color.r * 0.299 + color.g * 0.587 + color.b * 0.114;\n"
+"		color = vec4(gray,gray,gray,1.0);break;\n"
+"	case(8)://CV_GRAY2BGR\n"
+"	case(9)://CV_GRAY2BGRA\n"
+"	case(10)://CV_BGRA2GRAY\n"
+"	case(11)://CV_RGBA2GRAY\n"
+"		gray = color.r;\n"
+"		color = vec4(gray,gray,gray,1.0);break;\n"
+"	}\n"
+"	dst = color;\n"
 "\n"
 "}\n"
 ;
@@ -105,6 +158,7 @@ glsShaderConvert::glsShaderConvert(void)
 	position = glGetAttribLocation(program, "position");
 	texSrc = glGetUniformLocation(program, "texSrc");
 	f_scl = glGetUniformLocation(program, "scl");
+	i_flag = glGetUniformLocation(program, "flag");
 }
 
 
@@ -118,12 +172,36 @@ glsShaderConvertU::glsShaderConvertU(void)
 "precision highp float;\n"
 "uniform usampler2DRect	texSrc;\n"
 "uniform float	scl;\n"
+"uniform int	flag;\n"
 "layout (location = 0) out vec4 dst;\n"
 "void main(void)\n"
 "{\n"
 "	vec4 data = vec4(texture(texSrc, gl_FragCoord.xy));\n"
-"	dst = vec4(data.r*scl,data.g*scl,data.b*scl,data.a*scl);\n"
-"\n"
+"	vec4 color = vec4(data.r*scl,data.g*scl,data.b*scl,data.a*scl);\n"
+"	float gray;\n"
+"	switch(flag){\n"
+"	case(0)://CV_BGR2BGRA\n"
+"	case(1)://CV_BGRA2BGR\n"
+"		color = vec4(color.r,color.g,color.b,1.0);break;\n"
+"	case(2)://CV_BGR2RGBA\n"
+"	case(3)://CV_RGBA2BGR\n"
+"	case(4)://CV_BGR2RGB\n"
+"	case(5)://CV_BGRA2RGBA\n"
+"		color = vec4(color.b,color.g,color.r,1.0);break;\n"
+"	case(6)://CV_BGR2GRAY\n"
+"		gray = color.b * 0.299 + color.g * 0.587 + color.r * 0.114;\n"
+"		color = vec4(gray,gray,gray,1.0);break;\n"
+"	case(7)://CV_RGB2GRAY\n"
+"		gray = color.r * 0.299 + color.g * 0.587 + color.b * 0.114;\n"
+"		color = vec4(gray,gray,gray,1.0);break;\n"
+"	case(8)://CV_GRAY2BGR\n"
+"	case(9)://CV_GRAY2BGRA\n"
+"	case(10)://CV_BGRA2GRAY\n"
+"	case(11)://CV_RGBA2GRAY\n"
+"		gray = color.r;\n"
+"		color = vec4(gray,gray,gray,1.0);break;\n"
+"	}\n"
+"	dst = color;\n"
 "}\n"
 ;
 
@@ -134,6 +212,7 @@ glsShaderConvertU::glsShaderConvertU(void)
 	position = glGetAttribLocation(program, "position");
 	texSrc = glGetUniformLocation(program, "texSrc");
 	f_scl = glGetUniformLocation(program, "scl");
+	i_flag = glGetUniformLocation(program, "flag");
 }
 
 //-----------------------------------------------------------------------------
@@ -142,18 +221,42 @@ glsShaderConvertS::glsShaderConvertS(void)
 	:glsShaderConvertBase()
 {
 	const char fragmentShaderCode[] =
-		"#version 330 core\n"
-		"precision highp float;\n"
-		"uniform isampler2DRect	texSrc;\n"
-		"uniform float	scl;\n"
-		"layout (location = 0) out vec4 dst;\n"
-		"void main(void)\n"
-		"{\n"
-		"	vec4 data = vec4(texture(texSrc, gl_FragCoord.xy));\n"
-		"	dst = vec4(data.r*scl,data.g*scl,data.b*scl,data.a*scl);\n"
-		"\n"
-		"}\n"
-		;
+"#version 330 core\n"
+"precision highp float;\n"
+"uniform isampler2DRect	texSrc;\n"
+"uniform float	scl;\n"
+"uniform int	flag;\n"
+"layout (location = 0) out vec4 dst;\n"
+"void main(void)\n"
+"{\n"
+"	vec4 data = vec4(texture(texSrc, gl_FragCoord.xy));\n"
+"	vec4 color = vec4(data.r*scl,data.g*scl,data.b*scl,data.a*scl);\n"
+"	float gray;\n"
+"	switch(flag){\n"
+"	case(0)://CV_BGR2BGRA\n"
+"	case(1)://CV_BGRA2BGR\n"
+"		color = vec4(color.r,color.g,color.b,1.0);break;\n"
+"	case(2)://CV_BGR2RGBA\n"
+"	case(3)://CV_RGBA2BGR\n"
+"	case(4)://CV_BGR2RGB\n"
+"	case(5)://CV_BGRA2RGBA\n"
+"		color = vec4(color.b,color.g,color.r,1.0);break;\n"
+"	case(6)://CV_BGR2GRAY\n"
+"		gray = color.b * 0.299 + color.g * 0.587 + color.r * 0.114;\n"
+"		color = vec4(gray,gray,gray,1.0);break;\n"
+"	case(7)://CV_RGB2GRAY\n"
+"		gray = color.r * 0.299 + color.g * 0.587 + color.b * 0.114;\n"
+"		color = vec4(gray,gray,gray,1.0);break;\n"
+"	case(8)://CV_GRAY2BGR\n"
+"	case(9)://CV_GRAY2BGRA\n"
+"	case(10)://CV_BGRA2GRAY\n"
+"	case(11)://CV_RGBA2GRAY\n"
+"		gray = color.r;\n"
+"		color = vec4(gray,gray,gray,1.0);break;\n"
+"	}\n"
+"	dst = color;\n"
+"}\n"
+;
 
 	// Create and compile our GLSL program from the shaders
 	LoadShadersCode(vertexShaderCode, fragmentShaderCode);
@@ -162,6 +265,7 @@ glsShaderConvertS::glsShaderConvertS(void)
 	position = glGetAttribLocation(program, "position");
 	texSrc = glGetUniformLocation(program, "texSrc");
 	f_scl = glGetUniformLocation(program, "scl");
+	i_flag = glGetUniformLocation(program, "flag");
 }
 
 
@@ -197,7 +301,8 @@ static Size getTextureSize(GLuint tex){
 static void glsConvertProcess(
 	const glsShaderConvertBase* shader,	//progmra ID
 	const GLuint& texSrc,			//src texture IDs
-	const float scl					// scaling 
+	const float scl,				// scaling 
+	const int flag	= -1			// flag 
 	)
 {
 	Size size = getTextureSize(texSrc);
@@ -212,6 +317,7 @@ static void glsConvertProcess(
 	//uniform
 	{
 		glUniform1f(shader->f_scl, scl);
+		glUniform1i(shader->i_flag, flag);
 	}
 
 
@@ -324,6 +430,55 @@ void glsConvert(const glsMat& src, const glsMat& dst, const float scl){
 	glDeleteFramebuffers(1, &fbo);
 
 }
+
+void glsCvtColor(const glsMat& src, const glsMat& dst, const int code){
+	assert(dst.type == GL_FLOAT);
+
+
+
+	glsShaderConvertBase* shader = 0;
+
+	switch (src.type){
+	case(GL_FLOAT) : shader = shaderConvert; break;
+	case(GL_UNSIGNED_BYTE) :
+	case(GL_UNSIGNED_SHORT) :
+	case(GL_UNSIGNED_INT) : shader = shaderConvertU; break;
+	case(GL_BYTE) :
+	case(GL_SHORT) :
+	case(GL_INT) : shader = shaderConvertS; break;
+	default: assert(0);		//not implement
+	}
+
+	//FBO 
+	GLuint fbo = 0;
+	//---------------------------------
+	// FBO
+	// create FBO (off-screen framebuffer)
+	glGenFramebuffers(1, &fbo);
+
+	// bind offscreen framebuffer (that is, skip the window-specific render target)
+	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+
+	GLenum bufs[] =
+	{
+		GL_COLOR_ATTACHMENT0,
+	};
+	glDrawBuffers(1, bufs);
+
+
+	for (int i = 0; i < src.texArray.size(); i++){
+		//dst texture
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_RECTANGLE, dst.texArray[i], 0);
+		assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
+		float scl = 1.0f;
+		glsConvertProcess(shader, src.texArray[i], scl, code);
+	}
+
+	glDeleteFramebuffers(1, &fbo);
+
+
+}
+
 
 
 
