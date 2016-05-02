@@ -26,17 +26,14 @@ public:
 	int rows;
 	int cols;
 
-
 	vector<GLuint> texArray;
 
 	glsMat(const Mat & cvmat, bool upload = true);
 	glsMat(const Size size, const int type, const Size blkNum = Size(1,1));
-	glsMat& operator=(const glsMat& rhs);
-
-
-
 	glsMat(void);
 	~glsMat(void);
+
+	glsMat& operator=(const glsMat& rhs);
 
 	Size size(void) const { return Size(cols, rows); }
 	Size blkNum(void) const { return Size(blkX, blkY); }
