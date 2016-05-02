@@ -16,8 +16,11 @@
 
 glsMat::glsMat(void){
 	flag = 0;
-	width = 0;
-	height = 0;
+	rows = 0;
+	cols = 0;
+
+//	width = 0;
+//	height = 0;
 	blkX = 0;
 	blkY = 0;
 	texArray.clear();
@@ -28,10 +31,6 @@ glsMat::glsMat(const Size size, const int ocvtype, const Size blkNum){
 	createTexture(size.width, size.height, ocvtype, blkNum.width, blkNum.height);
 }
 
-
-glsMat::glsMat(const int _width, const int _height, int _type, const int _blkX, const int _blkY){
-	createTexture(_width, _height, _type, _blkX, _blkY);
-}
 
 
 glsMat::glsMat(const Mat & cvmat, bool upload){
@@ -48,8 +47,8 @@ glsMat& glsMat::operator=(const glsMat& rhs){
 	
 	refcount = rhs.refcount;
 	flag = rhs.flag;
-	width = rhs.width;
-	height = rhs.height;
+	cols = rhs.cols;
+	rows = rhs.rows;
 	blkX = rhs.blkX;
 	blkY = rhs.blkY;
 	texArray = rhs.texArray;
@@ -85,12 +84,10 @@ void glsMat::createTexture(
 
 	flag = _type;
 
-	width = _width;
-	height = _height;
+	cols = _width;
+	rows = _height;
 	blkX = _blkX;
 	blkY = _blkY;
-	int texWidth = width / blkX;
-	int texHeight = height / blkY;
 
 	texArray.resize(blkY*blkX);
 
@@ -105,7 +102,7 @@ void glsMat::createTexture(
 		glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 
 		//create the texture
-		glTexImage2D(GL_TEXTURE_RECTANGLE, 0, glSizedFormat(), texWidth, texHeight, 0, glFormat(), glType(), 0);
+		glTexImage2D(GL_TEXTURE_RECTANGLE, 0, glSizedFormat(), texWidth(), texHeight(), 0, glFormat(), glType(), 0);
 
 		glBindTexture(GL_TEXTURE_RECTANGLE, 0);
 	}
@@ -124,9 +121,9 @@ GLuint glsMat::at(const int y, const int x){
 void glsMat::CopyFrom(const Mat&src){
 	_TMR_("-upload :\t");
 
-	CV_Assert(src.type() == ocvtype());
-	CV_Assert(src.cols == width);
-	CV_Assert(src.rows == height);
+	CV_Assert(src.type() == type());
+	CV_Assert(src.cols == cols);
+	CV_Assert(src.rows == rows);
 
 	// texture
 	const int texWidth = src.cols / blkX;
@@ -203,15 +200,13 @@ void glsMat::CopyFrom(const Mat&src){
 void glsMat::CopyTo(Mat&dst){
 	_TMR_("-download:\t");
 
-	dst = Mat(Size(width, height), ocvtype());
+	dst = Mat(size(), type());
 
 	// texture
-	const int texWidth = width / blkX;
-	const int texHeight = height / blkY;
 
 	{	//download from texture
 #ifdef _USE_PBO_DOWN
-		int size = texWidth*texHeight * (int)dst.elemSize();
+		int size = texWidth()*texHeight() * (int)dst.elemSize();
 		vector<GLuint> pbo(texArray.size());
 		glGenBuffers((GLsizei)pbo.size(), &pbo[0]);
 		for (int i = 0; i < pbo.size(); i++){
@@ -222,10 +217,10 @@ void glsMat::CopyTo(Mat&dst){
 		for (int by = 0; by < blkY; by++){
 			for (int bx = 0; bx < blkX; bx++){
 				int i = by*blkX + bx;
-				int x = (bx)* texWidth;
-				int y = (by)* texHeight;
+				int x = (bx)* texWidth();
+				int y = (by)* texHeight();
 
-				Rect rect(x, y, texWidth, texHeight);
+				Rect rect(x, y, texWidth(), texHeight());
 				Mat roi = Mat(dst, rect);	// 1/2  1/2 rect
 
 				//Copy pixels from texture object to pbo_bank

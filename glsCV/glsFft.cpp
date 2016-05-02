@@ -306,14 +306,14 @@ static void glsFftProcess(
 // execute FFT 
 void glsFft(glsMat& texture, int flag){
 
-	int N = texture.width;
+	int N = texture.cols;
 	assert(IsPow2(N));
 
 	glsFBO fbo(2);
 	glsVAO vao(shaderFft->position);
 
-	glsMat texTmp(texture.size(), texture.ocvtype(), texture.blkNum());
-	glsMat texW(Size(N / 2, 1), texture.ocvtype());
+	glsMat texTmp(texture.size(), texture.type(), texture.blkNum());
+	glsMat texW(Size(N / 2, 1), texture.type());
 
 	//---------------------------------
 	// upload twidle texture

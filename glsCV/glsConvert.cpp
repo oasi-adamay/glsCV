@@ -350,7 +350,7 @@ static void glsConvertProcess(
 //conver texture format
 void glsConvert(const glsMat& src, glsMat& dst, const float scl){
 
-	glsMat _dst = glsMat(src.size(), CV_MAKETYPE(CV_32F, CV_MAT_CN(src.ocvtype())), src.blkNum());
+	glsMat _dst = glsMat(src.size(), CV_MAKETYPE(CV_32F, CV_MAT_CN(src.type())), src.blkNum());
 	assert(_dst.glType() == GL_FLOAT);
 
 	glsShaderConvertBase* shader = 0;
@@ -366,7 +366,7 @@ void glsConvert(const glsMat& src, glsMat& dst, const float scl){
 	//default: assert(0);		//not implement
 	//}
 
-	switch (CV_MAT_DEPTH(src.ocvtype())){
+	switch (CV_MAT_DEPTH(src.type())){
 	case(CV_32F) : shader = shaderConvert; break;
 	case(CV_8U) :
 	case(CV_16U) : shader = shaderConvertU; break;
@@ -422,11 +422,11 @@ void glsCvtColor(const glsMat& src, glsMat& dst, const int code){
 		assert(0);
 	}
 
-	glsMat _dst = glsMat(src.size(), CV_MAKETYPE(CV_MAT_DEPTH(src.ocvtype()), ch), src.blkNum());
+	glsMat _dst = glsMat(src.size(), CV_MAKETYPE(CV_MAT_DEPTH(src.type()), ch), src.blkNum());
 
 	glsShaderConvertBase* shader = 0;
 
-	switch (CV_MAT_DEPTH(src.ocvtype())){
+	switch (CV_MAT_DEPTH(src.type())){
 	case(CV_32F) : shader = shaderConvert; break;
 	case(CV_8U) :
 	case(CV_16U) : shader = shaderConvertU; break;
