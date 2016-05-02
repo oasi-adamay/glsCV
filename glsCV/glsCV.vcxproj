@@ -141,9 +141,11 @@
   <ItemGroup>
     <ClInclude Include="glsBasicOperation.h" />
     <ClInclude Include="glsCV.h" />
+    <ClInclude Include="glsFBO.h" />
     <ClInclude Include="glsFft.h" />
     <ClInclude Include="glsMat.h" />
     <ClInclude Include="glsShader.h" />
+    <ClInclude Include="glsVAO.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="Timer.h" />
@@ -153,9 +155,11 @@
     <ClCompile Include="glsConvert.cpp" />
     <ClCompile Include="glsCV.cpp" />
     <ClCompile Include="glsDraw.cpp" />
+    <ClCompile Include="glsFBO.cpp" />
     <ClCompile Include="glsFft.cpp" />
     <ClCompile Include="glsMat.cpp" />
     <ClCompile Include="glsShader.cpp" />
+    <ClCompile Include="glsVAO.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

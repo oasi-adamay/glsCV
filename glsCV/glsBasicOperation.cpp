@@ -158,54 +158,9 @@ const int flags					//flag (opcode)
 
 	glBindTexture(GL_TEXTURE_RECTANGLE, 0);
 
-
-	//FBO 
-	GLuint fbo = 0;
-
-	//---------------------------------
-	// FBO
-	// create FBO (off-screen framebuffer)
-	glGenFramebuffers(1, &fbo);
-
-	// bind offscreen framebuffer (that is, skip the window-specific render target)
-	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-
-	//---------------------------------
-	// vbo
-	GLuint vao = 0;
-	GLuint vbo = 0;
-
-	// [-1, 1] ‚Ì³•ûŒ`
-	static GLfloat position[][2] = {
-		{ -1.0f, -1.0f },
-		{ 1.0f, -1.0f },
-		{ 1.0f, 1.0f },
-		{ -1.0f, 1.0f }
-	};
-
-	// create vao&vbo
-	glGenVertexArrays(1, &vao);
-	glGenBuffers(1, &vbo);
-
-	// bind vao & vbo
-	glBindVertexArray(vao);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-
-	// upload vbo data
-	glBufferData(GL_ARRAY_BUFFER, (int)sizeof(position), position, GL_STATIC_DRAW);
-
-	// Set VertexAttribute
-	glEnableVertexAttribArray(shaderBinaryOperation->position);	//enable attribute Location
-	glVertexAttribPointer(
-		shaderBinaryOperation->position,	// attribute location.
-		2,					// size	(Specifies the number of components) x,y
-		GL_FLOAT,			// type
-		GL_FALSE,			// normalized?
-		0,					// stride (Specifies the byte offset between consecutive generic vertex attributes)
-		(void*)0			// array buffer offset (Specifies a pointer to the first generic vertex attribute in the array)
-		);
-
-
+	
+	glsFBO fbo;		//FBO 
+	glsVAO vao(shaderBinaryOperation->position);	//VAO
 
 	//program
 	{
@@ -250,13 +205,6 @@ const int flags					//flag (opcode)
 			glFlush();
 		}
 	}
-
-	//clean up
-	glBindVertexArray(0);
-	glDeleteVertexArrays(1, &vao);
-	glDeleteBuffers(1, &vbo);
-
-	glDeleteFramebuffers(1, &fbo);
 
 }
 
@@ -365,53 +313,8 @@ void glslBinaryOperation(
 
 	glBindTexture(GL_TEXTURE_RECTANGLE, 0);
 
-
-	//FBO 
-	GLuint fbo = 0;
-
-	//---------------------------------
-	// FBO
-	// create FBO (off-screen framebuffer)
-	glGenFramebuffers(1, &fbo);
-
-	// bind offscreen framebuffer (that is, skip the window-specific render target)
-	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-
-	//---------------------------------
-	// vbo
-	GLuint vao = 0;
-	GLuint vbo = 0;
-
-	// [-1, 1] ‚Ì³•ûŒ`
-	static GLfloat position[][2] = {
-		{ -1.0f, -1.0f },
-		{ 1.0f, -1.0f },
-		{ 1.0f, 1.0f },
-		{ -1.0f, 1.0f }
-	};
-
-	// create vao&vbo
-	glGenVertexArrays(1, &vao);
-	glGenBuffers(1, &vbo);
-
-	// bind vao & vbo
-	glBindVertexArray(vao);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-
-	// upload vbo data
-	glBufferData(GL_ARRAY_BUFFER, (int)sizeof(position), position, GL_STATIC_DRAW);
-
-	// Set VertexAttribute
-	glEnableVertexAttribArray(shaderBinaryOperation->position);	//enable attribute Location
-	glVertexAttribPointer(
-		shaderBinaryOperation->position,	// attribute location.
-		2,					// size	(Specifies the number of components) x,y
-		GL_FLOAT,			// type
-		GL_FALSE,			// normalized?
-		0,					// stride (Specifies the byte offset between consecutive generic vertex attributes)
-		(void*)0			// array buffer offset (Specifies a pointer to the first generic vertex attribute in the array)
-		);
-
+	glsFBO fbo;		//FBO 
+	glsVAO vao(shaderBinaryOperation->position);	//VAO
 
 
 	//program
@@ -460,13 +363,6 @@ void glslBinaryOperation(
 			glFlush();
 		}
 	}
-
-	//clean up
-	glBindVertexArray(0);
-	glDeleteVertexArrays(1, &vao);
-	glDeleteBuffers(1, &vbo);
-
-	glDeleteFramebuffers(1, &fbo);
 
 }
 
@@ -833,7 +729,7 @@ void glsMulSpectrumsPhaseOnly(const Mat& src0, const Mat& src1, Mat& dst){
 void glsMagSpectrums(const Mat& src, Mat& dst){
 	CV_Assert(src.type() == CV_32FC2);
 	glsMat _src(src, false);
-	glsMat _dst(src.cols, src.rows, CV_32FC1);
+	glsMat _dst(src.size(), CV_32FC1);
 	_src.CopyFrom(src);	//upload
 	glsMagSpectrums(_src, _dst);
 	_dst.CopyTo(dst);	//download

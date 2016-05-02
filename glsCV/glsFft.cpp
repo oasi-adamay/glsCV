@@ -7,6 +7,13 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
+#ifdef DEBUG
+#define _TMR_(...)  Timer tmr(__VA_ARGS__)
+#else
+#define _TMR_(...)
+#endif
+
+
 //-----------------------------------------------------------------------------
 //global 
 glsShaderFft* shaderFft = 0;
@@ -302,99 +309,44 @@ void glsFft(glsMat& texture, int flag){
 	int N = texture.width;
 	assert(IsPow2(N));
 
+	glsFBO fbo(2);
+	glsVAO vao(shaderFft->position);
 
-	//FBO 
-	GLuint fbo = 0;
-
-	//---------------------------------
-	// FBO
-	// create FBO (off-screen framebuffer)
-	glGenFramebuffers(1, &fbo);
-
-	// bind offscreen framebuffer (that is, skip the window-specific render target)
-	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-
-	//---------------------------------
-	// vbo
-	GLuint vao = 0;
-	GLuint vbo = 0;
-
-	// [-1, 1] ‚Ì³•ûŒ`
-	static GLfloat position[][2] = {
-		{ -1.0f, -1.0f },
-		{ 1.0f, -1.0f },
-		{ 1.0f, 1.0f },
-		{ -1.0f, 1.0f }
-	};
-
-	// create vao&vbo
-	glGenVertexArrays(1, &vao);
-	glGenBuffers(1, &vbo);
-
-	// bind vao & vbo
-	glBindVertexArray(vao);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-
-	// upload vbo data
-	glBufferData(GL_ARRAY_BUFFER, (int)sizeof(position), position, GL_STATIC_DRAW);
-
-	// Set VertexAttribute
-	glEnableVertexAttribArray(shaderFft->position);	//enable attribute Location
-	glVertexAttribPointer(
-		shaderFft->position,	// attribute location.
-		2,					// size	(Specifies the number of components) x,y
-		GL_FLOAT,			// type
-		GL_FALSE,			// normalized?
-		0,					// stride (Specifies the byte offset between consecutive generic vertex attributes)
-		(void*)0			// array buffer offset (Specifies a pointer to the first generic vertex attribute in the array)
-		);
-
-	glsMat texTmp(texture.width, texture.height, texture.ocvtype(), texture.blkX, texture.blkY);
-//	glsMat texTmp(texture,false);
-	GLuint texW = 0;	//twidle
-
-	//---------------------------------
-	// CreateTexture
-	{
-
-		//twidle texture
-		{
-			glGenTextures(1, &texW); // create (reference to) a new texture
-			glBindTexture(GL_TEXTURE_RECTANGLE, texW);
-			// (set texture parameters here)
-			glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-			glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-			glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-			glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-
-			//create the texture
-			glTexImage2D(GL_TEXTURE_RECTANGLE, 0, texture.glSizedFormat(), N / 2, 1, 0, texture.glFormat(), texture.glType(), 0);
-
-			glBindTexture(GL_TEXTURE_RECTANGLE, 0);
-		}
-
-	}
+	glsMat texTmp(texture.size(), texture.ocvtype(), texture.blkNum());
+	glsMat texW(Size(N / 2, 1), texture.ocvtype());
 
 	//---------------------------------
 	// upload twidle texture
 	{
-		Timer tmr("-twidle:  \t");
+		_TMR_("-twidle:  \t");
 
-		vector<vec2> w(N / 2);
+		Mat w(Size(N / 2, 1), CV_32FC2);
+		#ifdef _OPENMP
+		#pragma omp parallel for
+		#endif
+		for (int n = 0; n < N / 2; n++){
+			float jw = (float)(-2 * M_PI * n / N);
+			Vec2f val(cos(jw), sin(jw));
+			w.at<Vec2f>(0, n) = val;
+		}
+		texW.CopyFrom(w);
+
+
+		//vector<vec2> w(N / 2);
 		// --- twidle ----
 		//#ifdef _OPENMP
 		//#pragma omp parallel for
 		//#endif
-		for (int n = 0; n < N / 2; n++){
-			float jw = (float)(-2 * M_PI * n / N);
-			w[n][0] = cos(jw);
-			w[n][1] = sin(jw);
-		}
-		void* data = &w[0];
+		//for (int n = 0; n < N / 2; n++){
+		//	float jw = (float)(-2 * M_PI * n / N);
+		//	w[n][0] = cos(jw);
+		//	w[n][1] = sin(jw);
+		//}
+		//void* data = &w[0];
 
-		glBindTexture(GL_TEXTURE_RECTANGLE, texW);
-		glTexSubImage2D(GL_TEXTURE_RECTANGLE, 0, 0, 0, (GLsizei)w.size(), 1, texture.glFormat(), texture.glType(), data);
-		glBindTexture(GL_TEXTURE_RECTANGLE, 0);
+		//glBindTexture(GL_TEXTURE_RECTANGLE, texW);
+		//glTexSubImage2D(GL_TEXTURE_RECTANGLE, 0, 0, 0, (GLsizei)w.size(), 1, texture.glFormat(), texture.glType(), data);
+		//glBindTexture(GL_TEXTURE_RECTANGLE, 0);
 	}
 
 
@@ -405,7 +357,7 @@ void glsFft(glsMat& texture, int flag){
 	int bank = 0;
 
 	{
-		Timer tmr("-execute:\t");
+		_TMR_("-execute:\t");
 
 		int Q = 0;
 		while ((1 << Q) < N){ Q++; }
@@ -424,7 +376,7 @@ void glsFft(glsMat& texture, int flag){
 				float xscl = 1.0f;
 				float xconj = ((flag & GLS_FFT_INVERSE) && (p == 0)) ? -1.0f : 1.0f;
 				float yconj = 1.0f;
-				glsFftProcess(shaderFft, texSrc, texDst, texW, 0, p, q, N, xscl, yscl, xconj,yconj);
+				glsFftProcess(shaderFft, texSrc, texDst, texW.texArray[0], 0, p, q, N, xscl, yscl, xconj,yconj);
 			}
 		}
 		// --- FFT cols ----
@@ -438,18 +390,11 @@ void glsFft(glsMat& texture, int flag){
 				float xscl =  1.0f;
 				float xconj = 1.0f;
 				float yconj = ((flag & GLS_FFT_INVERSE) && (q == 0)) ? -1.0f : 1.0f;
-				glsFftProcess(shaderFft, texSrc, texDst, texW, 1, p, q, N, xscl, yscl, xconj, yconj);
+				glsFftProcess(shaderFft, texSrc, texDst, texW.texArray[0], 1, p, q, N, xscl, yscl, xconj, yconj);
 			}
 		}
 	}
 
-	//clean up
-	glBindVertexArray(0);
-	glDeleteVertexArrays(1, &vao);
-	glDeleteBuffers(1, &vbo);
-
-	glDeleteFramebuffers(1, &fbo);
-	glDeleteTextures(1, &texW);
 
 }
 
@@ -462,7 +407,7 @@ void glsFft(const Mat& src, Mat& dst, int flag){
 	int N = src.cols;
 	CV_Assert(IsPow2(N));
 
-	glsMat texture(src.cols, src.rows, src.type(),2, 2);
+	glsMat texture(src.size(), src.type(), Size(2, 2));
 
 	//---------------------------------
 	//upload

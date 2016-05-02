@@ -18,6 +18,7 @@ private:
 //	glsMat(const glsMat& src, bool copy);
 
 	void createTexture(const int _width, const int _height, int _type, const int _blkX = 1, const int _blkY = 1);
+	glsMat(const int _width, const int _height, int _type, const int _blkX = 1, const int _blkY = 1);
 
 public:
 	int width;
@@ -27,7 +28,6 @@ public:
 
 	vector<GLuint> texArray;
 
-	glsMat(const int _width, const int _height, int _type, const int _blkX = 1, const int _blkY = 1);
 	glsMat(const Mat & cvmat, bool upload = true);
 	glsMat(const Size size, const int type, const Size blkNum = Size(1,1));
 	glsMat& operator=(const glsMat& rhs);

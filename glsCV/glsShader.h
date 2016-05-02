@@ -2,6 +2,8 @@
 #define _GLS_SHADER_H_
 
 #include "glsMat.h"
+#include "glsFBO.h"
+#include "glsVAO.h"
 
 
 // glslBase shader

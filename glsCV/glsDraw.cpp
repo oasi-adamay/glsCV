@@ -227,40 +227,7 @@ static void glsDrawProcess(
 		glUniform1i(shader->texSrc, id);
 	}
 
-	//---------------------------------
-	// vbo
-	GLuint vao = 0;
-	GLuint vbo = 0;
-
-	// [-1, 1] ‚Ì³•ûŒ`
-	static GLfloat position[][2] = {
-		{ -1.0f, -1.0f },
-		{ 1.0f, -1.0f },
-		{ 1.0f, 1.0f },
-		{ -1.0f, 1.0f }
-	};
-
-	// create vao&vbo
-	glGenVertexArrays(1, &vao);
-	glGenBuffers(1, &vbo);
-
-	// bind vao & vbo
-	glBindVertexArray(vao);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-
-	// upload vbo data
-	glBufferData(GL_ARRAY_BUFFER, (int)sizeof(position), position, GL_STATIC_DRAW);
-
-	// Set VertexAttribute
-	glEnableVertexAttribArray(shaderDraw->position);	//enable attribute Location
-	glVertexAttribPointer(
-		shaderDraw->position,	// attribute location.
-		2,					// size	(Specifies the number of components) x,y
-		GL_FLOAT,			// type
-		GL_FALSE,			// normalized?
-		0,					// stride (Specifies the byte offset between consecutive generic vertex attributes)
-		(void*)0			// array buffer offset (Specifies a pointer to the first generic vertex attribute in the array)
-		);
+	glsVAO vao(shader->position);
 	
 
 	//Viewport
@@ -276,10 +243,6 @@ static void glsDrawProcess(
 
 	//	glFinish();
 
-	//clean up
-	glBindVertexArray(0);
-	glDeleteVertexArrays(1, &vao);
-	glDeleteBuffers(1, &vbo);
 }
 
 //-----------------------------------------------------------------------------
