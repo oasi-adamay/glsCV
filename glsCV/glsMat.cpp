@@ -94,17 +94,17 @@ void glsMat::createTexture(
 	glGenTextures((GLsizei)texArray.size(), &texArray[0]); // create (reference to) a new texture
 
 	for (int i = 0; i < (int)texArray.size(); i++){
-		glBindTexture(GL_TEXTURE_RECTANGLE, texArray[i]);
+		glBindTexture(GL_TEXTURE_2D, texArray[i]);
 		// (set texture parameters here)
-		glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-		glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 
 		//create the texture
-		glTexImage2D(GL_TEXTURE_RECTANGLE, 0, glSizedFormat(), texWidth(), texHeight(), 0, glFormat(), glType(), 0);
+		glTexImage2D(GL_TEXTURE_2D, 0, glSizedFormat(), texWidth(), texHeight(), 0, glFormat(), glType(), 0);
 
-		glBindTexture(GL_TEXTURE_RECTANGLE, 0);
+		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
 	refcount = make_shared<int>(1);
@@ -167,11 +167,11 @@ void glsMat::CopyFrom(const Mat&src){
 				glUnmapBuffer(GL_PIXEL_UNPACK_BUFFER);
 
 				//Copy pixels from pbo to texture object
-				glBindTexture(GL_TEXTURE_RECTANGLE, texArray[i]);
+				glBindTexture(GL_TEXTURE_2D, texArray[i]);
 				glBindBuffer(GL_PIXEL_UNPACK_BUFFER, pbo[i]); //bind pbo
-				glTexSubImage2D(GL_TEXTURE_RECTANGLE, 0, 0, 0, texWidth, texHeight, glFormat(), glType(), 0);
+				glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, texWidth, texHeight, glFormat(), glType(), 0);
 				glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
-				glBindTexture(GL_TEXTURE_RECTANGLE, 0);
+				glBindTexture(GL_TEXTURE_2D, 0);
 			}
 		}
 
@@ -187,9 +187,9 @@ void glsMat::CopyFrom(const Mat&src){
 				CV_Assert(roi.isContinuous());
 				void* data = roi.data;
 
-				glBindTexture(GL_TEXTURE_RECTANGLE, texArray[i]);
-				glTexSubImage2D(GL_TEXTURE_RECTANGLE, 0, 0, 0, texWidth, texHeight, format, type, data);
-				glBindTexture(GL_TEXTURE_RECTANGLE, 0);
+				glBindTexture(GL_TEXTURE_2D, texArray[i]);
+				glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, texWidth, texHeight, format, type, data);
+				glBindTexture(GL_TEXTURE_2D, 0);
 			}
 		}
 #endif
@@ -224,11 +224,11 @@ void glsMat::CopyTo(Mat&dst){
 				Mat roi = Mat(dst, rect);	// 1/2  1/2 rect
 
 				//Copy pixels from texture object to pbo_bank
-				glBindTexture(GL_TEXTURE_RECTANGLE, texArray[i]);
+				glBindTexture(GL_TEXTURE_2D, texArray[i]);
 				glBindBuffer(GL_PIXEL_PACK_BUFFER, pbo[i]); //bind pbo
-				glGetTexImage(GL_TEXTURE_RECTANGLE, 0, glFormat(), glType(), 0);
+				glGetTexImage(GL_TEXTURE_2D, 0, glFormat(), glType(), 0);
 				glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
-				glBindTexture(GL_TEXTURE_RECTANGLE, 0);
+				glBindTexture(GL_TEXTURE_2D, 0);
 
 				//bind current pbo for app->pbo transfer
 				glBindBuffer(GL_PIXEL_PACK_BUFFER, pbo[i]); //bind pbo
@@ -258,9 +258,9 @@ void glsMat::CopyTo(Mat&dst){
 				int y = (by)* texHeight;
 				void* data = tmp.data;
 
-				glBindTexture(GL_TEXTURE_RECTANGLE, texArray[i]);
-				glGetTexImage(GL_TEXTURE_RECTANGLE, 0, glFormat(), glType(), data);
-				glBindTexture(GL_TEXTURE_RECTANGLE, 0);
+				glBindTexture(GL_TEXTURE_2D, texArray[i]);
+				glGetTexImage(GL_TEXTURE_2D, 0, glFormat(), glType(), data);
+				glBindTexture(GL_TEXTURE_2D, 0);
 
 				Rect rect(x, y, texWidth, texHeight);
 				Mat roi = Mat(dst, rect);	// 1/2  1/2 rect

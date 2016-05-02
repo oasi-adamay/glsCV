@@ -79,7 +79,7 @@ glsShaderDraw::glsShaderDraw(void)
 	const char fragmentShaderCode[] =
 		"#version 330 core\n"
 		"precision highp float;\n"
-		"uniform sampler2DRect	texSrc;\n"
+		"uniform sampler2D	texSrc;\n"
 		"uniform float	scl;\n"
 		"uniform int 	flag;\n"
 		"\n"
@@ -87,7 +87,7 @@ glsShaderDraw::glsShaderDraw(void)
 		"\n"
 		"void main(void)\n"
 		"{\n"
-		"	vec4 data = texture(texSrc, gl_FragCoord.xy);\n"
+		"	vec4 data = texelFetch(texSrc, ivec2(gl_FragCoord.xy),0);\n"
 		"	vec4 color;\n"
 		"	switch(flag&3){\n"
 		"	case(0):color = vec4(data.r*scl,data.g*scl,data.b*scl,data.g*scl);break;\n"
@@ -132,7 +132,7 @@ glsShaderDrawU::glsShaderDrawU(void)
 	const char fragmentShaderCode[] =
 		"#version 330 core\n"
 		"precision highp float;\n"
-		"uniform usampler2DRect	texSrc;\n"
+		"uniform usampler2D	texSrc;\n"
 		"uniform float	scl;\n"
 		"uniform int 	flag;\n"
 		"\n"
@@ -140,7 +140,7 @@ glsShaderDrawU::glsShaderDrawU(void)
 		"\n"
 		"void main(void)\n"
 		"{\n"
-		"	vec4 data = vec4(texture(texSrc, gl_FragCoord.xy));\n"
+		"	vec4 data = vec4(texelFetch(texSrc, ivec2(gl_FragCoord.xy),0));\n"
 		"	vec4 color;\n"
 		"	switch(flag&3){\n"
 		"	case(0):color = vec4(data.r*scl,data.g*scl,data.b*scl,data.g*scl);break;\n"
@@ -175,18 +175,18 @@ static Size getTextureSize(GLuint tex){
 
 	//get texture size
 
-	glBindTexture(GL_TEXTURE_RECTANGLE, tex);
+	glBindTexture(GL_TEXTURE_2D, tex);
 	glGetTexLevelParameteriv(
-		GL_TEXTURE_RECTANGLE, 0,
+		GL_TEXTURE_2D, 0,
 		GL_TEXTURE_WIDTH, &width
 		);
 
 	glGetTexLevelParameteriv(
-		GL_TEXTURE_RECTANGLE, 0,
+		GL_TEXTURE_2D, 0,
 		GL_TEXTURE_HEIGHT, &height
 		);
 
-	glBindTexture(GL_TEXTURE_RECTANGLE, 0);
+	glBindTexture(GL_TEXTURE_2D, 0);
 
 	return Size(width, height);
 }
@@ -223,7 +223,7 @@ static void glsDrawProcess(
 	{
 		int id = 0;
 		glActiveTexture(GL_TEXTURE0 + id);
-		glBindTexture(GL_TEXTURE_RECTANGLE, texSrc);
+		glBindTexture(GL_TEXTURE_2D, texSrc);
 		glUniform1i(shader->texSrc, id);
 	}
 

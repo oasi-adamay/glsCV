@@ -115,13 +115,13 @@ glsShaderConvert::glsShaderConvert(void)
 	const char fragmentShaderCode[] = 
 "#version 330 core\n"
 "precision highp float;\n"
-"uniform sampler2DRect	texSrc;\n"
+"uniform sampler2D	texSrc;\n"
 "uniform float	scl;\n"
 "uniform int	flag;\n"
 "layout (location = 0) out vec4 dst;\n"
 "void main(void)\n"
 "{\n"
-"	vec4 data = texture(texSrc, gl_FragCoord.xy);\n"
+"	vec4 data = texelFetch(texSrc, ivec2(gl_FragCoord.xy),0);\n"
 "	vec4 color = vec4(data.r*scl,data.g*scl,data.b*scl,data.a*scl);\n"
 "	float gray;\n"
 "	switch(flag){\n"
@@ -170,13 +170,13 @@ glsShaderConvertU::glsShaderConvertU(void)
 	const char fragmentShaderCode[] =
 "#version 330 core\n"
 "precision highp float;\n"
-"uniform usampler2DRect	texSrc;\n"
+"uniform usampler2D	texSrc;\n"
 "uniform float	scl;\n"
 "uniform int	flag;\n"
 "layout (location = 0) out vec4 dst;\n"
 "void main(void)\n"
 "{\n"
-"	vec4 data = vec4(texture(texSrc, gl_FragCoord.xy));\n"
+"	vec4 data = vec4(texelFetch(texSrc, ivec2(gl_FragCoord.xy),0));\n"
 "	vec4 color = vec4(data.r*scl,data.g*scl,data.b*scl,data.a*scl);\n"
 "	float gray;\n"
 "	switch(flag){\n"
@@ -223,13 +223,13 @@ glsShaderConvertS::glsShaderConvertS(void)
 	const char fragmentShaderCode[] =
 "#version 330 core\n"
 "precision highp float;\n"
-"uniform isampler2DRect	texSrc;\n"
+"uniform isampler2D	texSrc;\n"
 "uniform float	scl;\n"
 "uniform int	flag;\n"
 "layout (location = 0) out vec4 dst;\n"
 "void main(void)\n"
 "{\n"
-"	vec4 data = vec4(texture(texSrc, gl_FragCoord.xy));\n"
+"	vec4 data = vec4(texelFetch(texSrc, ivec2(gl_FragCoord.xy),0));\n"
 "	vec4 color = vec4(data.r*scl,data.g*scl,data.b*scl,data.a*scl);\n"
 "	float gray;\n"
 "	switch(flag){\n"
@@ -277,18 +277,18 @@ static Size getTextureSize(GLuint tex){
 
 	//get texture size
 
-	glBindTexture(GL_TEXTURE_RECTANGLE, tex);
+	glBindTexture(GL_TEXTURE_2D, tex);
 	glGetTexLevelParameteriv(
-		GL_TEXTURE_RECTANGLE, 0,
+		GL_TEXTURE_2D, 0,
 		GL_TEXTURE_WIDTH, &width
 		);
 
 	glGetTexLevelParameteriv(
-		GL_TEXTURE_RECTANGLE, 0,
+		GL_TEXTURE_2D, 0,
 		GL_TEXTURE_HEIGHT, &height
 		);
 
-	glBindTexture(GL_TEXTURE_RECTANGLE, 0);
+	glBindTexture(GL_TEXTURE_2D, 0);
 
 	return Size(width, height);
 }
@@ -325,7 +325,7 @@ static void glsConvertProcess(
 	{
 		int id = 0;
 		glActiveTexture(GL_TEXTURE0 + id);
-		glBindTexture(GL_TEXTURE_RECTANGLE, texSrc);
+		glBindTexture(GL_TEXTURE_2D, texSrc);
 		glUniform1i(shader->texSrc, id);
 	}
 
@@ -380,7 +380,7 @@ void glsConvert(const glsMat& src, glsMat& dst, const float scl){
 
 	for (int i = 0; i < src.texArray.size(); i++){
 		//dst texture
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_RECTANGLE, _dst.texArray[i], 0);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _dst.texArray[i], 0);
 		assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
 
 		glsConvertProcess(shader, src.texArray[i], scl);
@@ -440,7 +440,7 @@ void glsCvtColor(const glsMat& src, glsMat& dst, const int code){
 
 	for (int i = 0; i < src.texArray.size(); i++){
 		//dst texture
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_RECTANGLE, _dst.texArray[i], 0);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _dst.texArray[i], 0);
 		assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
 		float scl = 1.0f;
 		glsConvertProcess(shader, src.texArray[i], scl, code);

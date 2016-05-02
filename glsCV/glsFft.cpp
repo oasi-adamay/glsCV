@@ -51,9 +51,9 @@ glsShaderFft::glsShaderFft(void)
 	const char fragmentShaderCode[] = 
 "#version 330 core\n"
 "precision highp float;\n"
-"uniform sampler2DRect	texSrc0;\n"
-"uniform sampler2DRect	texSrc1;\n"
-"uniform sampler2DRect	texW;\n"
+"uniform sampler2D	texSrc0;\n"
+"uniform sampler2D	texSrc1;\n"
+"uniform sampler2D	texW;\n"
 "uniform  int i_flag;	//bit0:(0:holizontal 1:vertical)\n"
 "uniform  int i_N;\n"
 "uniform  int i_p;\n"
@@ -101,22 +101,22 @@ glsShaderFft::glsShaderFft(void)
 "	int iw = (n >> q) << q;\n"
 "	int ix0 = insertZeroBits(n, q, 1);\n"
 "	int ix1 = ix0 + (1 << q);\n"
-"	w = texture(texW,vec2(iw,0)).rg;\n"
+"	w = texelFetch(texW,ivec2(iw,0),0).rg;\n"
 "\n"
 "\n"
 "	if(dir ==0){\n"
-"		if(ix0 < N/2) x0 = texture(texSrc0,vec2(ix0,gl_FragCoord.y)).rg;\n"
-"		else x0 = texture(texSrc1,vec2(ix0-N/2,gl_FragCoord.y)).rg;\n"
+"		if(ix0 < N/2) x0 = texelFetch(texSrc0,ivec2(ix0,gl_FragCoord.y),0).rg;\n"
+"		else x0 = texelFetch(texSrc1,ivec2(ix0-N/2,gl_FragCoord.y),0).rg;\n"
 "\n"
-"		if(ix1 < N/2) x1 = texture(texSrc0,vec2(ix1,gl_FragCoord.y)).rg;\n"
-"		else x1 = texture(texSrc1,vec2(ix1-N/2,gl_FragCoord.y)).rg;\n"
+"		if(ix1 < N/2) x1 = texelFetch(texSrc0,ivec2(ix1,gl_FragCoord.y),0).rg;\n"
+"		else x1 = texelFetch(texSrc1,ivec2(ix1-N/2,gl_FragCoord.y),0).rg;\n"
 "	}\n"
 "	else{\n"
-"		if(ix0 < N/2) x0 = texture(texSrc0,vec2(gl_FragCoord.x,ix0)).rg;\n"
-"		else x0 = texture(texSrc1,vec2(gl_FragCoord.x,ix0-N/2)).rg;\n"
+"		if(ix0 < N/2) x0 = texelFetch(texSrc0,ivec2(gl_FragCoord.x,ix0),0).rg;\n"
+"		else x0 = texelFetch(texSrc1,ivec2(gl_FragCoord.x,ix0-N/2),0).rg;\n"
 "\n"
-"		if(ix1 < N/2) x1 = texture(texSrc0,vec2(gl_FragCoord.x,ix1)).rg;\n"
-"		else x1 = texture(texSrc1,vec2(gl_FragCoord.x,ix1-N/2)).rg;\n"
+"		if(ix1 < N/2) x1 = texelFetch(texSrc0,ivec2(gl_FragCoord.x,ix1),0).rg;\n"
+"		else x1 = texelFetch(texSrc1,ivec2(gl_FragCoord.x,ix1-N/2),0).rg;\n"
 "	}\n"
 "\n"
 "//	x0 = x0*xscl;\n"
@@ -183,18 +183,18 @@ static Size getTextureSize(GLuint tex){
 
 	//get texture size
 
-	glBindTexture(GL_TEXTURE_RECTANGLE, tex);
+	glBindTexture(GL_TEXTURE_2D, tex);
 	glGetTexLevelParameteriv(
-		GL_TEXTURE_RECTANGLE, 0,
+		GL_TEXTURE_2D, 0,
 		GL_TEXTURE_WIDTH, &width
 		);
 
 	glGetTexLevelParameteriv(
-		GL_TEXTURE_RECTANGLE, 0,
+		GL_TEXTURE_2D, 0,
 		GL_TEXTURE_HEIGHT, &height
 		);
 
-	glBindTexture(GL_TEXTURE_RECTANGLE, 0);
+	glBindTexture(GL_TEXTURE_2D, 0);
 
 	return Size(width, height);
 }
@@ -250,13 +250,13 @@ static void glsFftProcess(
 		int id = 0;
 		for (int i = 0; i < texSrc.size(); i++, id++){
 			glActiveTexture(GL_TEXTURE0 + id);
-			glBindTexture(GL_TEXTURE_RECTANGLE, texSrc[i]);
+			glBindTexture(GL_TEXTURE_2D, texSrc[i]);
 			glUniform1i(shader->texSrc[i], id);
 		}
 
 		{
 			glActiveTexture(GL_TEXTURE0 + id);
-			glBindTexture(GL_TEXTURE_RECTANGLE, texW);
+			glBindTexture(GL_TEXTURE_2D, texW);
 			glUniform1i(shader->texW, id);
 			id++;
 		}
@@ -266,7 +266,7 @@ static void glsFftProcess(
 	//dst texture
 	{
 		for (int i = 0; i < texDst.size(); i++){
-			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_RECTANGLE, texDst[i], 0);
+			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, texDst[i], 0);
 		}
 		assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
 
@@ -344,9 +344,9 @@ void glsFft(glsMat& texture, int flag){
 		//}
 		//void* data = &w[0];
 
-		//glBindTexture(GL_TEXTURE_RECTANGLE, texW);
-		//glTexSubImage2D(GL_TEXTURE_RECTANGLE, 0, 0, 0, (GLsizei)w.size(), 1, texture.glFormat(), texture.glType(), data);
-		//glBindTexture(GL_TEXTURE_RECTANGLE, 0);
+		//glBindTexture(GL_TEXTURE_2D, texW);
+		//glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, (GLsizei)w.size(), 1, texture.glFormat(), texture.glType(), data);
+		//glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
 
@@ -444,12 +444,12 @@ glsShaderConj::glsShaderConj(void)
 	const char fragmentShaderCode[] =
 		"#version 330 core\n"
 		"precision highp float;\n"
-		"uniform sampler2DRect	texSrc;\n"
+		"uniform sampler2D	texSrc;\n"
 		"layout (location = 0) out vec2 dst;\n"
 		"\n"
 		"void main(void)\n"
 		"{\n"
-		"	vec2 src = texture(texSrc, gl_FragCoord.xy).rg;\n"
+		"	vec2 src = texelFetch(texSrc, ivec2(gl_FragCoord.xy),0).rg;\n"
 		"	dst = vec2(src.r, -1.0*src.g);\n"
 		"}\n"
 		;
@@ -493,12 +493,12 @@ static void glslConjProcess(
 		{
 			int id = 0;
 			glActiveTexture(GL_TEXTURE0 + id);
-			glBindTexture(GL_TEXTURE_RECTANGLE, texSrc[i]);
+			glBindTexture(GL_TEXTURE_2D, texSrc[i]);
 			glUniform1i(shader->texSrc, id);
 		}
 		//dst texture
 		{
-			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_RECTANGLE, texDst[i], 0);
+			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texDst[i], 0);
 			assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
 		}
 

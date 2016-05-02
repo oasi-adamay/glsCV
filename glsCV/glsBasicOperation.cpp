@@ -76,14 +76,14 @@ glsShaderScalarOperation::glsShaderScalarOperation(void){
 	const char fragmentShaderCode[] =
 		"#version 330 core\n"
 		"precision highp float;\n"
-		"uniform sampler2DRect	texSrc;\n"
+		"uniform sampler2D	texSrc;\n"
 		"uniform vec4 scalar;\n"
 		"uniform int	flags;\n"
 		"layout (location = 0) out vec4 dst;\n"
 		"\n"
 		"void main(void)\n"
 		"{\n"
-		"	vec4 src = texture(texSrc, gl_FragCoord.xy);\n"
+		"	vec4 src = texelFetch(texSrc, ivec2(gl_FragCoord.xy),0);\n"
 		"	switch(flags){\n"
 		"   case(0): dst = scalar + src; break;\n"
 		"	case(1): dst = scalar - src; break;\n"
@@ -145,18 +145,18 @@ const int flags					//flag (opcode)
 	int width;
 	int height;
 
-	glBindTexture(GL_TEXTURE_RECTANGLE, texSrc[0]);
+	glBindTexture(GL_TEXTURE_2D, texSrc[0]);
 	glGetTexLevelParameteriv(
-		GL_TEXTURE_RECTANGLE, 0,
+		GL_TEXTURE_2D, 0,
 		GL_TEXTURE_WIDTH, &width
 		);
 
 	glGetTexLevelParameteriv(
-		GL_TEXTURE_RECTANGLE, 0,
+		GL_TEXTURE_2D, 0,
 		GL_TEXTURE_HEIGHT, &height
 		);
 
-	glBindTexture(GL_TEXTURE_RECTANGLE, 0);
+	glBindTexture(GL_TEXTURE_2D, 0);
 
 	
 	glsFBO fbo;		//FBO 
@@ -179,12 +179,12 @@ const int flags					//flag (opcode)
 		{
 			int id = 0;
 			glActiveTexture(GL_TEXTURE0 + id);
-			glBindTexture(GL_TEXTURE_RECTANGLE, texSrc[i]);
+			glBindTexture(GL_TEXTURE_2D, texSrc[i]);
 			glUniform1i(shader->texSrc, id);
 		}
 		//dst texture
 		{
-			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_RECTANGLE, texDst[i], 0);
+			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texDst[i], 0);
 			assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
 		}
 
@@ -219,15 +219,15 @@ glsShaderBinaryOperation::glsShaderBinaryOperation(void){
 	const char fragmentShaderCode[] =
 		"#version 330 core\n"
 		"precision highp float;\n"
-		"uniform sampler2DRect	texSrc0;\n"
-		"uniform sampler2DRect	texSrc1;\n"
+		"uniform sampler2D	texSrc0;\n"
+		"uniform sampler2D	texSrc1;\n"
 		"uniform int			flags;\n"
 		"layout (location = 0) out vec4 dst;\n"
 		"\n"
 		"void main(void)\n"
 		"{\n"
-		"	vec4 src0 = texture(texSrc0, gl_FragCoord.xy);\n"
-		"	vec4 src1 = texture(texSrc1, gl_FragCoord.xy);\n"
+		"	vec4 src0 = texelFetch(texSrc0, ivec2(gl_FragCoord.xy),0);\n"
+		"	vec4 src1 = texelFetch(texSrc1, ivec2(gl_FragCoord.xy),0);\n"
 		"	switch(flags){\n"
 		"   case(0): dst = src0 + src1; break;\n"
 		"	case(1): dst = src0 - src1; break;\n"
@@ -300,18 +300,18 @@ void glslBinaryOperation(
 	int width;
 	int height;
 
-	glBindTexture(GL_TEXTURE_RECTANGLE, texSrc0[0]);
+	glBindTexture(GL_TEXTURE_2D, texSrc0[0]);
 	glGetTexLevelParameteriv(
-		GL_TEXTURE_RECTANGLE, 0,
+		GL_TEXTURE_2D, 0,
 		GL_TEXTURE_WIDTH, &width
 		);
 
 	glGetTexLevelParameteriv(
-		GL_TEXTURE_RECTANGLE, 0,
+		GL_TEXTURE_2D, 0,
 		GL_TEXTURE_HEIGHT, &height
 		);
 
-	glBindTexture(GL_TEXTURE_RECTANGLE, 0);
+	glBindTexture(GL_TEXTURE_2D, 0);
 
 	glsFBO fbo;		//FBO 
 	glsVAO vao(shaderBinaryOperation->position);	//VAO
@@ -332,17 +332,17 @@ void glslBinaryOperation(
 		{
 			int id = 0;
 			glActiveTexture(GL_TEXTURE0 + id);
-			glBindTexture(GL_TEXTURE_RECTANGLE, texSrc0[i]);
+			glBindTexture(GL_TEXTURE_2D, texSrc0[i]);
 			glUniform1i(shader->texSrc0, id);
 			id++;
 			glActiveTexture(GL_TEXTURE0 + id);
-			glBindTexture(GL_TEXTURE_RECTANGLE, texSrc1[i]);
+			glBindTexture(GL_TEXTURE_2D, texSrc1[i]);
 			glUniform1i(shader->texSrc1, id);
 
 		}
 		//dst texture
 		{
-			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_RECTANGLE, texDst[i], 0);
+			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texDst[i], 0);
 			assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
 		}
 
