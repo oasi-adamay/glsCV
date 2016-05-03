@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-
+#include "glsCV.h"
 #include "glsMat.h"
 #include "Timer.h"
 
@@ -11,8 +11,8 @@
 #endif
 
 
-#define _USE_PBO_UP
-#define _USE_PBO_DOWN
+//#define _USE_PBO_UP
+//#define _USE_PBO_DOWN
 
 glsMat::glsMat(void){
 	flag = 0;
@@ -59,7 +59,7 @@ glsMat& glsMat::operator=(const glsMat& rhs){
 
 //glsMat::glsMat(const glsMat& src, bool copy){
 //	createTexture(src.width, src.height, src.internalFormat, src.blkX, src.blkY);
-//	assert(copy == false);	///@TODO Copy tex
+//	GLS_Assert(copy == false);	///@TODO Copy tex
 //}
 
 
@@ -79,8 +79,8 @@ void glsMat::createTexture(
 	const int _blkX,				// block num X
 	const int _blkY					// block num Y
 	){
-	assert((_width%_blkX) == 0);
-	assert((_height%_blkY) == 0);
+	GLS_Assert((_width%_blkX) == 0);
+	GLS_Assert((_height%_blkY) == 0);
 
 	flag = _type;
 
@@ -103,6 +103,7 @@ void glsMat::createTexture(
 
 		//create the texture
 		glTexImage2D(GL_TEXTURE_2D, 0, glSizedFormat(), texWidth(), texHeight(), 0, glFormat(), glType(), 0);
+		GL_CHECK_ERROR();
 
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
@@ -112,7 +113,7 @@ void glsMat::createTexture(
 
 
 GLuint glsMat::at(const int y, const int x){
-	assert(y*blkX + x < texArray.size());
+	GLS_Assert(y*blkX + x < texArray.size());
 	return texArray[y*blkX + x];
 }
 
@@ -125,13 +126,10 @@ void glsMat::CopyFrom(const Mat&src){
 	CV_Assert(src.cols == cols);
 	CV_Assert(src.rows == rows);
 
-	// texture
-	const int texWidth = src.cols / blkX;
-	const int texHeight = src.rows / blkY;
 
 	{
 #ifdef _USE_PBO_UP
-		int size = texWidth*texHeight * (int)src.elemSize();
+		int size = texWidth()*texHeight() * (int)src.elemSize();
 		vector<GLuint> pbo(texArray.size());
 		glGenBuffers((GLsizei)pbo.size(), &pbo[0]);
 		for (int i = 0; i < pbo.size(); i++){
@@ -140,20 +138,19 @@ void glsMat::CopyFrom(const Mat&src){
 			glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
 		}
 
-
 		for (int by = 0; by < blkY; by++){
 			for (int bx = 0; bx < blkX; bx++){
 				int i = by*blkX + bx;
-				int x = (bx)* texWidth;
-				int y = (by)* texHeight;
-				Rect rect(x, y, texWidth, texHeight);
+				int x = (bx)* texWidth();
+				int y = (by)* texHeight();
+				Rect rect(x, y, texWidth(), texHeight());
 				Mat roi = Mat(src, rect);	// 1/2  1/2 rect
 
 				//bind current pbo for app->pbo transfer
 				glBindBuffer(GL_PIXEL_UNPACK_BUFFER, pbo[i]); //bind pbo
 				GLubyte* ptr = (GLubyte*)glMapBufferRange(GL_PIXEL_UNPACK_BUFFER, 0, size,
 					GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
-				assert(ptr != 0);
+				GLS_Assert(ptr != 0);
 
 				int lSize = roi.cols * (int)roi.elemSize();	// line size in byte
 #ifdef _OPENMP
@@ -169,7 +166,8 @@ void glsMat::CopyFrom(const Mat&src){
 				//Copy pixels from pbo to texture object
 				glBindTexture(GL_TEXTURE_2D, texArray[i]);
 				glBindBuffer(GL_PIXEL_UNPACK_BUFFER, pbo[i]); //bind pbo
-				glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, texWidth, texHeight, glFormat(), glType(), 0);
+				glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, texWidth(), texHeight(), glFormat(), glType(), 0);
+				GL_CHECK_ERROR();
 				glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
 				glBindTexture(GL_TEXTURE_2D, 0);
 			}
@@ -180,15 +178,16 @@ void glsMat::CopyFrom(const Mat&src){
 		for (int by = 0; by < blkY; by++){
 			for (int bx = 0; bx < blkX; bx++){
 				int i = by*blkX + bx;
-				int x = (bx)* texWidth;
-				int y = (by)* texHeight;
-				Rect rect(x, y, texWidth, texHeight);
+				int x = (bx)* texWidth();
+				int y = (by)* texHeight();
+				Rect rect(x, y, texWidth(), texHeight());
 				Mat roi = Mat(src, rect).clone();	// 1/2  1/2 rect
 				CV_Assert(roi.isContinuous());
 				void* data = roi.data;
 
 				glBindTexture(GL_TEXTURE_2D, texArray[i]);
-				glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, texWidth, texHeight, format, type, data);
+				glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, texWidth(), texHeight(), glFormat(), glType(), data);
+				GL_CHECK_ERROR();
 				glBindTexture(GL_TEXTURE_2D, 0);
 			}
 		}
@@ -234,7 +233,7 @@ void glsMat::CopyTo(Mat&dst){
 				glBindBuffer(GL_PIXEL_PACK_BUFFER, pbo[i]); //bind pbo
 				GLubyte* ptr = (GLubyte*)glMapBufferRange(GL_PIXEL_PACK_BUFFER, 0, size,
 					GL_MAP_READ_BIT);
-				assert(ptr != 0);
+				GLS_Assert(ptr != 0);
 
 				int lSize = roi.cols * (int)roi.elemSize();	// line size in byte
 #ifdef _OPENMP
@@ -250,20 +249,21 @@ void glsMat::CopyTo(Mat&dst){
 		}
 		glDeleteBuffers((GLsizei)pbo.size(), &pbo[0]);
 #else
-		Mat tmp = Mat(Size(texWidth, texHeight), dst.type());
+		Mat tmp = Mat(Size(texWidth(), texHeight()), dst.type());
 		for (int by = 0; by < blkY; by++){
 			for (int bx = 0; bx < blkX; bx++){
 				int i = by*blkX + bx;
-				int x = (bx)* texWidth;
-				int y = (by)* texHeight;
+				int x = (bx)* texWidth();
+				int y = (by)* texHeight();
 				void* data = tmp.data;
 
 				glBindTexture(GL_TEXTURE_2D, texArray[i]);
 				glGetTexImage(GL_TEXTURE_2D, 0, glFormat(), glType(), data);
+				GL_CHECK_ERROR();
 				glBindTexture(GL_TEXTURE_2D, 0);
 
-				Rect rect(x, y, texWidth, texHeight);
-				Mat roi = Mat(dst, rect);	// 1/2  1/2 rect
+				Rect rect(x, y, texWidth(), texHeight());
+				Mat roi = Mat(dst, rect);
 				tmp.copyTo(roi);
 			}
 		}
@@ -371,7 +371,7 @@ GLenum convCVtype2GLformat(int ocvtype){
 			case(2) : format = GL_RG; break;
 			case(3) : format = GL_RGB; break;
 			case(4) : format = GL_RGBA; break;
-			default: assert(0);
+			default: GLS_Assert(0);
 		}
 	}
 	else{
@@ -380,7 +380,7 @@ GLenum convCVtype2GLformat(int ocvtype){
 			case(2) : format = GL_RG_INTEGER; break;
 			case(3) : format = GL_RGB_INTEGER; break;
 			case(4) : format = GL_RGBA_INTEGER; break;
-			default: assert(0);
+			default: GLS_Assert(0);
 		}
 	}
 	return format;
@@ -398,7 +398,7 @@ GLenum convCVtype2GLtype(int ocvtype){
 //	case(CV_32U) : type = GL_UNSIGNED_INT; break;
 	case(CV_32S) : type = GL_INT; break;
 	case(CV_32F) : type = GL_FLOAT; break;
-	default: assert(0);
+	default: GLS_Assert(0);
 	}
 	return type;
 }

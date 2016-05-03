@@ -277,7 +277,7 @@ void glsDraw(glsMat& src){
 	//case(GL_BYTE) :
 	//case(GL_SHORT) :
 	//case(GL_INT) : shader = shaderDrawI; break;
-	default: assert(0);		//not implement
+	default: GLS_Assert(0);		//not implement
 	}
 
 	switch (src.glFormat()){
@@ -296,7 +296,7 @@ void glsDraw(glsMat& src){
 	case(GL_RGBA) :
 	case(GL_RGBA_INTEGER) :
 		break;
-	default: assert(0);		//not implement
+	default: GLS_Assert(0);		//not implement
 	}
 
 

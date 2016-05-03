@@ -13,20 +13,41 @@
 #define _TMR_(...)
 #endif
 
+// glsFft shader
+class glsShaderFft : public glsShaderBase
+{
+public:
+	glsShaderFft(void);
+
+	//attribute location
+	GLuint position;
+
+	//uniform  location
+
+	GLuint texSrc[2];
+	GLuint texW;
+	GLuint i_flag;
+	GLuint i_N;
+	GLuint i_p;
+	GLuint i_q;
+	GLuint f_xscl;
+	GLuint f_yscl;
+	GLuint f_xconj;
+	GLuint f_yconj;
+
+};
+
 
 //-----------------------------------------------------------------------------
 //global 
 glsShaderFft* shaderFft = 0;
-//glsShaderConj* shaderConj = 0;
 
 void glsFftInit(void){
 	shaderFft = new glsShaderFft();
-//	shaderConj = new glsShaderConj();
 }
 
 void glsFftTerminate(void){
 	delete shaderFft;
-//	delete shaderConj;
 }
 
 
@@ -268,7 +289,7 @@ static void glsFftProcess(
 		for (int i = 0; i < texDst.size(); i++){
 			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, texDst[i], 0);
 		}
-		assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
+		GLS_Assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
 
 		GLenum bufs[] =
 		{
@@ -307,7 +328,7 @@ static void glsFftProcess(
 void glsFft(glsMat& texture, int flag){
 
 	int N = texture.cols;
-	assert(IsPow2(N));
+	GLS_Assert(IsPow2(N));
 
 	glsFBO fbo(2);
 	glsVAO vao(shaderFft->position);
@@ -407,19 +428,19 @@ void glsFft(const Mat& src, Mat& dst, int flag){
 	int N = src.cols;
 	CV_Assert(IsPow2(N));
 
-	glsMat texture(src.size(), src.type(), Size(2, 2));
+	glsMat _src(src.size(), src.type(), Size(2, 2));
 
 	//---------------------------------
 	//upload
-	texture.CopyFrom(src);
+	_src.CopyFrom(src);
 
 	//---------------------------------
 	//fft
-	glsFft(texture, flag);
+	glsFft(_src, flag);
 
 	//---------------------------------
 	//download
-	texture.CopyTo(dst);
+	_src.CopyTo(dst);
 
 
 }
@@ -427,99 +448,6 @@ void glsFft(const Mat& src, Mat& dst, int flag){
 
 
 
-//=============================================================================
-glsShaderConj::glsShaderConj(void)
-	:glsShaderBase()
-{
-#if 1
-	const char vertexShaderCode[] = 
-		"#version 330 core\n"
-		"layout (location = 0)in  vec2 position;\n"
-		"void main(void)\n"
-		"{\n"
-		"   gl_Position  = vec4(position,0.0,1.0);\n"
-		"}\n"
-		;
-
-	const char fragmentShaderCode[] =
-		"#version 330 core\n"
-		"precision highp float;\n"
-		"uniform sampler2D	texSrc;\n"
-		"layout (location = 0) out vec2 dst;\n"
-		"\n"
-		"void main(void)\n"
-		"{\n"
-		"	vec2 src = texelFetch(texSrc, ivec2(gl_FragCoord.xy),0).rg;\n"
-		"	dst = vec2(src.r, -1.0*src.g);\n"
-		"}\n"
-		;
-
-	LoadShadersCode(vertexShaderCode, fragmentShaderCode);
-
-
-#else
-	// Create and compile our GLSL program from the shaders
-	LoadShadersFile("Fft_vs.glsl", "Conj_fs.glsl");
-#endif
-
-	// Attribute & Uniform location
-	position = glGetAttribLocation(program, "position");
-
-	texSrc = glGetUniformLocation(program, "texSrc");
-
-}
-
-static void glslConjProcess(
-	const glsShaderConj* shader,	//progmra ID
-	const vector<GLuint>& texSrc,	//src texture IDs
-	const vector<GLuint>& texDst	//dst texture IDs
-	)
-{
-	Size size = getTextureSize(texSrc[0]);
-	int width = size.width;
-	int height = size.height;
-
-	//program
-	{
-		glUseProgram(shader->program);
-	}
-
-	//uniform
-	{
-	}
-
-	for (int i = 0; i < texSrc.size(); i++){
-		//Bind Texture
-		{
-			int id = 0;
-			glActiveTexture(GL_TEXTURE0 + id);
-			glBindTexture(GL_TEXTURE_2D, texSrc[i]);
-			glUniform1i(shader->texSrc, id);
-		}
-		//dst texture
-		{
-			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texDst[i], 0);
-			assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
-		}
-
-		GLenum bufs[] =
-		{
-			GL_COLOR_ATTACHMENT0,
-		};
-		glDrawBuffers(1, bufs);
-
-		//Viewport
-		{
-			glViewport(0, 0, width, height);
-		}
-
-		//Render!!
-		{
-			glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
-			glFlush();
-		}
-	}
-}
 
 
 

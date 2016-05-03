@@ -5,43 +5,6 @@
 #include "glsMat.h"
 #include "glsShader.h"
 
-// glsFft shader
-class glsShaderFft : public glsShaderBase
-{
-public:
-	glsShaderFft(void);
-
-	//attribute location
-	GLuint position;
-
-	//uniform  location
-
-	GLuint texSrc[2];		
-	GLuint texW;
-	GLuint i_flag;
-	GLuint i_N;
-	GLuint i_p;
-	GLuint i_q;
-	GLuint f_xscl;
-	GLuint f_yscl;
-	GLuint f_xconj;
-	GLuint f_yconj;
-
-};
-
-// glslConj shader
-class  glsShaderConj : public glsShaderBase
-{
-public:
-	glsShaderConj(void);
-
-	//attribute location
-	GLuint position;
-	//uniform  location
-	GLuint texSrc;
-};
-
-
 
 
 

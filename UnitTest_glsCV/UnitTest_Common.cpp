@@ -45,7 +45,7 @@ namespace UnitTest_glsCV
 
 		// Make sure maxUlps is non-negative and small enough that the
 		// default NAN won't compare as equal to anything.
-		assert(maxUlps > 0 && maxUlps < 4 * 1024 * 1024);
+		GLS_Assert(maxUlps > 0 && maxUlps < 4 * 1024 * 1024);
 		int aInt = *(int*)&A;
 		// Make aInt lexicographically ordered as a twos-complement int
 		if (aInt < 0)
@@ -59,5 +59,41 @@ namespace UnitTest_glsCV
 			return true;
 		return false;
 	}
+
+	bool AreEqual(Mat& mat0, Mat& mat1){
+		if (mat0.size() != mat1.size()){
+			cerr << "mat0.size() != mat1.size()" << endl;
+			return false;
+		}
+
+		if (mat0.type() != mat1.type()){
+			cerr << "mat0.type() != mat1.type()" << endl;
+			return false;
+		}
+
+		//verify
+		int errNum = 0;
+		{
+			Mat cmp_ne;
+			cv::compare(mat0, mat1, cmp_ne, CMP_NE);
+			vector<Mat> pln_ne;
+			cv::split(cmp_ne, pln_ne);
+			for (int i = 0; i< pln_ne.size(); i++){
+				errNum += cv::countNonZero(pln_ne[i]);
+			}
+		}
+		cout << "errNum:" << errNum << endl;
+
+		if (errNum == 0) return true;
+#if 1
+		{
+			cout << mat0 << endl;
+			cout << mat1 << endl;
+		}
+#endif
+
+		return false;
+	}
+
 
 }

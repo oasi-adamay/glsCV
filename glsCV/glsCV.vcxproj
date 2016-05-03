@@ -140,7 +140,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="glsBasicOperation.h" />
+    <ClInclude Include="glsConvert.h" />
+    <ClInclude Include="glsCopy.h" />
     <ClInclude Include="glsCV.h" />
+    <ClInclude Include="glsDraw.h" />
     <ClInclude Include="glsFBO.h" />
     <ClInclude Include="glsFft.h" />
     <ClInclude Include="glsMat.h" />
@@ -153,6 +156,7 @@
   <ItemGroup>
     <ClCompile Include="glsBasicOperation.cpp" />
     <ClCompile Include="glsConvert.cpp" />
+    <ClCompile Include="glsCopy.cpp" />
     <ClCompile Include="glsCV.cpp" />
     <ClCompile Include="glsDraw.cpp" />
     <ClCompile Include="glsFBO.cpp" />

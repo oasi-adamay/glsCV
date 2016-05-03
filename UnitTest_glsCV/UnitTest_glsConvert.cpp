@@ -29,7 +29,7 @@ namespace UnitTest_glsCV
 
 		// Make sure maxUlps is non-negative and small enough that the
 		// default NAN won't compare as equal to anything.
-		assert(maxUlps > 0 && maxUlps < 4 * 1024 * 1024);
+		GLS_Assert(maxUlps > 0 && maxUlps < 4 * 1024 * 1024);
 		int aInt = *(int*)&A;
 		// Make aInt lexicographically ordered as a twos-complement int
 		if (aInt < 0)
@@ -131,37 +131,37 @@ namespace UnitTest_glsCV
 	TEST_CLASS(UnitTest_glsConvert)
 	{
 	public:
-		TEST_METHOD(TestMethod_glsConvert_CV_8UC1)
+		TEST_METHOD(glsConvert_CV_8UC1)
 		{
 			cout << __FUNCTION__ << endl;
 			int errNum = test_glsConvert<uchar, float>(CV_8UC1, CV_32FC1,1.0f/256.0f);
 			Assert::AreEqual(0, errNum);
 		}
-		TEST_METHOD(TestMethod_glsConvert_CV_8UC2)
+		TEST_METHOD(glsConvert_CV_8UC2)
 		{
 			cout << __FUNCTION__ << endl;
 			int errNum = test_glsConvert<uchar, float>(CV_8UC2, CV_32FC2);
 			Assert::AreEqual(0, errNum);
 		}
-		TEST_METHOD(TestMethod_glsConvert_CV_8UC3)
+		TEST_METHOD(glsConvert_CV_8UC3)
 		{
 			cout << __FUNCTION__ << endl;
 			int errNum = test_glsConvert<uchar, float>(CV_8UC3, CV_32FC3);
 			Assert::AreEqual(0, errNum);
 		}
-		TEST_METHOD(TestMethod_glsConvert_CV_8UC4)
+		TEST_METHOD(glsConvert_CV_8UC4)
 		{
 			cout << __FUNCTION__ << endl;
 			int errNum = test_glsConvert<uchar, float>(CV_8UC4, CV_32FC4);
 			Assert::AreEqual(0, errNum);
 		}
-		TEST_METHOD(TestMethod_glsConvert_CV_16UC1)
+		TEST_METHOD(glsConvert_CV_16UC1)
 		{
 			cout << __FUNCTION__ << endl;
 			int errNum = test_glsConvert<ushort, float>(CV_16UC1, CV_32FC1,  1.0f / 65536.0f);
 			Assert::AreEqual(0, errNum);
 		}
-		TEST_METHOD(TestMethod_glsConvert_CV_32SC1)
+		TEST_METHOD(glsConvert_CV_32SC1)
 		{
 			cout << __FUNCTION__ << endl;
 			int errNum = test_glsConvert<int, float>(CV_32SC1, CV_32FC1);
@@ -247,25 +247,25 @@ namespace UnitTest_glsCV
 	TEST_CLASS(UnitTest_glsCvtColor)
 	{
 	public:
-		TEST_METHOD(TestMethod_glsCvtColor_CV_32FC3_BGR2RGB)
+		TEST_METHOD(glsCvtColor_CV_32FC3_BGR2RGB)
 		{
 			cout << __FUNCTION__ << endl;
 			int errNum = test_glsCvtColor<float, float>(CV_32FC3, CV_BGR2RGB);
 			Assert::AreEqual(0, errNum);
 		}
-		TEST_METHOD(TestMethod_glsCvtColor_CV_32FC3_RGB2BGR)
+		TEST_METHOD(glsCvtColor_CV_32FC3_RGB2BGR)
 		{
 			cout << __FUNCTION__ << endl;
 			int errNum = test_glsCvtColor<float, float>(CV_32FC3, CV_RGB2BGR);
 			Assert::AreEqual(0, errNum);
 		}
-		TEST_METHOD(TestMethod_glsCvtColor_CV_32FC3_RGB2GARY)
+		TEST_METHOD(glsCvtColor_CV_32FC3_RGB2GARY)
 		{
 			cout << __FUNCTION__ << endl;
 			int errNum = test_glsCvtColor<float, float>(CV_32FC3, CV_RGB2GRAY);
 			Assert::AreEqual(0, errNum);
 		}
-		TEST_METHOD(TestMethod_glsCvtColor_CV_32FC3_BGR2GARY)
+		TEST_METHOD(glsCvtColor_CV_32FC3_BGR2GARY)
 		{
 			cout << __FUNCTION__ << endl;
 			int errNum = test_glsCvtColor<float, float>(CV_32FC3, CV_BGR2GRAY);

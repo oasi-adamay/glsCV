@@ -7,6 +7,7 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 #include "Timer.h"
 
 #include "glsCV.h"
+#include "UnitTest_Common.h"
 
 //Lib 
 #pragma comment (lib, "opengl32.lib")
@@ -20,14 +21,16 @@ namespace UnitTest_glsCV
 {
 
 	template <typename T>
-	int test_glsMat_CopyTo(const int width, const int height, const int cvtype){
-		Mat imgSrc = Mat(Size(width, height), cvtype);
+	int test_glsMat_CopyTo(const int cvtype , const Size size = Size(32,24)){
+		Mat imgSrc = Mat(size, cvtype);
 		Mat imgDst = Mat::zeros(imgSrc.size(), imgSrc.type());
+//		Mat imgDst;
 
 		cout << "Size:" << imgSrc.size() << endl;
 
 		//---------------------------------
 		//init Src image
+//		cv::randu(imgSrc, Scalar(0), Scalar(255));
 		{
 			RNG rng(0xFFFFFFFF);
 			for (int y = 0; y < imgSrc.rows; y++){
@@ -40,32 +43,13 @@ namespace UnitTest_glsCV
 			}
 		}
 
+
 		glsMat glsSrc(imgSrc);		//create glsMat and  upload
 		glsSrc.CopyTo(imgDst);		// download
 
 		//verify
 		int errNum = 0;
-		{
-			//verify
-			for (int y = 0; y < imgSrc.rows; y++){
-				for (int x = 0; x < imgSrc.cols; x++){
-					T* pSrc = imgSrc.ptr<T>(y, x);
-					T* pDst = imgDst.ptr<T>(y, x);
-					for (int ch = 0; ch < imgSrc.channels(); ch++){
-						T src = *pSrc++;
-						T dst = *pDst++;
-						if (src != dst){
-							cout << cv::format("(%4d,%4d,%4d)\t", y, x, ch);
-							cout << src << "\t";
-							cout << dst << "\t";
-							cout << endl;
-							errNum++;
-						}
-					}
-				}
-			}
-		}
-		cout << "errNum:" << errNum << endl;
+		if (!AreEqual(imgSrc, imgDst)) errNum = -1;
 
 		return errNum;
 	}
@@ -73,198 +57,208 @@ namespace UnitTest_glsCV
 	TEST_CLASS(UnitTest_glsMat)
 	{
 	public:
-		TEST_METHOD(TestMethod_glsMat_Copy_CV_8UC1)
+		TEST_METHOD(glsMat_Copy_CV_8UC1)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_glsMat_CopyTo<uchar>(CV_8UC1);
+			Assert::AreEqual(0, errNum);
+		}
+		TEST_METHOD(glsMat_Copy_CV_8UC2)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_glsMat_CopyTo<uchar>(CV_8UC2);
+			Assert::AreEqual(0, errNum);
+		}
+		TEST_METHOD(glsMat_Copy_CV_8UC3)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_glsMat_CopyTo<uchar>(CV_8UC3);
+			Assert::AreEqual(0, errNum);
+		}
+		TEST_METHOD(glsMat_Copy_CV_8UC4)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_glsMat_CopyTo<uchar>(CV_8UC4);
+			Assert::AreEqual(0, errNum);
+		}
+		TEST_METHOD(glsMat_Copy_CV_8SC1)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_glsMat_CopyTo<schar>(CV_8SC1);
+			Assert::AreEqual(0, errNum);
+		}
+		TEST_METHOD(glsMat_Copy_CV_8SC2)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_glsMat_CopyTo<schar>(CV_8SC2);
+			Assert::AreEqual(0, errNum);
+		}
+		TEST_METHOD(glsMat_Copy_CV_8SC3)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_glsMat_CopyTo<schar>(CV_8SC3);
+			Assert::AreEqual(0, errNum);
+		}
+		TEST_METHOD(glsMat_Copy_CV_8SC4)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_glsMat_CopyTo<schar>(CV_8SC4);
+			Assert::AreEqual(0, errNum);
+		}
+		TEST_METHOD(glsMat_Copy_CV_16SC1)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_glsMat_CopyTo<short>(CV_16SC1);
+			Assert::AreEqual(0, errNum);
+		}
+		TEST_METHOD(glsMat_Copy_CV_16SC2)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_glsMat_CopyTo<short>(CV_16SC2);
+			Assert::AreEqual(0, errNum);
+		}
+		TEST_METHOD(glsMat_Copy_CV_16SC3)
+		{
+			cout << __FUNCTION__ << endl;
+			const int width = 32;
+			const int height = 24;
+			int errNum = test_glsMat_CopyTo<short>(CV_16SC3);
+			Assert::AreEqual(0, errNum);
+		}
+		TEST_METHOD(glsMat_Copy_CV_16SC4)
+		{
+			cout << __FUNCTION__ << endl;
+			const int width = 32;
+			const int height = 24;
+			int errNum = test_glsMat_CopyTo<short>(CV_16SC4);
+			Assert::AreEqual(0, errNum);
+		}
+		TEST_METHOD(glsMat_Copy_CV_16UC1)
+		{
+			cout << __FUNCTION__ << endl;
+			const int width = 32;
+			const int height = 24;
+			int errNum = test_glsMat_CopyTo<ushort>(CV_16UC1);
+			Assert::AreEqual(0, errNum);
+		}
+		TEST_METHOD(glsMat_Copy_CV_16UC2)
+		{
+			cout << __FUNCTION__ << endl;
+			const int width = 32;
+			const int height = 24;
+			int errNum = test_glsMat_CopyTo<ushort>(CV_16UC2);
+			Assert::AreEqual(0, errNum);
+		}
+		TEST_METHOD(glsMat_Copy_CV_16UC3)
+		{
+			cout << __FUNCTION__ << endl;
+			const int width = 32;
+			const int height = 24;
+			int errNum = test_glsMat_CopyTo<ushort>(CV_16UC3);
+			Assert::AreEqual(0, errNum);
+		}
+		TEST_METHOD(glsMat_Copy_CV_16UC4)
+		{
+			cout << __FUNCTION__ << endl;
+			const int width = 32;
+			const int height = 24;
+			int errNum = test_glsMat_CopyTo<ushort>(CV_16UC4);
+			Assert::AreEqual(0, errNum);
+		}
+		TEST_METHOD(glsMat_Copy_CV_32SC1)
 		{
 			cout << __FUNCTION__ << endl;
 			const int width  = 32;
 			const int height = 24;
-			int errNum = test_glsMat_CopyTo<uchar>(width, height, CV_8UC1);
+			int errNum = test_glsMat_CopyTo<int>(CV_32SC1);
 			Assert::AreEqual(0, errNum);
 		}
-		TEST_METHOD(TestMethod_glsMat_Copy_CV_8UC2)
+		TEST_METHOD(glsMat_Copy_CV_32SC2)
 		{
 			cout << __FUNCTION__ << endl;
 			const int width = 32;
 			const int height = 24;
-			int errNum = test_glsMat_CopyTo<uchar>(width, height, CV_8UC2);
+			int errNum = test_glsMat_CopyTo<int>(CV_32SC2);
 			Assert::AreEqual(0, errNum);
 		}
-		TEST_METHOD(TestMethod_glsMat_Copy_CV_8UC3)
+		TEST_METHOD(glsMat_Copy_CV_32SC3)
 		{
 			cout << __FUNCTION__ << endl;
 			const int width = 32;
 			const int height = 24;
-			int errNum = test_glsMat_CopyTo<uchar>(width, height, CV_8UC3);
+			int errNum = test_glsMat_CopyTo<int>(CV_32SC3);
 			Assert::AreEqual(0, errNum);
 		}
-		TEST_METHOD(TestMethod_glsMat_Copy_CV_8UC4)
+		TEST_METHOD(glsMat_Copy_CV_32SC4)
 		{
 			cout << __FUNCTION__ << endl;
 			const int width = 32;
 			const int height = 24;
-			int errNum = test_glsMat_CopyTo<uchar>(width, height, CV_8UC4);
+			int errNum = test_glsMat_CopyTo<int>(CV_32SC4);
 			Assert::AreEqual(0, errNum);
 		}
-		TEST_METHOD(TestMethod_glsMat_Copy_CV_8SC1)
+		TEST_METHOD(glsMat_Copy_CV_32FC1)
 		{
 			cout << __FUNCTION__ << endl;
 			const int width = 32;
 			const int height = 24;
-			int errNum = test_glsMat_CopyTo<schar>(width, height, CV_8SC1);
+			int errNum = test_glsMat_CopyTo<float>(CV_32FC1);
 			Assert::AreEqual(0, errNum);
 		}
-		TEST_METHOD(TestMethod_glsMat_Copy_CV_8SC2)
+		TEST_METHOD(glsMat_Copy_CV_32FC2)
 		{
 			cout << __FUNCTION__ << endl;
 			const int width = 32;
 			const int height = 24;
-			int errNum = test_glsMat_CopyTo<schar>(width, height, CV_8SC2);
+			int errNum = test_glsMat_CopyTo<float>(CV_32FC2);
 			Assert::AreEqual(0, errNum);
 		}
-		TEST_METHOD(TestMethod_glsMat_Copy_CV_8SC3)
+		TEST_METHOD(glsMat_Copy_CV_32FC3)
 		{
 			cout << __FUNCTION__ << endl;
 			const int width = 32;
 			const int height = 24;
-			int errNum = test_glsMat_CopyTo<schar>(width, height, CV_8SC3);
+			int errNum = test_glsMat_CopyTo<float>(CV_32FC3);
 			Assert::AreEqual(0, errNum);
 		}
-		TEST_METHOD(TestMethod_glsMat_Copy_CV_8SC4)
+		TEST_METHOD(glsMat_Copy_CV_32FC4)
 		{
 			cout << __FUNCTION__ << endl;
 			const int width = 32;
 			const int height = 24;
-			int errNum = test_glsMat_CopyTo<schar>(width, height, CV_8SC4);
+			int errNum = test_glsMat_CopyTo<float>(CV_32FC4);
 			Assert::AreEqual(0, errNum);
 		}
-		TEST_METHOD(TestMethod_glsMat_Copy_CV_16SC1)
+
+		TEST_METHOD(glsMat_Copy_CV_8UC1_4x8)
 		{
 			cout << __FUNCTION__ << endl;
-			const int width = 32;
-			const int height = 24;
-			int errNum = test_glsMat_CopyTo<short>(width, height, CV_16SC1);
+			int errNum = test_glsMat_CopyTo<uchar>(CV_8UC1, Size(4, 8));
 			Assert::AreEqual(0, errNum);
 		}
-		TEST_METHOD(TestMethod_glsMat_Copy_CV_16SC2)
+		TEST_METHOD(glsMat_Copy_CV_8UC1_4x3)
 		{
 			cout << __FUNCTION__ << endl;
-			const int width = 32;
-			const int height = 24;
-			int errNum = test_glsMat_CopyTo<short>(width, height, CV_16SC2);
+			int errNum = test_glsMat_CopyTo<uchar>(CV_8UC1, Size(4, 3));
 			Assert::AreEqual(0, errNum);
 		}
-		TEST_METHOD(TestMethod_glsMat_Copy_CV_16SC3)
+
+		////@ To do Error!! 
+		//TEST_METHOD(glsMat_Copy_CV_8UC1_3x4)
+		//{
+		//	cout << __FUNCTION__ << endl;
+		//	int errNum = test_glsMat_CopyTo<uchar>(CV_8UC1, Size(3, 4));
+		//	Assert::AreEqual(0, errNum);
+		//}
+
+		TEST_METHOD(glsMat_Copy_CV_32FC1_5x5)
 		{
 			cout << __FUNCTION__ << endl;
-			const int width = 32;
-			const int height = 24;
-			int errNum = test_glsMat_CopyTo<short>(width, height, CV_16SC3);
+			int errNum = test_glsMat_CopyTo<float>(CV_32FC1, Size(5, 5));
 			Assert::AreEqual(0, errNum);
 		}
-		TEST_METHOD(TestMethod_glsMat_Copy_CV_16SC4)
-		{
-			cout << __FUNCTION__ << endl;
-			const int width = 32;
-			const int height = 24;
-			int errNum = test_glsMat_CopyTo<short>(width, height, CV_16SC4);
-			Assert::AreEqual(0, errNum);
-		}
-		TEST_METHOD(TestMethod_glsMat_Copy_CV_16UC1)
-		{
-			cout << __FUNCTION__ << endl;
-			const int width = 32;
-			const int height = 24;
-			int errNum = test_glsMat_CopyTo<ushort>(width, height, CV_16UC1);
-			Assert::AreEqual(0, errNum);
-		}
-		TEST_METHOD(TestMethod_glsMat_Copy_CV_16UC2)
-		{
-			cout << __FUNCTION__ << endl;
-			const int width = 32;
-			const int height = 24;
-			int errNum = test_glsMat_CopyTo<ushort>(width, height, CV_16UC2);
-			Assert::AreEqual(0, errNum);
-		}
-		TEST_METHOD(TestMethod_glsMat_Copy_CV_16UC3)
-		{
-			cout << __FUNCTION__ << endl;
-			const int width = 32;
-			const int height = 24;
-			int errNum = test_glsMat_CopyTo<ushort>(width, height, CV_16UC3);
-			Assert::AreEqual(0, errNum);
-		}
-		TEST_METHOD(TestMethod_glsMat_Copy_CV_16UC4)
-		{
-			cout << __FUNCTION__ << endl;
-			const int width = 32;
-			const int height = 24;
-			int errNum = test_glsMat_CopyTo<ushort>(width, height, CV_16UC4);
-			Assert::AreEqual(0, errNum);
-		}
-		TEST_METHOD(TestMethod_glsMat_Copy_CV_32SC1)
-		{
-			cout << __FUNCTION__ << endl;
-			const int width  = 32;
-			const int height = 24;
-			int errNum = test_glsMat_CopyTo<int>(width, height, CV_32SC1);
-			Assert::AreEqual(0, errNum);
-		}
-		TEST_METHOD(TestMethod_glsMat_Copy_CV_32SC2)
-		{
-			cout << __FUNCTION__ << endl;
-			const int width = 32;
-			const int height = 24;
-			int errNum = test_glsMat_CopyTo<int>(width, height, CV_32SC2);
-			Assert::AreEqual(0, errNum);
-		}
-		TEST_METHOD(TestMethod_glsMat_Copy_CV_32SC3)
-		{
-			cout << __FUNCTION__ << endl;
-			const int width = 32;
-			const int height = 24;
-			int errNum = test_glsMat_CopyTo<int>(width, height, CV_32SC3);
-			Assert::AreEqual(0, errNum);
-		}
-		TEST_METHOD(TestMethod_glsMat_Copy_CV_32SC4)
-		{
-			cout << __FUNCTION__ << endl;
-			const int width = 32;
-			const int height = 24;
-			int errNum = test_glsMat_CopyTo<int>(width, height, CV_32SC4);
-			Assert::AreEqual(0, errNum);
-		}
-		TEST_METHOD(TestMethod_glsMat_Copy_CV_32FC1)
-		{
-			cout << __FUNCTION__ << endl;
-			const int width = 32;
-			const int height = 24;
-			int errNum = test_glsMat_CopyTo<float>(width, height, CV_32FC1);
-			Assert::AreEqual(0, errNum);
-		}
-		TEST_METHOD(TestMethod_glsMat_Copy_CV_32FC2)
-		{
-			cout << __FUNCTION__ << endl;
-			const int width = 32;
-			const int height = 24;
-			int errNum = test_glsMat_CopyTo<float>(width, height, CV_32FC2);
-			Assert::AreEqual(0, errNum);
-		}
-		TEST_METHOD(TestMethod_glsMat_Copy_CV_32FC3)
-		{
-			cout << __FUNCTION__ << endl;
-			const int width = 32;
-			const int height = 24;
-			int errNum = test_glsMat_CopyTo<float>(width, height, CV_32FC3);
-			Assert::AreEqual(0, errNum);
-		}
-		TEST_METHOD(TestMethod_glsMat_Copy_CV_32FC4)
-		{
-			cout << __FUNCTION__ << endl;
-			const int width = 32;
-			const int height = 24;
-			int errNum = test_glsMat_CopyTo<float>(width, height, CV_32FC4);
-			Assert::AreEqual(0, errNum);
-		}
+
+
 
 	};
 

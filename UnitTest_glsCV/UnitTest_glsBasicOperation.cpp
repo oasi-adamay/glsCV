@@ -19,7 +19,7 @@ namespace UnitTest_glsCV
 
 		// Make sure maxUlps is non-negative and small enough that the
 		// default NAN won't compare as equal to anything.
-		assert(maxUlps > 0 && maxUlps < 4 * 1024 * 1024);
+		GLS_Assert(maxUlps > 0 && maxUlps < 4 * 1024 * 1024);
 		int aInt = *(int*)&A;
 		// Make aInt lexicographically ordered as a twos-complement int
 		if (aInt < 0)
@@ -249,14 +249,14 @@ namespace UnitTest_glsCV
 	{
 	public:
 
-		TEST_METHOD(TestMethod_glsAdd)
+		TEST_METHOD(glsAdd)
 		{
 			cout << __FUNCTION__ << endl;
 			int errNum = test_glsBasicOperationT<float>(CV_32FC4, E_TEST::ADD);
 			Assert::AreEqual(0, errNum);
 		}
 
-		TEST_METHOD(TestMethod_glsSubtract)
+		TEST_METHOD(glsSubtract)
 		{
 			cout << __FUNCTION__ << endl;
 			int errNum = test_glsBasicOperationT<float>(CV_32FC3,E_TEST::SUB);
@@ -264,28 +264,28 @@ namespace UnitTest_glsCV
 		}
 
 
-		TEST_METHOD(TestMethod_glsMultiply)
+		TEST_METHOD(glsMultiply)
 		{
 			cout << __FUNCTION__ << endl;
 			int errNum = test_glsBasicOperationT<float>(CV_32FC2, E_TEST::MUL);
 			Assert::AreEqual(0, errNum);
 		}
 
-		TEST_METHOD(TestMethod_glsDivide)
+		TEST_METHOD(glsDivide)
 		{
 			cout << __FUNCTION__ << endl;
 			int errNum = test_glsBasicOperationT<float>(CV_32FC1, E_TEST::DIV, 4);
 			Assert::AreEqual(0, errNum);
 		}
 
-		TEST_METHOD(TestMethod_glsAdd_S)
+		TEST_METHOD(glsAdd_S)
 		{
 			cout << __FUNCTION__ << endl;
 			int errNum = test_glsBasicOperationT<float>(CV_32FC1, E_TEST::ADD_S);
 			Assert::AreEqual(0, errNum);
 		}
 
-		TEST_METHOD(TestMethod_glsSubtract_S)
+		TEST_METHOD(glsSubtract_S)
 		{
 			cout << __FUNCTION__ << endl;
 			int errNum = test_glsBasicOperationT<float>(CV_32FC1, E_TEST::SUB_S);
@@ -293,90 +293,90 @@ namespace UnitTest_glsCV
 		}
 
 
-		TEST_METHOD(TestMethod_glsMultiply_S)
+		TEST_METHOD(glsMultiply_S)
 		{
 			cout << __FUNCTION__ << endl;
 			int errNum = test_glsBasicOperationT<float>(CV_32FC1, E_TEST::MUL_S);
 			Assert::AreEqual(0, errNum);
 		}
 
-		TEST_METHOD(TestMethod_glsDivide_S)
+		TEST_METHOD(glsDivide_S)
 		{
 			cout << __FUNCTION__ << endl;
 			int errNum = test_glsBasicOperationT<float>(CV_32FC1, E_TEST::DIV_S, 4);
 			Assert::AreEqual(0, errNum);
 		}
 
-		TEST_METHOD(TestMethod_glsMin)
+		TEST_METHOD(glsMin)
 		{
 			cout << __FUNCTION__ << endl;
 			int errNum = test_glsBasicOperationT<float>(CV_32FC1, E_TEST::MIN);
 			Assert::AreEqual(0, errNum);
 		}
 
-		TEST_METHOD(TestMethod_glsMax)
+		TEST_METHOD(glsMax)
 		{
 			cout << __FUNCTION__ << endl;
 			int errNum = test_glsBasicOperationT<float>(CV_32FC1, E_TEST::MAX);
 			Assert::AreEqual(0, errNum);
 		}
 
-		TEST_METHOD(TestMethod_glsMin_S)
+		TEST_METHOD(glsMin_S)
 		{
 			cout << __FUNCTION__ << endl;
 			int errNum = test_glsBasicOperationT<float>(CV_32FC1, E_TEST::MIN_S);
 			Assert::AreEqual(0, errNum);
 		}
 
-		TEST_METHOD(TestMethod_glsMax_S)
+		TEST_METHOD(glsMax_S)
 		{
 			cout << __FUNCTION__ << endl;
 			int errNum = test_glsBasicOperationT<float>(CV_32FC1, E_TEST::MAX_S);
 			Assert::AreEqual(0, errNum);
 		}
 
-		TEST_METHOD(TestMethod_glsMulSpectrums)
+		TEST_METHOD(glsMulSpectrums)
 		{
 			cout << __FUNCTION__ << endl;
 			int errNum = test_glsBasicOperationT<float>(CV_32FC2, E_TEST::MUL_SPECTRUMS, 1024);
 			Assert::AreEqual(0, errNum);
 		}
 
-		TEST_METHOD(TestMethod_glsMulSpectrumsConj)
+		TEST_METHOD(glsMulSpectrumsConj)
 		{
 			cout << __FUNCTION__ << endl;
 			int errNum = test_glsBasicOperationT<float>(CV_32FC2, E_TEST::MUL_SPECTRUMS_CONJ, 128);
 			Assert::AreEqual(0, errNum);
 		}
 
-		TEST_METHOD(TestMethod_glsMulSpectrumsPhaseOnly)
+		TEST_METHOD(glsMulSpectrumsPhaseOnly)
 		{
 			cout << __FUNCTION__ << endl;
 			int errNum = test_glsBasicOperationT<float>(CV_32FC2, E_TEST::MUL_SPECTRUMS_POC, 256);
 			Assert::AreEqual(0, errNum);
 		}
-		TEST_METHOD(TestMethod_glsMagSpectrums)
+		TEST_METHOD(glsMagSpectrums)
 		{
 			cout << __FUNCTION__ << endl;
 			int errNum = test_glsBasicOperationT<float>(CV_32FC2, E_TEST::MAG_SPECTRUMS);
 			Assert::AreEqual(0, errNum);
 		}
 
-		TEST_METHOD(TestMethod_glsLog)
+		TEST_METHOD(glsLog)
 		{
 			cout << __FUNCTION__ << endl;
 			int errNum = test_glsBasicOperationT<float>(CV_32FC1, E_TEST::LOG,64);
 			Assert::AreEqual(0, errNum);
 		}
 
-		TEST_METHOD(TestMethod_glsExp)
+		TEST_METHOD(glsExp)
 		{
 			cout << __FUNCTION__ << endl;
 			int errNum = test_glsBasicOperationT<float>(CV_32FC1, E_TEST::EXP);
 			Assert::AreEqual(0, errNum);
 		}
 
-		TEST_METHOD(TestMethod_glsPow)
+		TEST_METHOD(glsPow)
 		{
 			cout << __FUNCTION__ << endl;
 			int errNum = test_glsBasicOperationT<float>(CV_32FC1, E_TEST::POW);

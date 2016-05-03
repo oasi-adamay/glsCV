@@ -42,7 +42,7 @@ public:
 	GLenum glFormat(void) const{ return convCVtype2GLformat(CV_MAT_TYPE(flag)); }
 	GLenum glType(void) const{ return convCVtype2GLtype(CV_MAT_TYPE(flag)); }
 	bool empty(void) const { return refcount.use_count() == 0; }
-
+	bool isContinuous(void) const { return texArray.size() == 1; }
 
 
 	GLuint at(const int y, const int x);

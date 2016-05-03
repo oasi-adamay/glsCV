@@ -1,5 +1,6 @@
 #include "stdafx.h"
 
+#include "glsCV.h"
 
 #include "glsShader.h"
 #include "Timer.h"
@@ -42,7 +43,7 @@ void glsShaderBase::LoadShadersCode(const std::string& VertexShaderCode, const s
 		//		printf("%s\n", &VertexShaderErrorMessage[0]);
 		cout << &VertexShaderErrorMessage[0] << endl;
 	}
-	assert(Result == GL_TRUE);
+	GLS_Assert(Result == GL_TRUE);
 
 
 
@@ -62,7 +63,7 @@ void glsShaderBase::LoadShadersCode(const std::string& VertexShaderCode, const s
 		//		printf("%s\n", &FragmentShaderErrorMessage[0]);
 		cout << &FragmentShaderErrorMessage[0] << endl;
 	}
-	assert(Result == GL_TRUE);
+	GLS_Assert(Result == GL_TRUE);
 
 
 	// Link the program
@@ -82,7 +83,7 @@ void glsShaderBase::LoadShadersCode(const std::string& VertexShaderCode, const s
 		//		printf("%s\n", &ProgramErrorMessage[0]);
 		cout << &ProgramErrorMessage[0] << endl;
 	}
-	assert(Result == GL_TRUE);
+	GLS_Assert(Result == GL_TRUE);
 
 
 	glDetachShader(ProgramID, VertexShaderID);
@@ -109,7 +110,7 @@ void glsShaderBase::LoadShadersFile(const char * vertex_file_path, const char * 
 	}
 	else{
 		cout << "Impossible to open:" << vertex_file_path << endl;
-		assert(0);
+		GLS_Assert(0);
 	}
 
 	// Read the Fragment Shader code from the file
@@ -123,7 +124,7 @@ void glsShaderBase::LoadShadersFile(const char * vertex_file_path, const char * 
 	}
 	else{
 		cout << "Impossible to open:" << fragment_file_path << endl;
-		assert(0);
+		GLS_Assert(0);
 	}
 
 	LoadShadersCode(VertexShaderCode, FragmentShaderCode);

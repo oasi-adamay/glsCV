@@ -351,7 +351,7 @@ static void glsConvertProcess(
 void glsConvert(const glsMat& src, glsMat& dst, const float scl){
 
 	glsMat _dst = glsMat(src.size(), CV_MAKETYPE(CV_32F, CV_MAT_CN(src.type())), src.blkNum());
-	assert(_dst.glType() == GL_FLOAT);
+	GLS_Assert(_dst.glType() == GL_FLOAT);
 
 	glsShaderConvertBase* shader = 0;
 
@@ -363,7 +363,7 @@ void glsConvert(const glsMat& src, glsMat& dst, const float scl){
 	//case(GL_BYTE) :
 	//case(GL_SHORT) :
 	//case(GL_INT) : shader = shaderConvertS; break;
-	//default: assert(0);		//not implement
+	//default: GLS_Assert(0);		//not implement
 	//}
 
 	switch (CV_MAT_DEPTH(src.type())){
@@ -373,7 +373,7 @@ void glsConvert(const glsMat& src, glsMat& dst, const float scl){
 	case(CV_8S) :
 	case(CV_16S) :
 	case(CV_32S) : shader = shaderConvertS; break;
-	default: assert(0);		//not implement
+	default: GLS_Assert(0);		//not implement
 	}
 
 	glsFBO fbo(1);
@@ -381,7 +381,7 @@ void glsConvert(const glsMat& src, glsMat& dst, const float scl){
 	for (int i = 0; i < src.texArray.size(); i++){
 		//dst texture
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _dst.texArray[i], 0);
-		assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
+		GLS_Assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
 
 		glsConvertProcess(shader, src.texArray[i], scl);
 	}
@@ -391,7 +391,7 @@ void glsConvert(const glsMat& src, glsMat& dst, const float scl){
 }
 
 void glsCvtColor(const glsMat& src, glsMat& dst, const int code){
-	assert(src.glType() == GL_FLOAT);
+	GLS_Assert(src.glType() == GL_FLOAT);
 
 	int ch=1;
 	switch (code){
@@ -419,7 +419,7 @@ void glsCvtColor(const glsMat& src, glsMat& dst, const int code){
 	case(CV_RGBA2GRAY) :
 		ch = 1; break;
 	default:
-		assert(0);
+		GLS_Assert(0);
 	}
 
 	glsMat _dst = glsMat(src.size(), CV_MAKETYPE(CV_MAT_DEPTH(src.type()), ch), src.blkNum());
@@ -433,7 +433,7 @@ void glsCvtColor(const glsMat& src, glsMat& dst, const int code){
 	case(CV_8S) :
 	case(CV_16S) :
 	case(CV_32S) : shader = shaderConvertS; break;
-	default: assert(0);		//not implement
+	default: GLS_Assert(0);		//not implement
 	}
 
 	glsFBO fbo(1);
@@ -441,7 +441,7 @@ void glsCvtColor(const glsMat& src, glsMat& dst, const int code){
 	for (int i = 0; i < src.texArray.size(); i++){
 		//dst texture
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _dst.texArray[i], 0);
-		assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
+		GLS_Assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
 		float scl = 1.0f;
 		glsConvertProcess(shader, src.texArray[i], scl, code);
 	}

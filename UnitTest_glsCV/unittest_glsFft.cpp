@@ -35,7 +35,7 @@ namespace UnitTest_glsCV
 
 		// Make sure maxUlps is non-negative and small enough that the
 		// default NAN won't compare as equal to anything.
-		assert(maxUlps > 0 && maxUlps < 4 * 1024 * 1024);
+		GLS_Assert(maxUlps > 0 && maxUlps < 4 * 1024 * 1024);
 		int aInt = *(int*)&A;
 		// Make aInt lexicographically ordered as a twos-complement int
 		if (aInt < 0)
@@ -82,12 +82,24 @@ namespace UnitTest_glsCV
 
 		//---------------------------------
 		{
-			Timer tmr("glsFft:  \t");
 			int _flags = 0;
 			if (flags & DFT_SCALE)	_flags |= GLS_FFT_SCALE;
 			if (flags & DFT_INVERSE)_flags |= GLS_FFT_INVERSE;
+#if 0
+			{
+				Timer tmr("glsFft:  \t");
+				glsFft(imgSrc, imgFft, _flags);
+			}
+#else
+			glsMat _src(imgSrc.size(), imgSrc.type(), Size(2, 2));
+			_src.CopyFrom(imgSrc);
+			{
+				Timer tmr("glsFft:  \t");
+				glsFft(_src, _flags);
+			}
+			_src.CopyTo(imgFft);
+#endif
 
-			glsFft(imgSrc, imgFft, _flags);
 		}
 
 		//verify
@@ -145,7 +157,7 @@ namespace UnitTest_glsCV
 //		}
 
 
-		TEST_METHOD(TestMethod_FFT)
+		TEST_METHOD(FFT)
 		{
 			cout << __FUNCTION__ << endl;
 			const int N = 256;
@@ -154,7 +166,7 @@ namespace UnitTest_glsCV
 			Assert::AreEqual(0, errNum);
 		}
 
-		TEST_METHOD(TestMethod_FFT_SCALE)
+		TEST_METHOD(FFT_SCALE)
 		{
 			cout << __FUNCTION__ << endl;
 			const int N = 128;
@@ -163,7 +175,7 @@ namespace UnitTest_glsCV
 			Assert::AreEqual(0, errNum);
 		}
 
-		TEST_METHOD(TestMethod_IFFT)
+		TEST_METHOD(IFFT)
 		{
 			cout << __FUNCTION__ << endl;
 			const int N = 64;
@@ -172,7 +184,7 @@ namespace UnitTest_glsCV
 			Assert::AreEqual(0, errNum);
 		}
 
-		TEST_METHOD(TestMethod_IFFT_SCALE)
+		TEST_METHOD(IFFT_SCALE)
 		{
 			cout << __FUNCTION__ << endl;
 			const int N = 32;

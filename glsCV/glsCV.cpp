@@ -7,6 +7,35 @@
 //-----------------------------------------------------------------------------
 //global 
 
+/*!----------------------------------------------------------------------------
+@brief
+gl error string(gluErrorString compatible)
+@return
+-----------------------------------------------------------------------------*/
+static const char* glErrStr_GL_NO_ERROR = "GL_NO_ERROR";
+static const char* glErrStr_GL_INVALID_ENUM = "GL_INVALID_ENUM";
+static const char* glErrStr_GL_INVALID_VALUE = "GL_INVALID_VALUE";
+static const char* glErrStr_GL_INVALID_OPERATION = "GL_INVALID_OPERATION";
+static const char* glErrStr_GL_OUT_OF_MEMORY = "GL_OUT_OF_MEMORY";
+static const char* glErrStr_GL_UNDEFINED = "GL_UNDEFINED";
+
+/*!----------------------------------------------------------------------------
+@brief
+get Error string (gluErrorString compatible)
+@return
+-----------------------------------------------------------------------------*/
+const char* glsErrorString(GLenum err){
+	switch (err){
+	case(GL_NO_ERROR) : return glErrStr_GL_NO_ERROR;
+	case(GL_INVALID_ENUM) : return glErrStr_GL_INVALID_ENUM;
+	case(GL_INVALID_VALUE) : return glErrStr_GL_INVALID_VALUE;
+	case(GL_INVALID_OPERATION) : return glErrStr_GL_INVALID_OPERATION;
+	case(GL_OUT_OF_MEMORY) : return glErrStr_GL_OUT_OF_MEMORY;
+	}
+	return glErrStr_GL_UNDEFINED;
+}
+
+
 //-----------------------------------------------------------------------------
 // GLFWÇ≈ÉGÉâÅ[Ç∆Ç»Ç¡ÇΩÇ∆Ç´Ç…åƒÇ—èoÇ≥ÇÍÇÈä÷êî
 static void glfw_error_callback_func(int error, const char* description){
@@ -38,7 +67,7 @@ GLFWwindow* glsCvInit(const int _width, const int _height){
 	if (!glfwInit())
 	{
 		cerr<< "Failed to initialize GLFW" << endl;
-		assert(0);
+		GLS_Assert(0);
 	}
 
 	//-----------------------------------------------------------------------------
@@ -59,7 +88,7 @@ GLFWwindow* glsCvInit(const int _width, const int _height){
 	if (window == NULL){
 		cerr << "Failed to open GLFW window." << endl;
 		glfwTerminate();
-		assert(0);
+		GLS_Assert(0);
 	}
 	glfwMakeContextCurrent(window);
 
@@ -69,10 +98,12 @@ GLFWwindow* glsCvInit(const int _width, const int _height){
 	if (glewInit() != GLEW_OK) {
 		cerr << "Failed to initialize GLEW." << endl;
 		glfwTerminate();
-		assert(0);
+		GLS_Assert(0);
 	}
 #endif
 
+
+	glGetError();	// clear error flag!
 
 	{
 		cout << "GL_VENDOR:" << glGetString(GL_VENDOR) << endl;
@@ -82,10 +113,13 @@ GLFWwindow* glsCvInit(const int _width, const int _height){
 
 	}
 
+	glsCopyInit();
 	glsConvertInit();
 	glsDrawInit();
 	glsBasicOperationInit();
 	glsFftInit();
+
+	GL_CHECK_ERROR();
 
 	return window;
 }
@@ -94,6 +128,7 @@ GLFWwindow* glsCvInit(const int _width, const int _height){
 //Terminate glsFft
 void glsCvTerminate(void){
 
+	glsCopyTerminate();
 	glsConvertTerminate();
 	glsDrawTerminate();
 	glsBasicOperationTerminate();

@@ -1,9 +1,10 @@
 #include "stdafx.h"
 
+#include "glsCV.h"
 #include "glsFBO.h"
 
 glsFBO::glsFBO(const int attachment_num){
-	assert(attachment_num < 16);
+	GLS_Assert(attachment_num < 16);
 	// create FBO (off-screen framebuffer)
 	glGenFramebuffers(1, &fbo);
 
