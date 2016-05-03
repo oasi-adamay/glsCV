@@ -38,11 +38,14 @@ namespace UnitTest_glsCV
 		return errNum;
 	}
 
-	int test_glsCopyRect(int cvtype){
+	int test_glsCopyRect(int cvtype,int flag = 0){
 		const int width = 32;
 		const int height = 24;
 //		const Rect rect(4, 3, 15, 13);
 		const Rect rect(4, 3, 8, 6);
+		Size blkNum;
+		if (flag == 0) blkNum = Size(1, 1);
+		else blkNum = Size(2, 2);
 
 		Mat imgSrc = Mat(Size(width, height), cvtype);
 		Mat imgDst;
@@ -57,7 +60,7 @@ namespace UnitTest_glsCV
 		//----------------------
 		glsMat glsSrc(imgSrc);		//create glsMat and  upload
 		glsMat glsDst;
-		glsCopy(glsSrc, glsDst,rect);	//copy texture within rect
+		glsCopy(glsSrc, glsDst, rect, blkNum);	//copy texture within rect
 		glsDst.CopyTo(imgDst);		// download
 
 		int errNum = 0;
@@ -159,6 +162,16 @@ namespace UnitTest_glsCV
 			int errNum = test_glsCopyRect(CV_32SC1);
 			Assert::AreEqual(0, errNum);
 		}
+
+		// tiling
+		TEST_METHOD(glsCopyRect_CV_32FC1_TILING)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_glsCopyRect(CV_32FC1,1);
+			Assert::AreEqual(0, errNum);
+		}
+
+
 
 
 

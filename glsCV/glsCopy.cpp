@@ -217,10 +217,12 @@ void glsCopy(const glsMat& src, glsMat& dst){
 
 
 //copy texture with rect
-void glsCopy(const glsMat& src, glsMat& dst, const Rect& rect){
+void glsCopy(const glsMat& src, glsMat& dst, const Rect& rect, const Size& blkNum){
 	GLS_Assert(src.isContinuous());
+	GLS_Assert(rect.width % blkNum.width == 0);
+	GLS_Assert(rect.height % blkNum.height == 0);
 
-	glsMat _dst = glsMat(rect.size(), src.type());
+	glsMat _dst = glsMat(rect.size(), src.type(), blkNum);
 
 	glsShaderCopyBase* shader = 0;
 
@@ -237,12 +239,18 @@ void glsCopy(const glsMat& src, glsMat& dst, const Rect& rect){
 
 	glsFBO fbo(1);
 
-	for (int i = 0; i < src.texArray.size(); i++){
-		//dst texture
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _dst.texArray[i], 0);
-		GLS_Assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
+	for (int by = 0; by < _dst.blkNumY(); by++){
+		for (int bx = 0; bx < _dst.blkNumX(); bx++){
+			int x = rect.x + bx* _dst.texWidth();
+			int y = rect.y + by* _dst.texHeight();
+			Rect _rect(x, y, _dst.texWidth(), _dst.texHeight());
 
-		glsCopyProcess(shader, src.texArray[i], rect);
+			//dst texture
+			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _dst.at(by, bx), 0);
+			GLS_Assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
+
+			glsCopyProcess(shader, src.texArray[0], _rect);
+		}
 	}
 	
 	dst = _dst;

@@ -18,11 +18,9 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace UnitTest_glsCV
 {
-	//HookCoutCerr hook;
-	HookCoutCerr* hook;
+	HookCoutCerr hook;
 #if 1
 	TEST_MODULE_INITIALIZE(test_module_initialize) {
-		hook = new HookCoutCerr();
 		cout << __FUNCTION__ << endl;
 		glsCvInit();
 
@@ -30,7 +28,6 @@ namespace UnitTest_glsCV
 	TEST_MODULE_CLEANUP(test_module_cleanup)  {
 		cout << __FUNCTION__ << endl;
 		glsCvTerminate();
-		delete hook;
 		Logger::WriteMessage("TEST_MODULE_CLEANUP end");
 	}
 #endif

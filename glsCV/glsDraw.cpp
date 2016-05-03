@@ -87,7 +87,9 @@ glsShaderDraw::glsShaderDraw(void)
 		"\n"
 		"void main(void)\n"
 		"{\n"
-		"	vec4 data = texelFetch(texSrc, ivec2(gl_FragCoord.xy),0);\n"
+		"	ivec2 texSize = textureSize(texSrc,0);\n"
+		"	ivec2 texCord = ivec2(gl_FragCoord.xy)%texSize;\n"
+		"	vec4 data = texelFetch(texSrc, texCord,0);\n"
 		"	vec4 color;\n"
 		"	switch(flag&3){\n"
 		"	case(0):color = vec4(data.r*scl,data.g*scl,data.b*scl,data.g*scl);break;\n"
@@ -140,7 +142,9 @@ glsShaderDrawU::glsShaderDrawU(void)
 		"\n"
 		"void main(void)\n"
 		"{\n"
-		"	vec4 data = vec4(texelFetch(texSrc, ivec2(gl_FragCoord.xy),0));\n"
+		"	ivec2 texSize = textureSize(texSrc,0);\n"
+		"	ivec2 texCord = ivec2(gl_FragCoord.xy)%texSize;\n"
+		"	vec4 data = vec4(texelFetch(texSrc, texCord,0));\n"
 		"	vec4 color;\n"
 		"	switch(flag&3){\n"
 		"	case(0):color = vec4(data.r*scl,data.g*scl,data.b*scl,data.g*scl);break;\n"
@@ -198,14 +202,15 @@ static Size getTextureSize(GLuint tex){
 //
 static void glsDrawProcess(
 	const glsShaderDrawBase* shader,	//progmra ID
-	const GLuint& texSrc,			//src texture IDs
+	const GLuint& texSrc,				//src texture IDs
+	const Rect  rect,					//src rect
+	const Size  sizeDst,				//dst size
 	const float scl,					// scaling 
 	const int   flag					// flag [1:0] channnel 
 	)
 {
-	Size size = getTextureSize(texSrc);
-	int width = size.width;
-	int height = size.height;
+	int width = sizeDst.width;
+	int height = sizeDst.height;
 
 	//program
 	{
@@ -232,7 +237,8 @@ static void glsDrawProcess(
 
 	//Viewport
 	{
-		glViewport(0, 0, width, height);
+//		glViewport(0, 0, width, height);
+		glViewport(rect.x, rect.y, rect.width, rect.height);
 	}
 
 	//Render!!
@@ -299,9 +305,15 @@ void glsDraw(glsMat& src){
 	default: GLS_Assert(0);		//not implement
 	}
 
+	Size sizeDst(src.size());
 
+	for (int by = 0; by < src.blkNumY(); by++){
+		for (int bx = 0; bx < src.blkNumX(); bx++){
+			Rect rect(bx * src.texWidth(), by * src.texHeight(), src.texWidth(), src.texHeight());
+			glsDrawProcess(shader, src.at(by, bx), rect, sizeDst, scl, flag);
+		}
+	}
 
-	glsDrawProcess(shader, src.texArray[0], scl,flag);
 
 }
 

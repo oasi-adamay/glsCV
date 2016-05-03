@@ -37,6 +37,9 @@ public:
 
 	Size size(void) const { return Size(cols, rows); }
 	Size blkNum(void) const { return Size(blkX, blkY); }
+	int blkNumX(void) const { return blkX; }
+	int blkNumY(void) const { return blkY; }
+
 	int type(void) const { return CV_MAT_TYPE(flag); }
 	GLenum glSizedFormat(void) const{ return convCVtype2GLsizedFormat(CV_MAT_TYPE(flag)); }
 	GLenum glFormat(void) const{ return convCVtype2GLformat(CV_MAT_TYPE(flag)); }

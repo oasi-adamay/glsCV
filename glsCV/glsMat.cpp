@@ -4,7 +4,7 @@
 #include "glsMat.h"
 #include "Timer.h"
 
-#ifdef DEBUG
+#ifdef _DEBUG
 #define _TMR_(...)  Timer tmr(__VA_ARGS__)
 #else
 #define _TMR_(...)
@@ -39,12 +39,6 @@ glsMat::glsMat(const Mat & cvmat, bool upload){
 }
 
 glsMat& glsMat::operator=(const glsMat& rhs){
-	if (refcount.use_count() == 1){
-		glDeleteTextures((GLsizei)texArray.size(), &texArray[0]);
-		texArray.clear();
-//		refcount.reset();
-	}
-	
 	refcount = rhs.refcount;
 	flag = rhs.flag;
 	cols = rhs.cols;
@@ -67,6 +61,16 @@ glsMat& glsMat::operator=(const glsMat& rhs){
 
 glsMat::~glsMat(void){
 	if (refcount.use_count()==1){
+#if 0
+		{
+			cout << "delete:";
+			for (int i = 0; i < texArray.size(); i++){
+				cout << texArray[i] << ",";
+			}
+			cout << endl;
+		}
+#endif
+
 		glDeleteTextures((GLsizei)texArray.size(), &texArray[0]);
 		texArray.clear();
 	}
@@ -109,6 +113,16 @@ void glsMat::createTexture(
 	}
 
 	refcount = make_shared<int>(1);
+#if 0
+	{
+		cout << "create:";
+		for (int i = 0; i < texArray.size(); i++){
+			cout << texArray[i] << ",";
+		}
+		cout << endl;
+	}
+#endif
+
 }
 
 
@@ -197,6 +211,8 @@ void glsMat::CopyFrom(const Mat&src){
 }
 
 void glsMat::CopyTo(Mat&dst){
+//	cout << "CopyTo:start" << endl;
+
 	_TMR_("-download:\t");
 
 	dst = Mat(size(), type());
@@ -252,23 +268,22 @@ void glsMat::CopyTo(Mat&dst){
 		Mat tmp = Mat(Size(texWidth(), texHeight()), dst.type());
 		for (int by = 0; by < blkY; by++){
 			for (int bx = 0; bx < blkX; bx++){
-				int i = by*blkX + bx;
-				int x = (bx)* texWidth();
-				int y = (by)* texHeight();
 				void* data = tmp.data;
 
-				glBindTexture(GL_TEXTURE_2D, texArray[i]);
+				glBindTexture(GL_TEXTURE_2D, at(by,bx));
 				glGetTexImage(GL_TEXTURE_2D, 0, glFormat(), glType(), data);
 				GL_CHECK_ERROR();
 				glBindTexture(GL_TEXTURE_2D, 0);
 
-				Rect rect(x, y, texWidth(), texHeight());
+				Rect rect(bx* texWidth(), by* texHeight(), texWidth(), texHeight());
 				Mat roi = Mat(dst, rect);
 				tmp.copyTo(roi);
 			}
 		}
 #endif
 	}
+
+//	cout << "CopyTo:end" << endl;
 }
 
 

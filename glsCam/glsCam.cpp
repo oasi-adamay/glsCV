@@ -16,23 +16,26 @@
 
 enum E_CAM_MODE {
 	NORMAL,
-	GRAY
-	
+	GRAY,
+	FFT,
 };
 
 void controls(GLFWwindow* window, int& mode){
 
 	if (glfwGetKey(window, GLFW_KEY_0) == GLFW_PRESS) mode = E_CAM_MODE::NORMAL;
 	if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS) mode = E_CAM_MODE::GRAY;
+	if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS) mode = E_CAM_MODE::FFT;
 }
 
 
 
 int _tmain(int argc, _TCHAR* argv[])
 {
-	const int frameWidth = 640;
-	const int frameHeight = 480;
-	GLFWwindow* window = glsCvInit(frameWidth, frameHeight);
+	const GLsizei captureWidth(640);
+	const GLsizei captureHeight(480);
+
+
+	GLFWwindow* window = glsCvInit(captureWidth, captureHeight);
 	
 	
 	// OpenCV によるビデオキャプチャを初期化する
@@ -45,22 +48,9 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	// カメラの初期設定
 	camera.grab();
-	const GLsizei capture_width(frameWidth);
-	const GLsizei capture_height(frameHeight);
-	camera.set(CV_CAP_PROP_FRAME_WIDTH, double(capture_width));
-	camera.set(CV_CAP_PROP_FRAME_HEIGHT, double(capture_height));
+	camera.set(CV_CAP_PROP_FRAME_WIDTH, double(captureWidth));
+	camera.set(CV_CAP_PROP_FRAME_HEIGHT, double(captureHeight));
 
-#if 0
-	{
-		cv::Mat frame;
-		camera >> frame;						// キャプチャ映像から画像を切り出す
-
-		glsMat glsFrame0(frame);
-		glsMat glsFrame1(glsFrame0);
-		glsMat glsFrame2 = glsFrame0;
-		glsMat glsFrame3 = glsFrame0;
-	}
-#endif
 
 	int camMode = E_CAM_MODE::NORMAL;
 	do{
@@ -73,6 +63,16 @@ int _tmain(int argc, _TCHAR* argv[])
 		glsMat glsFrame(frame);
 		glsConvert(glsFrame, glsFrame, 1.0f / 256.0f);
 		switch (camMode){
+		case(E_CAM_MODE::FFT) :
+			{
+				Size sizeFft(256, 256);
+				int x = (glsFrame.size().width - sizeFft.width) / 2;
+				int y = (glsFrame.size().height - sizeFft.height) / 2;
+				Rect rect( x, y, sizeFft.width, sizeFft.height);
+				glsCopy(glsFrame, glsFrame, rect , Size(2,2));
+				glsCvtColor(glsFrame, glsFrame, CV_BGR2GRAY);
+			}
+			break;
 		case(E_CAM_MODE::GRAY) :
 			glsCvtColor(glsFrame, glsFrame, CV_BGR2GRAY);
 			break;
@@ -82,7 +82,7 @@ int _tmain(int argc, _TCHAR* argv[])
 			break;
 		}
 
-
+		glfwSetWindowSize(window, glsFrame.size().width, glsFrame.size().height);
 		glsDraw(glsFrame);
 
 		glfwSwapBuffers(window);  // Swap buffers
