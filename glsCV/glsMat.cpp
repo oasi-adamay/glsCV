@@ -14,13 +14,16 @@
 //#define _USE_PBO_UP
 //#define _USE_PBO_DOWN
 
+//#define _DBG_GLS_MAT
+
+#ifdef _DBG_GLS_MAT
+static int gTextureNum = 0;
+#endif
+
 glsMat::glsMat(void){
 	flag = 0;
 	rows = 0;
 	cols = 0;
-
-//	width = 0;
-//	height = 0;
 	blkX = 0;
 	blkY = 0;
 	texArray.clear();
@@ -39,6 +42,10 @@ glsMat::glsMat(const Mat & cvmat, bool upload){
 }
 
 glsMat& glsMat::operator=(const glsMat& rhs){
+	if (refcount.use_count() == 1){
+		deleteTexture();
+	}
+
 	refcount = rhs.refcount;
 	flag = rhs.flag;
 	cols = rhs.cols;
@@ -61,18 +68,7 @@ glsMat& glsMat::operator=(const glsMat& rhs){
 
 glsMat::~glsMat(void){
 	if (refcount.use_count()==1){
-#if 0
-		{
-			cout << "delete:";
-			for (int i = 0; i < texArray.size(); i++){
-				cout << texArray[i] << ",";
-			}
-			cout << endl;
-		}
-#endif
-
-		glDeleteTextures((GLsizei)texArray.size(), &texArray[0]);
-		texArray.clear();
+		deleteTexture();
 	}
 }
 
@@ -112,18 +108,46 @@ void glsMat::createTexture(
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
+
 	refcount = make_shared<int>(1);
-#if 0
+#ifdef _DBG_GLS_MAT
 	{
+
 		cout << "create:";
 		for (int i = 0; i < texArray.size(); i++){
 			cout << texArray[i] << ",";
 		}
 		cout << endl;
+
+		gTextureNum += texArray.size();
+		cout << "texnum:" << gTextureNum << endl;
 	}
 #endif
+}
+
+void glsMat::deleteTexture(void){
+#ifdef _DBG_GLS_MAT
+	{
+		cout << "delete:";
+		for (int i = 0; i < texArray.size(); i++){
+			cout << texArray[i] << ",";
+		}
+		cout << endl;
+	}
+	gTextureNum -= texArray.size();
+	cout << "texnum:" << gTextureNum << endl;
+#endif
+
+	glDeleteTextures((GLsizei)texArray.size(), &texArray[0]);
+	flag = 0;
+	rows = 0;
+	cols = 0;
+	blkX = 0;
+	blkY = 0;
+	texArray.clear();
 
 }
+
 
 
 GLuint glsMat::at(const int y, const int x){

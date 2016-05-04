@@ -18,6 +18,7 @@ private:
 //	glsMat(const glsMat& src, bool copy);
 
 	void createTexture(const int _width, const int _height, int _type, const int _blkX = 1, const int _blkY = 1);
+	void deleteTexture(void);
 
 	int blkX;
 	int blkY;
