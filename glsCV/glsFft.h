@@ -10,6 +10,7 @@
 
 #define GLS_FFT_SCALE	   (1<<1)
 #define GLS_FFT_INVERSE   (1<<2)
+#define GLS_FFT_SHIFT	   (1<<3)	
 
 void glsFftInit(void);
 void glsFftTerminate(void);

@@ -31,8 +31,10 @@ void controls(GLFWwindow* window, int& mode){
 
 int _tmain(int argc, _TCHAR* argv[])
 {
-	const GLsizei captureWidth(640);
-	const GLsizei captureHeight(480);
+//	const GLsizei captureWidth(640);
+//	const GLsizei captureHeight(480);
+	const GLsizei captureWidth(1280);
+	const GLsizei captureHeight(720);
 
 
 	GLFWwindow* window = glsCvInit(captureWidth, captureHeight);
@@ -51,8 +53,14 @@ int _tmain(int argc, _TCHAR* argv[])
 	camera.set(CV_CAP_PROP_FRAME_WIDTH, double(captureWidth));
 	camera.set(CV_CAP_PROP_FRAME_HEIGHT, double(captureHeight));
 
+//	Size sizeFft(256, 256);
+	Size sizeFft(512, 512);
+	Mat fftwin;
+	cv::createHanningWindow(fftwin, sizeFft, CV_32F);
+	glsMat glsFftWin(fftwin);
 
-	int camMode = E_CAM_MODE::NORMAL;
+
+	int camMode = E_CAM_MODE::FFT;
 	do{
 		cv::Mat frame;
 		camera >> frame;						// キャプチャ映像から画像を切り出す
@@ -65,14 +73,13 @@ int _tmain(int argc, _TCHAR* argv[])
 		switch (camMode){
 		case(E_CAM_MODE::FFT) :
 			{
-				Size sizeFft(256, 256);
 
 				int x = (glsFrame.size().width - sizeFft.width) / 2;
 				int y = (glsFrame.size().height - sizeFft.height) / 2;
 				Rect rect( x, y, sizeFft.width, sizeFft.height);
 #if 0
 				Mat roi = Mat(frame, rect).clone();
-				cvtColor(roi,roi,CV_BGR2GRAY);
+				cv::cvtColor(roi,roi,CV_BGR2GRAY);
 				roi.convertTo(roi, CV_32FC1,1.0/256.0);
 				Mat zero = Mat::zeros(roi.size(),roi.type());
 				vector<Mat> pln(2);
@@ -85,21 +92,28 @@ int _tmain(int argc, _TCHAR* argv[])
 				Mat mag;
 				cv::magnitude(pln[0], pln[1], mag);
 				cv::log(mag+1,mag);
-				cv::normalize(mag, mag, 0, 1, CV_MINMAX);
-				imshow("[CV MAG]",mag);
+//				cv::normalize(mag, mag, 0, 1, CV_MINMAX);
+				cv::imshow("[CV MAG]",mag);
 #else
 				glsMat glsZero(sizeFft, CV_32FC1,Size(2,2));
 				glsCopyRect(glsFrame, glsFrame, rect , Size(2,2));
 				glsCvtColor(glsFrame, glsFrame, CV_BGR2GRAY);
+				glsMultiply(glsFftWin, glsFrame, glsFrame);
 				vector<glsMat> plnGls(2);
 				plnGls[0] = glsFrame;
 				plnGls[1] = glsZero;
 				glsMat glsComplx;
 				glsMerge(plnGls, glsComplx);
-				glsFft(glsComplx, glsComplx);
+				glsFft(glsComplx, glsComplx, GLS_FFT_SHIFT);
 				glsMagSpectrums(glsComplx, glsFrame);
-				glsAdd(vec4(1.0, 1.0, 1.0, 1.0), glsFrame, glsFrame);
+				glsAdd(vec4(1.0), glsFrame, glsFrame);
 				glsLog(glsFrame, glsFrame);
+				Mat tmp;
+				glsFrame.CopyTo(tmp);
+				double min, max;
+				cv::minMaxLoc(tmp, &min, &max);
+				glsAdd(vec4((float)-min), glsFrame, glsFrame);
+				glsMultiply(vec4(1.0f / (float)(max - min)), glsFrame, glsFrame);
 #endif
 			}
 			break;

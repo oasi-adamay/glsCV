@@ -435,6 +435,14 @@ void glsFft(const glsMat& src, glsMat& dst ,int flag){
 	}
 
 	dst = *texid[bank];
+
+	if (flag & GLS_FFT_SHIFT){
+		vector<GLuint> tmp = dst.texArray;
+		dst.texArray[0] = tmp[3];
+		dst.texArray[1] = tmp[2];
+		dst.texArray[2] = tmp[1];
+		dst.texArray[3] = tmp[0];
+	}
 }
 
 
