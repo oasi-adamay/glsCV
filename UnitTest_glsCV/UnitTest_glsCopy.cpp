@@ -29,19 +29,7 @@ namespace UnitTest_glsCV
 
 		//---------------------------------
 		//init Src image
-//		cv::randu(imgSrc, Scalar(0), Scalar(255));
-		{
-			RNG rng(0xFFFFFFFF);
-			for (int y = 0; y < imgSrc.rows; y++){
-				for (int x = 0; x < imgSrc.cols; x++){
-					T* pSrc = imgSrc.ptr<T>(y, x);
-					for (int ch = 0; ch < imgSrc.channels(); ch++){
-						*pSrc++ = randu<T>();
-					}
-				}
-			}
-		}
-
+		FillRandU<T>(imgSrc);
 
 		//----------------------
 //		glsMat glsSrc(imgSrc);		//create glsMat and  upload
@@ -63,6 +51,78 @@ namespace UnitTest_glsCV
 	}
 
 	template <typename T>
+	int test_glsCopyTiled(int cvtype){
+		const int width = 32;
+		const int height = 24;
+		Size blkNum = Size(2, 2);
+
+		Mat imgSrc = Mat(Size(width, height), cvtype);
+		Mat imgDst;
+
+		cout << "Size:" << imgSrc.size() << endl;
+
+		//---------------------------------
+		//init Src image
+		FillRandU<T>(imgSrc);
+
+		//----------------------
+		glsMat glsSrc(imgSrc);					//create glsMat and  upload
+		glsMat glsDst;
+		glsCopyTiled(glsSrc, glsDst, blkNum);	//copy texture
+		glsDst.CopyTo(imgDst);					// download
+
+		int errNum = 0;
+		if (glsDst.blkNum() != blkNum) errNum = -1;
+		if (!AreEqual(imgSrc, imgDst)) errNum = -1;
+
+		//cout << imgSrc << endl;
+		//cout << imgDst << endl;
+		//cout << imgDst - imgSrc << endl;
+
+
+		return errNum;
+	}
+
+	template <typename T>
+	int test_glsCopyUntiled(int cvtype){
+		//const int width = 32;
+		//const int height = 24;
+		const int width = 8;
+		const int height = 6;
+		Size blkNum = Size(2, 2);
+
+		Mat imgSrc = Mat(Size(width, height), cvtype);
+		Mat imgDst;
+
+		cout << "Size:" << imgSrc.size() << endl;
+
+		//---------------------------------
+		//init Src image
+		FillRandU<T>(imgSrc);
+
+		//----------------------
+		glsMat glsSrc(imgSrc.size(), imgSrc.type(), blkNum);
+		glsSrc.CopyFrom(imgSrc);
+
+		glsMat glsDst;
+		glsCopyUntiled(glsSrc, glsDst);		//copy texture  with untiling
+		glsDst.CopyTo(imgDst);				// download
+
+		int errNum = 0;
+		if (glsDst.blkNum() != Size(1,1)) errNum = -1;
+		if (!AreEqual(imgSrc, imgDst)) errNum = -1;
+
+		//cout << imgSrc << endl;
+		//cout << imgDst << endl;
+		//cout << imgDst - imgSrc << endl;
+
+
+		return errNum;
+	}
+
+
+
+	template <typename T>
 	int test_glsCopyRect(int cvtype, int flag = 0){
 		int width = 32;
 		int height = 24;
@@ -71,13 +131,6 @@ namespace UnitTest_glsCV
 		Size blkNum;
 		if (flag == 0) blkNum = Size(1, 1);
 		else blkNum = Size(2, 2);
-
-		if (flag == 2){
-			width = 256;
-			height = 256;
-			rect = Rect(0, 0, width, height);
-			blkNum = Size(2, 2);
-		}
 
 
 		Mat imgSrc = Mat(Size(width, height), cvtype);
@@ -88,18 +141,7 @@ namespace UnitTest_glsCV
 
 		//---------------------------------
 		//init Src image
-//		cv::randu(imgSrc, Scalar(0), Scalar(255));
-		{
-			RNG rng(0xFFFFFFFF);
-			for (int y = 0; y < imgSrc.rows; y++){
-				for (int x = 0; x < imgSrc.cols; x++){
-					T* pSrc = imgSrc.ptr<T>(y, x);
-					for (int ch = 0; ch < imgSrc.channels(); ch++){
-						*pSrc++ = randu<T>();
-					}
-				}
-			}
-		}
+		FillRandU<T>(imgSrc);
 
 
 		//----------------------
@@ -127,6 +169,8 @@ namespace UnitTest_glsCV
 	TEST_CLASS(UnitTest_glsCopy)
 	{
 	public:
+		//glsCopy
+
 		TEST_METHOD(glsCopy_CV_32FC1)
 		{
 			cout << __FUNCTION__ << endl;
@@ -176,7 +220,35 @@ namespace UnitTest_glsCV
 			Assert::AreEqual(0, errNum);
 		}
 
+		//glsCopyTiled
+		TEST_METHOD(glsCopyTiled_CV_8UC1)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_glsCopyTiled<uchar>(CV_8UC1);
+			Assert::AreEqual(0, errNum);
+		}
+		TEST_METHOD(glsCopyTiled_CV_32FC1)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_glsCopyTiled<float>(CV_32FC1);
+			Assert::AreEqual(0, errNum);
+		}
 
+		//glsCopyUntiled
+		TEST_METHOD(glsCopyUntiled_CV_8UC1)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_glsCopyUntiled<uchar>(CV_8UC1);
+			Assert::AreEqual(0, errNum);
+		}
+		TEST_METHOD(glsCopyUntiled_CV_32FC1)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_glsCopyUntiled<float>(CV_32FC1);
+			Assert::AreEqual(0, errNum);
+		}
+
+		//glsCopyRect
 		TEST_METHOD(glsCopyRect_CV_32FC1)
 		{
 			cout << __FUNCTION__ << endl;
@@ -227,16 +299,6 @@ namespace UnitTest_glsCV
 			int errNum = test_glsCopyRect<float>(CV_32FC1,1);
 			Assert::AreEqual(0, errNum);
 		}
-
-		TEST_METHOD(glsCopyRect_CV_32FC2_TILING)
-		{
-			cout << __FUNCTION__ << endl;
-			int errNum = test_glsCopyRect<float>(CV_32FC2, 2);
-			Assert::AreEqual(0, errNum);
-		}
-
-
-
 
 
 

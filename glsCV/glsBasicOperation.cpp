@@ -206,6 +206,8 @@ const int flags					//flag (opcode)
 		}
 	}
 
+	GL_CHECK_ERROR();
+
 }
 
 
@@ -364,11 +366,14 @@ void glslBinaryOperation(
 		}
 	}
 
+	GL_CHECK_ERROR();
+
 }
 
 //スカラと配列の 要素毎の和を求めます．
 void glsAdd(const vec4& scalar, const glsMat& src, glsMat& dst){
 	GLS_Assert(src.glType() == GL_FLOAT);
+	dst = glsMat(src.size(), src.type(), src.blkNum());
 	glslScalarOperation(shaderScalarOperation, scalar, src.texArray, dst.texArray, OPCODE_ADD);
 }
 
@@ -377,6 +382,7 @@ void glsAdd(const glsMat& src0, const glsMat& src1, glsMat& dst)
 {
 	GLS_Assert(src0.glType() == GL_FLOAT);
 	GLS_Assert(src1.glType() == GL_FLOAT);
+	dst = glsMat(src0.size(), src0.type(), src0.blkNum());
 	glslBinaryOperation(shaderBinaryOperation, src0.texArray, src1.texArray, dst.texArray, OPCODE_ADD);
 }
 
@@ -384,6 +390,7 @@ void glsAdd(const glsMat& src0, const glsMat& src1, glsMat& dst)
 //スカラと配列の 要素毎の差を求めます．
 void glsSubtract(const vec4& scalar, const glsMat& src, glsMat& dst){
 	GLS_Assert(src.glType() == GL_FLOAT);
+	dst = glsMat(src.size(), src.type(), src.blkNum());
 	glslScalarOperation(shaderScalarOperation, scalar, src.texArray, dst.texArray, OPCODE_SUB);
 }
 
@@ -392,6 +399,7 @@ void glsSubtract(const glsMat& src0, const glsMat& src1, glsMat& dst)
 {
 	GLS_Assert(src0.glType() == GL_FLOAT);
 	GLS_Assert(src1.glType() == GL_FLOAT);
+	dst = glsMat(src0.size(), src0.type(), src0.blkNum());
 	glslBinaryOperation(shaderBinaryOperation, src0.texArray, src1.texArray, dst.texArray, OPCODE_SUB);
 }
 
@@ -399,6 +407,7 @@ void glsSubtract(const glsMat& src0, const glsMat& src1, glsMat& dst)
 //スカラと配列の 要素毎の積を求めます．
 void glsMultiply(const vec4& scalar, const glsMat& src, glsMat& dst){
 	GLS_Assert(src.glType() == GL_FLOAT);
+	dst = glsMat(src.size(), src.type(), src.blkNum());
 	glslScalarOperation(shaderScalarOperation, scalar, src.texArray, dst.texArray, OPCODE_MUL);
 }
 
@@ -407,12 +416,14 @@ void glsMultiply(const glsMat& src0, const glsMat& src1, glsMat& dst)
 {
 	GLS_Assert(src0.glType() == GL_FLOAT);
 	GLS_Assert(src1.glType() == GL_FLOAT);
+	dst = glsMat(src0.size(), src0.type(), src0.blkNum());
 	glslBinaryOperation(shaderBinaryOperation, src0.texArray, src1.texArray, dst.texArray, OPCODE_MUL);
 }
 
 //スカラと配列の 要素毎の商を求めます．
 void glsDivide(const vec4& scalar, const glsMat& src, glsMat& dst){
 	GLS_Assert(src.glType() == GL_FLOAT);
+	dst = glsMat(src.size(), src.type(), src.blkNum());
 	glslScalarOperation(shaderScalarOperation, scalar, src.texArray, dst.texArray, OPCODE_DIV);
 }
 
@@ -421,12 +432,14 @@ void glsDivide(const vec4& scalar, const glsMat& src, glsMat& dst){
 void glsDivide(const glsMat& src0, const glsMat& src1, glsMat& dst){
 	GLS_Assert(src0.glType() == GL_FLOAT);
 	GLS_Assert(src1.glType() == GL_FLOAT);
+	dst = glsMat(src0.size(), src0.type(), src0.blkNum());
 	glslBinaryOperation(shaderBinaryOperation, src0.texArray, src1.texArray, dst.texArray, OPCODE_DIV);
 }
 
 //スカラと配列の 要素毎の最小値を求めます．
 void glsMin(const vec4& scalar, const glsMat& src, glsMat& dst){
 	GLS_Assert(src.glType() == GL_FLOAT);
+	dst = glsMat(src.size(), src.type(), src.blkNum());
 	glslScalarOperation(shaderScalarOperation, scalar, src.texArray, dst.texArray, OPCODE_MIN);
 }
 
@@ -434,12 +447,14 @@ void glsMin(const vec4& scalar, const glsMat& src, glsMat& dst){
 void glsMin(const glsMat& src0, const glsMat& src1, glsMat& dst){
 	GLS_Assert(src0.glType() == GL_FLOAT);
 	GLS_Assert(src1.glType() == GL_FLOAT);
+	dst = glsMat(src0.size(), src0.type(), src0.blkNum());
 	glslBinaryOperation(shaderBinaryOperation, src0.texArray, src1.texArray, dst.texArray, OPCODE_MIN);
 }
 
 //スカラと配列の 要素毎の最大値を求めます．
 void glsMax(const vec4& scalar, const glsMat& src, glsMat& dst){
 	GLS_Assert(src.glType() == GL_FLOAT);
+	dst = glsMat(src.size(), src.type(), src.blkNum());
 	glslScalarOperation(shaderScalarOperation, scalar, src.texArray, dst.texArray, OPCODE_MAX);
 }
 
@@ -447,6 +462,7 @@ void glsMax(const vec4& scalar, const glsMat& src, glsMat& dst){
 void glsMax(const glsMat& src0, const glsMat& src1, glsMat& dst){
 	GLS_Assert(src0.glType() == GL_FLOAT);
 	GLS_Assert(src1.glType() == GL_FLOAT);
+	dst = glsMat(src0.size(), src0.type(), src0.blkNum());
 	glslBinaryOperation(shaderBinaryOperation, src0.texArray, src1.texArray, dst.texArray, OPCODE_MAX);
 }
 
@@ -455,6 +471,7 @@ void glsMax(const glsMat& src0, const glsMat& src1, glsMat& dst){
 void glsMulSpectrums(const glsMat& src0, const glsMat& src1, glsMat& dst, bool conj){
 	GLS_Assert(src0.glSizedFormat() == GL_RG32F);
 	GLS_Assert(src1.glSizedFormat() == GL_RG32F);
+	dst = glsMat(src0.size(), src0.type(), src0.blkNum());
 	if (conj)glslBinaryOperation(shaderBinaryOperation, src0.texArray, src1.texArray, dst.texArray, OPCODE_MUL_SPCETRUM_CONJ);
 	else glslBinaryOperation(shaderBinaryOperation, src0.texArray, src1.texArray, dst.texArray, OPCODE_MUL_SPCETRUM);
 }
@@ -463,6 +480,7 @@ void glsMulSpectrums(const glsMat& src0, const glsMat& src1, glsMat& dst, bool c
 void glsMulSpectrumsPhaseOnly(const glsMat& src0, const glsMat& src1, glsMat& dst){
 	GLS_Assert(src0.glSizedFormat() == GL_RG32F);
 	GLS_Assert(src1.glSizedFormat() == GL_RG32F);
+	dst = glsMat(src0.size(), src0.type(), src0.blkNum());
 	glslBinaryOperation(shaderBinaryOperation, src0.texArray, src1.texArray, dst.texArray, OPCODE_MUL_SPCETRUM_POC);
 }
 
@@ -470,6 +488,7 @@ void glsMulSpectrumsPhaseOnly(const glsMat& src0, const glsMat& src1, glsMat& ds
 void glsMagSpectrums(const glsMat& src, glsMat& dst){
 	GLS_Assert(src.glSizedFormat() == GL_RG32F);
 	vec4 scalar(1.0, 1.0, 1.0, 1.0);
+	dst = glsMat(src.size(), src.type(), src.blkNum());
 	glslScalarOperation(shaderScalarOperation, scalar, src.texArray, dst.texArray, OPCODE_MAG_SPCETRUM);
 }
 
@@ -477,6 +496,7 @@ void glsMagSpectrums(const glsMat& src, glsMat& dst){
 void glsLog(const glsMat& src, glsMat& dst){
 	GLS_Assert(src.glType() == GL_FLOAT);
 	vec4 scalar(1.0, 1.0, 1.0, 1.0);
+	dst = glsMat(src.size(), src.type(), src.blkNum());
 	glslScalarOperation(shaderScalarOperation, scalar, src.texArray, dst.texArray, OPCODE_LOG);
 }
 
@@ -484,6 +504,7 @@ void glsLog(const glsMat& src, glsMat& dst){
 void glsExp(const glsMat& src, glsMat& dst){
 	GLS_Assert(src.glType() == GL_FLOAT);
 	vec4 scalar(1.0, 1.0, 1.0, 1.0);
+	dst = glsMat(src.size(), src.type(), src.blkNum());
 	glslScalarOperation(shaderScalarOperation, scalar, src.texArray, dst.texArray, OPCODE_EXP);
 }
 
@@ -491,6 +512,7 @@ void glsExp(const glsMat& src, glsMat& dst){
 void glsPow(const glsMat& src, const float& power, glsMat& dst){
 	GLS_Assert(src.glType() == GL_FLOAT);
 	vec4 scalar(power, power, power, power);
+	dst = glsMat(src.size(), src.type(), src.blkNum());
 	glslScalarOperation(shaderScalarOperation, scalar, src.texArray, dst.texArray, OPCODE_POW);
 }
 
@@ -502,7 +524,7 @@ void glsPow(const glsMat& src, const float& power, glsMat& dst){
 void glsAdd(const Vec4f& scalar, const Mat& src, Mat& dst)
 {
 	glsMat _src(src, false);
-	glsMat _dst(src, false);
+	glsMat _dst;
 	vec4 _scalar = { scalar[0], scalar[1], scalar[2], scalar[3] };
 	_src.CopyFrom(src);					//upload
 	glsAdd(_scalar, _src, _dst);			//execute
@@ -517,7 +539,7 @@ void glsAdd(const Mat& src0, const Mat& src1, Mat& dst)
 
 	glsMat _src0(src0, false);
 	glsMat _src1(src0, false);
-	glsMat _dst(src0, false);
+	glsMat _dst;
 
 	//---------------------------------
 	//upload
@@ -538,7 +560,7 @@ void glsAdd(const Mat& src0, const Mat& src1, Mat& dst)
 void glsSubtract(const Vec4f& scalar, const Mat& src, Mat& dst)
 {
 	glsMat _src(src, false);
-	glsMat _dst(src, false);
+	glsMat _dst;
 	vec4 _scalar = { scalar[0], scalar[1], scalar[2], scalar[3] };
 	_src.CopyFrom(src);					//upload
 	glsSubtract(_scalar, _src, _dst);	//execute
@@ -553,7 +575,7 @@ void glsSubtract(const Mat& src0, const Mat& src1, Mat& dst)
 
 	glsMat _src0(src0, false);
 	glsMat _src1(src0, false);
-	glsMat _dst(src0, false);
+	glsMat _dst;
 
 	//---------------------------------
 	//upload
@@ -574,7 +596,7 @@ void glsSubtract(const Mat& src0, const Mat& src1, Mat& dst)
 void glsMultiply(const Vec4f& scalar, const Mat& src, Mat& dst)
 {
 	glsMat _src(src, false);
-	glsMat _dst(src, false);
+	glsMat _dst;
 	vec4 _scalar = { scalar[0], scalar[1], scalar[2], scalar[3] };
 	_src.CopyFrom(src);					//upload
 	glsMultiply(_scalar, _src, _dst);	//execute
@@ -589,7 +611,7 @@ void glsMultiply(const Mat& src0, const Mat& src1, Mat& dst)
 
 	glsMat _src0(src0, false);
 	glsMat _src1(src0, false);
-	glsMat _dst(src0, false);
+	glsMat _dst;
 
 	//---------------------------------
 	//upload
@@ -610,7 +632,7 @@ void glsMultiply(const Mat& src0, const Mat& src1, Mat& dst)
 void glsDivide(const Vec4f& scalar, const Mat& src, Mat& dst)
 {
 	glsMat _src(src, false);
-	glsMat _dst(src, false);
+	glsMat _dst;
 	vec4 _scalar = { scalar[0], scalar[1], scalar[2], scalar[3] };
 	_src.CopyFrom(src);					//upload
 	glsDivide(_scalar, _src, _dst);	//execute
@@ -625,7 +647,7 @@ void glsDivide(const Mat& src0, const Mat& src1, Mat& dst)
 
 	glsMat _src0(src0, false);
 	glsMat _src1(src0, false);
-	glsMat _dst(src0, false);
+	glsMat _dst;
 
 	//---------------------------------
 	//upload
@@ -645,7 +667,7 @@ void glsDivide(const Mat& src0, const Mat& src1, Mat& dst)
 void glsMin(const Vec4f& scalar, const Mat& src, Mat& dst)
 {
 	glsMat _src(src, false);
-	glsMat _dst(src, false);
+	glsMat _dst;
 	vec4 _scalar = { scalar[0], scalar[1], scalar[2], scalar[3] };
 	_src.CopyFrom(src);					//upload
 	glsMin(_scalar, _src, _dst);	//execute
@@ -659,7 +681,7 @@ void glsMin(const Mat& src0, const Mat& src1, Mat& dst)
 
 	glsMat _src0(src0, false);
 	glsMat _src1(src0, false);
-	glsMat _dst(src0, false);
+	glsMat _dst;
 
 	_src0.CopyFrom(src0);	//upload
 	_src1.CopyFrom(src1);	//upload
@@ -671,7 +693,7 @@ void glsMin(const Mat& src0, const Mat& src1, Mat& dst)
 void glsMax(const Vec4f& scalar, const Mat& src, Mat& dst)
 {
 	glsMat _src(src, false);
-	glsMat _dst(src, false);
+	glsMat _dst;
 	vec4 _scalar = { scalar[0], scalar[1], scalar[2], scalar[3] };
 	_src.CopyFrom(src);					//upload
 	glsMax(_scalar, _src, _dst);	//execute
@@ -685,7 +707,7 @@ void glsMax(const Mat& src0, const Mat& src1, Mat& dst)
 
 	glsMat _src0(src0, false);
 	glsMat _src1(src0, false);
-	glsMat _dst(src0, false);
+	glsMat _dst;
 
 	_src0.CopyFrom(src0);	//upload
 	_src1.CopyFrom(src1);	//upload
@@ -701,7 +723,7 @@ void glsMulSpectrums(const Mat& src0, const Mat& src1, Mat& dst, bool conj){
 
 	glsMat _src0(src0, false);
 	glsMat _src1(src0, false);
-	glsMat _dst(src0, false);
+	glsMat _dst;
 
 	_src0.CopyFrom(src0);	//upload
 	_src1.CopyFrom(src1);	//upload
@@ -717,7 +739,7 @@ void glsMulSpectrumsPhaseOnly(const Mat& src0, const Mat& src1, Mat& dst){
 
 	glsMat _src0(src0, false);
 	glsMat _src1(src0, false);
-	glsMat _dst(src0, false);
+	glsMat _dst;
 
 	_src0.CopyFrom(src0);	//upload
 	_src1.CopyFrom(src1);	//upload
@@ -737,21 +759,21 @@ void glsMagSpectrums(const Mat& src, Mat& dst){
 
 void glsLog(const Mat& src, Mat& dst){
 	glsMat _src(src, false);
-	glsMat _dst(src, false);
+	glsMat _dst;
 	_src.CopyFrom(src);					//upload
 	glsLog(_src, _dst);					//execute
 	_dst.CopyTo(dst);					//download
 }
 void glsExp(const Mat& src, Mat& dst){
 	glsMat _src(src, false);
-	glsMat _dst(src, false);
+	glsMat _dst;
 	_src.CopyFrom(src);					//upload
 	glsExp(_src, _dst);					//execute
 	_dst.CopyTo(dst);					//download
 }
 void glsPow(const Mat& src, const float& power, Mat& dst){
 	glsMat _src(src, false);
-	glsMat _dst(src, false);
+	glsMat _dst;
 	_src.CopyFrom(src);					//upload
 	glsPow(_src, power, _dst);					//execute
 	_dst.CopyTo(dst);					//download

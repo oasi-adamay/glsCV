@@ -135,12 +135,11 @@ glsShaderCopyS::glsShaderCopyS(void)
 static void glsCopyProcess(
 	const glsShaderBase* shader,	//progmra ID
 	const GLuint& texSrc,			//src texture IDs
-	const Rect& rect				// copy rectangel
+	const Rect& rectSrc,			// copy src rectangel
+	const Rect& rectDst 			// copy dst rectangel
 	)
 {
-	int width = rect.width;
-	int height = rect.height;
-	const int offset[2] = { rect.x, rect.y };
+	const int offset[2] = { rectSrc.x, rectSrc.y };
 
 	//program
 	{
@@ -164,7 +163,7 @@ static void glsCopyProcess(
 	glsVAO vao(glGetAttribLocation(shader->program, "position"));
 	//Viewport
 	{
-		glViewport(0, 0, width, height);
+		glViewport(rectDst.x, rectDst.y, rectDst.width, rectDst.height);
 	}
 
 	//Render!!
@@ -194,13 +193,14 @@ glsShaderBase* selectShader(int type){
 	return shader;
 }
 
-//copy texture with rect
+//copy texture
 void glsCopy(const glsMat& src, glsMat& dst){
 	glsMat _dst = glsMat(src.size(), src.type(),src.blkNum());
 
 	glsShaderBase* shader = selectShader(src.type());
 
-	Rect rect(0, 0, src.cols,src.rows);
+	Rect rectSrc(0, 0, src.texWidth(), src.texHeight());
+	Rect rectDst = rectSrc;
 
 	glsFBO fbo(1);
 
@@ -209,12 +209,67 @@ void glsCopy(const glsMat& src, glsMat& dst){
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _dst.texArray[i], 0);
 		GLS_Assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
 
-		glsCopyProcess(shader, src.texArray[i], rect);
+		glsCopyProcess(shader, src.texArray[i], rectSrc, rectDst);
 
+	}
+	dst = _dst;
+}
+
+//copy texture to tiled texture
+void glsCopyTiled(const glsMat& src, glsMat& dst, const Size& blkNum){
+	GLS_Assert(src.isContinuous());
+	GLS_Assert(blkNum.width >=1);
+	GLS_Assert(blkNum.height >= 1);
+	GLS_Assert(src.cols % blkNum.width == 0);
+	GLS_Assert(src.rows % blkNum.height == 0);
+
+	glsMat _dst = glsMat(src.size(), src.type(), blkNum);
+
+	glsShaderBase* shader = selectShader(src.type());
+
+	glsFBO fbo(1);
+
+	for (int by = 0; by < _dst.blkNumY(); by++){
+		for (int bx = 0; bx < _dst.blkNumX(); bx++){
+			Rect rectSrc(bx* _dst.texWidth(), by* _dst.texHeight(), _dst.texWidth(), _dst.texHeight());
+			Rect rectDst(0, 0, _dst.texWidth(), _dst.texHeight());
+
+			//dst texture
+			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _dst.at(by, bx), 0);
+			GLS_Assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
+
+			glsCopyProcess(shader, src.texArray[0], rectSrc, rectDst);
+		}
 	}
 
 	dst = _dst;
+
 }
+
+//copy tiled texture to untiled texture
+void glsCopyUntiled(const glsMat& src, glsMat& dst){
+
+	glsMat _dst = glsMat(src.size(), src.type(), Size(1,1));
+
+	glsShaderBase* shader = selectShader(src.type());	glsFBO fbo(1);
+
+	//dst texture
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _dst.at(0,0), 0);
+	GLS_Assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
+
+	for (int by = 0; by < src.blkNumY(); by++){
+		for (int bx = 0; bx < src.blkNumX(); bx++){
+			Rect rectSrc(-bx* src.texWidth(), -by* src.texHeight(), src.texWidth(), src.texHeight());
+			Rect rectDst(bx* src.texWidth(), by* src.texHeight(), src.texWidth(), src.texHeight());
+
+			glsCopyProcess(shader, src.at(by, bx), rectSrc, rectDst);
+		}
+	}
+
+	dst = _dst;
+
+}
+
 
 
 //copy texture with rect
@@ -231,15 +286,14 @@ void glsCopyRect(const glsMat& src, glsMat& dst, const Rect& rect, const Size& b
 
 	for (int by = 0; by < _dst.blkNumY(); by++){
 		for (int bx = 0; bx < _dst.blkNumX(); bx++){
-			int x = rect.x + bx* _dst.texWidth();
-			int y = rect.y + by* _dst.texHeight();
-			Rect _rect(x, y, _dst.texWidth(), _dst.texHeight());
+			Rect rectSrc(rect.x + bx* _dst.texWidth(), rect.y + by* _dst.texHeight(), _dst.texWidth(), _dst.texHeight());
+			Rect rectDst(0, 0, _dst.texWidth(), _dst.texHeight());
 
 			//dst texture
 			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _dst.at(by, bx), 0);
 			GLS_Assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
 
-			glsCopyProcess(shader, src.texArray[0], _rect);
+			glsCopyProcess(shader, src.texArray[0], rectSrc, rectDst);
 		}
 	}
 	

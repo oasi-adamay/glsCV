@@ -250,7 +250,6 @@ static void glsFftProcess(
 	//program
 	{
 		glUseProgram(shader->program);
-		GL_CHECK_ERROR();
 	}
 
 
@@ -273,14 +272,12 @@ static void glsFftProcess(
 		for (int i = 0; i < texSrc.size(); i++, id++){
 			glActiveTexture(GL_TEXTURE0 + id);
 			glBindTexture(GL_TEXTURE_2D, texSrc[i]);
-			GL_CHECK_ERROR();
 			glUniform1i(shader->texSrc[i], id);
 		}
 
 		{
 			glActiveTexture(GL_TEXTURE0 + id);
 			glBindTexture(GL_TEXTURE_2D, texW);
-			GL_CHECK_ERROR();
 			glUniform1i(shader->texW, id);
 			id++;
 		}
@@ -288,12 +285,9 @@ static void glsFftProcess(
 
 
 	//dst texture
-	GL_CHECK_ERROR();
-
 	{
 		for (int i = 0; i < texDst.size(); i++){
 			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, texDst[i], 0);
-			GL_CHECK_ERROR();
 		}
 		GLS_Assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
 
@@ -303,14 +297,12 @@ static void glsFftProcess(
 			GL_COLOR_ATTACHMENT1,
 		};
 		glDrawBuffers(2, bufs);
-		GL_CHECK_ERROR();
 	}
 	
 
 	//Viewport
 	{
 		glViewport(0, 0, width, height);
-		GL_CHECK_ERROR();
 	}
 
 	//Render!!
@@ -338,21 +330,12 @@ void glsFft(const glsMat& src, glsMat& dst ,int flag){
 	int N = src.cols;
 	GLS_Assert(IsPow2(N));
 
-	glsFBO fbo(2);
-	glsVAO vao(shaderFft->position);
-
-#if 1
+#if 0
 	glsMat _dst0 = src;
-
-//	glsMat xxxx;
-//	glsCopy(src, xxxx);
-
 #else
 	glsMat _dst0;
 	glsCopy(src, _dst0);
 #endif
-	//	glsCopy(src, _dst, Rect(0, 0, src.cols, src.rows), Size(2, 2));
-	//	glsCopy(src, _dst);
 
 
 	glsMat _dst1(_dst0.size(), _dst0.type(), _dst0.blkNum());
@@ -399,6 +382,10 @@ void glsFft(const glsMat& src, glsMat& dst ,int flag){
 
 	{
 		_TMR_("-execute:\t");
+
+		glsFBO fbo(2);
+		glsVAO vao(shaderFft->position);
+
 
 		int Q = 0;
 		while ((1 << Q) < N){ Q++; }
