@@ -11,7 +11,7 @@ void glsCopyInit(void);
 void glsCopyTerminate(void);
 
 void glsCopy(const glsMat& src, glsMat& dst);
-void glsCopy(const glsMat& src, glsMat& dst, const Rect& rect, const Size& blkNum = Size(1,1));
+void glsCopyRect(const glsMat& src, glsMat& dst, const Rect& rect, const Size& blkNum = Size(1,1));
 
 
 

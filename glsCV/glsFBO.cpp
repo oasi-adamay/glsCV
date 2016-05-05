@@ -35,5 +35,6 @@ glsFBO::glsFBO(const int attachment_num){
 }
 
 glsFBO::~glsFBO(void){
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glDeleteFramebuffers(1, &fbo);
 }

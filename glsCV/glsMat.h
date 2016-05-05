@@ -49,9 +49,9 @@ public:
 	bool isContinuous(void) const { return texArray.size() == 1; }
 
 
-	GLuint at(const int y, const int x);
+	GLuint at(const int y, const int x) const;
 	void CopyFrom(const Mat&src);
-	void CopyTo(Mat&dst);
+	void CopyTo(Mat&dst) const;
 
 	int texWidth(void) const { return cols / blkX;}
 	int texHeight(void) const { return rows / blkY; }

@@ -85,7 +85,7 @@ namespace UnitTest_glsCV
 			int _flags = 0;
 			if (flags & DFT_SCALE)	_flags |= GLS_FFT_SCALE;
 			if (flags & DFT_INVERSE)_flags |= GLS_FFT_INVERSE;
-#if 0
+#if 1
 			{
 				Timer tmr("glsFft:  \t");
 				glsFft(imgSrc, imgFft, _flags);

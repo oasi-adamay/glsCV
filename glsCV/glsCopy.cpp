@@ -6,16 +6,11 @@
 
 
 
-//-----------------------------------------------------------------------------
-class glsShaderCopyBase : public glsShaderBase
-{
-public:
-};
 
 
 //-----------------------------------------------------------------------------
 // glsShaderCopy
-class glsShaderCopy : public glsShaderCopyBase
+class glsShaderCopy : public glsShaderBase
 {
 public:
 	glsShaderCopy(void);
@@ -24,7 +19,7 @@ public:
 
 //-----------------------------------------------------------------------------
 // glsShaderCopyU unsigned
-class glsShaderCopyU : public glsShaderCopyBase
+class glsShaderCopyU : public glsShaderBase
 {
 public:
 	glsShaderCopyU(void);
@@ -32,7 +27,7 @@ public:
 
 //-----------------------------------------------------------------------------
 // glsShaderCopyS unsigned
-class glsShaderCopyS : public glsShaderCopyBase
+class glsShaderCopyS : public glsShaderBase
 {
 public:
 	glsShaderCopyS(void);
@@ -73,7 +68,7 @@ static const char vertexShaderCode[] =
 //-----------------------------------------------------------------------------
 //glsShaderCopy
 glsShaderCopy::glsShaderCopy(void)
-	:glsShaderCopyBase()
+	:glsShaderBase()
 {
 	const char fragmentShaderCode[] = 
 "#version 330 core\n"
@@ -95,7 +90,7 @@ glsShaderCopy::glsShaderCopy(void)
 //-----------------------------------------------------------------------------
 //glsShaderCopyU
 glsShaderCopyU::glsShaderCopyU(void)
-	:glsShaderCopyBase()
+	:glsShaderBase()
 {
 	const char fragmentShaderCode[] =
 "#version 330 core\n"
@@ -115,7 +110,7 @@ glsShaderCopyU::glsShaderCopyU(void)
 //-----------------------------------------------------------------------------
 //glsShaderCopyS
 glsShaderCopyS::glsShaderCopyS(void)
-	:glsShaderCopyBase()
+	:glsShaderBase()
 {
 	const char fragmentShaderCode[] =
 "#version 330 core\n"
@@ -138,7 +133,7 @@ glsShaderCopyS::glsShaderCopyS(void)
 //---------------------------------------------------------------------------
 //
 static void glsCopyProcess(
-	const glsShaderCopyBase* shader,	//progmra ID
+	const glsShaderBase* shader,	//progmra ID
 	const GLuint& texSrc,			//src texture IDs
 	const Rect& rect				// copy rectangel
 	)
@@ -166,8 +161,7 @@ static void glsCopyProcess(
 		glUniform1i(glGetUniformLocation(shader->program, "texSrc"), id);
 	}
 
-	glsVAO vao(glGetAttribLocation(shader->program,"position"));
-
+	glsVAO vao(glGetAttribLocation(shader->program, "position"));
 	//Viewport
 	{
 		glViewport(0, 0, width, height);
@@ -179,20 +173,16 @@ static void glsCopyProcess(
 		glFlush();
 	}
 
+	GL_CHECK_ERROR();
+
 	//	glFinish();
 
 }
 
-//copy texture with rect
-void glsCopy(const glsMat& src, glsMat& dst){
-	glsMat _dst = glsMat(src.size(), src.type(),src.blkNum());
-
-	glsShaderCopyBase* shader = 0;
-
-	Rect rect(0, 0, src.cols,src.rows);
-
-
-	switch (CV_MAT_DEPTH(src.type())){
+static 
+glsShaderBase* selectShader(int type){
+	glsShaderBase* shader = 0;
+	switch (CV_MAT_DEPTH(type)){
 	case(CV_32F) : shader = shaderCopy; break;
 	case(CV_8U) :
 	case(CV_16U) : shader = shaderCopyU; break;
@@ -201,6 +191,16 @@ void glsCopy(const glsMat& src, glsMat& dst){
 	case(CV_32S) : shader = shaderCopyS; break;
 	default: GLS_Assert(0);		//not implement
 	}
+	return shader;
+}
+
+//copy texture with rect
+void glsCopy(const glsMat& src, glsMat& dst){
+	glsMat _dst = glsMat(src.size(), src.type(),src.blkNum());
+
+	glsShaderBase* shader = selectShader(src.type());
+
+	Rect rect(0, 0, src.cols,src.rows);
 
 	glsFBO fbo(1);
 
@@ -210,6 +210,7 @@ void glsCopy(const glsMat& src, glsMat& dst){
 		GLS_Assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
 
 		glsCopyProcess(shader, src.texArray[i], rect);
+
 	}
 
 	dst = _dst;
@@ -217,25 +218,14 @@ void glsCopy(const glsMat& src, glsMat& dst){
 
 
 //copy texture with rect
-void glsCopy(const glsMat& src, glsMat& dst, const Rect& rect, const Size& blkNum){
+void glsCopyRect(const glsMat& src, glsMat& dst, const Rect& rect, const Size& blkNum){
 	GLS_Assert(src.isContinuous());
 	GLS_Assert(rect.width % blkNum.width == 0);
 	GLS_Assert(rect.height % blkNum.height == 0);
 
 	glsMat _dst = glsMat(rect.size(), src.type(), blkNum);
 
-	glsShaderCopyBase* shader = 0;
-
-
-	switch (CV_MAT_DEPTH(src.type())){
-	case(CV_32F) : shader = shaderCopy; break;
-	case(CV_8U) :
-	case(CV_16U) : shader = shaderCopyU; break;
-	case(CV_8S) :
-	case(CV_16S) :
-	case(CV_32S) : shader = shaderCopyS; break;
-	default: GLS_Assert(0);		//not implement
-	}
+	glsShaderBase* shader = selectShader(src.type());
 
 	glsFBO fbo(1);
 

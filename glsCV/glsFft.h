@@ -14,7 +14,7 @@
 void glsFftInit(void);
 void glsFftTerminate(void);
 
-void glsFft(glsMat& texture, int flag = 0);
+void glsFft(const glsMat& src, glsMat& dst, int flag = 0);
 void glsFft(const Mat& src, Mat& dst, int flag = 0);
 
 

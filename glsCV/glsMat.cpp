@@ -14,7 +14,9 @@
 //#define _USE_PBO_UP
 //#define _USE_PBO_DOWN
 
-//#define _DBG_GLS_MAT
+#ifdef _DEBUG
+#define _DBG_GLS_MAT
+#endif
 
 #ifdef _DBG_GLS_MAT
 static int gTextureNum = 0;
@@ -150,7 +152,7 @@ void glsMat::deleteTexture(void){
 
 
 
-GLuint glsMat::at(const int y, const int x){
+GLuint glsMat::at(const int y, const int x)  const{
 	GLS_Assert(y*blkX + x < texArray.size());
 	return texArray[y*blkX + x];
 }
@@ -234,7 +236,7 @@ void glsMat::CopyFrom(const Mat&src){
 
 }
 
-void glsMat::CopyTo(Mat&dst){
+void glsMat::CopyTo(Mat&dst) const{
 //	cout << "CopyTo:start" << endl;
 
 	_TMR_("-download:\t");

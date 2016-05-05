@@ -250,6 +250,7 @@ static void glsFftProcess(
 	//program
 	{
 		glUseProgram(shader->program);
+		GL_CHECK_ERROR();
 	}
 
 
@@ -272,12 +273,14 @@ static void glsFftProcess(
 		for (int i = 0; i < texSrc.size(); i++, id++){
 			glActiveTexture(GL_TEXTURE0 + id);
 			glBindTexture(GL_TEXTURE_2D, texSrc[i]);
+			GL_CHECK_ERROR();
 			glUniform1i(shader->texSrc[i], id);
 		}
 
 		{
 			glActiveTexture(GL_TEXTURE0 + id);
 			glBindTexture(GL_TEXTURE_2D, texW);
+			GL_CHECK_ERROR();
 			glUniform1i(shader->texW, id);
 			id++;
 		}
@@ -285,9 +288,12 @@ static void glsFftProcess(
 
 
 	//dst texture
+	GL_CHECK_ERROR();
+
 	{
 		for (int i = 0; i < texDst.size(); i++){
 			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, texDst[i], 0);
+			GL_CHECK_ERROR();
 		}
 		GLS_Assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
 
@@ -297,12 +303,14 @@ static void glsFftProcess(
 			GL_COLOR_ATTACHMENT1,
 		};
 		glDrawBuffers(2, bufs);
+		GL_CHECK_ERROR();
 	}
 	
 
 	//Viewport
 	{
 		glViewport(0, 0, width, height);
+		GL_CHECK_ERROR();
 	}
 
 	//Render!!
@@ -313,7 +321,7 @@ static void glsFftProcess(
 
 //	glFinish();
 
-
+	GL_CHECK_ERROR();
 
 }
 
@@ -325,16 +333,30 @@ static void glsFftProcess(
 
 //-----------------------------------------------------------------------------
 // execute FFT 
-void glsFft(glsMat& texture, int flag){
+void glsFft(const glsMat& src, glsMat& dst ,int flag){
 
-	int N = texture.cols;
+	int N = src.cols;
 	GLS_Assert(IsPow2(N));
 
 	glsFBO fbo(2);
 	glsVAO vao(shaderFft->position);
 
-	glsMat texTmp(texture.size(), texture.type(), texture.blkNum());
-	glsMat texW(Size(N / 2, 1), texture.type());
+#if 1
+	glsMat _dst0 = src;
+
+//	glsMat xxxx;
+//	glsCopy(src, xxxx);
+
+#else
+	glsMat _dst0;
+	glsCopy(src, _dst0);
+#endif
+	//	glsCopy(src, _dst, Rect(0, 0, src.cols, src.rows), Size(2, 2));
+	//	glsCopy(src, _dst);
+
+
+	glsMat _dst1(_dst0.size(), _dst0.type(), _dst0.blkNum());
+	glsMat texW(Size(N / 2, 1), _dst0.type());
 
 	//---------------------------------
 	// upload twidle texture
@@ -370,9 +392,7 @@ void glsFft(glsMat& texture, int flag){
 		//glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
-
-	glsMat* texid[2] = { &texture, &texTmp };
-
+	glsMat* texid[2] = { &_dst0, &_dst1 };
 
 	//Execute
 	int bank = 0;
@@ -416,7 +436,7 @@ void glsFft(glsMat& texture, int flag){
 		}
 	}
 
-
+	dst = *texid[bank];
 }
 
 
@@ -429,6 +449,8 @@ void glsFft(const Mat& src, Mat& dst, int flag){
 	CV_Assert(IsPow2(N));
 
 	glsMat _src(src.size(), src.type(), Size(2, 2));
+//	glsMat _src(src.size(), src.type());
+	glsMat _dst;
 
 	//---------------------------------
 	//upload
@@ -436,11 +458,11 @@ void glsFft(const Mat& src, Mat& dst, int flag){
 
 	//---------------------------------
 	//fft
-	glsFft(_src, flag);
+	glsFft(_src, _dst,flag);
 
 	//---------------------------------
 	//download
-	_src.CopyTo(dst);
+	_dst.CopyTo(dst);
 
 
 }

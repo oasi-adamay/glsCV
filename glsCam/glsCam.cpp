@@ -69,7 +69,7 @@ int _tmain(int argc, _TCHAR* argv[])
 				int x = (glsFrame.size().width - sizeFft.width) / 2;
 				int y = (glsFrame.size().height - sizeFft.height) / 2;
 				Rect rect( x, y, sizeFft.width, sizeFft.height);
-				glsCopy(glsFrame, glsFrame, rect , Size(2,2));
+				glsCopyRect(glsFrame, glsFrame, rect , Size(2,2));
 				glsCvtColor(glsFrame, glsFrame, CV_BGR2GRAY);
 			}
 			break;
