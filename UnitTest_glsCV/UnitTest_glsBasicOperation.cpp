@@ -84,6 +84,7 @@ namespace UnitTest_glsCV
 		Mat imgDst;
 		Mat imgRef;
 		Scalar scalar;
+		vec4   _scalar;
 
 		cout << "Size:" << imgSrc0.size() << endl;
 
@@ -117,66 +118,75 @@ namespace UnitTest_glsCV
 			scalar[1] = (float)rng.gaussian(1.0);
 			scalar[2] = (float)rng.gaussian(1.0);
 			scalar[3] = (float)rng.gaussian(1.0);
+			_scalar[0] = (float)scalar[0];
+			_scalar[1] = (float)scalar[1];
+			_scalar[2] = (float)scalar[2];
+			_scalar[3] = (float)scalar[3];
+
 
 		}
+
+		glsMat glsSrc0(imgSrc0);
+		glsMat glsSrc1(imgSrc1);
+		glsMat glsDst;
 
 		//---------------------------------
 		switch (flags){
 		case(E_TEST::ADD) :
 			cv::add(imgSrc0, imgSrc1, imgRef); 
-			glsAdd(imgSrc0, imgSrc1, imgDst);
+			glsAdd(glsSrc0, glsSrc1, glsSrc1);
 			break;
 		case(E_TEST::SUB):
 			cv::subtract(imgSrc0, imgSrc1, imgRef); 
-			glsSubtract(imgSrc0, imgSrc1, imgDst); 
+			glsSubtract(glsSrc0, glsSrc1, glsSrc1);
 			break;
 		case(E_TEST::MUL) :
 			cv::multiply(imgSrc0, imgSrc1, imgRef); 
-			glsMultiply(imgSrc0, imgSrc1, imgDst);
+			glsMultiply(glsSrc0, glsSrc1, glsSrc1);
 			break;
 		case(E_TEST::DIV) :
 			cv::divide(imgSrc0, imgSrc1, imgRef); 
-			glsDivide(imgSrc0, imgSrc1, imgDst);
+			glsDivide(glsSrc0, glsSrc1, glsSrc1);
 			break;
 		case(E_TEST::ADD_S) :
 			cv::add(scalar, imgSrc1, imgRef); 
-			glsAdd(scalar, imgSrc1, imgDst);
+			glsAdd(_scalar, glsSrc1, glsSrc1);
 			break;
 		case(E_TEST::SUB_S) :
 			cv::subtract(scalar, imgSrc1, imgRef);
-			glsSubtract(scalar, imgSrc1, imgDst);
+			glsSubtract(_scalar, glsSrc1, glsSrc1);
 			break;
 		case(E_TEST::MUL_S) :
 			cv::multiply(scalar, imgSrc1, imgRef); 
-			glsMultiply(scalar, imgSrc1, imgDst);
+			glsMultiply(_scalar, glsSrc1, glsSrc1);
 			break;
 		case(E_TEST::DIV_S) :
 			cv::divide(scalar, imgSrc1, imgRef);
-			glsDivide(scalar, imgSrc1, imgDst);
+			glsDivide(_scalar, glsSrc1, glsSrc1);
 			break;
 		case(E_TEST::MIN) :
 			cv::min(imgSrc0, imgSrc1, imgRef); 
-			glsMin(imgSrc0, imgSrc1, imgDst);
+			glsMin(glsSrc0, glsSrc1, glsSrc1);
 			break;
 		case(E_TEST::MAX) :
 			cv::max(imgSrc0, imgSrc1, imgRef);
-			glsMax(imgSrc0, imgSrc1, imgDst);
+			glsMax(glsSrc0, glsSrc1, glsSrc1);
 			break;
 		case(E_TEST::MIN_S) :
 			cv::min(scalar, imgSrc1, imgRef); 
-			glsMin(scalar, imgSrc1, imgDst);
+			glsMin(_scalar, glsSrc1, glsSrc1);
 			break;
 		case(E_TEST::MAX_S) :
 			cv::max(scalar, imgSrc1, imgRef); 
-			glsMax(scalar, imgSrc1, imgDst);
+			glsMax(_scalar, glsSrc1, glsSrc1);
 			break;
 		case(E_TEST::MUL_SPECTRUMS) :
 			cv::mulSpectrums(imgSrc0, imgSrc1, imgRef, 0, false); 
-			glsMulSpectrums(imgSrc0, imgSrc1, imgDst, false);
+			glsMulSpectrums(glsSrc0, glsSrc1, glsSrc1, false);
 			break;
 		case(E_TEST::MUL_SPECTRUMS_CONJ) :
 			cv::mulSpectrums(imgSrc0, imgSrc1, imgRef, 0, true); 
-			glsMulSpectrums(imgSrc0, imgSrc1, imgDst, true);
+			glsMulSpectrums(glsSrc0, glsSrc1, glsSrc1, true);
 			break;
 		case(E_TEST::MUL_SPECTRUMS_POC) :
 			{
@@ -190,7 +200,7 @@ namespace UnitTest_glsCV
 				cv::divide(tmp[1], mag, tmp[1]);
 				cv::merge(tmp, imgRef);
 			}
-			glsMulSpectrumsPhaseOnly(imgSrc0, imgSrc1, imgDst);
+			glsMulSpectrumsPhaseOnly(glsSrc0, glsSrc1, glsSrc1);
 			break;
 		case(E_TEST::MAG_SPECTRUMS) :
 			{
@@ -198,24 +208,25 @@ namespace UnitTest_glsCV
 				cv::split(imgSrc1, tmp);
 				cv::magnitude(tmp[0], tmp[1], imgRef);
 			}
-			glsMagSpectrums(imgSrc1, imgDst);
+			glsMagSpectrums(glsSrc1, glsSrc1);
 			break;
 		case(E_TEST::LOG) :
 			cv::log(imgSrc1, imgRef);
-			glsLog(imgSrc1, imgDst);
+			glsLog(glsSrc1, glsSrc1);
 			break;
 		case(E_TEST::EXP) :
 			cv::exp(imgSrc1, imgRef);
-			glsExp(imgSrc1, imgDst);
+			glsExp(glsSrc1, glsSrc1);
 			break;
 		case(E_TEST::POW) :
 			float power = (float)scalar[0];
 			cv::pow(imgSrc1, power, imgRef);
-			glsPow(imgSrc1, power, imgDst);
+			glsPow(glsSrc1, power, glsSrc1);
 			break;
 
 		};
 
+		glsSrc1.CopyTo(imgDst);
 
 		//verify
 		{

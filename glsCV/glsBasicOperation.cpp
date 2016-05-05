@@ -373,8 +373,9 @@ void glslBinaryOperation(
 //スカラと配列の 要素毎の和を求めます．
 void glsAdd(const vec4& scalar, const glsMat& src, glsMat& dst){
 	GLS_Assert(src.glType() == GL_FLOAT);
-	dst = glsMat(src.size(), src.type(), src.blkNum());
-	glslScalarOperation(shaderScalarOperation, scalar, src.texArray, dst.texArray, OPCODE_ADD);
+	glsMat _dst = glsMat(src.size(), src.type(), src.blkNum());
+	glslScalarOperation(shaderScalarOperation, scalar, src.texArray, _dst.texArray, OPCODE_ADD);
+	dst = _dst;
 }
 
 //2 つの配列同士の 要素毎の和を求めます
@@ -382,16 +383,18 @@ void glsAdd(const glsMat& src0, const glsMat& src1, glsMat& dst)
 {
 	GLS_Assert(src0.glType() == GL_FLOAT);
 	GLS_Assert(src1.glType() == GL_FLOAT);
-	dst = glsMat(src0.size(), src0.type(), src0.blkNum());
-	glslBinaryOperation(shaderBinaryOperation, src0.texArray, src1.texArray, dst.texArray, OPCODE_ADD);
+	glsMat _dst = glsMat(src0.size(), src0.type(), src0.blkNum());
+	glslBinaryOperation(shaderBinaryOperation, src0.texArray, src1.texArray, _dst.texArray, OPCODE_ADD);
+	dst = _dst;
 }
 
 
 //スカラと配列の 要素毎の差を求めます．
 void glsSubtract(const vec4& scalar, const glsMat& src, glsMat& dst){
 	GLS_Assert(src.glType() == GL_FLOAT);
-	dst = glsMat(src.size(), src.type(), src.blkNum());
-	glslScalarOperation(shaderScalarOperation, scalar, src.texArray, dst.texArray, OPCODE_SUB);
+	glsMat _dst = glsMat(src.size(), src.type(), src.blkNum());
+	glslScalarOperation(shaderScalarOperation, scalar, src.texArray, _dst.texArray, OPCODE_SUB);
+	dst = _dst;
 }
 
 //2 つの配列同士の 要素毎の差を求めます
@@ -399,16 +402,18 @@ void glsSubtract(const glsMat& src0, const glsMat& src1, glsMat& dst)
 {
 	GLS_Assert(src0.glType() == GL_FLOAT);
 	GLS_Assert(src1.glType() == GL_FLOAT);
-	dst = glsMat(src0.size(), src0.type(), src0.blkNum());
-	glslBinaryOperation(shaderBinaryOperation, src0.texArray, src1.texArray, dst.texArray, OPCODE_SUB);
+	glsMat _dst = glsMat(src0.size(), src0.type(), src0.blkNum());
+	glslBinaryOperation(shaderBinaryOperation, src0.texArray, src1.texArray, _dst.texArray, OPCODE_SUB);
+	dst = _dst;
 }
 
 
 //スカラと配列の 要素毎の積を求めます．
 void glsMultiply(const vec4& scalar, const glsMat& src, glsMat& dst){
 	GLS_Assert(src.glType() == GL_FLOAT);
-	dst = glsMat(src.size(), src.type(), src.blkNum());
-	glslScalarOperation(shaderScalarOperation, scalar, src.texArray, dst.texArray, OPCODE_MUL);
+	glsMat _dst = glsMat(src.size(), src.type(), src.blkNum());
+	glslScalarOperation(shaderScalarOperation, scalar, src.texArray, _dst.texArray, OPCODE_MUL);
+	dst = _dst;
 }
 
 //2 つの配列同士の 要素毎の積を求めます
@@ -416,15 +421,17 @@ void glsMultiply(const glsMat& src0, const glsMat& src1, glsMat& dst)
 {
 	GLS_Assert(src0.glType() == GL_FLOAT);
 	GLS_Assert(src1.glType() == GL_FLOAT);
-	dst = glsMat(src0.size(), src0.type(), src0.blkNum());
-	glslBinaryOperation(shaderBinaryOperation, src0.texArray, src1.texArray, dst.texArray, OPCODE_MUL);
+	glsMat _dst = glsMat(src0.size(), src0.type(), src0.blkNum());
+	glslBinaryOperation(shaderBinaryOperation, src0.texArray, src1.texArray, _dst.texArray, OPCODE_MUL);
+	dst = _dst;
 }
 
 //スカラと配列の 要素毎の商を求めます．
 void glsDivide(const vec4& scalar, const glsMat& src, glsMat& dst){
 	GLS_Assert(src.glType() == GL_FLOAT);
-	dst = glsMat(src.size(), src.type(), src.blkNum());
-	glslScalarOperation(shaderScalarOperation, scalar, src.texArray, dst.texArray, OPCODE_DIV);
+	glsMat _dst = glsMat(src.size(), src.type(), src.blkNum());
+	glslScalarOperation(shaderScalarOperation, scalar, src.texArray, _dst.texArray, OPCODE_DIV);
+	dst = _dst;
 }
 
 
@@ -432,38 +439,43 @@ void glsDivide(const vec4& scalar, const glsMat& src, glsMat& dst){
 void glsDivide(const glsMat& src0, const glsMat& src1, glsMat& dst){
 	GLS_Assert(src0.glType() == GL_FLOAT);
 	GLS_Assert(src1.glType() == GL_FLOAT);
-	dst = glsMat(src0.size(), src0.type(), src0.blkNum());
-	glslBinaryOperation(shaderBinaryOperation, src0.texArray, src1.texArray, dst.texArray, OPCODE_DIV);
+	glsMat _dst = glsMat(src0.size(), src0.type(), src0.blkNum());
+	glslBinaryOperation(shaderBinaryOperation, src0.texArray, src1.texArray, _dst.texArray, OPCODE_DIV);
+	dst = _dst;
 }
 
 //スカラと配列の 要素毎の最小値を求めます．
 void glsMin(const vec4& scalar, const glsMat& src, glsMat& dst){
 	GLS_Assert(src.glType() == GL_FLOAT);
-	dst = glsMat(src.size(), src.type(), src.blkNum());
-	glslScalarOperation(shaderScalarOperation, scalar, src.texArray, dst.texArray, OPCODE_MIN);
+	glsMat _dst = glsMat(src.size(), src.type(), src.blkNum());
+	glslScalarOperation(shaderScalarOperation, scalar, src.texArray, _dst.texArray, OPCODE_MIN);
+	dst = _dst;
 }
 
 //2 つの配列同士の  要素毎の最小値を求めます．
 void glsMin(const glsMat& src0, const glsMat& src1, glsMat& dst){
 	GLS_Assert(src0.glType() == GL_FLOAT);
 	GLS_Assert(src1.glType() == GL_FLOAT);
-	dst = glsMat(src0.size(), src0.type(), src0.blkNum());
-	glslBinaryOperation(shaderBinaryOperation, src0.texArray, src1.texArray, dst.texArray, OPCODE_MIN);
+	glsMat _dst = glsMat(src0.size(), src0.type(), src0.blkNum());
+	glslBinaryOperation(shaderBinaryOperation, src0.texArray, src1.texArray, _dst.texArray, OPCODE_MIN);
+	dst = _dst;
 }
 
 //スカラと配列の 要素毎の最大値を求めます．
 void glsMax(const vec4& scalar, const glsMat& src, glsMat& dst){
 	GLS_Assert(src.glType() == GL_FLOAT);
-	dst = glsMat(src.size(), src.type(), src.blkNum());
-	glslScalarOperation(shaderScalarOperation, scalar, src.texArray, dst.texArray, OPCODE_MAX);
+	glsMat _dst = glsMat(src.size(), src.type(), src.blkNum());
+	glslScalarOperation(shaderScalarOperation, scalar, src.texArray, _dst.texArray, OPCODE_MAX);
+	dst = _dst;
 }
 
 //2 つの配列同士の  要素毎の最大値を求めます．
 void glsMax(const glsMat& src0, const glsMat& src1, glsMat& dst){
 	GLS_Assert(src0.glType() == GL_FLOAT);
 	GLS_Assert(src1.glType() == GL_FLOAT);
-	dst = glsMat(src0.size(), src0.type(), src0.blkNum());
-	glslBinaryOperation(shaderBinaryOperation, src0.texArray, src1.texArray, dst.texArray, OPCODE_MAX);
+	glsMat _dst = glsMat(src0.size(), src0.type(), src0.blkNum());
+	glslBinaryOperation(shaderBinaryOperation, src0.texArray, src1.texArray, _dst.texArray, OPCODE_MAX);
+	dst = _dst;
 }
 
 //2 つのフーリエスペクトル同士の要素毎の乗算を行います．
@@ -471,55 +483,61 @@ void glsMax(const glsMat& src0, const glsMat& src1, glsMat& dst){
 void glsMulSpectrums(const glsMat& src0, const glsMat& src1, glsMat& dst, bool conj){
 	GLS_Assert(src0.glSizedFormat() == GL_RG32F);
 	GLS_Assert(src1.glSizedFormat() == GL_RG32F);
-	dst = glsMat(src0.size(), src0.type(), src0.blkNum());
-	if (conj)glslBinaryOperation(shaderBinaryOperation, src0.texArray, src1.texArray, dst.texArray, OPCODE_MUL_SPCETRUM_CONJ);
-	else glslBinaryOperation(shaderBinaryOperation, src0.texArray, src1.texArray, dst.texArray, OPCODE_MUL_SPCETRUM);
+	glsMat _dst = glsMat(src0.size(), src0.type(), src0.blkNum());
+	if (conj)glslBinaryOperation(shaderBinaryOperation, src0.texArray, src1.texArray, _dst.texArray, OPCODE_MUL_SPCETRUM_CONJ);
+	else glslBinaryOperation(shaderBinaryOperation, src0.texArray, src1.texArray, _dst.texArray, OPCODE_MUL_SPCETRUM);
+	dst = _dst;
 }
 
 //2 つのフーリエスペクトル同士の  要素毎の位相限定相関を求めます．
 void glsMulSpectrumsPhaseOnly(const glsMat& src0, const glsMat& src1, glsMat& dst){
 	GLS_Assert(src0.glSizedFormat() == GL_RG32F);
 	GLS_Assert(src1.glSizedFormat() == GL_RG32F);
-	dst = glsMat(src0.size(), src0.type(), src0.blkNum());
-	glslBinaryOperation(shaderBinaryOperation, src0.texArray, src1.texArray, dst.texArray, OPCODE_MUL_SPCETRUM_POC);
+	glsMat _dst = glsMat(src0.size(), src0.type(), src0.blkNum());
+	glslBinaryOperation(shaderBinaryOperation, src0.texArray, src1.texArray, _dst.texArray, OPCODE_MUL_SPCETRUM_POC);
+	dst = _dst;
 }
 
 //複素行列要素の絶対値の2乗を求めます．
 void glsMagSpectrums(const glsMat& src, glsMat& dst){
 	GLS_Assert(src.glSizedFormat() == GL_RG32F);
 	vec4 scalar(1.0, 1.0, 1.0, 1.0);
-	dst = glsMat(src.size(), src.type(), src.blkNum());
-	glslScalarOperation(shaderScalarOperation, scalar, src.texArray, dst.texArray, OPCODE_MAG_SPCETRUM);
+	glsMat _dst = glsMat(src.size(), src.type(), src.blkNum());
+	glslScalarOperation(shaderScalarOperation, scalar, src.texArray, _dst.texArray, OPCODE_MAG_SPCETRUM);
+	dst = _dst;
 }
 
 //各配列要素の絶対値の自然対数を求めます．
 void glsLog(const glsMat& src, glsMat& dst){
 	GLS_Assert(src.glType() == GL_FLOAT);
 	vec4 scalar(1.0, 1.0, 1.0, 1.0);
-	dst = glsMat(src.size(), src.type(), src.blkNum());
-	glslScalarOperation(shaderScalarOperation, scalar, src.texArray, dst.texArray, OPCODE_LOG);
+	glsMat _dst = glsMat(src.size(), src.type(), src.blkNum());
+	glslScalarOperation(shaderScalarOperation, scalar, src.texArray, _dst.texArray, OPCODE_LOG);
+	dst = _dst;
 }
 
 //各配列要素を指数として，自然対数の底（ネイピア数）e のべき乗を求めます．
 void glsExp(const glsMat& src, glsMat& dst){
 	GLS_Assert(src.glType() == GL_FLOAT);
 	vec4 scalar(1.0, 1.0, 1.0, 1.0);
-	dst = glsMat(src.size(), src.type(), src.blkNum());
-	glslScalarOperation(shaderScalarOperation, scalar, src.texArray, dst.texArray, OPCODE_EXP);
+	glsMat _dst = glsMat(src.size(), src.type(), src.blkNum());
+	glslScalarOperation(shaderScalarOperation, scalar, src.texArray, _dst.texArray, OPCODE_EXP);
+	dst = _dst;
 }
 
 //各配列要素を累乗します．
 void glsPow(const glsMat& src, const float& power, glsMat& dst){
 	GLS_Assert(src.glType() == GL_FLOAT);
 	vec4 scalar(power, power, power, power);
-	dst = glsMat(src.size(), src.type(), src.blkNum());
-	glslScalarOperation(shaderScalarOperation, scalar, src.texArray, dst.texArray, OPCODE_POW);
+	glsMat _dst = glsMat(src.size(), src.type(), src.blkNum());
+	glslScalarOperation(shaderScalarOperation, scalar, src.texArray, _dst.texArray, OPCODE_POW);
+	dst = _dst;
 }
 
 
 
 
-
+# if 0
 
 void glsAdd(const Vec4f& scalar, const Mat& src, Mat& dst)
 {
@@ -780,6 +798,6 @@ void glsPow(const Mat& src, const float& power, Mat& dst){
 
 }
 
-
+#endif
 
 

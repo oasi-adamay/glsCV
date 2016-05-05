@@ -40,7 +40,7 @@ void glsExp(const glsMat& src, glsMat& dst);
 void glsPow(const glsMat& src, const float& power, glsMat& dst);
 
 
-
+#if 0
 //OpenCV I/F
 void glsAdd(const Vec4f& scalar, const Mat& src, Mat& dst);
 void glsAdd(const Mat& src0, const Mat& src1, Mat& dst);
@@ -67,7 +67,7 @@ void glsMagSpectrums(const Mat& src, Mat& dst);
 void glsLog(const Mat& src, Mat& dst);
 void glsExp(const Mat& src, Mat& dst);
 void glsPow(const Mat& src, const float& power, Mat& dst);
-
+#endif
 	
 
 

@@ -66,11 +66,41 @@ int _tmain(int argc, _TCHAR* argv[])
 		case(E_CAM_MODE::FFT) :
 			{
 				Size sizeFft(256, 256);
+
 				int x = (glsFrame.size().width - sizeFft.width) / 2;
 				int y = (glsFrame.size().height - sizeFft.height) / 2;
 				Rect rect( x, y, sizeFft.width, sizeFft.height);
+#if 0
+				Mat roi = Mat(frame, rect).clone();
+				cvtColor(roi,roi,CV_BGR2GRAY);
+				roi.convertTo(roi, CV_32FC1,1.0/256.0);
+				Mat zero = Mat::zeros(roi.size(),roi.type());
+				vector<Mat> pln(2);
+				pln[0] = roi;
+				pln[1] = zero;
+				Mat img;
+				cv::merge(pln, img);
+				cv::dft(img, img);
+				cv::split(img, pln);
+				Mat mag;
+				cv::magnitude(pln[0], pln[1], mag);
+				cv::log(mag+1,mag);
+				cv::normalize(mag, mag, 0, 1, CV_MINMAX);
+				imshow("[CV MAG]",mag);
+#else
+				glsMat glsZero(sizeFft, CV_32FC1,Size(2,2));
 				glsCopyRect(glsFrame, glsFrame, rect , Size(2,2));
 				glsCvtColor(glsFrame, glsFrame, CV_BGR2GRAY);
+				vector<glsMat> plnGls(2);
+				plnGls[0] = glsFrame;
+				plnGls[1] = glsZero;
+				glsMat glsComplx;
+				glsMerge(plnGls, glsComplx);
+				glsFft(glsComplx, glsComplx);
+				glsMagSpectrums(glsComplx, glsFrame);
+				glsAdd(vec4(1.0, 1.0, 1.0, 1.0), glsFrame, glsFrame);
+				glsLog(glsFrame, glsFrame);
+#endif
 			}
 			break;
 		case(E_CAM_MODE::GRAY) :
