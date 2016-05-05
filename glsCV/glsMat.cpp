@@ -15,6 +15,7 @@
 //#define _USE_PBO_DOWN
 
 #ifdef _DEBUG
+//#if 0
 #define _DBG_GLS_MAT
 #endif
 

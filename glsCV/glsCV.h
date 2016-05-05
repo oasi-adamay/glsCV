@@ -7,6 +7,7 @@
 #include "glsCopy.h"
 #include "glsConvert.h"
 #include "glsDraw.h"
+#include "glsMerge.h"
 #include "glsFft.h"
 #include "glsBasicOperation.h"
 

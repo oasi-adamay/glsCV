@@ -42,6 +42,9 @@ public:
 	int blkNumY(void) const { return blkY; }
 
 	int type(void) const { return CV_MAT_TYPE(flag); }
+	int channels(void) const { return CV_MAT_CN(flag); }
+	int depth(void) const { return CV_MAT_DEPTH(flag); }
+
 	GLenum glSizedFormat(void) const{ return convCVtype2GLsizedFormat(CV_MAT_TYPE(flag)); }
 	GLenum glFormat(void) const{ return convCVtype2GLformat(CV_MAT_TYPE(flag)); }
 	GLenum glType(void) const{ return convCVtype2GLtype(CV_MAT_TYPE(flag)); }

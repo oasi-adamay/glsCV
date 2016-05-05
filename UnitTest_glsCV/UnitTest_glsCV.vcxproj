@@ -177,6 +177,7 @@
     <ClCompile Include="UnitTest_glsCopy.cpp" />
     <ClCompile Include="unittest_glsFft.cpp" />
     <ClCompile Include="UnitTest_glsMat.cpp" />
+    <ClCompile Include="UnitTest_glsMerge.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

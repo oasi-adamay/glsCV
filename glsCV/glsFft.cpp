@@ -7,7 +7,8 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
-#ifdef DEBUG
+#ifdef _DEBUG
+//#if 1
 #define _TMR_(...)  Timer tmr(__VA_ARGS__)
 #else
 #define _TMR_(...)
@@ -326,6 +327,9 @@ static void glsFftProcess(
 //-----------------------------------------------------------------------------
 // execute FFT 
 void glsFft(const glsMat& src, glsMat& dst ,int flag){
+	GLS_Assert(src.channels() == 2);
+	GLS_Assert(src.depth() == CV_32F);
+
 
 	int N = src.cols;
 	GLS_Assert(IsPow2(N));
@@ -334,7 +338,14 @@ void glsFft(const glsMat& src, glsMat& dst ,int flag){
 	glsMat _dst0 = src;
 #else
 	glsMat _dst0;
-	glsCopy(src, _dst0);
+	if (src.blkNum() == Size(2, 2)){
+		_TMR_("-glsCopy:  \t");
+		glsCopy(src, _dst0);
+	}
+	else if (src.blkNum() == Size(1, 1)){
+		_TMR_("-glsCopyTiled:  \t");
+		glsCopyTiled(src, _dst0, Size(2, 2));
+	}
 #endif
 
 

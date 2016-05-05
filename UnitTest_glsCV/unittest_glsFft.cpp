@@ -85,19 +85,28 @@ namespace UnitTest_glsCV
 			int _flags = 0;
 			if (flags & DFT_SCALE)	_flags |= GLS_FFT_SCALE;
 			if (flags & DFT_INVERSE)_flags |= GLS_FFT_INVERSE;
-#if 1
+#if 0
 			{
 				Timer tmr("glsFft:  \t");
 				glsFft(imgSrc, imgFft, _flags);
 			}
-#else
-			glsMat _src(imgSrc.size(), imgSrc.type(), Size(2, 2));
-			_src.CopyFrom(imgSrc);
+#elif 1
+			glsMat _src(imgSrc);
+			glsMat _dst;
 			{
 				Timer tmr("glsFft:  \t");
-				glsFft(_src, _flags);
+				glsFft(_src, _dst,_flags);
 			}
-			_src.CopyTo(imgFft);
+			_dst.CopyTo(imgFft);
+#elif 1
+			glsMat _src(imgSrc.size(), imgSrc.type(),Size(2,2));
+			_src.CopyFrom(imgSrc);
+			glsMat _dst;
+			{
+				Timer tmr("glsFft:  \t");
+				glsFft(_src, _dst, _flags);
+			}
+			_dst.CopyTo(imgFft);
 #endif
 
 		}
@@ -165,6 +174,20 @@ namespace UnitTest_glsCV
 			int errNum = test_glsFft(N, flags);
 			Assert::AreEqual(0, errNum);
 		}
+
+//		TEST_METHOD(FFT_time)
+//		{
+//			cout << __FUNCTION__ << endl;
+//			const int N = 256;
+////			const int N = 1024;
+//			const int flags = 0;
+//			int errNum = 0;
+//			for (int i = 0; i < 100; i++){
+//				errNum += test_glsFft(N, flags);
+//			}
+//			Assert::AreEqual(0, errNum);
+//		}
+
 
 		TEST_METHOD(FFT_SCALE)
 		{
