@@ -34,6 +34,7 @@ void glsMax(const glsMat& src0, const glsMat& src1, glsMat& dst);
 void glsMulSpectrums(const glsMat& src0, const glsMat& src1, glsMat& dst, bool conj = false);
 void glsMulSpectrumsPhaseOnly(const glsMat& src0, const glsMat& src1, glsMat& dst);
 void glsMagSpectrums(const glsMat& src, glsMat& dst);
+void glsLogMagSpectrums(const glsMat& src, glsMat& dst,float offset);
 
 void glsLog(const glsMat& src, glsMat& dst);
 void glsExp(const glsMat& src, glsMat& dst);

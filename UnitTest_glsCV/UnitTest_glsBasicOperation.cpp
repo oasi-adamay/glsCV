@@ -68,6 +68,7 @@ namespace UnitTest_glsCV
 		LOG,
 		EXP,
 		POW,
+		LOG_MAG_SPECTRUMS,
 	};
 
 	template <typename T>
@@ -218,12 +219,22 @@ namespace UnitTest_glsCV
 			cv::exp(imgSrc1, imgRef);
 			glsExp(glsSrc1, glsSrc1);
 			break;
-		case(E_TEST::POW) :
-			float power = (float)scalar[0];
-			cv::pow(imgSrc1, power, imgRef);
-			glsPow(glsSrc1, power, glsSrc1);
+		case(E_TEST::POW) : 
+			{
+				float power = (float)scalar[0];
+				cv::pow(imgSrc1, power, imgRef);
+				glsPow(glsSrc1, power, glsSrc1);
+			}
 			break;
-
+		case(E_TEST::LOG_MAG_SPECTRUMS) :
+			{
+				vector<Mat> tmp;
+				cv::split(imgSrc1, tmp);
+				cv::magnitude(tmp[0], tmp[1], imgRef);
+				cv::log(imgRef+1.0, imgRef);
+			}
+			glsLogMagSpectrums(glsSrc1, glsSrc1,1.0);
+			break;
 		};
 
 		glsSrc1.CopyTo(imgDst);
@@ -363,7 +374,7 @@ namespace UnitTest_glsCV
 		TEST_METHOD(glsMulSpectrumsPhaseOnly)
 		{
 			cout << __FUNCTION__ << endl;
-			int errNum = test_glsBasicOperationT<float>(CV_32FC2, E_TEST::MUL_SPECTRUMS_POC, 256);
+			int errNum = test_glsBasicOperationT<float>(CV_32FC2, E_TEST::MUL_SPECTRUMS_POC, 512);
 			Assert::AreEqual(0, errNum);
 		}
 		TEST_METHOD(glsMagSpectrums)
@@ -394,6 +405,14 @@ namespace UnitTest_glsCV
 			Assert::AreEqual(0, errNum);
 		}
 
+		TEST_METHOD(glsLogMagSpectrums)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_glsBasicOperationT<float>(CV_32FC2, E_TEST::LOG_MAG_SPECTRUMS,16);
+			Assert::AreEqual(0, errNum);
+		}
+
+		
 
 	};
 }

@@ -94,7 +94,7 @@ int _tmain(int argc, _TCHAR* argv[])
 				cv::log(mag+1,mag);
 				cv::normalize(mag, mag, 0, 1, CV_MINMAX);
 				cv::imshow("[CV MAG]",mag);
-#else
+#elif 0
 				glsMat glsZero(sizeFft, CV_32FC1,Size(2,2));
 				glsCopyRect(glsFrame, glsFrame, rect , Size(2,2));
 				glsCvtColor(glsFrame, glsFrame, CV_BGR2GRAY);
@@ -109,9 +109,22 @@ int _tmain(int argc, _TCHAR* argv[])
 				glsAdd(vec4(1.0), glsFrame, glsFrame);
 				glsLog(glsFrame, glsFrame);
 				double min, max;
-				//Mat tmp;
-				//glsFrame.CopyTo(tmp);
-				//cv::minMaxLoc(tmp, &min, &max);
+				glsMinMaxLoc(glsFrame, &min, &max);
+				glsAdd(vec4((float)-min), glsFrame, glsFrame);
+				glsMultiply(vec4(1.0f / (float)(max - min)), glsFrame, glsFrame);
+#else
+				glsMat glsZero(sizeFft, CV_32FC1, Size(2, 2));
+				glsCopyRect(glsFrame, glsFrame, rect, Size(2, 2));
+				glsCvtColor(glsFrame, glsFrame, CV_BGR2GRAY);
+				glsMultiply(glsFftWin, glsFrame, glsFrame);
+				vector<glsMat> plnGls(2);
+				plnGls[0] = glsFrame;
+				plnGls[1] = glsZero;
+				glsMat glsComplx;
+				glsMerge(plnGls, glsComplx);
+				glsFft(glsComplx, glsComplx, GLS_FFT_SHIFT);
+				glsLogMagSpectrums(glsComplx, glsFrame, 1.0);
+				double min, max;
 				glsMinMaxLoc(glsFrame, &min, &max);
 				glsAdd(vec4((float)-min), glsFrame, glsFrame);
 				glsMultiply(vec4(1.0f / (float)(max - min)), glsFrame, glsFrame);

@@ -61,6 +61,7 @@ void glsBasicOperationTerminate(void){
 #define OPCODE_LOG 10
 #define OPCODE_EXP 11
 #define OPCODE_POW 12
+#define OPCODE_LOG_MAG_SPCETRUM		 13
 
 static const char vertexShaderCode[] =
 "#version 330 core\n"
@@ -112,6 +113,9 @@ glsShaderScalarOperation::glsShaderScalarOperation(void){
 		"		break;\n"
 		"	case(12)://OPCODE_POW \n"
 		"		dst = pow(src,scalar);\n"
+		"		break;\n"
+		"	case(13)://OPCODE_LOG_MAG_SPCETRUM \n"
+		"		dst.r = log(abs(sqrt(src.r*src.r +  src.g*src.g)+scalar.r));\n"
 		"		break;\n"
 		"	default: dst = src;\n"
 		"   }\n"
@@ -506,6 +510,16 @@ void glsMagSpectrums(const glsMat& src, glsMat& dst){
 	glslScalarOperation(shaderScalarOperation, scalar, src.texArray, _dst.texArray, OPCODE_MAG_SPCETRUM);
 	dst = _dst;
 }
+
+//複素行列要素の絶対値の2乗にoffset加算し、絶対値の自然対数を求めます．
+void glsLogMagSpectrums(const glsMat& src, glsMat& dst, float offset){
+	GLS_Assert(src.glSizedFormat() == GL_RG32F);
+	vec4 scalar(offset);
+	glsMat _dst = glsMat(src.size(), src.type(), src.blkNum());
+	glslScalarOperation(shaderScalarOperation, scalar, src.texArray, _dst.texArray, OPCODE_LOG_MAG_SPCETRUM);
+	dst = _dst;
+}
+
 
 //各配列要素の絶対値の自然対数を求めます．
 void glsLog(const glsMat& src, glsMat& dst){
