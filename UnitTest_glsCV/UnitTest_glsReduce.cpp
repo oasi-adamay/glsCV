@@ -109,6 +109,56 @@ namespace UnitTest_glsCV
 			Assert::AreEqual(0, errNum);
 		}
 
+		TEST_METHOD(glsReduce_CV_32FC4_0_CV_REDUCE_MAX)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_glsReduce<float>(CV_32FC4, 0, CV_REDUCE_MAX);
+			Assert::AreEqual(0, errNum);
+		}
+		TEST_METHOD(glsReduce_CV_32FC4_1_CV_REDUCE_MAX)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_glsReduce<float>(CV_32FC4, 1, CV_REDUCE_MAX);
+			Assert::AreEqual(0, errNum);
+		}
+		TEST_METHOD(glsReduce_CV_32FC4_0_CV_REDUCE_MIN)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_glsReduce<float>(CV_32FC4, 0, CV_REDUCE_MIN);
+			Assert::AreEqual(0, errNum);
+		}
+		TEST_METHOD(glsReduce_CV_32FC4_1_CV_REDUCE_MIN)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_glsReduce<float>(CV_32FC4, 1, CV_REDUCE_MIN);
+			Assert::AreEqual(0, errNum);
+		}
+		TEST_METHOD(glsReduce_CV_32FC4_0_CV_REDUCE_SUM)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_glsReduce<float>(CV_32FC4, 0, CV_REDUCE_SUM, 16);
+			Assert::AreEqual(0, errNum);
+		}
+		TEST_METHOD(glsReduce_CV_32FC4_1_CV_REDUCE_SUM)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_glsReduce<float>(CV_32FC4, 1, CV_REDUCE_SUM, 16);
+			Assert::AreEqual(0, errNum);
+		}
+		TEST_METHOD(glsReduce_CV_32FC4_0_CV_REDUCE_AVG)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_glsReduce<float>(CV_32FC4, 0, CV_REDUCE_AVG, 16);
+			Assert::AreEqual(0, errNum);
+		}
+		TEST_METHOD(glsReduce_CV_32FC4_1_CV_REDUCE_AVG)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_glsReduce<float>(CV_32FC4, 1, CV_REDUCE_AVG, 16);
+			Assert::AreEqual(0, errNum);
+		}
+
+
 
 	};
 
