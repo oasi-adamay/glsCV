@@ -55,7 +55,6 @@ namespace UnitTest_glsCV
 
 
 
-
 	TEST_CLASS(UnitTest_glsReduce)
 	{
 	public:
@@ -158,9 +157,56 @@ namespace UnitTest_glsCV
 			Assert::AreEqual(0, errNum);
 		}
 
-
-
 	};
 
+	template <typename T>
+	int test_glsMinMaxLoc(int cvtype){
+		const int width = 24;
+		const int height = 32;
+		//		const int width = 8;
+		//		const int height = 6;
+
+		//		Size blkNum(1,1);
+		Size blkNum(2, 2);
+
+
+		Mat imgSrc(Size(width, height), cvtype);
+		FillRandU<T>(imgSrc);
+
+		cout << "Size:" << imgSrc.size() << endl;
+
+		double maxValRef;
+		double minValRef;
+		double maxVal;
+		double minVal;
+
+		cv::minMaxLoc(imgSrc, &minValRef, &maxValRef);
+
+
+		glsMat glsSrc(imgSrc.size(), imgSrc.type(), blkNum);
+		glsSrc.CopyFrom(imgSrc);
+		glsMinMaxLoc(glsSrc, &minVal, &maxVal);
+
+		cout << maxValRef << "," << maxVal << endl;
+		cout << minValRef << "," << minVal << endl;
+
+		int errNum = 0;
+		if (!AreEqual<double>(maxValRef, maxVal, 0))errNum++;
+		if (!AreEqual<double>(minValRef, minVal, 0))errNum++;
+
+		return errNum;
+	}
+
+	TEST_CLASS(UnitTest_glsMinMaxLoc)
+	{
+	public:
+		//glsMerge
+		TEST_METHOD(glsMinMaxLoc_CV_32FC1)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_glsMinMaxLoc<float>(CV_32FC1);
+			Assert::AreEqual(0, errNum);
+		}
+	};
 
 }

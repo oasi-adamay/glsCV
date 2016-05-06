@@ -277,4 +277,51 @@ void glsReduce(const glsMat& src, glsMat& dst, int dim, int reduceOp){
 }
 
 
+void glsMinMaxLoc(const glsMat& src, double* minVal, double* maxVal, Point* minLoc, Point* maxLoc, const glsMat& mask){
+	GLS_Assert(src.depth() == CV_32F);
+	GLS_Assert(maxLoc == 0);	// not implement yet
+	GLS_Assert(minLoc == 0);	// not implement yet
+	GLS_Assert(mask.empty());	// not implement yet
+
+	glsMat _src;
+
+	if (src.isContinuous()){
+		_src = src;
+	}
+	else{
+		glsCopyUntiled(src, _src);
+	}
+
+	glsMat tmp;
+
+	if (minVal){
+		glsReduce(_src, tmp, 0, CV_REDUCE_MIN);
+		glsReduce(tmp, tmp, 1, CV_REDUCE_MIN);
+
+		Mat val;
+		tmp.CopyTo(val);
+		GLS_Assert(val.rows == 1);
+		GLS_Assert(val.cols == 1);
+		*minVal = val.at<float>(0, 0);
+	}
+
+	if (maxVal){
+		glsReduce(_src, tmp, 0, CV_REDUCE_MAX);
+		glsReduce(tmp, tmp, 1, CV_REDUCE_MAX);
+
+		Mat val;
+		tmp.CopyTo(val);
+		GLS_Assert(val.rows == 1);
+		GLS_Assert(val.cols == 1);
+		*maxVal = val.at<float>(0, 0);
+	}
+
+
+
+
+
+}
+
+
+
 

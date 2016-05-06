@@ -108,10 +108,11 @@ int _tmain(int argc, _TCHAR* argv[])
 				glsMagSpectrums(glsComplx, glsFrame);
 				glsAdd(vec4(1.0), glsFrame, glsFrame);
 				glsLog(glsFrame, glsFrame);
-				Mat tmp;
-				glsFrame.CopyTo(tmp);
 				double min, max;
-				cv::minMaxLoc(tmp, &min, &max);
+				//Mat tmp;
+				//glsFrame.CopyTo(tmp);
+				//cv::minMaxLoc(tmp, &min, &max);
+				glsMinMaxLoc(glsFrame, &min, &max);
 				glsAdd(vec4((float)-min), glsFrame, glsFrame);
 				glsMultiply(vec4(1.0f / (float)(max - min)), glsFrame, glsFrame);
 #endif

@@ -6,12 +6,13 @@ namespace UnitTest_glsCV
 	bool AlmostEqualUlpsAbsEps(float A, float B, int maxUlps, float maxDiff = 1e-3);
 
 
-	template <typename T>
-	static bool AreEqual(T val0, T val1, int maxUlps){
+	template <typename T> static
+	bool AreEqual(T val0, T val1, int maxUlps){
 		return val0 == val1;
 	}
 
-	template<> static bool AreEqual<float>(float val0, float val1, int maxUlps){
+	template<> static 
+	bool AreEqual<float>(float val0, float val1, int maxUlps){
 		return AlmostEqualUlpsAbsEps(val0, val1, maxUlps, FLT_MIN);
 	}
 
