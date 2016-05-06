@@ -3,20 +3,20 @@
 namespace UnitTest_glsCV
 {
 
-	bool AlmostEqualUlpsAbsEps(float A, float B, int maxUlps, float maxDiff = 1e-3);
+	bool AlmostEqualUlpsAbsEps(float A, float B, int maxUlps, float maxDiff = 1e-3, int* upls = 0);
 
 
 	template <typename T> static
-	bool AreEqual(T val0, T val1, int maxUlps){
+	bool AreEqual(T val0, T val1, int maxUlps , int* upls){
 		return val0 == val1;
 	}
 
 	template<> static 
-	bool AreEqual<float>(float val0, float val1, int maxUlps){
-		return AlmostEqualUlpsAbsEps(val0, val1, maxUlps, FLT_MIN);
+	bool AreEqual<float>(float val0, float val1, int maxUlps, int* upls){
+		return AlmostEqualUlpsAbsEps(val0, val1, maxUlps, FLT_MIN, upls);
 	}
 
-	template <typename T>
+	template <typename T> static
 	bool AreEqual(Mat& mat0, Mat& mat1, int maxUlps = 0){
 		if (mat0.size() != mat1.size()){
 			cerr << "mat0.size() != mat1.size()" << endl;
@@ -36,12 +36,14 @@ namespace UnitTest_glsCV
 				for (int ch = 0; ch < mat0.channels(); ch++){
 					T ref = *pRef++;
 					T dst = *pDst++;
-					if (!AreEqual<T>(ref, dst, maxUlps)){
+					int ulps;
+					if (!AreEqual<T>(ref, dst, maxUlps, &ulps)){
 						errNum++;
 						if (errNum<100){
 							cout << cv::format("(%4d,%4d,%4d)\t", y, x, ch);
 							cout << ref << "\t";
 							cout << dst << "\t";
+							cout << ulps << "\t";
 							cout << endl;
 						}
 					}

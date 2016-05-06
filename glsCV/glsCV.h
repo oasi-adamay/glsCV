@@ -11,6 +11,7 @@
 #include "glsFft.h"
 #include "glsBasicOperation.h"
 #include "glsReduce.h"
+#include "glsNormalize.h"
 
 const char* glsErrorString(GLenum err);
 

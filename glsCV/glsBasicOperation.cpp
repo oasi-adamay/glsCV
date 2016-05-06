@@ -506,7 +506,7 @@ void glsMulSpectrumsPhaseOnly(const glsMat& src0, const glsMat& src1, glsMat& ds
 void glsMagSpectrums(const glsMat& src, glsMat& dst){
 	GLS_Assert(src.glSizedFormat() == GL_RG32F);
 	vec4 scalar(1.0, 1.0, 1.0, 1.0);
-	glsMat _dst = glsMat(src.size(), src.type(), src.blkNum());
+	glsMat _dst = glsMat(src.size(), CV_MAKE_TYPE(src.depth(), 1), src.blkNum());
 	glslScalarOperation(shaderScalarOperation, scalar, src.texArray, _dst.texArray, OPCODE_MAG_SPCETRUM);
 	dst = _dst;
 }
@@ -515,7 +515,7 @@ void glsMagSpectrums(const glsMat& src, glsMat& dst){
 void glsLogMagSpectrums(const glsMat& src, glsMat& dst, float offset){
 	GLS_Assert(src.glSizedFormat() == GL_RG32F);
 	vec4 scalar(offset);
-	glsMat _dst = glsMat(src.size(), src.type(), src.blkNum());
+	glsMat _dst = glsMat(src.size(), CV_MAKE_TYPE(src.depth(), 1), src.blkNum());
 	glslScalarOperation(shaderScalarOperation, scalar, src.texArray, _dst.texArray, OPCODE_LOG_MAG_SPCETRUM);
 	dst = _dst;
 }

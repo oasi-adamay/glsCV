@@ -122,7 +122,7 @@ namespace UnitTest_glsCV
 					Vec2f ref = imgFftRef.at<Vec2f>(y, x);
 					Vec2f dst = imgFft.at<Vec2f>(y, x);
 					Vec2f err = dst - ref;
-					if (!AlmostEqualUlpsAbsEps(ref[0], dst[0], ULPS, EPS)){
+					if (!AlmostEqualUlpsAbsEps(ref[0], dst[0], ULPS, EPS,0)){
 						cout << cv::format("r(%4d,%4d)\t", x, y);
 						cout << cv::format("%8g\t", dst[0]);
 						cout << cv::format("%8g\t", ref[0]);
@@ -130,7 +130,7 @@ namespace UnitTest_glsCV
 						cout << endl;
 						errNum++;
 					}
-					if (!AlmostEqualUlpsAbsEps(ref[1], dst[1], ULPS, EPS)){
+					if (!AlmostEqualUlpsAbsEps(ref[1], dst[1], ULPS, EPS,0)){
 						cout << cv::format("i(%4d,%4d)\t", x, y);
 						cout << cv::format("%8g\t", dst[1]);
 						cout << cv::format("%8g\t", ref[1]);

@@ -5,49 +5,10 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 #include "Timer.h"
 #include "glsCV.h"
 #include "math.h"
+#include "UnitTest_Common.h"
 
 namespace UnitTest_glsCV
 {
-	static
-		bool AlmostEqualUlpsAbsEps(float A, float B, int maxUlps, float maxDiff)
-	{
-		// Check if the numbers are really close -- needed
-		// when comparing numbers near zero.
-		float absDiff = fabs(A - B);
-		if (absDiff <= maxDiff)
-			return true;
-
-		// Make sure maxUlps is non-negative and small enough that the
-		// default NAN won't compare as equal to anything.
-		GLS_Assert(maxUlps > 0 && maxUlps < 4 * 1024 * 1024);
-		int aInt = *(int*)&A;
-		// Make aInt lexicographically ordered as a twos-complement int
-		if (aInt < 0)
-			aInt = 0x80000000 - aInt;
-		// Make bInt lexicographically ordered as a twos-complement int
-		int bInt = *(int*)&B;
-		if (bInt < 0)
-			bInt = 0x80000000 - bInt;
-		int intDiff = abs(aInt - bInt);
-		if (intDiff <= maxUlps) return true;
-
-		cout << "A:" << A << "\t";
-		cout << "B:" << B << "\t";
-		cout << "intDiff:" << intDiff << "\t";
-		cout << endl;
-			
-		return false;
-	}
-
-	template <typename T>
-	static bool AreEqual(T val0, T val1, int maxUlps){
-		return val0 == val1;
-	}
-
-	template<> static bool AreEqual<float>(float val0, float val1, int maxUlps){
-		return AlmostEqualUlpsAbsEps(val0, val1, maxUlps, FLT_MIN);
-	}
-
 	enum E_TEST {
 		ADD,
 		SUB,
@@ -238,28 +199,8 @@ namespace UnitTest_glsCV
 		};
 
 		glsSrc1.CopyTo(imgDst);
+		if (!AreEqual<T>(imgRef, imgDst, maxUlps)) errNum = -1;
 
-		//verify
-		{
-			//verify
-			for (int y = 0; y < imgRef.rows; y++){
-				for (int x = 0; x < imgRef.cols; x++){
-					T* pRef = imgRef.ptr<T>(y, x);
-					T* pDst = imgDst.ptr<T>(y, x);
-					for (int ch = 0; ch < imgRef.channels(); ch++){
-						T ref = *pRef++;
-						T dst = *pDst++;
-						if (!AreEqual<T>(ref, dst, maxUlps)){
-							cout << cv::format("(%4d,%4d,%4d)\t", y, x, ch);
-							cout << ref << "\t";
-							cout << dst << "\t";
-							cout << endl;
-							errNum++;
-						}
-					}
-				}
-			}
-		}
 		cout << "errNum:" << errNum << endl;
 
 		return errNum;

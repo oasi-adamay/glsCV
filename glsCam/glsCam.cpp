@@ -124,10 +124,7 @@ int _tmain(int argc, _TCHAR* argv[])
 				glsMerge(plnGls, glsComplx);
 				glsFft(glsComplx, glsComplx, GLS_FFT_SHIFT);
 				glsLogMagSpectrums(glsComplx, glsFrame, 1.0);
-				double min, max;
-				glsMinMaxLoc(glsFrame, &min, &max);
-				glsAdd(vec4((float)-min), glsFrame, glsFrame);
-				glsMultiply(vec4(1.0f / (float)(max - min)), glsFrame, glsFrame);
+				glsNormalize(glsFrame, glsFrame, 0, 1, NORM_MINMAX);
 #endif
 			}
 			break;

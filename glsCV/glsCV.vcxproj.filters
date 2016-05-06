@@ -63,6 +63,9 @@
     <ClInclude Include="glsReduce.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
+    <ClInclude Include="glsNormalize.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -102,6 +105,9 @@
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="glsReduce.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="glsNormalize.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>

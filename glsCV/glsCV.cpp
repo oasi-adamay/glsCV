@@ -119,6 +119,7 @@ GLFWwindow* glsCvInit(const int _width, const int _height){
 	glsBasicOperationInit();
 	glsMergeInit();
 	glsReduceInit();
+	glsNormalizeInit();
 	glsFftInit();
 
 	GL_CHECK_ERROR();
@@ -136,6 +137,7 @@ void glsCvTerminate(void){
 	glsBasicOperationTerminate();
 	glsMergeTerminate();
 	glsReduceTerminate();
+	glsNormalizeTerminate();
 	glsFftTerminate();
 
 	// Close OpenGL window and terminate GLFW
