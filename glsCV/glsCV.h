@@ -10,6 +10,7 @@
 #include "glsMerge.h"
 #include "glsFft.h"
 #include "glsBasicOperation.h"
+#include "glsReduce.h"
 
 const char* glsErrorString(GLenum err);
 

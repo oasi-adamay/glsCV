@@ -40,7 +40,7 @@ namespace UnitTest_glsCV
 		glsDst.CopyTo(imgDst);		// download
 
 		int errNum = 0;
-		if (!AreEqual(imgSrc, imgDst)) errNum = -1;
+		if (!AreEqual<T>(imgSrc, imgDst)) errNum = -1;
 
 		//cout << imgSrc << endl;
 		//cout << imgDst << endl;
@@ -73,7 +73,7 @@ namespace UnitTest_glsCV
 
 		int errNum = 0;
 		if (glsDst.blkNum() != blkNum) errNum = -1;
-		if (!AreEqual(imgSrc, imgDst)) errNum = -1;
+		if (!AreEqual<T>(imgSrc, imgDst)) errNum = -1;
 
 		//cout << imgSrc << endl;
 		//cout << imgDst << endl;
@@ -110,7 +110,7 @@ namespace UnitTest_glsCV
 
 		int errNum = 0;
 		if (glsDst.blkNum() != Size(1,1)) errNum = -1;
-		if (!AreEqual(imgSrc, imgDst)) errNum = -1;
+		if (!AreEqual<T>(imgSrc, imgDst)) errNum = -1;
 
 		//cout << imgSrc << endl;
 		//cout << imgDst << endl;
@@ -152,7 +152,7 @@ namespace UnitTest_glsCV
 
 		int errNum = 0;
 		Mat roi = Mat(imgSrc, rect);
-		if (!AreEqual(roi, imgDst)) errNum = -1;
+		if (!AreEqual<T>(roi, imgDst)) errNum = -1;
 
 		//cout << roi << endl;
 		//cout << imgDst << endl;

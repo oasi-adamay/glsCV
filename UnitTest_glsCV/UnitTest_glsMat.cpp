@@ -49,7 +49,7 @@ namespace UnitTest_glsCV
 
 		//verify
 		int errNum = 0;
-		if (!AreEqual(imgSrc, imgDst)) errNum = -1;
+		if (!AreEqual<T>(imgSrc, imgDst)) errNum = -1;
 
 		return errNum;
 	}

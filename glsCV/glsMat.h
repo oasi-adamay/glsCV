@@ -56,6 +56,7 @@ public:
 	void CopyFrom(const Mat&src);
 	void CopyTo(Mat&dst) const;
 
+	Size texSize(void) const { return Size(cols / blkX, rows / blkY); }
 	int texWidth(void) const { return cols / blkX;}
 	int texHeight(void) const { return rows / blkY; }
 

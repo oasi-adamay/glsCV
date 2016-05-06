@@ -148,6 +148,7 @@
     <ClInclude Include="glsFft.h" />
     <ClInclude Include="glsMat.h" />
     <ClInclude Include="glsMerge.h" />
+    <ClInclude Include="glsReduce.h" />
     <ClInclude Include="glsShader.h" />
     <ClInclude Include="glsVAO.h" />
     <ClInclude Include="stdafx.h" />
@@ -164,6 +165,7 @@
     <ClCompile Include="glsFft.cpp" />
     <ClCompile Include="glsMat.cpp" />
     <ClCompile Include="glsMerge.cpp" />
+    <ClCompile Include="glsReduce.cpp" />
     <ClCompile Include="glsShader.cpp" />
     <ClCompile Include="glsVAO.cpp" />
     <ClCompile Include="stdafx.cpp">

@@ -48,7 +48,7 @@ namespace UnitTest_glsCV
 		glsDst.CopyTo(imgDst);		// download
 
 		int errNum = 0;
-		if (!AreEqual(imgRef, imgDst)) errNum = -1;
+		if (!AreEqual<T>(imgRef, imgDst)) errNum = -1;
 
 		//cout << imgRef << endl;
 		//cout << imgDst << endl;

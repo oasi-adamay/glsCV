@@ -42,7 +42,7 @@ namespace UnitTest_glsCV
 
 		// Make sure maxUlps is non-negative and small enough that the
 		// default NAN won't compare as equal to anything.
-		GLS_Assert(maxUlps > 0 && maxUlps < 4 * 1024 * 1024);
+		GLS_Assert(maxUlps >= 0 && maxUlps < 4 * 1024 * 1024);
 		int aInt = *(int*)&A;
 		// Make aInt lexicographically ordered as a twos-complement int
 		if (aInt < 0)
@@ -56,6 +56,9 @@ namespace UnitTest_glsCV
 			return true;
 		return false;
 	}
+
+
+
 
 	bool AreEqual(Mat& mat0, Mat& mat1){
 		if (mat0.size() != mat1.size()){

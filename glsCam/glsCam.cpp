@@ -92,7 +92,7 @@ int _tmain(int argc, _TCHAR* argv[])
 				Mat mag;
 				cv::magnitude(pln[0], pln[1], mag);
 				cv::log(mag+1,mag);
-//				cv::normalize(mag, mag, 0, 1, CV_MINMAX);
+				cv::normalize(mag, mag, 0, 1, CV_MINMAX);
 				cv::imshow("[CV MAG]",mag);
 #else
 				glsMat glsZero(sizeFft, CV_32FC1,Size(2,2));
