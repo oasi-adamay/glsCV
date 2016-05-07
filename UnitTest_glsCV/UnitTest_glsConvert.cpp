@@ -7,58 +7,12 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 #include "Timer.h"
 
 #include "glsCV.h"
+#include "UnitTest_Common.h"
 
-//Lib 
-#pragma comment (lib, "opengl32.lib")
-#pragma comment (lib, "glew32.lib")
-#pragma comment (lib, "glfw3dll.lib")
-
-#pragma comment (lib, "glsCV.lib")
 
 
 namespace UnitTest_glsCV
 {
-	static
-		bool AlmostEqualUlpsAbsEps(float A, float B, int maxUlps, float maxDiff)
-	{
-		// Check if the numbers are really close -- needed
-		// when comparing numbers near zero.
-		float absDiff = fabs(A - B);
-		if (absDiff <= maxDiff)
-			return true;
-
-		// Make sure maxUlps is non-negative and small enough that the
-		// default NAN won't compare as equal to anything.
-		GLS_Assert(maxUlps > 0 && maxUlps < 4 * 1024 * 1024);
-		int aInt = *(int*)&A;
-		// Make aInt lexicographically ordered as a twos-complement int
-		if (aInt < 0)
-			aInt = 0x80000000 - aInt;
-		// Make bInt lexicographically ordered as a twos-complement int
-		int bInt = *(int*)&B;
-		if (bInt < 0)
-			bInt = 0x80000000 - bInt;
-		int intDiff = abs(aInt - bInt);
-		if (intDiff <= maxUlps) return true;
-
-		cout << "A:" << A << "\t";
-		cout << "B:" << B << "\t";
-		cout << "intDiff:" << intDiff << "\t";
-		cout << endl;
-
-		return false;
-	}
-
-	template <typename T>
-	static bool AreEqual(T val0, T val1, int maxUlps){
-		return val0 == val1;
-	}
-
-	template<> static bool AreEqual<float>(float val0, float val1, int maxUlps){
-		return AlmostEqualUlpsAbsEps(val0, val1, maxUlps, FLT_MIN);
-	}
-
-
 	template <typename Ts, typename Td>
 	int test_glsConvert(const int typeS, const int typeD, const float scale = 1.0f){
 		const int width = 32;
@@ -67,20 +21,10 @@ namespace UnitTest_glsCV
 		Mat imgRef; 
 
 		cout << "Size:" << imgSrc.size() << endl;
-
 		//---------------------------------
 		//init Src image
-		{
-			RNG rng(0xFFFFFFFF);
-			for (int y = 0; y < imgSrc.rows; y++){
-				for (int x = 0; x < imgSrc.cols; x++){
-					Ts* pSrc = imgSrc.ptr<Ts>(y, x);
-					for (int ch = 0; ch < imgSrc.channels(); ch++){
-						*pSrc++ = randu<Ts>();
-					}
-				}
-			}
-		}
+		FillRandU<Ts>(imgSrc);
+
 		imgSrc.convertTo(imgRef, typeD, scale);
 		Mat imgDst = Mat::zeros(imgRef.size(), imgRef.type());
 
@@ -103,26 +47,7 @@ namespace UnitTest_glsCV
 
 		//verify
 		int errNum = 0;
-		{
-			//verify
-			for (int y = 0; y < imgRef.rows; y++){
-				for (int x = 0; x < imgRef.cols; x++){
-					Td* pRef = imgRef.ptr<Td>(y, x);
-					Td* pDst = imgDst.ptr<Td>(y, x);
-					for (int ch = 0; ch < imgRef.channels(); ch++){
-						Td ref = *pRef++;
-						Td dst = *pDst++;
-						if (ref != dst){
-							cout << cv::format("(%4d,%4d,%4d)\t", y, x, ch);
-							cout << ref << "\t";
-							cout << dst << "\t";
-							cout << endl;
-							errNum++;
-						}
-					}
-				}
-			}
-		}
+		if (!AreEqual<Td>(imgRef, imgDst, 0)) errNum = -1;
 		cout << "errNum:" << errNum << endl;
 
 		return errNum;
@@ -185,17 +110,8 @@ namespace UnitTest_glsCV
 
 		//---------------------------------
 		//init Src image
-		{
-			RNG rng(0xFFFFFFFF);
-			for (int y = 0; y < imgSrc.rows; y++){
-				for (int x = 0; x < imgSrc.cols; x++){
-					Ts* pSrc = imgSrc.ptr<Ts>(y, x);
-					for (int ch = 0; ch < imgSrc.channels(); ch++){
-						*pSrc++ = randu<Ts>();
-					}
-				}
-			}
-		}
+		FillRandU<Ts>(imgSrc);
+
 		cv::cvtColor(imgSrc, imgRef, code);
 
 		Mat imgDst = Mat::zeros(imgRef.size(), imgRef.type());
@@ -219,26 +135,8 @@ namespace UnitTest_glsCV
 
 		//verify
 		int errNum = 0;
-		{
-			//verify
-			for (int y = 0; y < imgRef.rows; y++){
-				for (int x = 0; x < imgRef.cols; x++){
-					Td* pRef = imgRef.ptr<Td>(y, x);
-					Td* pDst = imgDst.ptr<Td>(y, x);
-					for (int ch = 0; ch < imgRef.channels(); ch++){
-						Td ref = *pRef++;
-						Td dst = *pDst++;
-						if (!AreEqual<Td>(ref, dst, maxUlps)){
-							cout << cv::format("(%4d,%4d,%4d)\t", y, x, ch);
-							cout << ref << "\t";
-							cout << dst << "\t";
-							cout << endl;
-							errNum++;
-						}
-					}
-				}
-			}
-		}
+		if (!AreEqual<Td>(imgRef, imgDst, maxUlps)) errNum = -1;
+
 		cout << "errNum:" << errNum << endl;
 
 		return errNum;

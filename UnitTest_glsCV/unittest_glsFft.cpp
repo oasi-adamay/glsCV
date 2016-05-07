@@ -11,49 +11,37 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace UnitTest_glsCV
 {	
-//	HookCoutCerr hook;
-#if 0
-	TEST_MODULE_INITIALIZE(test_module_initialize) {
-		cout << __FUNCTION__ << endl;
-		glsCvInit();
 
-	}
-	TEST_MODULE_CLEANUP(test_module_cleanup)  {
-		cout << __FUNCTION__ << endl;
-		glsCvTerminate();
-	}
-#endif
+	//static
+	//bool AlmostEqualUlpsAbsEps(float A, float B, int maxUlps, float maxDiff)
+	//{
+	//	// Check if the numbers are really close -- needed
+	//	// when comparing numbers near zero.
+	//	float absDiff = fabs(A - B);
+	//	if (absDiff <= maxDiff)
+	//		return true;
 
-	static
-	bool AlmostEqualUlpsAbsEps(float A, float B, int maxUlps, float maxDiff)
-	{
-		// Check if the numbers are really close -- needed
-		// when comparing numbers near zero.
-		float absDiff = fabs(A - B);
-		if (absDiff <= maxDiff)
-			return true;
-
-		// Make sure maxUlps is non-negative and small enough that the
-		// default NAN won't compare as equal to anything.
-		GLS_Assert(maxUlps > 0 && maxUlps < 4 * 1024 * 1024);
-		int aInt = *(int*)&A;
-		// Make aInt lexicographically ordered as a twos-complement int
-		if (aInt < 0)
-			aInt = 0x80000000 - aInt;
-		// Make bInt lexicographically ordered as a twos-complement int
-		int bInt = *(int*)&B;
-		if (bInt < 0)
-			bInt = 0x80000000 - bInt;
-		int intDiff = abs(aInt - bInt);
-		if (intDiff <= maxUlps)
-			return true;
-		return false;
-	}
+	//	// Make sure maxUlps is non-negative and small enough that the
+	//	// default NAN won't compare as equal to anything.
+	//	GLS_Assert(maxUlps > 0 && maxUlps < 4 * 1024 * 1024);
+	//	int aInt = *(int*)&A;
+	//	// Make aInt lexicographically ordered as a twos-complement int
+	//	if (aInt < 0)
+	//		aInt = 0x80000000 - aInt;
+	//	// Make bInt lexicographically ordered as a twos-complement int
+	//	int bInt = *(int*)&B;
+	//	if (bInt < 0)
+	//		bInt = 0x80000000 - bInt;
+	//	int intDiff = abs(aInt - bInt);
+	//	if (intDiff <= maxUlps)
+	//		return true;
+	//	return false;
+	//}
 
 
 	int test_glsFft(const int N, const int flags){
-		int ULPS = 4096;
-		float EPS = 1e-3f;
+		int ULPS = 64;
+		float EPS = 1e-4f;
 		Mat imgSrc = Mat(Size(N, N), CV_32FC2);
 		Mat imgFft = Mat::zeros(imgSrc.size(), imgSrc.type());
 		Mat imgFftRef = Mat::zeros(imgSrc.size(), imgSrc.type());
@@ -62,35 +50,31 @@ namespace UnitTest_glsCV
 
 		//---------------------------------
 		//init Src image
-		{
-			RNG rng(0xFFFFFFFF);
+		FillRandU<float>(imgSrc);
 
-			const int width = imgSrc.cols;
-			const int height = imgSrc.rows;
-			for (int y = 0; y < height; y++){
-				for (int x = 0; x < width; x++){
-					imgSrc.at<Vec2f>(y, x) = Vec2f((float)rng.gaussian(1.0), (float)rng.gaussian(1.0));
-				}
-			}
-		}
+#if 1
 		//---------------------------------
 		//CPU FFT(cv::dft)
 		{
 			Timer tmr("cv:dft:   \t");
 			cv::dft(imgSrc, imgFftRef, flags);
 		}
+#else
+		//---------------------------------
+		//CPU FFT(cv::dft)
+		{
+			Timer tmr("cv:dft:   \t");
+			void fft_dit_Stockham_radix2_type0(const Mat& src, Mat &dst);
+			fft_dit_Stockham_radix2_type0(imgSrc, imgFftRef);
+		}
+#endif
 
 		//---------------------------------
 		{
 			int _flags = 0;
 			if (flags & DFT_SCALE)	_flags |= GLS_FFT_SCALE;
 			if (flags & DFT_INVERSE)_flags |= GLS_FFT_INVERSE;
-#if 0
-			{
-				Timer tmr("glsFft:  \t");
-				glsFft(imgSrc, imgFft, _flags);
-			}
-#elif 1
+#if 1
 			glsMat _src(imgSrc);
 			glsMat _dst;
 			{
@@ -113,34 +97,8 @@ namespace UnitTest_glsCV
 
 		//verify
 		int errNum = 0;
-		{
-			//verify
-			int width = imgSrc.cols;
-			int height = imgSrc.rows;
-			for (int y = 0; y < height; y++){
-				for (int x = 0; x < width; x++){
-					Vec2f ref = imgFftRef.at<Vec2f>(y, x);
-					Vec2f dst = imgFft.at<Vec2f>(y, x);
-					Vec2f err = dst - ref;
-					if (!AlmostEqualUlpsAbsEps(ref[0], dst[0], ULPS, EPS,0)){
-						cout << cv::format("r(%4d,%4d)\t", x, y);
-						cout << cv::format("%8g\t", dst[0]);
-						cout << cv::format("%8g\t", ref[0]);
-						cout << cv::format("%8g\t", err[0]);
-						cout << endl;
-						errNum++;
-					}
-					if (!AlmostEqualUlpsAbsEps(ref[1], dst[1], ULPS, EPS,0)){
-						cout << cv::format("i(%4d,%4d)\t", x, y);
-						cout << cv::format("%8g\t", dst[1]);
-						cout << cv::format("%8g\t", ref[1]);
-						cout << cv::format("%8g\t", err[1]);
-						cout << endl;
-						errNum++;
-					}
-				}
-			}
-		}
+		if (!AreEqual<float>(imgFftRef, imgFft, ULPS, EPS)) errNum = -1;
+
 		cout << "errNum:" << errNum << endl;
 
 		return errNum;
@@ -150,20 +108,6 @@ namespace UnitTest_glsCV
 	TEST_CLASS(UnitTest_glsFft)
 	{
 	public:
-
-//		TEST_CLASS_INITIALIZE(test_class_initialize)
-//		{
-//			cout << __FUNCTION__ << endl;
-//			glsCvInit();
-//
-//		}
-
-//		TEST_CLASS_CLEANUP(test_class_cleanup)
-//		{
-//			cout << __FUNCTION__ << endl;
-//			glsCvTerminate();
-//
-//		}
 
 
 		TEST_METHOD(FFT)

@@ -30,18 +30,7 @@ namespace UnitTest_glsCV
 
 		//---------------------------------
 		//init Src image
-//		cv::randu(imgSrc, Scalar(0), Scalar(255));
-		{
-			RNG rng(0xFFFFFFFF);
-			for (int y = 0; y < imgSrc.rows; y++){
-				for (int x = 0; x < imgSrc.cols; x++){
-					T* pSrc = imgSrc.ptr<T>(y, x);
-					for (int ch = 0; ch < imgSrc.channels(); ch++){
-						*pSrc++ = randu<T>();
-					}
-				}
-			}
-		}
+		FillRandU<T>(imgSrc);
 
 
 		glsMat glsSrc(imgSrc);		//create glsMat and  upload

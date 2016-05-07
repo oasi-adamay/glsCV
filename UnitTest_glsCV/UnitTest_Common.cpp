@@ -32,9 +32,8 @@ namespace UnitTest_glsCV
 	}
 #endif
 
-	bool AlmostEqualUlpsAbsEps(float A, float B, int maxUlps, float maxDiff, int* upls)
+	bool AlmostEqualUlpsAbsEps(float A, float B, int maxUlps, float maxDiff)
 	{
-		if (upls)*upls = 0;
 		// Check if the numbers are really close -- needed
 		// when comparing numbers near zero.
 		float absDiff = fabs(A - B);
@@ -56,7 +55,6 @@ namespace UnitTest_glsCV
 		if (intDiff <= maxUlps)
 			return true;
 
-		if (upls)*upls = intDiff;
 
 		return false;
 	}
@@ -64,6 +62,7 @@ namespace UnitTest_glsCV
 
 
 
+#if 0
 	bool AreEqual(Mat& mat0, Mat& mat1){
 		if (mat0.size() != mat1.size()){
 			cerr << "mat0.size() != mat1.size()" << endl;
@@ -98,7 +97,7 @@ namespace UnitTest_glsCV
 
 		return false;
 	}
-
+#endif
 
 
 

@@ -54,17 +54,9 @@ namespace UnitTest_glsCV
 		//init Src image
 		{
 
-			RNG rng(0xFFFFFFFF);
-			for (int y = 0; y < imgSrc0.rows; y++){
-				for (int x = 0; x < imgSrc0.cols; x++){
-					T* pSrc0 = imgSrc0.ptr<T>(y, x);
-					T* pSrc1 = imgSrc1.ptr<T>(y, x);
-					for (int ch = 0; ch < imgSrc0.channels(); ch++){
-						*pSrc0++ = randu<T>();
-						*pSrc1++ = randu<T>();
-					}
-				}
-			}
+			FillRandU<T>(imgSrc0);
+			FillRandU<T>(imgSrc1);
+
 
 			//prevent div by 0
 			for (int y = 0; y < imgSrc1.rows; y++){
@@ -76,10 +68,10 @@ namespace UnitTest_glsCV
 				}
 			}
 
-			scalar[0] = (float)rng.gaussian(1.0);
-			scalar[1] = (float)rng.gaussian(1.0);
-			scalar[2] = (float)rng.gaussian(1.0);
-			scalar[3] = (float)rng.gaussian(1.0);
+			scalar[0] = randu<float>();
+			scalar[1] = randu<float>();
+			scalar[2] = randu<float>();
+			scalar[3] = randu<float>();
 			_scalar[0] = (float)scalar[0];
 			_scalar[1] = (float)scalar[1];
 			_scalar[2] = (float)scalar[2];
@@ -342,7 +334,7 @@ namespace UnitTest_glsCV
 		TEST_METHOD(glsPow)
 		{
 			cout << __FUNCTION__ << endl;
-			int errNum = test_glsBasicOperationT<float>(CV_32FC1, E_TEST::POW);
+			int errNum = test_glsBasicOperationT<float>(CV_32FC1, E_TEST::POW,16);
 			Assert::AreEqual(0, errNum);
 		}
 

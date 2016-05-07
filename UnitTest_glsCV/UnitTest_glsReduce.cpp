@@ -191,8 +191,8 @@ namespace UnitTest_glsCV
 		cout << minValRef << "," << minVal << endl;
 
 		int errNum = 0;
-		if (!AreEqual<float>((float)maxValRef, (float)maxVal, 0 , 0))errNum++;
-		if (!AreEqual<float>((float)minValRef, (float)minVal, 0 , 0))errNum++;
+		if (!AreEqual<float>((float)maxValRef, (float)maxVal, 0))errNum++;
+		if (!AreEqual<float>((float)minValRef, (float)minVal, 0))errNum++;
 
 		return errNum;
 	}
