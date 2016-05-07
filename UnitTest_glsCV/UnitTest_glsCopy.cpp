@@ -6,6 +6,14 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 #include "glsCV.h"
 #include "UnitTest_Common.h"
+#include "Timer.h"
+
+//#ifdef _DEBUG
+#if 1
+#define _TMR_(...)  Timer tmr(__VA_ARGS__)
+#else
+#define _TMR_(...)
+#endif
 
 
 
@@ -13,16 +21,10 @@ namespace UnitTest_glsCV
 {
 
 	template <typename T>
-	int test_glsCopy(int cvtype, int flag = 0){
-		const int width = 32;
-		const int height = 24;
-//		const int width = 8;
-//		const int height = 6;
-		Size blkNum;
-		if (flag == 0)blkNum = Size(1, 1);
-		else blkNum = Size(2, 2);
+	int test_glsCopy(int cvtype, Size size = Size(32,24), Size blkNum = Size(1,1)){
 
-		Mat imgSrc = Mat(Size(width, height), cvtype);
+		Mat imgSrc = Mat(size, cvtype);
+		Mat imgRef;
 		Mat imgDst;
 
 		cout << "Size:" << imgSrc.size() << endl;
@@ -31,16 +33,26 @@ namespace UnitTest_glsCV
 		//init Src image
 		FillRandU<T>(imgSrc);
 
+		{
+			_TMR_("-cv::copyTo:\t");
+			imgSrc.copyTo(imgRef);
+		}
+
 		//----------------------
 //		glsMat glsSrc(imgSrc);		//create glsMat and  upload
 		glsMat glsSrc(imgSrc.size(),imgSrc.type(),blkNum);
 		glsSrc.CopyFrom(imgSrc);
 		glsMat glsDst;
-		glsCopy(glsSrc, glsDst);	//copy texture
+		{
+			_TMR_("-glsCopy:\t");
+			glsCopy(glsSrc, glsDst);	//copy texture
+		}
+
+
 		glsDst.CopyTo(imgDst);		// download
 
 		int errNum = 0;
-		if (!AreEqual<T>(imgSrc, imgDst)) errNum = -1;
+		if (!AreEqual<T>(imgRef, imgDst)) errNum = -1;
 
 		//cout << imgSrc << endl;
 		//cout << imgDst << endl;
@@ -216,9 +228,17 @@ namespace UnitTest_glsCV
 		TEST_METHOD(glsCopy_CV_32FC2_TILING)
 		{
 			cout << __FUNCTION__ << endl;
-			int errNum = test_glsCopy<float>(CV_32FC2,1);
+			int errNum = test_glsCopy<float>(CV_32FC2, Size(32, 24), Size(2, 2));
 			Assert::AreEqual(0, errNum);
 		}
+
+		TEST_METHOD(glsCopy_CV_32FC1_1024x1024)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_glsCopy<float>(CV_32FC1, Size(1024, 1024));
+			Assert::AreEqual(0, errNum);
+		}
+
 
 		//glsCopyTiled
 		TEST_METHOD(glsCopyTiled_CV_8UC1)
