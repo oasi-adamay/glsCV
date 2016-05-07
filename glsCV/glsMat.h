@@ -30,7 +30,8 @@ public:
 	vector<GLuint> texArray;
 
 	glsMat(const Mat & cvmat, bool upload = true);
-	glsMat(const Size size, const int type, const Size blkNum = Size(1,1));
+	glsMat(const Mat & cvmat, const Size blkNum, bool upload = true);
+	glsMat(const Size size, const int type, const Size blkNum = Size(1, 1));
 	glsMat(void);
 	~glsMat(void);
 

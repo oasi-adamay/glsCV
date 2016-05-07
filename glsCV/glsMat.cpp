@@ -4,7 +4,8 @@
 #include "glsMat.h"
 #include "Timer.h"
 
-#ifdef _DEBUG
+//#ifdef _DEBUG
+#if 1
 #define _TMR_(...)  Timer tmr(__VA_ARGS__)
 #else
 #define _TMR_(...)
@@ -43,6 +44,12 @@ glsMat::glsMat(const Mat & cvmat, bool upload){
 	createTexture(cvmat.cols, cvmat.rows, cvmat.type(), 1, 1);
 	if (upload)	CopyFrom(cvmat);
 }
+
+glsMat::glsMat(const Mat & cvmat, const Size blkNum, bool upload){
+	createTexture(cvmat.cols, cvmat.rows, cvmat.type(), blkNum.width, blkNum.height);
+	if (upload)	CopyFrom(cvmat);
+}
+
 
 glsMat& glsMat::operator=(const glsMat& rhs){
 	if (refcount.use_count() == 1){
@@ -159,6 +166,29 @@ GLuint glsMat::at(const int y, const int x)  const{
 }
 
 //-----------------------------------------------------------------------------
+//OpenCV mat to OpenGL  pbo
+static void mat2pbo(const Mat&src, const GLuint pbo){
+	int size = (int)src.total() * (int)src.elemSize();
+
+	//bind current pbo for app->pbo transfer
+	glBindBuffer(GL_PIXEL_UNPACK_BUFFER, pbo); //bind pbo
+	GLubyte* ptr = (GLubyte*)glMapBufferRange(GL_PIXEL_UNPACK_BUFFER, 0, size,
+		GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
+	GLS_Assert(ptr != 0);
+
+	int lSize = src.cols * (int)src.elemSize();	// line size in byte
+#ifdef _OPENMP
+#pragma omp parallel for
+#endif
+	for (int y = 0; y < src.rows; y++){
+		const uchar* pSrc = src.ptr<uchar>(y);
+		uchar* pDst = ptr + lSize * y;
+		std::memcpy(pDst, pSrc, lSize);
+	}
+	glUnmapBuffer(GL_PIXEL_UNPACK_BUFFER);
+}
+
+//-----------------------------------------------------------------------------
 //Upload texture from cv::Mat to GL texture
 void glsMat::CopyFrom(const Mat&src){
 	_TMR_("-upload :\t");
@@ -171,54 +201,54 @@ void glsMat::CopyFrom(const Mat&src){
 	{
 #ifdef _USE_PBO_UP
 		int size = texWidth()*texHeight() * (int)src.elemSize();
-		vector<GLuint> pbo(texArray.size());
-		glGenBuffers((GLsizei)pbo.size(), &pbo[0]);
-		for (int i = 0; i < pbo.size(); i++){
+		GLuint pbo[2];
+		glGenBuffers(2, &pbo[0]);
+		for (int i = 0; i < 2; i++){
 			glBindBuffer(GL_PIXEL_UNPACK_BUFFER, pbo[i]);
-			glBufferData(GL_PIXEL_UNPACK_BUFFER, size, 0, GL_DYNAMIC_DRAW);
+			glBufferData(GL_PIXEL_UNPACK_BUFFER, size, 0, GL_DYNAMIC_READ);
 			glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
 		}
 
-		for (int by = 0; by < blkY; by++){
-			for (int bx = 0; bx < blkX; bx++){
-				int i = by*blkX + bx;
+		int bank = 0;
+		int i = 0;
+		{
+			int by = i / blkX;
+			int bx = i % blkX;
+			int x = (bx)* texWidth();
+			int y = (by)* texHeight();
+			Rect rect(x, y, texWidth(), texHeight());
+			Mat roi = Mat(src, rect);	// 1/2  1/2 rect
+			mat2pbo(roi, pbo[bank]);
+		}
+
+		while(1){
+			//bind current pbo for app->pbo transfer
+			glBindBuffer(GL_PIXEL_UNPACK_BUFFER, pbo[bank]); //bind pbo
+
+			//Copy pixels from pbo to texture object
+			glBindTexture(GL_TEXTURE_2D, texArray[i]);
+			glBindBuffer(GL_PIXEL_UNPACK_BUFFER, pbo[bank]); //bind pbo
+			glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, texWidth(), texHeight(), glFormat(), glType(), 0);
+			GL_CHECK_ERROR();
+
+			i++;
+			bank = bank ^ 1;
+			if (i >= texArray.size()) break;
+			{
+				int by = i / blkX;
+				int bx = i % blkX;
 				int x = (bx)* texWidth();
 				int y = (by)* texHeight();
 				Rect rect(x, y, texWidth(), texHeight());
 				Mat roi = Mat(src, rect);	// 1/2  1/2 rect
-
-				//bind current pbo for app->pbo transfer
-				glBindBuffer(GL_PIXEL_UNPACK_BUFFER, pbo[i]); //bind pbo
-				GLubyte* ptr = (GLubyte*)glMapBufferRange(GL_PIXEL_UNPACK_BUFFER, 0, size,
-					GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
-				GLS_Assert(ptr != 0);
-
-				int lSize = roi.cols * (int)roi.elemSize();	// line size in byte
-#ifdef _OPENMP
-#pragma omp parallel for
-#endif
-				for (int y = 0; y < roi.rows; y++){
-					uchar* pSrc = roi.ptr<uchar>(y);
-					uchar* pDst = ptr + lSize * y;
-					memcpy(pDst, pSrc, lSize);
-				}
-				glUnmapBuffer(GL_PIXEL_UNPACK_BUFFER);
-
-				//Copy pixels from pbo to texture object
-				glBindTexture(GL_TEXTURE_2D, texArray[i]);
-				glBindBuffer(GL_PIXEL_UNPACK_BUFFER, pbo[i]); //bind pbo
-				glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, texWidth(), texHeight(), glFormat(), glType(), 0);
-				GL_CHECK_ERROR();
-				glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
-				glBindTexture(GL_TEXTURE_2D, 0);
+				mat2pbo(roi, pbo[bank]);
 			}
-		}
 
-		glDeleteBuffers((GLsizei)pbo.size(), &pbo[0]);
+		}
+		glDeleteBuffers(2, &pbo[0]);
 #else
 		for (int by = 0; by < blkY; by++){
 			for (int bx = 0; bx < blkX; bx++){
-				int i = by*blkX + bx;
 				int x = (bx)* texWidth();
 				int y = (by)* texHeight();
 				Rect rect(x, y, texWidth(), texHeight());
@@ -226,7 +256,7 @@ void glsMat::CopyFrom(const Mat&src){
 				CV_Assert(roi.isContinuous());
 				void* data = roi.data;
 
-				glBindTexture(GL_TEXTURE_2D, texArray[i]);
+				glBindTexture(GL_TEXTURE_2D, at(by,bx));
 				glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, texWidth(), texHeight(), glFormat(), glType(), data);
 				GL_CHECK_ERROR();
 				glBindTexture(GL_TEXTURE_2D, 0);
@@ -236,6 +266,31 @@ void glsMat::CopyFrom(const Mat&src){
 	}
 
 }
+
+//-----------------------------------------------------------------------------
+//OpenGL  pbo to OpenCV mat
+static void pbo2mat(const GLuint pbo, Mat&dst){
+	int size = (int)dst.total() * (int)dst.elemSize();
+
+	//bind current pbo for app->pbo transfer
+	glBindBuffer(GL_PIXEL_PACK_BUFFER, pbo); //bind pbo
+	GLubyte* ptr = (GLubyte*)glMapBufferRange(GL_PIXEL_PACK_BUFFER, 0, size,
+		GL_MAP_READ_BIT);
+	GLS_Assert(ptr != 0);
+
+	int lSize = dst.cols * (int)dst.elemSize();	// line size in byte
+#ifdef _OPENMP
+#pragma omp parallel for
+#endif
+	for (int y = 0; y < dst.rows; y++){
+		uchar* pSrc = ptr + lSize * y;
+		uchar* pDst = dst.ptr<uchar>(y);
+		memcpy(pDst, pSrc, lSize);
+	}
+	glUnmapBuffer(GL_PIXEL_PACK_BUFFER);
+
+}
+
 
 void glsMat::CopyTo(Mat&dst) const{
 //	cout << "CopyTo:start" << endl;
@@ -248,49 +303,46 @@ void glsMat::CopyTo(Mat&dst) const{
 
 	{	//download from texture
 #ifdef _USE_PBO_DOWN
+
 		int size = texWidth()*texHeight() * (int)dst.elemSize();
-		vector<GLuint> pbo(texArray.size());
-		glGenBuffers((GLsizei)pbo.size(), &pbo[0]);
-		for (int i = 0; i < pbo.size(); i++){
+		GLuint pbo[2];
+		glGenBuffers(2, &pbo[0]);
+		for (int i = 0; i < 2; i++){
 			glBindBuffer(GL_PIXEL_UNPACK_BUFFER, pbo[i]);
 			glBufferData(GL_PIXEL_UNPACK_BUFFER, size, 0, GL_DYNAMIC_DRAW);
 			glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
 		}
-		for (int by = 0; by < blkY; by++){
-			for (int bx = 0; bx < blkX; bx++){
-				int i = by*blkX + bx;
-				int x = (bx)* texWidth();
-				int y = (by)* texHeight();
+		int bank = 0;
+		int i = 0;
 
-				Rect rect(x, y, texWidth(), texHeight());
-				Mat roi = Mat(dst, rect);	// 1/2  1/2 rect
-
-				//Copy pixels from texture object to pbo_bank
-				glBindTexture(GL_TEXTURE_2D, texArray[i]);
-				glBindBuffer(GL_PIXEL_PACK_BUFFER, pbo[i]); //bind pbo
-				glGetTexImage(GL_TEXTURE_2D, 0, glFormat(), glType(), 0);
-				glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
-				glBindTexture(GL_TEXTURE_2D, 0);
-
-				//bind current pbo for app->pbo transfer
-				glBindBuffer(GL_PIXEL_PACK_BUFFER, pbo[i]); //bind pbo
-				GLubyte* ptr = (GLubyte*)glMapBufferRange(GL_PIXEL_PACK_BUFFER, 0, size,
-					GL_MAP_READ_BIT);
-				GLS_Assert(ptr != 0);
-
-				int lSize = roi.cols * (int)roi.elemSize();	// line size in byte
-#ifdef _OPENMP
-#pragma omp parallel for
-#endif
-				for (int y = 0; y < roi.rows; y++){
-					uchar* pSrc = ptr + lSize * y;
-					uchar* pDst = roi.ptr<uchar>(y);
-					memcpy(pDst, pSrc, lSize);
-				}
-				glUnmapBuffer(GL_PIXEL_PACK_BUFFER);
-			}
+		{
+			//Copy pixels from texture object to pbo_bank
+			glBindTexture(GL_TEXTURE_2D, texArray[i]);
+			glBindBuffer(GL_PIXEL_PACK_BUFFER, pbo[bank]); //bind pbo
+			glGetTexImage(GL_TEXTURE_2D, 0, glFormat(), glType(), 0);
 		}
-		glDeleteBuffers((GLsizei)pbo.size(), &pbo[0]);
+
+		while (1){
+			if (i + 1 < texArray.size()){
+				//Copy pixels from texture object to pbo_bank
+				glBindTexture(GL_TEXTURE_2D, texArray[i + 1]);
+				glBindBuffer(GL_PIXEL_PACK_BUFFER, pbo[bank ^ 1]); //bind pbo
+				glGetTexImage(GL_TEXTURE_2D, 0, glFormat(), glType(), 0);
+			}
+
+			int by = i / blkX;
+			int bx = i % blkX;
+			int x = (bx)* texWidth();
+			int y = (by)* texHeight();
+			Rect rect(x, y, texWidth(), texHeight());
+			Mat roi = Mat(dst, rect);	// 1/2  1/2 rect
+			pbo2mat(pbo[bank], roi);
+			i++;
+			bank = bank ^ 1;
+
+			if (i >= texArray.size()) break;
+		}
+		glDeleteBuffers(2, &pbo[0]);
 #else
 		Mat tmp = Mat(Size(texWidth(), texHeight()), dst.type());
 		for (int by = 0; by < blkY; by++){
