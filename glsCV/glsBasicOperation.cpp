@@ -141,15 +141,15 @@ static
 void glslScalarOperation(
 const glsShaderScalarOperation* shader,	//progmra ID
 const vec4 scalar,				//scalar
-const vector<GLuint>& texSrc,	//src texture IDs
-const vector<GLuint>& texDst,	//dst texture IDs
+const GLuint texSrc,			//src texture ID
+const GLuint texDst,			//dst texture ID
 const int flags					//flag (opcode)
 )
 {
 	int width;
 	int height;
 
-	glBindTexture(GL_TEXTURE_2D, texSrc[0]);
+	glBindTexture(GL_TEXTURE_2D, texSrc);
 	glGetTexLevelParameteriv(
 		GL_TEXTURE_2D, 0,
 		GL_TEXTURE_WIDTH, &width
@@ -178,36 +178,35 @@ const int flags					//flag (opcode)
 
 	}
 
-	for (int i = 0; i < texSrc.size(); i++){
-		//Bind Texture
-		{
-			int id = 0;
-			glActiveTexture(GL_TEXTURE0 + id);
-			glBindTexture(GL_TEXTURE_2D, texSrc[i]);
-			glUniform1i(shader->texSrc, id);
-		}
-		//dst texture
-		{
-			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texDst[i], 0);
-			GLS_Assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
-		}
+	//Bind Texture
+	{
+		int id = 0;
+		glActiveTexture(GL_TEXTURE0 + id);
+		glBindTexture(GL_TEXTURE_2D, texSrc);
+		glUniform1i(shader->texSrc, id);
+	}
 
-		GLenum bufs[] =
-		{
-			GL_COLOR_ATTACHMENT0,
-		};
-		glDrawBuffers(1, bufs);
+	//dst texture
+	{
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texDst, 0);
+		GLS_Assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
+	}
 
-		//Viewport
-		{
-			glViewport(0, 0, width, height);
-		}
+	GLenum bufs[] =
+	{
+		GL_COLOR_ATTACHMENT0,
+	};
+	glDrawBuffers(1, bufs);
 
-		//Render!!
-		{
-			glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
-			glFlush();
-		}
+	//Viewport
+	{
+		glViewport(0, 0, width, height);
+	}
+
+	//Render!!
+	{
+		glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+		glFlush();
 	}
 
 	GL_CHECK_ERROR();
@@ -297,16 +296,16 @@ glsShaderBinaryOperation::glsShaderBinaryOperation(void){
 static 
 void glslBinaryOperation(
 	const glsShaderBinaryOperation* shader,	//progmra ID
-	const vector<GLuint>& texSrc0,	//src texture IDs
-	const vector<GLuint>& texSrc1,	//src texture IDs
-	const vector<GLuint>& texDst,	//dst texture IDs
+	const GLuint texSrc0,	//src texture ID
+	const GLuint texSrc1,	//src texture ID
+	const GLuint texDst,	//dst texture ID
 	const int flags					//flag (opcode)
 	)
 {
 	int width;
 	int height;
 
-	glBindTexture(GL_TEXTURE_2D, texSrc0[0]);
+	glBindTexture(GL_TEXTURE_2D, texSrc0);
 	glGetTexLevelParameteriv(
 		GL_TEXTURE_2D, 0,
 		GL_TEXTURE_WIDTH, &width
@@ -333,41 +332,38 @@ void glslBinaryOperation(
 		glUniform1i(shader->i_flags, flags);
 	}
 
-	for (int i = 0; i < texSrc0.size(); i++){
-		//Bind Texture
-		{
-			int id = 0;
-			glActiveTexture(GL_TEXTURE0 + id);
-			glBindTexture(GL_TEXTURE_2D, texSrc0[i]);
-			glUniform1i(shader->texSrc0, id);
-			id++;
-			glActiveTexture(GL_TEXTURE0 + id);
-			glBindTexture(GL_TEXTURE_2D, texSrc1[i]);
-			glUniform1i(shader->texSrc1, id);
+	//Bind Texture
+	{
+		int id = 0;
+		glActiveTexture(GL_TEXTURE0 + id);
+		glBindTexture(GL_TEXTURE_2D, texSrc0);
+		glUniform1i(shader->texSrc0, id);
+		id++;
+		glActiveTexture(GL_TEXTURE0 + id);
+		glBindTexture(GL_TEXTURE_2D, texSrc1);
+		glUniform1i(shader->texSrc1, id);
+	}
+	//dst texture
+	{
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texDst, 0);
+		GLS_Assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
+	}
 
-		}
-		//dst texture
-		{
-			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texDst[i], 0);
-			GLS_Assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
-		}
+	GLenum bufs[] =
+	{
+		GL_COLOR_ATTACHMENT0,
+	};
+	glDrawBuffers(1, bufs);
 
-		GLenum bufs[] =
-		{
-			GL_COLOR_ATTACHMENT0,
-		};
-		glDrawBuffers(1, bufs);
+	//Viewport
+	{
+		glViewport(0, 0, width, height);
+	}
 
-		//Viewport
-		{
-			glViewport(0, 0, width, height);
-		}
-
-		//Render!!
-		{
-			glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
-			glFlush();
-		}
+	//Render!!
+	{
+		glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+		glFlush();
 	}
 
 	GL_CHECK_ERROR();
@@ -377,8 +373,8 @@ void glslBinaryOperation(
 //スカラと配列の 要素毎の和を求めます．
 void glsAdd(const vec4& scalar, const glsMat& src, glsMat& dst){
 	GLS_Assert(src.glType() == GL_FLOAT);
-	glsMat _dst = glsMat(src.size(), src.type(), src.blkNum());
-	glslScalarOperation(shaderScalarOperation, scalar, src.texArray, _dst.texArray, OPCODE_ADD);
+	glsMat _dst = glsMat(src.size(), src.type());
+	glslScalarOperation(shaderScalarOperation, scalar, src.texid(), _dst.texid(), OPCODE_ADD);
 	dst = _dst;
 }
 
@@ -387,8 +383,8 @@ void glsAdd(const glsMat& src0, const glsMat& src1, glsMat& dst)
 {
 	GLS_Assert(src0.glType() == GL_FLOAT);
 	GLS_Assert(src1.glType() == GL_FLOAT);
-	glsMat _dst = glsMat(src0.size(), src0.type(), src0.blkNum());
-	glslBinaryOperation(shaderBinaryOperation, src0.texArray, src1.texArray, _dst.texArray, OPCODE_ADD);
+	glsMat _dst = glsMat(src0.size(), src0.type());
+	glslBinaryOperation(shaderBinaryOperation, src0.texid(), src1.texid(), _dst.texid(), OPCODE_ADD);
 	dst = _dst;
 }
 
@@ -396,8 +392,8 @@ void glsAdd(const glsMat& src0, const glsMat& src1, glsMat& dst)
 //スカラと配列の 要素毎の差を求めます．
 void glsSubtract(const vec4& scalar, const glsMat& src, glsMat& dst){
 	GLS_Assert(src.glType() == GL_FLOAT);
-	glsMat _dst = glsMat(src.size(), src.type(), src.blkNum());
-	glslScalarOperation(shaderScalarOperation, scalar, src.texArray, _dst.texArray, OPCODE_SUB);
+	glsMat _dst = glsMat(src.size(), src.type());
+	glslScalarOperation(shaderScalarOperation, scalar, src.texid(), _dst.texid(), OPCODE_SUB);
 	dst = _dst;
 }
 
@@ -406,8 +402,8 @@ void glsSubtract(const glsMat& src0, const glsMat& src1, glsMat& dst)
 {
 	GLS_Assert(src0.glType() == GL_FLOAT);
 	GLS_Assert(src1.glType() == GL_FLOAT);
-	glsMat _dst = glsMat(src0.size(), src0.type(), src0.blkNum());
-	glslBinaryOperation(shaderBinaryOperation, src0.texArray, src1.texArray, _dst.texArray, OPCODE_SUB);
+	glsMat _dst = glsMat(src0.size(), src0.type());
+	glslBinaryOperation(shaderBinaryOperation, src0.texid(), src1.texid(), _dst.texid(), OPCODE_SUB);
 	dst = _dst;
 }
 
@@ -415,8 +411,8 @@ void glsSubtract(const glsMat& src0, const glsMat& src1, glsMat& dst)
 //スカラと配列の 要素毎の積を求めます．
 void glsMultiply(const vec4& scalar, const glsMat& src, glsMat& dst){
 	GLS_Assert(src.glType() == GL_FLOAT);
-	glsMat _dst = glsMat(src.size(), src.type(), src.blkNum());
-	glslScalarOperation(shaderScalarOperation, scalar, src.texArray, _dst.texArray, OPCODE_MUL);
+	glsMat _dst = glsMat(src.size(), src.type());
+	glslScalarOperation(shaderScalarOperation, scalar, src.texid(), _dst.texid(), OPCODE_MUL);
 	dst = _dst;
 }
 
@@ -425,16 +421,16 @@ void glsMultiply(const glsMat& src0, const glsMat& src1, glsMat& dst)
 {
 	GLS_Assert(src0.glType() == GL_FLOAT);
 	GLS_Assert(src1.glType() == GL_FLOAT);
-	glsMat _dst = glsMat(src0.size(), src0.type(), src0.blkNum());
-	glslBinaryOperation(shaderBinaryOperation, src0.texArray, src1.texArray, _dst.texArray, OPCODE_MUL);
+	glsMat _dst = glsMat(src0.size(), src0.type());
+	glslBinaryOperation(shaderBinaryOperation, src0.texid(), src1.texid(), _dst.texid(), OPCODE_MUL);
 	dst = _dst;
 }
 
 //スカラと配列の 要素毎の商を求めます．
 void glsDivide(const vec4& scalar, const glsMat& src, glsMat& dst){
 	GLS_Assert(src.glType() == GL_FLOAT);
-	glsMat _dst = glsMat(src.size(), src.type(), src.blkNum());
-	glslScalarOperation(shaderScalarOperation, scalar, src.texArray, _dst.texArray, OPCODE_DIV);
+	glsMat _dst = glsMat(src.size(), src.type());
+	glslScalarOperation(shaderScalarOperation, scalar, src.texid(), _dst.texid(), OPCODE_DIV);
 	dst = _dst;
 }
 
@@ -443,16 +439,16 @@ void glsDivide(const vec4& scalar, const glsMat& src, glsMat& dst){
 void glsDivide(const glsMat& src0, const glsMat& src1, glsMat& dst){
 	GLS_Assert(src0.glType() == GL_FLOAT);
 	GLS_Assert(src1.glType() == GL_FLOAT);
-	glsMat _dst = glsMat(src0.size(), src0.type(), src0.blkNum());
-	glslBinaryOperation(shaderBinaryOperation, src0.texArray, src1.texArray, _dst.texArray, OPCODE_DIV);
+	glsMat _dst = glsMat(src0.size(), src0.type());
+	glslBinaryOperation(shaderBinaryOperation, src0.texid(), src1.texid(), _dst.texid(), OPCODE_DIV);
 	dst = _dst;
 }
 
 //スカラと配列の 要素毎の最小値を求めます．
 void glsMin(const vec4& scalar, const glsMat& src, glsMat& dst){
 	GLS_Assert(src.glType() == GL_FLOAT);
-	glsMat _dst = glsMat(src.size(), src.type(), src.blkNum());
-	glslScalarOperation(shaderScalarOperation, scalar, src.texArray, _dst.texArray, OPCODE_MIN);
+	glsMat _dst = glsMat(src.size(), src.type());
+	glslScalarOperation(shaderScalarOperation, scalar, src.texid(), _dst.texid(), OPCODE_MIN);
 	dst = _dst;
 }
 
@@ -460,16 +456,16 @@ void glsMin(const vec4& scalar, const glsMat& src, glsMat& dst){
 void glsMin(const glsMat& src0, const glsMat& src1, glsMat& dst){
 	GLS_Assert(src0.glType() == GL_FLOAT);
 	GLS_Assert(src1.glType() == GL_FLOAT);
-	glsMat _dst = glsMat(src0.size(), src0.type(), src0.blkNum());
-	glslBinaryOperation(shaderBinaryOperation, src0.texArray, src1.texArray, _dst.texArray, OPCODE_MIN);
+	glsMat _dst = glsMat(src0.size(), src0.type());
+	glslBinaryOperation(shaderBinaryOperation, src0.texid(), src1.texid(), _dst.texid(), OPCODE_MIN);
 	dst = _dst;
 }
 
 //スカラと配列の 要素毎の最大値を求めます．
 void glsMax(const vec4& scalar, const glsMat& src, glsMat& dst){
 	GLS_Assert(src.glType() == GL_FLOAT);
-	glsMat _dst = glsMat(src.size(), src.type(), src.blkNum());
-	glslScalarOperation(shaderScalarOperation, scalar, src.texArray, _dst.texArray, OPCODE_MAX);
+	glsMat _dst = glsMat(src.size(), src.type());
+	glslScalarOperation(shaderScalarOperation, scalar, src.texid(), _dst.texid(), OPCODE_MAX);
 	dst = _dst;
 }
 
@@ -477,8 +473,8 @@ void glsMax(const vec4& scalar, const glsMat& src, glsMat& dst){
 void glsMax(const glsMat& src0, const glsMat& src1, glsMat& dst){
 	GLS_Assert(src0.glType() == GL_FLOAT);
 	GLS_Assert(src1.glType() == GL_FLOAT);
-	glsMat _dst = glsMat(src0.size(), src0.type(), src0.blkNum());
-	glslBinaryOperation(shaderBinaryOperation, src0.texArray, src1.texArray, _dst.texArray, OPCODE_MAX);
+	glsMat _dst = glsMat(src0.size(), src0.type());
+	glslBinaryOperation(shaderBinaryOperation, src0.texid(), src1.texid(), _dst.texid(), OPCODE_MAX);
 	dst = _dst;
 }
 
@@ -487,9 +483,9 @@ void glsMax(const glsMat& src0, const glsMat& src1, glsMat& dst){
 void glsMulSpectrums(const glsMat& src0, const glsMat& src1, glsMat& dst, bool conj){
 	GLS_Assert(src0.glSizedFormat() == GL_RG32F);
 	GLS_Assert(src1.glSizedFormat() == GL_RG32F);
-	glsMat _dst = glsMat(src0.size(), src0.type(), src0.blkNum());
-	if (conj)glslBinaryOperation(shaderBinaryOperation, src0.texArray, src1.texArray, _dst.texArray, OPCODE_MUL_SPCETRUM_CONJ);
-	else glslBinaryOperation(shaderBinaryOperation, src0.texArray, src1.texArray, _dst.texArray, OPCODE_MUL_SPCETRUM);
+	glsMat _dst = glsMat(src0.size(), src0.type());
+	if (conj)glslBinaryOperation(shaderBinaryOperation, src0.texid(), src1.texid(), _dst.texid(), OPCODE_MUL_SPCETRUM_CONJ);
+	else glslBinaryOperation(shaderBinaryOperation, src0.texid(), src1.texid(), _dst.texid(), OPCODE_MUL_SPCETRUM);
 	dst = _dst;
 }
 
@@ -497,8 +493,8 @@ void glsMulSpectrums(const glsMat& src0, const glsMat& src1, glsMat& dst, bool c
 void glsMulSpectrumsPhaseOnly(const glsMat& src0, const glsMat& src1, glsMat& dst){
 	GLS_Assert(src0.glSizedFormat() == GL_RG32F);
 	GLS_Assert(src1.glSizedFormat() == GL_RG32F);
-	glsMat _dst = glsMat(src0.size(), src0.type(), src0.blkNum());
-	glslBinaryOperation(shaderBinaryOperation, src0.texArray, src1.texArray, _dst.texArray, OPCODE_MUL_SPCETRUM_POC);
+	glsMat _dst = glsMat(src0.size(), src0.type());
+	glslBinaryOperation(shaderBinaryOperation, src0.texid(), src1.texid(), _dst.texid(), OPCODE_MUL_SPCETRUM_POC);
 	dst = _dst;
 }
 
@@ -506,8 +502,8 @@ void glsMulSpectrumsPhaseOnly(const glsMat& src0, const glsMat& src1, glsMat& ds
 void glsMagSpectrums(const glsMat& src, glsMat& dst){
 	GLS_Assert(src.glSizedFormat() == GL_RG32F);
 	vec4 scalar(1.0, 1.0, 1.0, 1.0);
-	glsMat _dst = glsMat(src.size(), CV_MAKE_TYPE(src.depth(), 1), src.blkNum());
-	glslScalarOperation(shaderScalarOperation, scalar, src.texArray, _dst.texArray, OPCODE_MAG_SPCETRUM);
+	glsMat _dst = glsMat(src.size(), CV_MAKE_TYPE(src.depth(), 1));
+	glslScalarOperation(shaderScalarOperation, scalar, src.texid(), _dst.texid(), OPCODE_MAG_SPCETRUM);
 	dst = _dst;
 }
 
@@ -515,8 +511,8 @@ void glsMagSpectrums(const glsMat& src, glsMat& dst){
 void glsLogMagSpectrums(const glsMat& src, glsMat& dst, float offset){
 	GLS_Assert(src.glSizedFormat() == GL_RG32F);
 	vec4 scalar(offset);
-	glsMat _dst = glsMat(src.size(), CV_MAKE_TYPE(src.depth(), 1), src.blkNum());
-	glslScalarOperation(shaderScalarOperation, scalar, src.texArray, _dst.texArray, OPCODE_LOG_MAG_SPCETRUM);
+	glsMat _dst = glsMat(src.size(), CV_MAKE_TYPE(src.depth(), 1));
+	glslScalarOperation(shaderScalarOperation, scalar, src.texid(), _dst.texid(), OPCODE_LOG_MAG_SPCETRUM);
 	dst = _dst;
 }
 
@@ -525,8 +521,8 @@ void glsLogMagSpectrums(const glsMat& src, glsMat& dst, float offset){
 void glsLog(const glsMat& src, glsMat& dst){
 	GLS_Assert(src.glType() == GL_FLOAT);
 	vec4 scalar(1.0, 1.0, 1.0, 1.0);
-	glsMat _dst = glsMat(src.size(), src.type(), src.blkNum());
-	glslScalarOperation(shaderScalarOperation, scalar, src.texArray, _dst.texArray, OPCODE_LOG);
+	glsMat _dst = glsMat(src.size(), src.type());
+	glslScalarOperation(shaderScalarOperation, scalar, src.texid(), _dst.texid(), OPCODE_LOG);
 	dst = _dst;
 }
 
@@ -534,8 +530,8 @@ void glsLog(const glsMat& src, glsMat& dst){
 void glsExp(const glsMat& src, glsMat& dst){
 	GLS_Assert(src.glType() == GL_FLOAT);
 	vec4 scalar(1.0, 1.0, 1.0, 1.0);
-	glsMat _dst = glsMat(src.size(), src.type(), src.blkNum());
-	glslScalarOperation(shaderScalarOperation, scalar, src.texArray, _dst.texArray, OPCODE_EXP);
+	glsMat _dst = glsMat(src.size(), src.type());
+	glslScalarOperation(shaderScalarOperation, scalar, src.texid(), _dst.texid(), OPCODE_EXP);
 	dst = _dst;
 }
 
@@ -543,8 +539,8 @@ void glsExp(const glsMat& src, glsMat& dst){
 void glsPow(const glsMat& src, const float& power, glsMat& dst){
 	GLS_Assert(src.glType() == GL_FLOAT);
 	vec4 scalar(power, power, power, power);
-	glsMat _dst = glsMat(src.size(), src.type(), src.blkNum());
-	glslScalarOperation(shaderScalarOperation, scalar, src.texArray, _dst.texArray, OPCODE_POW);
+	glsMat _dst = glsMat(src.size(), src.type());
+	glslScalarOperation(shaderScalarOperation, scalar, src.texid(), _dst.texid(), OPCODE_POW);
 	dst = _dst;
 }
 

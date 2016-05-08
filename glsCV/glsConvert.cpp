@@ -350,7 +350,7 @@ static void glsConvertProcess(
 //conver texture format
 void glsConvert(const glsMat& src, glsMat& dst, const float scl){
 
-	glsMat _dst = glsMat(src.size(), CV_MAKETYPE(CV_32F, CV_MAT_CN(src.type())), src.blkNum());
+	glsMat _dst = glsMat(src.size(), CV_MAKETYPE(CV_32F, CV_MAT_CN(src.type())));
 	GLS_Assert(_dst.glType() == GL_FLOAT);
 
 	glsShaderConvertBase* shader = 0;
@@ -378,13 +378,11 @@ void glsConvert(const glsMat& src, glsMat& dst, const float scl){
 
 	glsFBO fbo(1);
 
-	for (int i = 0; i < src.texArray.size(); i++){
-		//dst texture
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _dst.texArray[i], 0);
-		GLS_Assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
+	//dst texture
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _dst.texid(), 0);
+	GLS_Assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
 
-		glsConvertProcess(shader, src.texArray[i], scl);
-	}
+	glsConvertProcess(shader, src.texid(), scl);
 	
 	dst = _dst;
 
@@ -422,7 +420,7 @@ void glsCvtColor(const glsMat& src, glsMat& dst, const int code){
 		GLS_Assert(0);
 	}
 
-	glsMat _dst = glsMat(src.size(), CV_MAKETYPE(CV_MAT_DEPTH(src.type()), ch), src.blkNum());
+	glsMat _dst = glsMat(src.size(), CV_MAKETYPE(CV_MAT_DEPTH(src.type()), ch));
 
 	glsShaderConvertBase* shader = 0;
 
@@ -438,13 +436,11 @@ void glsCvtColor(const glsMat& src, glsMat& dst, const int code){
 
 	glsFBO fbo(1);
 
-	for (int i = 0; i < src.texArray.size(); i++){
-		//dst texture
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _dst.texArray[i], 0);
-		GLS_Assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
-		float scl = 1.0f;
-		glsConvertProcess(shader, src.texArray[i], scl, code);
-	}
+	//dst texture
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _dst.texid(), 0);
+	GLS_Assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
+	float scl = 1.0f;
+	glsConvertProcess(shader, src.texid(), scl, code);
 
 
 	dst = _dst;

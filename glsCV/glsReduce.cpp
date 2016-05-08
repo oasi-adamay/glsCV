@@ -237,21 +237,15 @@ void glsReduce(const glsMat& src, glsMat& dst, int dim, int reduceOp){
 	GLS_Assert(src.depth() == CV_32F);
 
 
-	glsMat _src;
+	glsMat _src = src;
 
-	if (src.isContinuous()){
-		_src = src;
-	}
-	else{
-		glsCopyUntiled(src, _src);
-	}
 
 	glsMat _dst;
 	if (dim == 0){
-		_dst = glsMat(Size(_src.texWidth(), 1), _src.type(), _src.blkNum());
+		_dst = glsMat(Size(_src.cols, 1), _src.type());
 	}
 	else{
-		_dst = glsMat(Size(1, _src.texHeight()), _src.type(), _src.blkNum());
+		_dst = glsMat(Size(1, _src.rows), _src.type());
 	}
 
 
@@ -260,14 +254,12 @@ void glsReduce(const glsMat& src, glsMat& dst, int dim, int reduceOp){
 	{
 		glsFBO fbo(1);
 
-		for (int i = 0; i < _src.texArray.size(); i++){
-			//dst texture
-			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _dst.texArray[i], 0);
-			GLS_Assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
+		//dst texture
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _dst.texid(), 0);
+		GLS_Assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
 
-			glsReduceProcess(shader, _src.texArray[i], _src.texSize(), dim, reduceOp);
+		glsReduceProcess(shader, _src.texid(), _src.size(), dim, reduceOp);
 
-		}
 
 	}
 
@@ -283,14 +275,8 @@ void glsMinMaxLoc(const glsMat& src, double* minVal, double* maxVal, Point* minL
 	GLS_Assert(minLoc == 0);	// not implement yet
 	GLS_Assert(mask.empty());	// not implement yet
 
-	glsMat _src;
+	glsMat _src = src;
 
-	if (src.isContinuous()){
-		_src = src;
-	}
-	else{
-		glsCopyUntiled(src, _src);
-	}
 
 	glsMat tmp;
 

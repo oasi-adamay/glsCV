@@ -307,12 +307,8 @@ void glsDraw(glsMat& src){
 
 	Size sizeDst(src.size());
 
-	for (int by = 0; by < src.blkNumY(); by++){
-		for (int bx = 0; bx < src.blkNumX(); bx++){
-			Rect rect(bx * src.texWidth(), by * src.texHeight(), src.texWidth(), src.texHeight());
-			glsDrawProcess(shader, src.at(by, bx), rect, sizeDst, scl, flag);
-		}
-	}
+	Rect rect(0, 0, src.cols, src.rows);
+	glsDrawProcess(shader, src.texid(), rect, sizeDst, scl, flag);
 
 
 }

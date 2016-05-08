@@ -21,19 +21,18 @@ namespace UnitTest_glsCV
 {
 
 	template <typename T>
-	int test_glsMat_CopyTo(const int cvtype, const Size size = Size(32, 24), const Size blkNum = Size(1, 1)){
+	int test_glsMat_CopyTo(const int cvtype, const Size size = Size(32, 24)){
 		Mat imgSrc = Mat(size, cvtype);
 		Mat imgDst = Mat::zeros(imgSrc.size(), imgSrc.type());
 //		Mat imgDst;
 
 		cout << "Size:" << imgSrc.size() << endl;
-		cout << "blkNum:" << blkNum << endl;
 
 		//---------------------------------
 		//init Src image
 		FillRandU<T>(imgSrc);
 
-		glsMat glsSrc(imgSrc, blkNum);		//create glsMat and  upload
+		glsMat glsSrc(imgSrc);		//create glsMat and  upload
 		glsSrc.CopyTo(imgDst);		// download
 
 
@@ -260,12 +259,6 @@ namespace UnitTest_glsCV
 			Assert::AreEqual(0, errNum);
 		}
 
-		TEST_METHOD(glsMat_Copy_CV_32FC1_1024x1024_2x2)
-		{
-			cout << __FUNCTION__ << endl;
-			int errNum = test_glsMat_CopyTo<float>(CV_32FC1, Size(1024, 1024), Size(2, 2));
-			Assert::AreEqual(0, errNum);
-		}
 
 
 

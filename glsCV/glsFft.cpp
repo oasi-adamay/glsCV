@@ -320,13 +320,9 @@ static void glsFftProcess(
 
 
 
-
-
-
-
 //-----------------------------------------------------------------------------
 // execute FFT 
-void glsFft(const glsMat& src, glsMat& dst ,int flag){
+void glsFft(const glsMat& src, glsMat& dst, int flag){
 	GLS_Assert(src.channels() == 2);
 	GLS_Assert(src.depth() == CV_32F);
 
@@ -334,23 +330,19 @@ void glsFft(const glsMat& src, glsMat& dst ,int flag){
 	int N = src.cols;
 	GLS_Assert(IsPow2(N));
 
-#if 0
-	glsMat _dst0 = src;
-#else
-	glsMat _dst0;
-	if (src.blkNum() == Size(2, 2)){
-		_TMR_("-glsCopy:  \t");
-		glsCopy(src, _dst0);
+	Size blkNum(2,2);
+	vector<vector<glsMat>> _dst0 = vector<vector<glsMat>>(blkNum.height, vector<glsMat>(blkNum.width));
+	vector<vector<glsMat>> _dst1 = vector<vector<glsMat>>(blkNum.height, vector<glsMat>(blkNum.width));
+
+	glsTiled(src, _dst0, blkNum);
+	for (int by = 0; by < blkNum.height; by++){
+		for (int bx = 0; bx < blkNum.width; bx++){
+			_dst1[by][bx] = glsMat(Size(src.cols / blkNum.width, src.rows / blkNum.height), src.type());
+		}
 	}
-	else if (src.blkNum() == Size(1, 1)){
-		_TMR_("-glsCopyTiled:  \t");
-		glsCopyTiled(src, _dst0, Size(2, 2));
-	}
-#endif
 
 
-	glsMat _dst1(_dst0.size(), _dst0.type(), _dst0.blkNum());
-	glsMat texW(Size(N / 2, 1), _dst0.type());
+	glsMat texW(Size(N / 2, 1), src.type());
 
 	//---------------------------------
 	// upload twidle texture
@@ -358,9 +350,9 @@ void glsFft(const glsMat& src, glsMat& dst ,int flag){
 		_TMR_("-twidle:  \t");
 
 		Mat w(Size(N / 2, 1), CV_32FC2);
-		#ifdef _OPENMP
-		#pragma omp parallel for
-		#endif
+#ifdef _OPENMP
+#pragma omp parallel for
+#endif
 		for (int n = 0; n < N / 2; n++){
 			float jw = (float)(-2 * M_PI * n / N);
 			Vec2f val(cos(jw), sin(jw));
@@ -386,7 +378,7 @@ void glsFft(const glsMat& src, glsMat& dst ,int flag){
 		//glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
-	glsMat* texid[2] = { &_dst0, &_dst1 };
+	vector<vector<glsMat>>* texbuf[2] = { &_dst0, &_dst1 };
 
 	//Execute
 	int bank = 0;
@@ -408,42 +400,45 @@ void glsFft(const glsMat& src, glsMat& dst ,int flag){
 		for (int p = 0, q = Q - 1; q >= 0; p++, q--, bank = bank ^ 1) {
 			for (int i = 0; i < 2; i++){
 				for (int j = 0; j < 2; j++){
-					texSrc[j] = texid[bank    ]->at(i, j);
-					texDst[j] = texid[bank ^ 1]->at(i, j);
+					texSrc[j] = (*texbuf[bank])[i][j].texid();
+					texDst[j] = (*texbuf[bank ^ 1])[i][j].texid();
 				}
 				float yscl = ((flag & GLS_FFT_SCALE) && (q == 0)) ? 1.0f / (float)N : 1.0f;
 				float xscl = 1.0f;
 				float xconj = ((flag & GLS_FFT_INVERSE) && (p == 0)) ? -1.0f : 1.0f;
 				float yconj = 1.0f;
-				glsFftProcess(shaderFft, texSrc, texDst, texW.texArray[0], 0, p, q, N, xscl, yscl, xconj,yconj);
+				glsFftProcess(shaderFft, texSrc, texDst, texW.texid(), 0, p, q, N, xscl, yscl, xconj, yconj);
 			}
 		}
 		// --- FFT cols ----
 		for (int p = 0, q = Q - 1; q >= 0; p++, q--, bank = bank ^ 1) {
 			for (int j = 0; j < 2; j++){
 				for (int i = 0; i < 2; i++){
-					texSrc[i] = texid[bank    ]->at(i, j);
-					texDst[i] = texid[bank ^ 1]->at(i, j);
+					texSrc[i] = (*texbuf[bank])[i][j].texid();
+					texDst[i] = (*texbuf[bank ^ 1])[i][j].texid();
 				}
 				float yscl = ((flag & GLS_FFT_SCALE) && (q == 0)) ? 1.0f / (float)N : 1.0f;
-				float xscl =  1.0f;
+				float xscl = 1.0f;
 				float xconj = 1.0f;
 				float yconj = ((flag & GLS_FFT_INVERSE) && (q == 0)) ? -1.0f : 1.0f;
-				glsFftProcess(shaderFft, texSrc, texDst, texW.texArray[0], 1, p, q, N, xscl, yscl, xconj, yconj);
+				glsFftProcess(shaderFft, texSrc, texDst, texW.texid(), 1, p, q, N, xscl, yscl, xconj, yconj);
 			}
 		}
 	}
 
-	dst = *texid[bank];
+
 
 	if (flag & GLS_FFT_SHIFT){
-		vector<GLuint> tmp = dst.texArray;
-		dst.texArray[0] = tmp[3];
-		dst.texArray[1] = tmp[2];
-		dst.texArray[2] = tmp[1];
-		dst.texArray[3] = tmp[0];
+		(*texbuf[bank ^ 1])[0][0] = (*texbuf[bank])[1][1];
+		(*texbuf[bank ^ 1])[0][1] = (*texbuf[bank])[1][0];
+		(*texbuf[bank ^ 1])[1][0] = (*texbuf[bank])[0][1];
+		(*texbuf[bank ^ 1])[1][1] = (*texbuf[bank])[0][0];
+		bank = bank ^ 1;
 	}
+
+	glsUntiled(*texbuf[bank], dst);
 }
+
 
 
 
@@ -454,8 +449,7 @@ void glsFft(const Mat& src, Mat& dst, int flag){
 	int N = src.cols;
 	CV_Assert(IsPow2(N));
 
-	glsMat _src(src.size(), src.type(), Size(2, 2));
-//	glsMat _src(src.size(), src.type());
+	glsMat _src(src.size(), src.type());
 	glsMat _dst;
 
 	//---------------------------------
