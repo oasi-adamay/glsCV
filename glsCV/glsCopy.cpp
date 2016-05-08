@@ -301,6 +301,63 @@ void glsCopyRect(const glsMat& src, glsMat& dst, const Rect& rect, const Size& b
 }
 
 
+void glsTiled(const glsMat& src, vector<vector<glsMat>>& dst, const Size& blkNum){
+	GLS_Assert(src.isContinuous());
+	GLS_Assert(blkNum.width >= 1);
+	GLS_Assert(blkNum.height >= 1);
+	GLS_Assert(src.cols % blkNum.width == 0);
+	GLS_Assert(src.rows % blkNum.height == 0);
+
+	Size sizeDst = Size(src.cols / blkNum.width, src.rows / blkNum.height);
+	dst = vector<vector<glsMat>>(blkNum.height, vector<glsMat>(blkNum.width));
+
+
+	glsShaderBase* shader = selectShader(src.type());
+
+	glsFBO fbo(1);
+
+	for (int by = 0; by < blkNum.height; by++){
+		for (int bx = 0; bx < blkNum.width; bx++){
+			dst[by][bx] = glsMat(sizeDst, src.type());
+
+			Rect rectSrc(bx* sizeDst.width, by* sizeDst.height, sizeDst.width, sizeDst.height);
+			Rect rectDst(0, 0, sizeDst.width, sizeDst.height);
+
+			//dst texture
+			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, dst[by][bx].texid(), 0);
+			GLS_Assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
+
+			glsCopyProcess(shader, src.texid(), rectSrc, rectDst);
+		}
+	}
+
+}
+void glsUntiled(const vector<vector<glsMat>>& src, glsMat& dst){
+
+	Size blkNum(src[0].size(), src.size());
+	Size sizeSrc = Size(src[0][0].cols, src[0][0].rows);
+	Size sizeDst = Size(sizeSrc.width * blkNum.width, sizeSrc.height * blkNum.height);
+
+
+	dst = glsMat(sizeDst, src[0][0].type());
+
+	glsShaderBase* shader = selectShader(src[0][0].type());	
+	glsFBO fbo(1);
+
+	//dst texture
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, dst.texid(), 0);
+	GLS_Assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
+
+	for (int by = 0; by < blkNum.height; by++){
+		for (int bx = 0; bx < blkNum.width; bx++){
+			Rect rectSrc(-bx* sizeSrc.width, -by* sizeSrc.height, sizeSrc.width, sizeSrc.height);
+			Rect rectDst(+bx* sizeSrc.width, +by* sizeSrc.height, sizeSrc.width, sizeSrc.height);
+
+			glsCopyProcess(shader, src[by][bx].texid(), rectSrc, rectDst);
+		}
+	}
+
+}
 
 
 

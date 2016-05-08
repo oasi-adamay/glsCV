@@ -26,6 +26,7 @@ private:
 public:
 	int rows;
 	int cols;
+	GLuint texid(void)const { return texArray[0];}
 
 	vector<GLuint> texArray;
 
