@@ -407,7 +407,7 @@ void glsFft(const glsMat& src, glsMat& dst, int flag){
 				float xscl = 1.0f;
 				float xconj = ((flag & GLS_FFT_INVERSE) && (p == 0)) ? -1.0f : 1.0f;
 				float yconj = 1.0f;
-				glsFftProcess(shaderFft, texSrc, texDst, texW.texArray[0], 0, p, q, N, xscl, yscl, xconj, yconj);
+				glsFftProcess(shaderFft, texSrc, texDst, texW.texid(), 0, p, q, N, xscl, yscl, xconj, yconj);
 			}
 		}
 		// --- FFT cols ----
@@ -421,7 +421,7 @@ void glsFft(const glsMat& src, glsMat& dst, int flag){
 				float xscl = 1.0f;
 				float xconj = 1.0f;
 				float yconj = ((flag & GLS_FFT_INVERSE) && (q == 0)) ? -1.0f : 1.0f;
-				glsFftProcess(shaderFft, texSrc, texDst, texW.texArray[0], 1, p, q, N, xscl, yscl, xconj, yconj);
+				glsFftProcess(shaderFft, texSrc, texDst, texW.texid(), 1, p, q, N, xscl, yscl, xconj, yconj);
 			}
 		}
 	}

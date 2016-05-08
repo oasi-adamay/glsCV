@@ -11,10 +11,7 @@ void glsCopyInit(void);
 void glsCopyTerminate(void);
 
 void glsCopy(const glsMat& src, glsMat& dst);
-void glsCopyTiled(const glsMat& src, glsMat& dst, const Size& blkNum);
-void glsCopyUntiled(const glsMat& src, glsMat& dst);
-
-void glsCopyRect(const glsMat& src, glsMat& dst, const Rect& rect, const Size& blkNum = Size(1, 1));
+void glsCopyRect(const glsMat& src, glsMat& dst, const Rect& rect);
 
 
 void glsTiled(const glsMat& src, vector<vector<glsMat>>& dst, const Size& blkNum);

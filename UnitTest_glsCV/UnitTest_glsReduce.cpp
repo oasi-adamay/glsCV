@@ -19,9 +19,6 @@ namespace UnitTest_glsCV
 //		const int width = 8;
 //		const int height = 6;
 
-//		Size blkNum(1,1);
-		Size blkNum(2, 2);
-
 
 		Mat imgSrc(Size(width, height), cvtype);
 		FillRandU<T>(imgSrc);
@@ -33,9 +30,7 @@ namespace UnitTest_glsCV
 
 		cv::reduce(imgSrc, imgRef, dim, reduceOp);
 
-		glsMat glsSrc(imgSrc.size(), imgSrc.type(),blkNum);
-		glsSrc.CopyFrom(imgSrc);
-
+		glsMat glsSrc(imgSrc);
 		glsMat glsDst;
 
 		glsReduce(glsSrc, glsDst, dim, reduceOp);
@@ -166,8 +161,6 @@ namespace UnitTest_glsCV
 		//		const int width = 8;
 		//		const int height = 6;
 
-		//		Size blkNum(1,1);
-		Size blkNum(2, 2);
 
 
 		Mat imgSrc(Size(width, height), cvtype);
@@ -183,8 +176,7 @@ namespace UnitTest_glsCV
 		cv::minMaxLoc(imgSrc, &minValRef, &maxValRef);
 
 
-		glsMat glsSrc(imgSrc.size(), imgSrc.type(), blkNum);
-		glsSrc.CopyFrom(imgSrc);
+		glsMat glsSrc(imgSrc);
 		glsMinMaxLoc(glsSrc, &minVal, &maxVal);
 
 		cout << maxValRef << "," << maxVal << endl;

@@ -218,29 +218,27 @@ void glsMerge(const vector<glsMat>& plnSrc, glsMat& dst){
 	GLS_Assert(1 <= cn);
 	GLS_Assert(cn <= 4);
 
-	glsMat _dst = glsMat(plnSrc[0].size(), CV_MAKE_TYPE(plnSrc[0].depth(), cn), plnSrc[0].blkNum());
+	glsMat _dst = glsMat(plnSrc[0].size(), CV_MAKE_TYPE(plnSrc[0].depth(), cn));
 
 	glsShaderBase* shader = selectShader(plnSrc[0].type());
 
-	Rect rectSrc(0, 0, plnSrc[0].texWidth(), plnSrc[0].texHeight());
+	Rect rectSrc(0, 0, plnSrc[0].cols, plnSrc[0].rows);
 	Rect rectDst = rectSrc;
 
 	glsFBO fbo(1);
 
-	for (int i = 0; i < plnSrc[0].texArray.size(); i++){
 
-		//dst texture
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _dst.texArray[i], 0);
-		GLS_Assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
+	//dst texture
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _dst.texid(), 0);
+	GLS_Assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
 
-		vector<GLuint> texSrc(cn);
-		for (int c = 0; c < cn; c++){
-			texSrc[c] = plnSrc[c].texArray[i];
-		}
-
-		glsMergeProcess(shader, texSrc, rectSrc, rectDst);
-
+	vector<GLuint> texSrc(cn);
+	for (int c = 0; c < cn; c++){
+		texSrc[c] = plnSrc[c].texid();
 	}
+
+	glsMergeProcess(shader, texSrc, rectSrc, rectDst);
+
 	dst = _dst;
 }
 

@@ -19,8 +19,6 @@ namespace UnitTest_glsCV
 //		const int width = 8;
 //		const int height = 6;
 
-//		Size blkNum(1,1);
-		Size blkNum(2, 2);
 
 
 		Mat imgSrc(Size(width, height), cvtype);
@@ -33,8 +31,7 @@ namespace UnitTest_glsCV
 
 		cv::normalize(imgSrc, imgRef, alpha, beta, normType);
 
-		glsMat glsSrc(imgSrc.size(), imgSrc.type(),blkNum);
-		glsSrc.CopyFrom(imgSrc);
+		glsMat glsSrc(imgSrc);
 
 		glsMat glsDst;
 
