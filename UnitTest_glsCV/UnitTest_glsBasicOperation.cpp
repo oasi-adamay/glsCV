@@ -1,3 +1,33 @@
+/*
+Copyright (c) 2016, oasi-adamay
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+* Redistributions of source code must retain the above copyright notice, this
+list of conditions and the following disclaimer.
+
+* Redistributions in binary form must reproduce the above copyright notice,
+this list of conditions and the following disclaimer in the documentation
+and/or other materials provided with the distribution.
+
+* Neither the name of glsCV nor the names of its
+contributors may be used to endorse or promote products derived from
+this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
 #include "stdafx.h"
 #include "CppUnitTest.h"
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
@@ -80,67 +110,67 @@ namespace UnitTest_glsCV
 
 		}
 
-		glsMat glsSrc0(imgSrc0);
-		glsMat glsSrc1(imgSrc1);
-		glsMat glsDst;
+		GlsMat glsSrc0(imgSrc0);
+		GlsMat glsSrc1(imgSrc1);
+		GlsMat glsDst;
 
 		//---------------------------------
 		switch (flags){
 		case(E_TEST::ADD) :
 			cv::add(imgSrc0, imgSrc1, imgRef); 
-			glsAdd(glsSrc0, glsSrc1, glsSrc1);
+			gls::add(glsSrc0, glsSrc1, glsSrc1);
 			break;
 		case(E_TEST::SUB):
 			cv::subtract(imgSrc0, imgSrc1, imgRef); 
-			glsSubtract(glsSrc0, glsSrc1, glsSrc1);
+			gls::subtract(glsSrc0, glsSrc1, glsSrc1);
 			break;
 		case(E_TEST::MUL) :
 			cv::multiply(imgSrc0, imgSrc1, imgRef); 
-			glsMultiply(glsSrc0, glsSrc1, glsSrc1);
+			gls::multiply(glsSrc0, glsSrc1, glsSrc1);
 			break;
 		case(E_TEST::DIV) :
 			cv::divide(imgSrc0, imgSrc1, imgRef); 
-			glsDivide(glsSrc0, glsSrc1, glsSrc1);
+			gls::divide(glsSrc0, glsSrc1, glsSrc1);
 			break;
 		case(E_TEST::ADD_S) :
 			cv::add(scalar, imgSrc1, imgRef); 
-			glsAdd(_scalar, glsSrc1, glsSrc1);
+			gls::add(_scalar, glsSrc1, glsSrc1);
 			break;
 		case(E_TEST::SUB_S) :
 			cv::subtract(scalar, imgSrc1, imgRef);
-			glsSubtract(_scalar, glsSrc1, glsSrc1);
+			gls::subtract(_scalar, glsSrc1, glsSrc1);
 			break;
 		case(E_TEST::MUL_S) :
 			cv::multiply(scalar, imgSrc1, imgRef); 
-			glsMultiply(_scalar, glsSrc1, glsSrc1);
+			gls::multiply(_scalar, glsSrc1, glsSrc1);
 			break;
 		case(E_TEST::DIV_S) :
 			cv::divide(scalar, imgSrc1, imgRef);
-			glsDivide(_scalar, glsSrc1, glsSrc1);
+			gls::divide(_scalar, glsSrc1, glsSrc1);
 			break;
 		case(E_TEST::MIN) :
 			cv::min(imgSrc0, imgSrc1, imgRef); 
-			glsMin(glsSrc0, glsSrc1, glsSrc1);
+			gls::min(glsSrc0, glsSrc1, glsSrc1);
 			break;
 		case(E_TEST::MAX) :
 			cv::max(imgSrc0, imgSrc1, imgRef);
-			glsMax(glsSrc0, glsSrc1, glsSrc1);
+			gls::max(glsSrc0, glsSrc1, glsSrc1);
 			break;
 		case(E_TEST::MIN_S) :
 			cv::min(scalar, imgSrc1, imgRef); 
-			glsMin(_scalar, glsSrc1, glsSrc1);
+			gls::min(_scalar, glsSrc1, glsSrc1);
 			break;
 		case(E_TEST::MAX_S) :
 			cv::max(scalar, imgSrc1, imgRef); 
-			glsMax(_scalar, glsSrc1, glsSrc1);
+			gls::max(_scalar, glsSrc1, glsSrc1);
 			break;
 		case(E_TEST::MUL_SPECTRUMS) :
 			cv::mulSpectrums(imgSrc0, imgSrc1, imgRef, 0, false); 
-			glsMulSpectrums(glsSrc0, glsSrc1, glsSrc1, false);
+			gls::mulSpectrums(glsSrc0, glsSrc1, glsSrc1, false);
 			break;
 		case(E_TEST::MUL_SPECTRUMS_CONJ) :
 			cv::mulSpectrums(imgSrc0, imgSrc1, imgRef, 0, true); 
-			glsMulSpectrums(glsSrc0, glsSrc1, glsSrc1, true);
+			gls::mulSpectrums(glsSrc0, glsSrc1, glsSrc1, true);
 			break;
 		case(E_TEST::MUL_SPECTRUMS_POC) :
 			{
@@ -154,7 +184,7 @@ namespace UnitTest_glsCV
 				cv::divide(tmp[1], mag, tmp[1]);
 				cv::merge(tmp, imgRef);
 			}
-			glsMulSpectrumsPhaseOnly(glsSrc0, glsSrc1, glsSrc1);
+			gls::mulSpectrumsPhaseOnly(glsSrc0, glsSrc1, glsSrc1);
 			break;
 		case(E_TEST::MAG_SPECTRUMS) :
 			{
@@ -162,21 +192,21 @@ namespace UnitTest_glsCV
 				cv::split(imgSrc1, tmp);
 				cv::magnitude(tmp[0], tmp[1], imgRef);
 			}
-			glsMagSpectrums(glsSrc1, glsSrc1);
+			gls::magSpectrums(glsSrc1, glsSrc1);
 			break;
 		case(E_TEST::LOG) :
 			cv::log(imgSrc1, imgRef);
-			glsLog(glsSrc1, glsSrc1);
+			gls::log(glsSrc1, glsSrc1);
 			break;
 		case(E_TEST::EXP) :
 			cv::exp(imgSrc1, imgRef);
-			glsExp(glsSrc1, glsSrc1);
+			gls::exp(glsSrc1, glsSrc1);
 			break;
 		case(E_TEST::POW) : 
 			{
 				float power = (float)scalar[0];
 				cv::pow(imgSrc1, power, imgRef);
-				glsPow(glsSrc1, power, glsSrc1);
+				gls::pow(glsSrc1, power, glsSrc1);
 			}
 			break;
 		case(E_TEST::LOG_MAG_SPECTRUMS) :
@@ -186,7 +216,7 @@ namespace UnitTest_glsCV
 				cv::magnitude(tmp[0], tmp[1], imgRef);
 				cv::log(imgRef+1.0, imgRef);
 			}
-			glsLogMagSpectrums(glsSrc1, glsSrc1,1.0);
+			gls::logMagSpectrums(glsSrc1, glsSrc1,1.0);
 			break;
 		};
 

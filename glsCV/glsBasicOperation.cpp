@@ -1,7 +1,40 @@
+/*
+Copyright (c) 2016, oasi-adamay
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+* Redistributions of source code must retain the above copyright notice, this
+list of conditions and the following disclaimer.
+
+* Redistributions in binary form must reproduce the above copyright notice,
+this list of conditions and the following disclaimer in the documentation
+and/or other materials provided with the distribution.
+
+* Neither the name of glsCV nor the names of its
+contributors may be used to endorse or promote products derived from
+this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
 #include "stdafx.h"
 
 #include "glsCV.h"
 #include "glsBasicOperation.h"
+
+namespace gls
+{
 
 
 class glsShaderScalarOperation : public glsShaderBase
@@ -38,12 +71,12 @@ public:
 glsShaderScalarOperation* shaderScalarOperation = 0;
 glsShaderBinaryOperation* shaderBinaryOperation = 0;
 
-void glsBasicOperationInit(void){
+void ShaderBasicOperationInit(void){
 	shaderScalarOperation = new glsShaderScalarOperation();
 	shaderBinaryOperation = new glsShaderBinaryOperation();
 }
 
-void glsBasicOperationTerminate(void){
+void ShaderBasicOperationTerminate(void){
 	delete shaderScalarOperation;
 	delete shaderBinaryOperation;
 }
@@ -370,176 +403,156 @@ void glslBinaryOperation(
 
 }
 
-//スカラと配列の 要素毎の和を求めます．
-void glsAdd(const vec4& scalar, const glsMat& src, glsMat& dst){
+void add(const vec4& scalar, const GlsMat& src, GlsMat& dst){
 	GLS_Assert(src.glType() == GL_FLOAT);
-	glsMat _dst = glsMat(src.size(), src.type());
+	GlsMat _dst = GlsMat(src.size(), src.type());
 	glslScalarOperation(shaderScalarOperation, scalar, src.texid(), _dst.texid(), OPCODE_ADD);
 	dst = _dst;
 }
 
-//2 つの配列同士の 要素毎の和を求めます
-void glsAdd(const glsMat& src0, const glsMat& src1, glsMat& dst)
+void add(const GlsMat& src0, const GlsMat& src1, GlsMat& dst)
 {
 	GLS_Assert(src0.glType() == GL_FLOAT);
 	GLS_Assert(src1.glType() == GL_FLOAT);
-	glsMat _dst = glsMat(src0.size(), src0.type());
+	GlsMat _dst = GlsMat(src0.size(), src0.type());
 	glslBinaryOperation(shaderBinaryOperation, src0.texid(), src1.texid(), _dst.texid(), OPCODE_ADD);
 	dst = _dst;
 }
 
 
-//スカラと配列の 要素毎の差を求めます．
-void glsSubtract(const vec4& scalar, const glsMat& src, glsMat& dst){
+void subtract(const vec4& scalar, const GlsMat& src, GlsMat& dst){
 	GLS_Assert(src.glType() == GL_FLOAT);
-	glsMat _dst = glsMat(src.size(), src.type());
+	GlsMat _dst = GlsMat(src.size(), src.type());
 	glslScalarOperation(shaderScalarOperation, scalar, src.texid(), _dst.texid(), OPCODE_SUB);
 	dst = _dst;
 }
 
-//2 つの配列同士の 要素毎の差を求めます
-void glsSubtract(const glsMat& src0, const glsMat& src1, glsMat& dst)
+void subtract(const GlsMat& src0, const GlsMat& src1, GlsMat& dst)
 {
 	GLS_Assert(src0.glType() == GL_FLOAT);
 	GLS_Assert(src1.glType() == GL_FLOAT);
-	glsMat _dst = glsMat(src0.size(), src0.type());
+	GlsMat _dst = GlsMat(src0.size(), src0.type());
 	glslBinaryOperation(shaderBinaryOperation, src0.texid(), src1.texid(), _dst.texid(), OPCODE_SUB);
 	dst = _dst;
 }
 
 
-//スカラと配列の 要素毎の積を求めます．
-void glsMultiply(const vec4& scalar, const glsMat& src, glsMat& dst){
+void multiply(const vec4& scalar, const GlsMat& src, GlsMat& dst){
 	GLS_Assert(src.glType() == GL_FLOAT);
-	glsMat _dst = glsMat(src.size(), src.type());
+	GlsMat _dst = GlsMat(src.size(), src.type());
 	glslScalarOperation(shaderScalarOperation, scalar, src.texid(), _dst.texid(), OPCODE_MUL);
 	dst = _dst;
 }
 
-//2 つの配列同士の 要素毎の積を求めます
-void glsMultiply(const glsMat& src0, const glsMat& src1, glsMat& dst)
+void multiply(const GlsMat& src0, const GlsMat& src1, GlsMat& dst)
 {
 	GLS_Assert(src0.glType() == GL_FLOAT);
 	GLS_Assert(src1.glType() == GL_FLOAT);
-	glsMat _dst = glsMat(src0.size(), src0.type());
+	GlsMat _dst = GlsMat(src0.size(), src0.type());
 	glslBinaryOperation(shaderBinaryOperation, src0.texid(), src1.texid(), _dst.texid(), OPCODE_MUL);
 	dst = _dst;
 }
 
-//スカラと配列の 要素毎の商を求めます．
-void glsDivide(const vec4& scalar, const glsMat& src, glsMat& dst){
+void divide(const vec4& scalar, const GlsMat& src, GlsMat& dst){
 	GLS_Assert(src.glType() == GL_FLOAT);
-	glsMat _dst = glsMat(src.size(), src.type());
+	GlsMat _dst = GlsMat(src.size(), src.type());
 	glslScalarOperation(shaderScalarOperation, scalar, src.texid(), _dst.texid(), OPCODE_DIV);
 	dst = _dst;
 }
 
 
-//2 つの配列同士の  要素毎の商を求めます．
-void glsDivide(const glsMat& src0, const glsMat& src1, glsMat& dst){
+void divide(const GlsMat& src0, const GlsMat& src1, GlsMat& dst){
 	GLS_Assert(src0.glType() == GL_FLOAT);
 	GLS_Assert(src1.glType() == GL_FLOAT);
-	glsMat _dst = glsMat(src0.size(), src0.type());
+	GlsMat _dst = GlsMat(src0.size(), src0.type());
 	glslBinaryOperation(shaderBinaryOperation, src0.texid(), src1.texid(), _dst.texid(), OPCODE_DIV);
 	dst = _dst;
 }
 
-//スカラと配列の 要素毎の最小値を求めます．
-void glsMin(const vec4& scalar, const glsMat& src, glsMat& dst){
+void min(const vec4& scalar, const GlsMat& src, GlsMat& dst){
 	GLS_Assert(src.glType() == GL_FLOAT);
-	glsMat _dst = glsMat(src.size(), src.type());
+	GlsMat _dst = GlsMat(src.size(), src.type());
 	glslScalarOperation(shaderScalarOperation, scalar, src.texid(), _dst.texid(), OPCODE_MIN);
 	dst = _dst;
 }
 
-//2 つの配列同士の  要素毎の最小値を求めます．
-void glsMin(const glsMat& src0, const glsMat& src1, glsMat& dst){
+void min(const GlsMat& src0, const GlsMat& src1, GlsMat& dst){
 	GLS_Assert(src0.glType() == GL_FLOAT);
 	GLS_Assert(src1.glType() == GL_FLOAT);
-	glsMat _dst = glsMat(src0.size(), src0.type());
+	GlsMat _dst = GlsMat(src0.size(), src0.type());
 	glslBinaryOperation(shaderBinaryOperation, src0.texid(), src1.texid(), _dst.texid(), OPCODE_MIN);
 	dst = _dst;
 }
 
-//スカラと配列の 要素毎の最大値を求めます．
-void glsMax(const vec4& scalar, const glsMat& src, glsMat& dst){
+void max(const vec4& scalar, const GlsMat& src, GlsMat& dst){
 	GLS_Assert(src.glType() == GL_FLOAT);
-	glsMat _dst = glsMat(src.size(), src.type());
+	GlsMat _dst = GlsMat(src.size(), src.type());
 	glslScalarOperation(shaderScalarOperation, scalar, src.texid(), _dst.texid(), OPCODE_MAX);
 	dst = _dst;
 }
 
-//2 つの配列同士の  要素毎の最大値を求めます．
-void glsMax(const glsMat& src0, const glsMat& src1, glsMat& dst){
+void max(const GlsMat& src0, const GlsMat& src1, GlsMat& dst){
 	GLS_Assert(src0.glType() == GL_FLOAT);
 	GLS_Assert(src1.glType() == GL_FLOAT);
-	glsMat _dst = glsMat(src0.size(), src0.type());
+	GlsMat _dst = GlsMat(src0.size(), src0.type());
 	glslBinaryOperation(shaderBinaryOperation, src0.texid(), src1.texid(), _dst.texid(), OPCODE_MAX);
 	dst = _dst;
 }
 
-//2 つのフーリエスペクトル同士の要素毎の乗算を行います．
-//conj = ture の場合、2 番目の配列を複素共役に変更できます．
-void glsMulSpectrums(const glsMat& src0, const glsMat& src1, glsMat& dst, bool conj){
+void mulSpectrums(const GlsMat& src0, const GlsMat& src1, GlsMat& dst, bool conj){
 	GLS_Assert(src0.glSizedFormat() == GL_RG32F);
 	GLS_Assert(src1.glSizedFormat() == GL_RG32F);
-	glsMat _dst = glsMat(src0.size(), src0.type());
+	GlsMat _dst = GlsMat(src0.size(), src0.type());
 	if (conj)glslBinaryOperation(shaderBinaryOperation, src0.texid(), src1.texid(), _dst.texid(), OPCODE_MUL_SPCETRUM_CONJ);
 	else glslBinaryOperation(shaderBinaryOperation, src0.texid(), src1.texid(), _dst.texid(), OPCODE_MUL_SPCETRUM);
 	dst = _dst;
 }
 
-//2 つのフーリエスペクトル同士の  要素毎の位相限定相関を求めます．
-void glsMulSpectrumsPhaseOnly(const glsMat& src0, const glsMat& src1, glsMat& dst){
+void mulSpectrumsPhaseOnly(const GlsMat& src0, const GlsMat& src1, GlsMat& dst){
 	GLS_Assert(src0.glSizedFormat() == GL_RG32F);
 	GLS_Assert(src1.glSizedFormat() == GL_RG32F);
-	glsMat _dst = glsMat(src0.size(), src0.type());
+	GlsMat _dst = GlsMat(src0.size(), src0.type());
 	glslBinaryOperation(shaderBinaryOperation, src0.texid(), src1.texid(), _dst.texid(), OPCODE_MUL_SPCETRUM_POC);
 	dst = _dst;
 }
 
-//複素行列要素の絶対値の2乗を求めます．
-void glsMagSpectrums(const glsMat& src, glsMat& dst){
+void magSpectrums(const GlsMat& src, GlsMat& dst){
 	GLS_Assert(src.glSizedFormat() == GL_RG32F);
 	vec4 scalar(1.0, 1.0, 1.0, 1.0);
-	glsMat _dst = glsMat(src.size(), CV_MAKE_TYPE(src.depth(), 1));
+	GlsMat _dst = GlsMat(src.size(), CV_MAKE_TYPE(src.depth(), 1));
 	glslScalarOperation(shaderScalarOperation, scalar, src.texid(), _dst.texid(), OPCODE_MAG_SPCETRUM);
 	dst = _dst;
 }
 
-//複素行列要素の絶対値の2乗にoffset加算し、絶対値の自然対数を求めます．
-void glsLogMagSpectrums(const glsMat& src, glsMat& dst, float offset){
+void logMagSpectrums(const GlsMat& src, GlsMat& dst, float offset){
 	GLS_Assert(src.glSizedFormat() == GL_RG32F);
 	vec4 scalar(offset);
-	glsMat _dst = glsMat(src.size(), CV_MAKE_TYPE(src.depth(), 1));
+	GlsMat _dst = GlsMat(src.size(), CV_MAKE_TYPE(src.depth(), 1));
 	glslScalarOperation(shaderScalarOperation, scalar, src.texid(), _dst.texid(), OPCODE_LOG_MAG_SPCETRUM);
 	dst = _dst;
 }
 
 
-//各配列要素の絶対値の自然対数を求めます．
-void glsLog(const glsMat& src, glsMat& dst){
+void log(const GlsMat& src, GlsMat& dst){
 	GLS_Assert(src.glType() == GL_FLOAT);
 	vec4 scalar(1.0, 1.0, 1.0, 1.0);
-	glsMat _dst = glsMat(src.size(), src.type());
+	GlsMat _dst = GlsMat(src.size(), src.type());
 	glslScalarOperation(shaderScalarOperation, scalar, src.texid(), _dst.texid(), OPCODE_LOG);
 	dst = _dst;
 }
 
-//各配列要素を指数として，自然対数の底（ネイピア数）e のべき乗を求めます．
-void glsExp(const glsMat& src, glsMat& dst){
+void exp(const GlsMat& src, GlsMat& dst){
 	GLS_Assert(src.glType() == GL_FLOAT);
 	vec4 scalar(1.0, 1.0, 1.0, 1.0);
-	glsMat _dst = glsMat(src.size(), src.type());
+	GlsMat _dst = GlsMat(src.size(), src.type());
 	glslScalarOperation(shaderScalarOperation, scalar, src.texid(), _dst.texid(), OPCODE_EXP);
 	dst = _dst;
 }
 
-//各配列要素を累乗します．
-void glsPow(const glsMat& src, const float& power, glsMat& dst){
+void pow(const GlsMat& src, const float& power, GlsMat& dst){
 	GLS_Assert(src.glType() == GL_FLOAT);
 	vec4 scalar(power, power, power, power);
-	glsMat _dst = glsMat(src.size(), src.type());
+	GlsMat _dst = GlsMat(src.size(), src.type());
 	glslScalarOperation(shaderScalarOperation, scalar, src.texid(), _dst.texid(), OPCODE_POW);
 	dst = _dst;
 }
@@ -547,267 +560,5 @@ void glsPow(const glsMat& src, const float& power, glsMat& dst){
 
 
 
-# if 0
 
-void glsAdd(const Vec4f& scalar, const Mat& src, Mat& dst)
-{
-	glsMat _src(src, false);
-	glsMat _dst;
-	vec4 _scalar = { scalar[0], scalar[1], scalar[2], scalar[3] };
-	_src.CopyFrom(src);					//upload
-	glsAdd(_scalar, _src, _dst);			//execute
-	_dst.CopyTo(dst);					//download
-}
-
-
-void glsAdd(const Mat& src0, const Mat& src1, Mat& dst)
-{
-	CV_Assert(src0.size() == src1.size());
-	CV_Assert(src0.type() == src1.type());
-
-	glsMat _src0(src0, false);
-	glsMat _src1(src0, false);
-	glsMat _dst;
-
-	//---------------------------------
-	//upload
-	_src0.CopyFrom(src0);
-	_src1.CopyFrom(src1);
-
-	//---------------------------------
-	//execute
-	glsAdd(_src0, _src1, _dst);
-
-	//---------------------------------
-	//download
-	_dst.CopyTo(dst);
-
-}
-
-
-void glsSubtract(const Vec4f& scalar, const Mat& src, Mat& dst)
-{
-	glsMat _src(src, false);
-	glsMat _dst;
-	vec4 _scalar = { scalar[0], scalar[1], scalar[2], scalar[3] };
-	_src.CopyFrom(src);					//upload
-	glsSubtract(_scalar, _src, _dst);	//execute
-	_dst.CopyTo(dst);					//download
-}
-
-
-void glsSubtract(const Mat& src0, const Mat& src1, Mat& dst)
-{
-	CV_Assert(src0.size() == src1.size());
-	CV_Assert(src0.type() == src1.type());
-
-	glsMat _src0(src0, false);
-	glsMat _src1(src0, false);
-	glsMat _dst;
-
-	//---------------------------------
-	//upload
-	_src0.CopyFrom(src0);
-	_src1.CopyFrom(src1);
-
-	//---------------------------------
-	//execute
-	glsSubtract(_src0, _src1, _dst);
-
-	//---------------------------------
-	//download
-	_dst.CopyTo(dst);
-
-}
-
-
-void glsMultiply(const Vec4f& scalar, const Mat& src, Mat& dst)
-{
-	glsMat _src(src, false);
-	glsMat _dst;
-	vec4 _scalar = { scalar[0], scalar[1], scalar[2], scalar[3] };
-	_src.CopyFrom(src);					//upload
-	glsMultiply(_scalar, _src, _dst);	//execute
-	_dst.CopyTo(dst);					//download
-}
-
-
-void glsMultiply(const Mat& src0, const Mat& src1, Mat& dst)
-{
-	CV_Assert(src0.size() == src1.size());
-	CV_Assert(src0.type() == src1.type());
-
-	glsMat _src0(src0, false);
-	glsMat _src1(src0, false);
-	glsMat _dst;
-
-	//---------------------------------
-	//upload
-	_src0.CopyFrom(src0);
-	_src1.CopyFrom(src1);
-
-	//---------------------------------
-	//execute
-	glsMultiply(_src0, _src1, _dst);
-
-	//---------------------------------
-	//download
-	_dst.CopyTo(dst);
-
-}
-
-
-void glsDivide(const Vec4f& scalar, const Mat& src, Mat& dst)
-{
-	glsMat _src(src, false);
-	glsMat _dst;
-	vec4 _scalar = { scalar[0], scalar[1], scalar[2], scalar[3] };
-	_src.CopyFrom(src);					//upload
-	glsDivide(_scalar, _src, _dst);	//execute
-	_dst.CopyTo(dst);					//download
-}
-
-
-void glsDivide(const Mat& src0, const Mat& src1, Mat& dst)
-{
-	CV_Assert(src0.size() == src1.size());
-	CV_Assert(src0.type() == src1.type());
-
-	glsMat _src0(src0, false);
-	glsMat _src1(src0, false);
-	glsMat _dst;
-
-	//---------------------------------
-	//upload
-	_src0.CopyFrom(src0);
-	_src1.CopyFrom(src1);
-
-	//---------------------------------
-	//execute
-	glsDivide(_src0, _src1, _dst);
-
-	//---------------------------------
-	//download
-	_dst.CopyTo(dst);
-
-}
-
-void glsMin(const Vec4f& scalar, const Mat& src, Mat& dst)
-{
-	glsMat _src(src, false);
-	glsMat _dst;
-	vec4 _scalar = { scalar[0], scalar[1], scalar[2], scalar[3] };
-	_src.CopyFrom(src);					//upload
-	glsMin(_scalar, _src, _dst);	//execute
-	_dst.CopyTo(dst);					//download
-}
-
-void glsMin(const Mat& src0, const Mat& src1, Mat& dst)
-{
-	CV_Assert(src0.size() == src1.size());
-	CV_Assert(src0.type() == src1.type());
-
-	glsMat _src0(src0, false);
-	glsMat _src1(src0, false);
-	glsMat _dst;
-
-	_src0.CopyFrom(src0);	//upload
-	_src1.CopyFrom(src1);	//upload
-	glsMin(_src0, _src1, _dst); //execute
-	_dst.CopyTo(dst);	//download
-
-}
-
-void glsMax(const Vec4f& scalar, const Mat& src, Mat& dst)
-{
-	glsMat _src(src, false);
-	glsMat _dst;
-	vec4 _scalar = { scalar[0], scalar[1], scalar[2], scalar[3] };
-	_src.CopyFrom(src);					//upload
-	glsMax(_scalar, _src, _dst);	//execute
-	_dst.CopyTo(dst);					//download
-}
-
-void glsMax(const Mat& src0, const Mat& src1, Mat& dst)
-{
-	CV_Assert(src0.size() == src1.size());
-	CV_Assert(src0.type() == src1.type());
-
-	glsMat _src0(src0, false);
-	glsMat _src1(src0, false);
-	glsMat _dst;
-
-	_src0.CopyFrom(src0);	//upload
-	_src1.CopyFrom(src1);	//upload
-	glsMax(_src0, _src1, _dst); //execute
-	_dst.CopyTo(dst);	//download
-
-}
-
-void glsMulSpectrums(const Mat& src0, const Mat& src1, Mat& dst, bool conj){
-	CV_Assert(src0.size() == src1.size());
-	CV_Assert(src0.type() == src1.type());
-	CV_Assert(src0.type() == CV_32FC2);
-
-	glsMat _src0(src0, false);
-	glsMat _src1(src0, false);
-	glsMat _dst;
-
-	_src0.CopyFrom(src0);	//upload
-	_src1.CopyFrom(src1);	//upload
-	glsMulSpectrums(_src0, _src1, _dst,conj); //execute
-	_dst.CopyTo(dst);	//download
-
-}
-
-void glsMulSpectrumsPhaseOnly(const Mat& src0, const Mat& src1, Mat& dst){
-	CV_Assert(src0.size() == src1.size());
-	CV_Assert(src0.type() == src1.type());
-	CV_Assert(src0.type() == CV_32FC2);
-
-	glsMat _src0(src0, false);
-	glsMat _src1(src0, false);
-	glsMat _dst;
-
-	_src0.CopyFrom(src0);	//upload
-	_src1.CopyFrom(src1);	//upload
-	glsMulSpectrumsPhaseOnly(_src0, _src1, _dst); //execute
-	_dst.CopyTo(dst);	//download
-
-}
-
-void glsMagSpectrums(const Mat& src, Mat& dst){
-	CV_Assert(src.type() == CV_32FC2);
-	glsMat _src(src, false);
-	glsMat _dst(src.size(), CV_32FC1);
-	_src.CopyFrom(src);	//upload
-	glsMagSpectrums(_src, _dst);
-	_dst.CopyTo(dst);	//download
-}
-
-void glsLog(const Mat& src, Mat& dst){
-	glsMat _src(src, false);
-	glsMat _dst;
-	_src.CopyFrom(src);					//upload
-	glsLog(_src, _dst);					//execute
-	_dst.CopyTo(dst);					//download
-}
-void glsExp(const Mat& src, Mat& dst){
-	glsMat _src(src, false);
-	glsMat _dst;
-	_src.CopyFrom(src);					//upload
-	glsExp(_src, _dst);					//execute
-	_dst.CopyTo(dst);					//download
-}
-void glsPow(const Mat& src, const float& power, Mat& dst){
-	glsMat _src(src, false);
-	glsMat _dst;
-	_src.CopyFrom(src);					//upload
-	glsPow(_src, power, _dst);					//execute
-	_dst.CopyTo(dst);					//download
-
-}
-
-#endif
-
-
+}//namespace gls

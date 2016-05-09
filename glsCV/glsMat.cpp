@@ -1,7 +1,37 @@
+/*
+Copyright (c) 2016, oasi-adamay
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+* Redistributions of source code must retain the above copyright notice, this
+list of conditions and the following disclaimer.
+
+* Redistributions in binary form must reproduce the above copyright notice,
+this list of conditions and the following disclaimer in the documentation
+and/or other materials provided with the distribution.
+
+* Neither the name of glsCV nor the names of its
+contributors may be used to endorse or promote products derived from
+this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
 #include "stdafx.h"
 
 #include "glsCV.h"
-#include "glsMat.h"
+#include "GlsMat.h"
 #include "Timer.h"
 
 //#ifdef _DEBUG
@@ -10,6 +40,11 @@
 #else
 #define _TMR_(...)
 #endif
+
+
+namespace gls
+{
+
 
 
 //#define _USE_PBO_UP
@@ -24,27 +59,27 @@
 static int gTextureNum = 0;
 #endif
 
-glsMat::glsMat(void){
+GlsMat::GlsMat(void){
 	flag = 0;
 	rows = 0;
 	cols = 0;
 }
 
-glsMat::glsMat(const Size size, const int ocvtype){
+GlsMat::GlsMat(const Size size, const int ocvtype){
 
 	createTexture(size.width, size.height, ocvtype);
 }
 
 
 
-glsMat::glsMat(const Mat & cvmat){
+GlsMat::GlsMat(const Mat & cvmat){
 	createTexture(cvmat.cols, cvmat.rows, cvmat.type());
 	CopyFrom(cvmat);
 }
 
 
 
-glsMat& glsMat::operator=(const glsMat& rhs){
+GlsMat& GlsMat::operator=(const GlsMat& rhs){
 	if (_texid.use_count() == 1){
 		deleteTexture();
 	}
@@ -58,7 +93,7 @@ glsMat& glsMat::operator=(const glsMat& rhs){
 }
 
 
-//glsMat::glsMat(const glsMat& src, bool copy){
+//GlsMat::GlsMat(const GlsMat& src, bool copy){
 //	createTexture(src.width, src.height, src.internalFormat, src.blkX, src.blkY);
 //	GLS_Assert(copy == false);	///@TODO Copy tex
 //}
@@ -66,13 +101,13 @@ glsMat& glsMat::operator=(const glsMat& rhs){
 
 
 
-glsMat::~glsMat(void){
+GlsMat::~GlsMat(void){
 	if (_texid.use_count() == 1){
 		deleteTexture();
 	}
 }
 
-void glsMat::createTexture(
+void GlsMat::createTexture(
 	const int _width,				//image width
 	const int _height,				//image height
 	const int _type					//type(OpenCV)
@@ -111,7 +146,7 @@ void glsMat::createTexture(
 #endif
 }
 
-void glsMat::deleteTexture(void){
+void GlsMat::deleteTexture(void){
 #ifdef _DBG_GLS_MAT
 	{
 		std::cout << "delete:" << texid() << endl;
@@ -130,7 +165,7 @@ void glsMat::deleteTexture(void){
 
 
 
-//GLuint glsMat::at(const int y, const int x)  const{
+//GLuint GlsMat::at(const int y, const int x)  const{
 //	GLS_Assert(y*blkX + x < texArray.size());
 //	return texArray[y*blkX + x];
 //}
@@ -160,7 +195,7 @@ static void mat2pbo(const Mat&src, const GLuint pbo){
 
 //-----------------------------------------------------------------------------
 //Upload texture from cv::Mat to GL texture
-void glsMat::CopyFrom(const Mat&src){
+void GlsMat::CopyFrom(const Mat&src){
 	_TMR_("-upload :\t");
 
 	CV_Assert(src.type() == type());
@@ -263,7 +298,7 @@ static void pbo2mat(const GLuint pbo, Mat&dst){
 }
 
 
-void glsMat::CopyTo(Mat&dst) const{
+void GlsMat::CopyTo(Mat&dst) const{
 //	cout << "CopyTo:start" << endl;
 
 	_TMR_("-download:\t");
@@ -474,6 +509,8 @@ GLenum convCVtype2GLtype(int ocvtype){
 	}
 	return type;
 }
+
+}//namespace gls
 
 
 

@@ -1,8 +1,41 @@
+/*
+Copyright (c) 2016, oasi-adamay
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+* Redistributions of source code must retain the above copyright notice, this
+list of conditions and the following disclaimer.
+
+* Redistributions in binary form must reproduce the above copyright notice,
+this list of conditions and the following disclaimer in the documentation
+and/or other materials provided with the distribution.
+
+* Neither the name of glsCV nor the names of its
+contributors may be used to endorse or promote products derived from
+this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
 #include "stdafx.h"
 
 
 #include "glsConvert.h"
 #include "Timer.h"
+
+namespace gls
+{
 
 //-----------------------------------------------------------------------------
 // glsDraw shader
@@ -54,14 +87,14 @@ glsShaderConvert* shaderConvert = 0;
 glsShaderConvertU* shaderConvertU = 0;
 glsShaderConvertS* shaderConvertS = 0;
 
-void glsConvertInit(void){
+void ShaderConvertInit(void){
 	shaderConvert = new glsShaderConvert();
 	shaderConvertU = new glsShaderConvertU();
 	shaderConvertS = new glsShaderConvertS();
 
 }
 
-void glsConvertTerminate(void){
+void ShaderConvertTerminate(void){
 	delete shaderConvert;
 	delete shaderConvertU;
 	delete shaderConvertS;
@@ -347,10 +380,9 @@ static void glsConvertProcess(
 }
 
 
-//conver texture format
-void glsConvert(const glsMat& src, glsMat& dst, const float scl){
+void convert(const GlsMat& src, GlsMat& dst, const float scl){
 
-	glsMat _dst = glsMat(src.size(), CV_MAKETYPE(CV_32F, CV_MAT_CN(src.type())));
+	GlsMat _dst = GlsMat(src.size(), CV_MAKETYPE(CV_32F, CV_MAT_CN(src.type())));
 	GLS_Assert(_dst.glType() == GL_FLOAT);
 
 	glsShaderConvertBase* shader = 0;
@@ -388,7 +420,7 @@ void glsConvert(const glsMat& src, glsMat& dst, const float scl){
 
 }
 
-void glsCvtColor(const glsMat& src, glsMat& dst, const int code){
+void cvtColor(const GlsMat& src, GlsMat& dst, const int code){
 	GLS_Assert(src.glType() == GL_FLOAT);
 
 	int ch=1;
@@ -420,7 +452,7 @@ void glsCvtColor(const glsMat& src, glsMat& dst, const int code){
 		GLS_Assert(0);
 	}
 
-	glsMat _dst = glsMat(src.size(), CV_MAKETYPE(CV_MAT_DEPTH(src.type()), ch));
+	GlsMat _dst = GlsMat(src.size(), CV_MAKETYPE(CV_MAT_DEPTH(src.type()), ch));
 
 	glsShaderConvertBase* shader = 0;
 
@@ -448,6 +480,7 @@ void glsCvtColor(const glsMat& src, glsMat& dst, const int code){
 }
 
 
+}//namespace gls
 
 
 

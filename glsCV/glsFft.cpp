@@ -1,3 +1,32 @@
+/*
+Copyright (c) 2016, oasi-adamay
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+* Redistributions of source code must retain the above copyright notice, this
+list of conditions and the following disclaimer.
+
+* Redistributions in binary form must reproduce the above copyright notice,
+this list of conditions and the following disclaimer in the documentation
+and/or other materials provided with the distribution.
+
+* Neither the name of glsCV nor the names of its
+contributors may be used to endorse or promote products derived from
+this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
 #include "stdafx.h"
 
 
@@ -13,6 +42,9 @@
 #else
 #define _TMR_(...)
 #endif
+
+namespace gls
+{
 
 // glsFft shader
 class glsShaderFft : public glsShaderBase
@@ -43,11 +75,11 @@ public:
 //global 
 glsShaderFft* shaderFft = 0;
 
-void glsFftInit(void){
+void ShaderFftInit(void){
 	shaderFft = new glsShaderFft();
 }
 
-void glsFftTerminate(void){
+void ShaderFftTerminate(void){
 	delete shaderFft;
 }
 
@@ -321,8 +353,7 @@ static void glsFftProcess(
 
 
 //-----------------------------------------------------------------------------
-// execute FFT 
-void glsFft(const glsMat& src, glsMat& dst, int flag){
+void fft(const GlsMat& src, GlsMat& dst, int flag){
 	GLS_Assert(src.channels() == 2);
 	GLS_Assert(src.depth() == CV_32F);
 
@@ -331,18 +362,18 @@ void glsFft(const glsMat& src, glsMat& dst, int flag){
 	GLS_Assert(IsPow2(N));
 
 	Size blkNum(2,2);
-	vector<vector<glsMat>> _dst0 = vector<vector<glsMat>>(blkNum.height, vector<glsMat>(blkNum.width));
-	vector<vector<glsMat>> _dst1 = vector<vector<glsMat>>(blkNum.height, vector<glsMat>(blkNum.width));
+	vector<vector<GlsMat>> _dst0 = vector<vector<GlsMat>>(blkNum.height, vector<GlsMat>(blkNum.width));
+	vector<vector<GlsMat>> _dst1 = vector<vector<GlsMat>>(blkNum.height, vector<GlsMat>(blkNum.width));
 
-	glsTiled(src, _dst0, blkNum);
+	gls::tiled(src, _dst0, blkNum);
 	for (int by = 0; by < blkNum.height; by++){
 		for (int bx = 0; bx < blkNum.width; bx++){
-			_dst1[by][bx] = glsMat(Size(src.cols / blkNum.width, src.rows / blkNum.height), src.type());
+			_dst1[by][bx] = GlsMat(Size(src.cols / blkNum.width, src.rows / blkNum.height), src.type());
 		}
 	}
 
 
-	glsMat texW(Size(N / 2, 1), src.type());
+	GlsMat texW(Size(N / 2, 1), src.type());
 
 	//---------------------------------
 	// upload twidle texture
@@ -378,7 +409,7 @@ void glsFft(const glsMat& src, glsMat& dst, int flag){
 		//glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
-	vector<vector<glsMat>>* texbuf[2] = { &_dst0, &_dst1 };
+	vector<vector<GlsMat>>* texbuf[2] = { &_dst0, &_dst1 };
 
 	//Execute
 	int bank = 0;
@@ -436,21 +467,21 @@ void glsFft(const glsMat& src, glsMat& dst, int flag){
 		bank = bank ^ 1;
 	}
 
-	glsUntiled(*texbuf[bank], dst);
+	gls::untiled(*texbuf[bank], dst);
 }
 
 
 
 
-void glsFft(const Mat& src, Mat& dst, int flag){
+void fft(const Mat& src, Mat& dst, int flag){
 	CV_Assert(src.type() == CV_32FC2);
 	CV_Assert(src.cols == src.rows);
 
 	int N = src.cols;
 	CV_Assert(IsPow2(N));
 
-	glsMat _src(src.size(), src.type());
-	glsMat _dst;
+	GlsMat _src(src.size(), src.type());
+	GlsMat _dst;
 
 	//---------------------------------
 	//upload
@@ -458,7 +489,7 @@ void glsFft(const Mat& src, Mat& dst, int flag){
 
 	//---------------------------------
 	//fft
-	glsFft(_src, _dst,flag);
+	gls::fft(_src, _dst,flag);
 
 	//---------------------------------
 	//download
@@ -467,9 +498,5 @@ void glsFft(const Mat& src, Mat& dst, int flag){
 
 }
 
-
-
-
-
-
+}//namespace gls
 
