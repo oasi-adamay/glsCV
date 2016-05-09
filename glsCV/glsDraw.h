@@ -42,6 +42,12 @@ namespace gls
 void ShaderDrawInit(void);
 void ShaderDrawTerminate(void);
 
+/*!
+テクスチャーをカレントのフレームバッファにレンダリングします。
+
+シングルチャンネルはgrayでレンダリングします。
+3チャンネルはRGBでレンダリングします。
+*/
 void draw(GlsMat& src);
 
 }//namespace gls

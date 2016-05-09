@@ -42,11 +42,16 @@ namespace gls
 void ShaderCopyInit(void);
 void ShaderCopyTerminate(void);
 
+//! 行列の複製を作成します。 dst = src
 void copy(const GlsMat& src, GlsMat& dst);
+
+//! 行列の複製を作成します。 dst = src(rect)
 void copyRect(const GlsMat& src, GlsMat& dst, const Rect& rect);
 
-
+//! 行列の複数のタイルに分割します。
 void tiled(const GlsMat& src, vector<vector<GlsMat>>& dst, const Size& blkNum);
+
+//! 分割されたタイルを一つの行列に統合します。
 void untiled(const vector<vector<GlsMat>>& src, GlsMat& dst);
 
 }//namespace gls

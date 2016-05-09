@@ -353,7 +353,6 @@ static void glsFftProcess(
 
 
 //-----------------------------------------------------------------------------
-// execute FFT 
 void fft(const GlsMat& src, GlsMat& dst, int flag){
 	GLS_Assert(src.channels() == 2);
 	GLS_Assert(src.depth() == CV_32F);

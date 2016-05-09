@@ -380,7 +380,6 @@ static void glsConvertProcess(
 }
 
 
-//conver texture format
 void convert(const GlsMat& src, GlsMat& dst, const float scl){
 
 	GlsMat _dst = GlsMat(src.size(), CV_MAKETYPE(CV_32F, CV_MAT_CN(src.type())));

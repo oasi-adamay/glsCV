@@ -41,6 +41,11 @@ namespace gls
 void ShaderMergeInit(void);
 void ShaderMergeTerminate(void);
 
+/*!
+複数のシングルチャンネル行列から，マルチチャンネル行列を作成します．
+
+最大4チャンネルまで対応
+*/
 void merge(const vector<GlsMat>& src, GlsMat& dst);
 
 }

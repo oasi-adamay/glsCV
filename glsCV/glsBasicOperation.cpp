@@ -403,7 +403,6 @@ void glslBinaryOperation(
 
 }
 
-//スカラと配列の 要素毎の和を求めます．
 void add(const vec4& scalar, const GlsMat& src, GlsMat& dst){
 	GLS_Assert(src.glType() == GL_FLOAT);
 	GlsMat _dst = GlsMat(src.size(), src.type());
@@ -411,7 +410,6 @@ void add(const vec4& scalar, const GlsMat& src, GlsMat& dst){
 	dst = _dst;
 }
 
-//2 つの配列同士の 要素毎の和を求めます
 void add(const GlsMat& src0, const GlsMat& src1, GlsMat& dst)
 {
 	GLS_Assert(src0.glType() == GL_FLOAT);
@@ -422,7 +420,6 @@ void add(const GlsMat& src0, const GlsMat& src1, GlsMat& dst)
 }
 
 
-//スカラと配列の 要素毎の差を求めます．
 void subtract(const vec4& scalar, const GlsMat& src, GlsMat& dst){
 	GLS_Assert(src.glType() == GL_FLOAT);
 	GlsMat _dst = GlsMat(src.size(), src.type());
@@ -430,7 +427,6 @@ void subtract(const vec4& scalar, const GlsMat& src, GlsMat& dst){
 	dst = _dst;
 }
 
-//2 つの配列同士の 要素毎の差を求めます
 void subtract(const GlsMat& src0, const GlsMat& src1, GlsMat& dst)
 {
 	GLS_Assert(src0.glType() == GL_FLOAT);
@@ -441,7 +437,6 @@ void subtract(const GlsMat& src0, const GlsMat& src1, GlsMat& dst)
 }
 
 
-//スカラと配列の 要素毎の積を求めます．
 void multiply(const vec4& scalar, const GlsMat& src, GlsMat& dst){
 	GLS_Assert(src.glType() == GL_FLOAT);
 	GlsMat _dst = GlsMat(src.size(), src.type());
@@ -449,7 +444,6 @@ void multiply(const vec4& scalar, const GlsMat& src, GlsMat& dst){
 	dst = _dst;
 }
 
-//2 つの配列同士の 要素毎の積を求めます
 void multiply(const GlsMat& src0, const GlsMat& src1, GlsMat& dst)
 {
 	GLS_Assert(src0.glType() == GL_FLOAT);
@@ -459,7 +453,6 @@ void multiply(const GlsMat& src0, const GlsMat& src1, GlsMat& dst)
 	dst = _dst;
 }
 
-//スカラと配列の 要素毎の商を求めます．
 void divide(const vec4& scalar, const GlsMat& src, GlsMat& dst){
 	GLS_Assert(src.glType() == GL_FLOAT);
 	GlsMat _dst = GlsMat(src.size(), src.type());
@@ -468,7 +461,6 @@ void divide(const vec4& scalar, const GlsMat& src, GlsMat& dst){
 }
 
 
-//2 つの配列同士の  要素毎の商を求めます．
 void divide(const GlsMat& src0, const GlsMat& src1, GlsMat& dst){
 	GLS_Assert(src0.glType() == GL_FLOAT);
 	GLS_Assert(src1.glType() == GL_FLOAT);
@@ -477,7 +469,6 @@ void divide(const GlsMat& src0, const GlsMat& src1, GlsMat& dst){
 	dst = _dst;
 }
 
-//スカラと配列の 要素毎の最小値を求めます．
 void min(const vec4& scalar, const GlsMat& src, GlsMat& dst){
 	GLS_Assert(src.glType() == GL_FLOAT);
 	GlsMat _dst = GlsMat(src.size(), src.type());
@@ -485,7 +476,6 @@ void min(const vec4& scalar, const GlsMat& src, GlsMat& dst){
 	dst = _dst;
 }
 
-//2 つの配列同士の  要素毎の最小値を求めます．
 void min(const GlsMat& src0, const GlsMat& src1, GlsMat& dst){
 	GLS_Assert(src0.glType() == GL_FLOAT);
 	GLS_Assert(src1.glType() == GL_FLOAT);
@@ -494,7 +484,6 @@ void min(const GlsMat& src0, const GlsMat& src1, GlsMat& dst){
 	dst = _dst;
 }
 
-//スカラと配列の 要素毎の最大値を求めます．
 void max(const vec4& scalar, const GlsMat& src, GlsMat& dst){
 	GLS_Assert(src.glType() == GL_FLOAT);
 	GlsMat _dst = GlsMat(src.size(), src.type());
@@ -502,7 +491,6 @@ void max(const vec4& scalar, const GlsMat& src, GlsMat& dst){
 	dst = _dst;
 }
 
-//2 つの配列同士の  要素毎の最大値を求めます．
 void max(const GlsMat& src0, const GlsMat& src1, GlsMat& dst){
 	GLS_Assert(src0.glType() == GL_FLOAT);
 	GLS_Assert(src1.glType() == GL_FLOAT);
@@ -511,8 +499,6 @@ void max(const GlsMat& src0, const GlsMat& src1, GlsMat& dst){
 	dst = _dst;
 }
 
-//2 つのフーリエスペクトル同士の要素毎の乗算を行います．
-//conj = ture の場合、2 番目の配列を複素共役に変更できます．
 void mulSpectrums(const GlsMat& src0, const GlsMat& src1, GlsMat& dst, bool conj){
 	GLS_Assert(src0.glSizedFormat() == GL_RG32F);
 	GLS_Assert(src1.glSizedFormat() == GL_RG32F);
@@ -522,7 +508,6 @@ void mulSpectrums(const GlsMat& src0, const GlsMat& src1, GlsMat& dst, bool conj
 	dst = _dst;
 }
 
-//2 つのフーリエスペクトル同士の  要素毎の位相限定相関を求めます．
 void mulSpectrumsPhaseOnly(const GlsMat& src0, const GlsMat& src1, GlsMat& dst){
 	GLS_Assert(src0.glSizedFormat() == GL_RG32F);
 	GLS_Assert(src1.glSizedFormat() == GL_RG32F);
@@ -531,7 +516,6 @@ void mulSpectrumsPhaseOnly(const GlsMat& src0, const GlsMat& src1, GlsMat& dst){
 	dst = _dst;
 }
 
-//複素行列要素の絶対値の2乗を求めます．
 void magSpectrums(const GlsMat& src, GlsMat& dst){
 	GLS_Assert(src.glSizedFormat() == GL_RG32F);
 	vec4 scalar(1.0, 1.0, 1.0, 1.0);
@@ -540,7 +524,6 @@ void magSpectrums(const GlsMat& src, GlsMat& dst){
 	dst = _dst;
 }
 
-//複素行列要素の絶対値の2乗にoffset加算し、絶対値の自然対数を求めます．
 void logMagSpectrums(const GlsMat& src, GlsMat& dst, float offset){
 	GLS_Assert(src.glSizedFormat() == GL_RG32F);
 	vec4 scalar(offset);
@@ -550,7 +533,6 @@ void logMagSpectrums(const GlsMat& src, GlsMat& dst, float offset){
 }
 
 
-//各配列要素の絶対値の自然対数を求めます．
 void log(const GlsMat& src, GlsMat& dst){
 	GLS_Assert(src.glType() == GL_FLOAT);
 	vec4 scalar(1.0, 1.0, 1.0, 1.0);
@@ -559,7 +541,6 @@ void log(const GlsMat& src, GlsMat& dst){
 	dst = _dst;
 }
 
-//各配列要素を指数として，自然対数の底（ネイピア数）e のべき乗を求めます．
 void exp(const GlsMat& src, GlsMat& dst){
 	GLS_Assert(src.glType() == GL_FLOAT);
 	vec4 scalar(1.0, 1.0, 1.0, 1.0);
@@ -568,7 +549,6 @@ void exp(const GlsMat& src, GlsMat& dst){
 	dst = _dst;
 }
 
-//各配列要素を累乗します．
 void pow(const GlsMat& src, const float& power, GlsMat& dst){
 	GLS_Assert(src.glType() == GL_FLOAT);
 	vec4 scalar(power, power, power, power);

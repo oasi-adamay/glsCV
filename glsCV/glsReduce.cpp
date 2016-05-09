@@ -263,7 +263,7 @@ glsShaderBase* selectShader(int type){
 	return shader;
 }
 
-//Reduce texture
+
 void reduce(const GlsMat& src, GlsMat& dst, int dim, int reduceOp){
 	GLS_Assert(src.depth() == CV_32F);
 

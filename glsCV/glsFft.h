@@ -46,7 +46,15 @@ namespace gls
 void ShaderFftInit(void);
 void ShaderFftTerminate(void);
 
+/*!
+浮動小数点型の行列に対して，2次元のフーリエ順変換または逆変換を行います．
+インタリーブフォーマットの複素行列（ CV32FC2）を扱うことができます．
+
+*/
 void fft(const GlsMat& src, GlsMat& dst, int flag = 0);
+
+
+
 void fft(const Mat& src, Mat& dst, int flag = 0);
 
 }//namespace gls

@@ -43,31 +43,64 @@ void ShaderBasicOperationInit(void);
 void ShaderBasicOperationTerminate(void);
 
 //GlsMat I/F
+
+//! スカラと配列の 要素毎の和を求めます．(dst = scalar + src1)
 void add(const vec4& scalar, const GlsMat& src, GlsMat& dst);
+
+//! 2 つの配列同士の 要素毎の和を求めます(dst = src0 + src1)
 void add(const GlsMat& src0, const GlsMat& src1, GlsMat& dst);
 
+//! スカラと配列の 要素毎の差を求めます．(dst = scalar - src1)
 void subtract(const vec4& scalar, const GlsMat& src, GlsMat& dst);
+
+//! 2 つの配列同士の 要素毎の差を求めます(dst = src0 - src1)
 void subtract(const GlsMat& src0, const GlsMat& src1, GlsMat& dst);
 
+//! スカラと配列の 要素毎の積を求めます．(dst = scalar * src1)
 void multiply(const vec4& scalar, const GlsMat& src, GlsMat& dst);
+
+//! 2 つの配列同士の 要素毎の積を求めます(dst = src0 * src1)
 void multiply(const GlsMat& src0, const GlsMat& src1, GlsMat& dst);
 
+//! スカラと配列の 要素毎の商を求めます．(dst = scalar / src1)
 void divide(const vec4& scalar, const GlsMat& src, GlsMat& dst);
+
+//! 2 つの配列同士の  要素毎の商を求めます．(dst = src0 / src1)
 void divide(const GlsMat& src0, const GlsMat& src1, GlsMat& dst);
 
+//! スカラと配列の 要素毎の最小値を求めます．(dst = min(scalar, src))
 void min(const vec4& scalar, const GlsMat& src, GlsMat& dst);
+
+//! 2 つの配列同士の  要素毎の最小値を求めます．(dst = min(src0, src1))
 void min(const GlsMat& src0, const GlsMat& src1, GlsMat& dst);
 
+//! スカラと配列の 要素毎の最大値を求めます．(dst = max(scalar, src))
 void max(const vec4& scalar, const GlsMat& src, GlsMat& dst);
+
+//! 2 つの配列同士の  要素毎の最大値を求めます．(dst = max(src0, src1))
 void max(const GlsMat& src0, const GlsMat& src1, GlsMat& dst);
 
+//! 2 つのフーリエスペクトル同士の要素毎の乗算を行います．
+//! conj = ture の場合、2 番目の配列を複素共役に変更できます．
 void mulSpectrums(const GlsMat& src0, const GlsMat& src1, GlsMat& dst, bool conj = false);
+
+//! 2 つのフーリエスペクトル同士の  要素毎の位相限定相関を求めます．
 void mulSpectrumsPhaseOnly(const GlsMat& src0, const GlsMat& src1, GlsMat& dst);
+
+//! 複素行列要素の大きさを求めます．(dst = sqrt(src.re**2 + src.im**2 )
 void magSpectrums(const GlsMat& src, GlsMat& dst);
+
+//! 複素行列要素の絶対値の2乗にoffset加算し、絶対値の自然対数を求めます．
+//! (dst = log( sqrt(src.re**2 + src.im**2) + offset )
 void logMagSpectrums(const GlsMat& src, GlsMat& dst,float offset);
 
+//! 各配列要素の絶対値の自然対数を求めます．(dst = log(src))
 void log(const GlsMat& src, GlsMat& dst);
+
+//! 各配列要素を指数として，自然対数の底（ネイピア数）e のべき乗を求めます．(dst = exp(src))
 void exp(const GlsMat& src, GlsMat& dst);
+
+//! 各配列要素を累乗します． (dst = src**power)
 void pow(const GlsMat& src, const float& power, GlsMat& dst);
 
 

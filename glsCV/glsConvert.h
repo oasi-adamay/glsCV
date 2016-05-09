@@ -41,7 +41,10 @@ namespace gls
 void ShaderConvertInit(void);
 void ShaderConvertTerminate(void);
 
+//! formatを変更します。
 void convert(const GlsMat& src, GlsMat& dst,const float scl = 1.0);
+
+//! 画像の色空間を変換します．(一部のみ実装)
 void cvtColor(const GlsMat& src, GlsMat& dst, const int code);
 
 }//namespace gls

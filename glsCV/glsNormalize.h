@@ -42,7 +42,11 @@ namespace gls
 void ShaderNormalizeInit(void);
 void ShaderNormalizeTerminate(void);
 
+/*!
+配列のノルム，またはその範囲を正規化します．
 
+現在は、NORM_MINMAXのみ対応しています。
+*/
 void normalize(const GlsMat& src, GlsMat& dst, double alpha = 0, double beta = 1, int normType = NORM_MINMAX);
 
 

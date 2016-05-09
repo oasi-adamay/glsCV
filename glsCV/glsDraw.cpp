@@ -284,7 +284,6 @@ static void glsDrawProcess(
 }
 
 //-----------------------------------------------------------------------------
-// execute Draw 
 void draw(GlsMat& src){
 	// Clear the screen
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);

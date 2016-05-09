@@ -220,7 +220,6 @@ glsShaderBase* selectShader(int type){
 	return shader;
 }
 
-//copy texture
 void copy(const GlsMat& src, GlsMat& dst){
 	GlsMat _dst = GlsMat(src.size(), src.type());
 	glsShaderBase* shader = selectShader(src.type());
