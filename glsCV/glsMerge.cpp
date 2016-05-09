@@ -71,13 +71,13 @@ glsShaderMerge* shaderMerge = 0;
 glsShaderMergeU* shaderMergeU = 0;
 glsShaderMergeS* shaderMergeS = 0;
 
-void mergeInit(void){
+void ShaderMergeInit(void){
 	shaderMerge = new glsShaderMerge();
 	shaderMergeU = new glsShaderMergeU();
 	shaderMergeS = new glsShaderMergeS();
 }
 
-void mergeTerminate(void){
+void ShaderMergeTerminate(void){
 	delete shaderMerge;
 	delete shaderMergeU;
 	delete shaderMergeS;

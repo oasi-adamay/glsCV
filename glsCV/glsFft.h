@@ -43,8 +43,8 @@ namespace gls
 #define GLS_FFT_INVERSE   (1<<2)
 #define GLS_FFT_SHIFT	   (1<<3)	
 
-void fftInit(void);
-void fftTerminate(void);
+void ShaderFftInit(void);
+void ShaderFftTerminate(void);
 
 void fft(const GlsMat& src, GlsMat& dst, int flag = 0);
 void fft(const Mat& src, Mat& dst, int flag = 0);

@@ -71,13 +71,13 @@ glsShaderCopy* shaderCopy = 0;
 glsShaderCopyU* shaderCopyU = 0;
 glsShaderCopyS* shaderCopyS = 0;
 
-void copyInit(void){
+void ShaderCopyInit(void){
 	shaderCopy = new glsShaderCopy();
 	shaderCopyU = new glsShaderCopyU();
 	shaderCopyS = new glsShaderCopyS();
 }
 
-void copyTerminate(void){
+void ShaderCopyTerminate(void){
 	delete shaderCopy;
 	delete shaderCopyU;
 	delete shaderCopyS;

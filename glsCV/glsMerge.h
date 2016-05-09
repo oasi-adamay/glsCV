@@ -38,8 +38,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace gls
 {
 
-void mergeInit(void);
-void mergeTerminate(void);
+void ShaderMergeInit(void);
+void ShaderMergeTerminate(void);
 
 void merge(const vector<GlsMat>& src, GlsMat& dst);
 

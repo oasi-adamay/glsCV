@@ -87,14 +87,14 @@ glsShaderConvert* shaderConvert = 0;
 glsShaderConvertU* shaderConvertU = 0;
 glsShaderConvertS* shaderConvertS = 0;
 
-void convertInit(void){
+void ShaderConvertInit(void){
 	shaderConvert = new glsShaderConvert();
 	shaderConvertU = new glsShaderConvertU();
 	shaderConvertS = new glsShaderConvertS();
 
 }
 
-void convertTerminate(void){
+void ShaderConvertTerminate(void){
 	delete shaderConvert;
 	delete shaderConvertU;
 	delete shaderConvertS;

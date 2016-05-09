@@ -39,8 +39,8 @@ namespace gls
 {
 
 
-void drawInit(void);
-void drawTerminate(void);
+void ShaderDrawInit(void);
+void ShaderDrawTerminate(void);
 
 void draw(GlsMat& src);
 

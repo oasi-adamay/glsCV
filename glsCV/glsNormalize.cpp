@@ -70,13 +70,13 @@ public:
 //glsShaderNormalizeU* shaderNormalizeU = 0;
 //glsShaderNormalizeS* shaderNormalizeS = 0;
 
-void normalizeInit(void){
+void ShaderNormalizeInit(void){
 //	shaderNormalize = new glsShaderNormalize();
 //	shaderNormalizeU = new glsShaderNormalizeU();
 //	shaderNormalizeS = new glsShaderNormalizeS();
 }
 
-void normalizeTerminate(void){
+void ShaderNormalizeTerminate(void){
 //	delete shaderNormalize;
 //	delete shaderNormalizeU;
 //	delete shaderNormalizeS;

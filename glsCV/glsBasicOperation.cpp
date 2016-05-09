@@ -71,12 +71,12 @@ public:
 glsShaderScalarOperation* shaderScalarOperation = 0;
 glsShaderBinaryOperation* shaderBinaryOperation = 0;
 
-void basicOperationInit(void){
+void ShaderBasicOperationInit(void){
 	shaderScalarOperation = new glsShaderScalarOperation();
 	shaderBinaryOperation = new glsShaderBinaryOperation();
 }
 
-void basicOperationTerminate(void){
+void ShaderBasicOperationTerminate(void){
 	delete shaderScalarOperation;
 	delete shaderBinaryOperation;
 }

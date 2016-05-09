@@ -39,8 +39,8 @@ namespace gls
 {
 
 
-void basicOperationInit(void);
-void basicOperationTerminate(void);
+void ShaderBasicOperationInit(void);
+void ShaderBasicOperationTerminate(void);
 
 //GlsMat I/F
 void add(const vec4& scalar, const GlsMat& src, GlsMat& dst);

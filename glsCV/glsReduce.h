@@ -39,8 +39,8 @@ namespace gls
 {
 
 
-void reduceInit(void);
-void reduceTerminate(void);
+void ShaderReduceInit(void);
+void ShaderReduceTerminate(void);
 
 
 

@@ -39,8 +39,8 @@ namespace gls
 {
 
 
-void normalizeInit(void);
-void normalizeTerminate(void);
+void ShaderNormalizeInit(void);
+void ShaderNormalizeTerminate(void);
 
 
 void normalize(const GlsMat& src, GlsMat& dst, double alpha = 0, double beta = 1, int normType = NORM_MINMAX);

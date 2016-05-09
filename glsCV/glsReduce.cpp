@@ -68,13 +68,13 @@ glsShaderReduce* shaderReduce = 0;
 //glsShaderReduceU* shaderReduceU = 0;
 //glsShaderReduceS* shaderReduceS = 0;
 
-void reduceInit(void){
+void ShaderReduceInit(void){
 	shaderReduce = new glsShaderReduce();
 //	shaderReduceU = new glsShaderReduceU();
 //	shaderReduceS = new glsShaderReduceS();
 }
 
-void reduceTerminate(void){
+void ShaderReduceTerminate(void){
 	delete shaderReduce;
 //	delete shaderReduceU;
 //	delete shaderReduceS;

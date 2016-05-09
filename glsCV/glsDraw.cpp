@@ -78,13 +78,13 @@ public:
 glsShaderDraw* shaderDraw = 0;
 glsShaderDrawU* shaderDrawU = 0;
 
-void drawInit(void){
+void ShaderDrawInit(void){
 	shaderDraw = new glsShaderDraw();
 	shaderDrawU = new glsShaderDrawU();
 
 }
 
-void drawTerminate(void){
+void ShaderDrawTerminate(void){
 	delete shaderDraw;
 	delete shaderDrawU;
 }

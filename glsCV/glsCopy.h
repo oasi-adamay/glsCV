@@ -39,8 +39,8 @@ namespace gls
 {
 
 
-void copyInit(void);
-void copyTerminate(void);
+void ShaderCopyInit(void);
+void ShaderCopyTerminate(void);
 
 void copy(const GlsMat& src, GlsMat& dst);
 void copyRect(const GlsMat& src, GlsMat& dst, const Rect& rect);

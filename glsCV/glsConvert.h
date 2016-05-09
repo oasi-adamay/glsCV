@@ -38,8 +38,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace gls
 {
 
-void convertInit(void);
-void convertTerminate(void);
+void ShaderConvertInit(void);
+void ShaderConvertTerminate(void);
 
 void convert(const GlsMat& src, GlsMat& dst,const float scl = 1.0);
 void cvtColor(const GlsMat& src, GlsMat& dst, const int code);

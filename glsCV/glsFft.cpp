@@ -75,11 +75,11 @@ public:
 //global 
 glsShaderFft* shaderFft = 0;
 
-void fftInit(void){
+void ShaderFftInit(void){
 	shaderFft = new glsShaderFft();
 }
 
-void fftTerminate(void){
+void ShaderFftTerminate(void){
 	delete shaderFft;
 }
 
