@@ -1,6 +1,9 @@
 # glsCV
 OpenGLSLを使用したCVライブラリ  
 
+## LICENSE
+BSD-3clause license  
+
 ## 環境
  * Windows8
  * VC2013
