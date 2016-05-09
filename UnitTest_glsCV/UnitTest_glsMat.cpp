@@ -266,13 +266,7 @@ namespace UnitTest_glsCV
 			Assert::AreEqual(0, errNum);
 		}
 
-		////@ To do Error!! 
-		//TEST_METHOD(GlsMat_Copy_CV_8UC1_3x4)
-		//{
-		//	cout << __FUNCTION__ << endl;
-		//	int errNum = test_GlsMat_CopyTo<uchar>(CV_8UC1, Size(3, 4));
-		//	Assert::AreEqual(0, errNum);
-		//}
+
 
 		TEST_METHOD(GlsMat_Copy_CV_32FC1_5x5)
 		{
@@ -288,6 +282,35 @@ namespace UnitTest_glsCV
 			Assert::AreEqual(0, errNum);
 		}
 
+		TEST_METHOD(GlsMat_Copy_CV_32FC1_1x1)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_GlsMat_CopyTo<float>(CV_32FC1, Size(1, 1));
+			Assert::AreEqual(0, errNum);
+		}
+
+		TEST_METHOD(GlsMat_Copy_CV_32FC1_3x4)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_GlsMat_CopyTo<float>(CV_32FC1, Size(3, 4));
+			Assert::AreEqual(0, errNum);
+		}
+
+		//@@@ TODO issue #6
+#if 0
+		TEST_METHOD(GlsMat_Copy_CV_8UC1_3x4)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_GlsMat_CopyTo<uchar>(CV_8UC1, Size(3, 4));
+			Assert::AreEqual(0, errNum);
+		}
+		TEST_METHOD(GlsMat_Copy_CV_16UC1_3x4)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_GlsMat_CopyTo<ushort>(CV_16UC1, Size(3, 4));
+			Assert::AreEqual(0, errNum);
+		}
+#endif
 
 
 
