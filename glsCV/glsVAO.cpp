@@ -32,6 +32,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "glsVAO.h"
 
+namespace gls
+{
+
 glsVAO::glsVAO(GLuint attrLoc){
 	// [-1, 1] ÇÃê≥ï˚å`
 	static GLfloat position[][2] = {
@@ -72,4 +75,5 @@ glsVAO::~glsVAO(void){
 	glDeleteBuffers(1, &vbo);
 }
 
+}//namespace gls
 

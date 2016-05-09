@@ -90,8 +90,8 @@ int _tmain(int argc, _TCHAR* argv[])
 	Size sizeFft(512, 512);
 	Mat fftwin;
 	cv::createHanningWindow(fftwin, sizeFft, CV_32F);
-	glsMat glsFftWin(fftwin);
-	glsMat glsZero(Mat::zeros(sizeFft, CV_32FC1));
+	GlsMat glsFftWin(fftwin);
+	GlsMat glsZero(Mat::zeros(sizeFft, CV_32FC1));
 
 	Rect rectFft((captureWidth - sizeFft.width) / 2, (captureHeight - sizeFft.height) / 2 , sizeFft.width, sizeFft.height);
 
@@ -104,7 +104,7 @@ int _tmain(int argc, _TCHAR* argv[])
 
 		cv::flip(frame, frame, 0);				// è„â∫îΩì]
 
-		glsMat glsFrame;
+		GlsMat glsFrame;
 
 		switch (camMode){
 		case(E_CAM_MODE::FFT) :	{
@@ -128,41 +128,41 @@ int _tmain(int argc, _TCHAR* argv[])
 #else
 			Mat roi = Mat(frame, rectFft);
 			glsFrame = roi;
-			glsConvert(glsFrame, glsFrame, 1.0f / 256.0f);
-			glsCvtColor(glsFrame, glsFrame, CV_BGR2GRAY);
-			glsMultiply(glsFftWin, glsFrame, glsFrame);
-			vector<glsMat> plnGls(2);
+			gls::convert(glsFrame, glsFrame, 1.0f / 256.0f);
+			gls::cvtColor(glsFrame, glsFrame, CV_BGR2GRAY);
+			gls::multiply(glsFftWin, glsFrame, glsFrame);
+			vector<GlsMat> plnGls(2);
 			plnGls[0] = glsFrame;
 			plnGls[1] = glsZero;
-			glsMat glsComplx;
-			glsMerge(plnGls, glsComplx);
-			glsFft(glsComplx, glsComplx, GLS_FFT_SHIFT);
-			glsLogMagSpectrums(glsComplx, glsFrame, 1.0);
-			glsNormalize(glsFrame, glsFrame, 0, 1, NORM_MINMAX);
+			GlsMat glsComplx;
+			gls::merge(plnGls, glsComplx);
+			gls::fft(glsComplx, glsComplx, GLS_FFT_SHIFT);
+			gls::logMagSpectrums(glsComplx, glsFrame, 1.0);
+			gls::normalize(glsFrame, glsFrame, 0, 1, NORM_MINMAX);
 #endif
 		}break;
 		case(E_CAM_MODE::FFT_RECT) : {
 			Mat roi = Mat(frame, rectFft);
 			glsFrame = roi;
-			glsConvert(glsFrame, glsFrame, 1.0f / 256.0f);
-			glsCvtColor(glsFrame, glsFrame, CV_BGR2GRAY);
-			glsMultiply(glsFftWin, glsFrame, glsFrame);
+			gls::convert(glsFrame, glsFrame, 1.0f / 256.0f);
+			gls::cvtColor(glsFrame, glsFrame, CV_BGR2GRAY);
+			gls::multiply(glsFftWin, glsFrame, glsFrame);
 		} break;
 		case(E_CAM_MODE::GRAY) : {
 			glsFrame = frame;
-			glsConvert(glsFrame, glsFrame, 1.0f / 256.0f);
-			glsCvtColor(glsFrame, glsFrame, CV_BGR2GRAY);
+			gls::convert(glsFrame, glsFrame, 1.0f / 256.0f);
+			gls::cvtColor(glsFrame, glsFrame, CV_BGR2GRAY);
 		}break;
 		case(E_CAM_MODE::NORMAL):
 		default:{
 			glsFrame = frame;
-			glsConvert(glsFrame, glsFrame, 1.0f / 256.0f);
-			glsCvtColor(glsFrame, glsFrame, CV_BGR2RGB);
+			gls::convert(glsFrame, glsFrame, 1.0f / 256.0f);
+			gls::cvtColor(glsFrame, glsFrame, CV_BGR2RGB);
 		}break;
 		}
 
 		glfwSetWindowSize(window, glsFrame.size().width, glsFrame.size().height);
-		glsDraw(glsFrame);
+		gls::draw(glsFrame);
 
 		glfwSwapBuffers(window);  // Swap buffers
 		glfwPollEvents();

@@ -60,11 +60,11 @@ namespace UnitTest_glsCV
 
 		cv::normalize(imgSrc, imgRef, alpha, beta, normType);
 
-		glsMat glsSrc(imgSrc);
+		GlsMat glsSrc(imgSrc);
 
-		glsMat glsDst;
+		GlsMat glsDst;
 
-		glsNormalize(glsSrc, glsDst, alpha, beta, normType);
+		gls::normalize(glsSrc, glsDst, alpha, beta, normType);
 
 		glsDst.CopyTo(imgDst);		// download
 

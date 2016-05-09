@@ -33,6 +33,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "glsCV.h"
 #include "glsFBO.h"
 
+namespace gls
+{
+
 glsFBO::glsFBO(const int attachment_num){
 	GLS_Assert(attachment_num < 16);
 	// create FBO (off-screen framebuffer)
@@ -68,3 +71,5 @@ glsFBO::~glsFBO(void){
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glDeleteFramebuffers(1, &fbo);
 }
+
+}//namespace gls

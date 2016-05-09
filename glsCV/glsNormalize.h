@@ -32,19 +32,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _GLS_NORMALIZE_H_
 
 #include "glsCV.h"
-#include "glsMat.h"
+#include "GlsMat.h"
 #include "glsShader.h"
 
+namespace gls
+{
 
 
-void glsNormalizeInit(void);
-void glsNormalizeTerminate(void);
+void normalizeInit(void);
+void normalizeTerminate(void);
 
 
-
-void glsNormalize(const glsMat& src, glsMat& dst, double alpha = 0, double beta = 1, int normType = NORM_MINMAX);
-
+void normalize(const GlsMat& src, GlsMat& dst, double alpha = 0, double beta = 1, int normType = NORM_MINMAX);
 
 
+}//namespace gls
 
 #endif

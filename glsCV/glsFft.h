@@ -32,22 +32,24 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _GLS_FFT_H_
 
 #include "glsCV.h"
-#include "glsMat.h"
+#include "GlsMat.h"
 #include "glsShader.h"
 
 
-
+namespace gls
+{
 
 #define GLS_FFT_SCALE	   (1<<1)
 #define GLS_FFT_INVERSE   (1<<2)
 #define GLS_FFT_SHIFT	   (1<<3)	
 
-void glsFftInit(void);
-void glsFftTerminate(void);
+void fftInit(void);
+void fftTerminate(void);
 
-void glsFft(const glsMat& src, glsMat& dst, int flag = 0);
-void glsFft(const Mat& src, Mat& dst, int flag = 0);
+void fft(const GlsMat& src, GlsMat& dst, int flag = 0);
+void fft(const Mat& src, Mat& dst, int flag = 0);
 
+}//namespace gls
 
 
 #endif

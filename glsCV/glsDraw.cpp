@@ -33,6 +33,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "glsDraw.h"
 #include "Timer.h"
 
+namespace gls
+{
+
 //-----------------------------------------------------------------------------
 // glsDraw shader
 class glsShaderDrawBase : public glsShaderBase
@@ -75,13 +78,13 @@ public:
 glsShaderDraw* shaderDraw = 0;
 glsShaderDrawU* shaderDrawU = 0;
 
-void glsDrawInit(void){
+void drawInit(void){
 	shaderDraw = new glsShaderDraw();
 	shaderDrawU = new glsShaderDrawU();
 
 }
 
-void glsDrawTerminate(void){
+void drawTerminate(void){
 	delete shaderDraw;
 	delete shaderDrawU;
 }
@@ -282,7 +285,7 @@ static void glsDrawProcess(
 
 //-----------------------------------------------------------------------------
 // execute Draw 
-void glsDraw(glsMat& src){
+void draw(GlsMat& src){
 	// Clear the screen
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClearDepth(1.0);
@@ -342,6 +345,7 @@ void glsDraw(glsMat& src){
 
 }
 
+}//namespace gls
 
 
 

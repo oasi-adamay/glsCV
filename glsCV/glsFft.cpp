@@ -43,6 +43,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _TMR_(...)
 #endif
 
+namespace gls
+{
+
 // glsFft shader
 class glsShaderFft : public glsShaderBase
 {
@@ -72,11 +75,11 @@ public:
 //global 
 glsShaderFft* shaderFft = 0;
 
-void glsFftInit(void){
+void fftInit(void){
 	shaderFft = new glsShaderFft();
 }
 
-void glsFftTerminate(void){
+void fftTerminate(void){
 	delete shaderFft;
 }
 
@@ -351,7 +354,7 @@ static void glsFftProcess(
 
 //-----------------------------------------------------------------------------
 // execute FFT 
-void glsFft(const glsMat& src, glsMat& dst, int flag){
+void fft(const GlsMat& src, GlsMat& dst, int flag){
 	GLS_Assert(src.channels() == 2);
 	GLS_Assert(src.depth() == CV_32F);
 
@@ -360,18 +363,18 @@ void glsFft(const glsMat& src, glsMat& dst, int flag){
 	GLS_Assert(IsPow2(N));
 
 	Size blkNum(2,2);
-	vector<vector<glsMat>> _dst0 = vector<vector<glsMat>>(blkNum.height, vector<glsMat>(blkNum.width));
-	vector<vector<glsMat>> _dst1 = vector<vector<glsMat>>(blkNum.height, vector<glsMat>(blkNum.width));
+	vector<vector<GlsMat>> _dst0 = vector<vector<GlsMat>>(blkNum.height, vector<GlsMat>(blkNum.width));
+	vector<vector<GlsMat>> _dst1 = vector<vector<GlsMat>>(blkNum.height, vector<GlsMat>(blkNum.width));
 
-	glsTiled(src, _dst0, blkNum);
+	gls::tiled(src, _dst0, blkNum);
 	for (int by = 0; by < blkNum.height; by++){
 		for (int bx = 0; bx < blkNum.width; bx++){
-			_dst1[by][bx] = glsMat(Size(src.cols / blkNum.width, src.rows / blkNum.height), src.type());
+			_dst1[by][bx] = GlsMat(Size(src.cols / blkNum.width, src.rows / blkNum.height), src.type());
 		}
 	}
 
 
-	glsMat texW(Size(N / 2, 1), src.type());
+	GlsMat texW(Size(N / 2, 1), src.type());
 
 	//---------------------------------
 	// upload twidle texture
@@ -407,7 +410,7 @@ void glsFft(const glsMat& src, glsMat& dst, int flag){
 		//glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
-	vector<vector<glsMat>>* texbuf[2] = { &_dst0, &_dst1 };
+	vector<vector<GlsMat>>* texbuf[2] = { &_dst0, &_dst1 };
 
 	//Execute
 	int bank = 0;
@@ -465,21 +468,21 @@ void glsFft(const glsMat& src, glsMat& dst, int flag){
 		bank = bank ^ 1;
 	}
 
-	glsUntiled(*texbuf[bank], dst);
+	gls::untiled(*texbuf[bank], dst);
 }
 
 
 
 
-void glsFft(const Mat& src, Mat& dst, int flag){
+void fft(const Mat& src, Mat& dst, int flag){
 	CV_Assert(src.type() == CV_32FC2);
 	CV_Assert(src.cols == src.rows);
 
 	int N = src.cols;
 	CV_Assert(IsPow2(N));
 
-	glsMat _src(src.size(), src.type());
-	glsMat _dst;
+	GlsMat _src(src.size(), src.type());
+	GlsMat _dst;
 
 	//---------------------------------
 	//upload
@@ -487,7 +490,7 @@ void glsFft(const Mat& src, Mat& dst, int flag){
 
 	//---------------------------------
 	//fft
-	glsFft(_src, _dst,flag);
+	gls::fft(_src, _dst,flag);
 
 	//---------------------------------
 	//download
@@ -496,9 +499,5 @@ void glsFft(const Mat& src, Mat& dst, int flag){
 
 }
 
-
-
-
-
-
+}//namespace gls
 

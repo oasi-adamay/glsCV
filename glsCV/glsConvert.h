@@ -32,17 +32,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _GLS_CONVERT_H_
 
 #include "glsCV.h"
-#include "glsMat.h"
+#include "GlsMat.h"
 #include "glsShader.h"
 
+namespace gls
+{
 
+void convertInit(void);
+void convertTerminate(void);
 
-void glsConvertInit(void);
-void glsConvertTerminate(void);
+void convert(const GlsMat& src, GlsMat& dst,const float scl = 1.0);
+void cvtColor(const GlsMat& src, GlsMat& dst, const int code);
 
-void glsConvert(const glsMat& src, glsMat& dst,const float scl = 1.0);
-void glsCvtColor(const glsMat& src, glsMat& dst, const int code);
-
+}//namespace gls
 
 
 #endif

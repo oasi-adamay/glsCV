@@ -34,6 +34,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "glsConvert.h"
 #include "Timer.h"
 
+namespace gls
+{
+
 //-----------------------------------------------------------------------------
 // glsDraw shader
 class glsShaderConvertBase : public glsShaderBase
@@ -84,14 +87,14 @@ glsShaderConvert* shaderConvert = 0;
 glsShaderConvertU* shaderConvertU = 0;
 glsShaderConvertS* shaderConvertS = 0;
 
-void glsConvertInit(void){
+void convertInit(void){
 	shaderConvert = new glsShaderConvert();
 	shaderConvertU = new glsShaderConvertU();
 	shaderConvertS = new glsShaderConvertS();
 
 }
 
-void glsConvertTerminate(void){
+void convertTerminate(void){
 	delete shaderConvert;
 	delete shaderConvertU;
 	delete shaderConvertS;
@@ -378,9 +381,9 @@ static void glsConvertProcess(
 
 
 //conver texture format
-void glsConvert(const glsMat& src, glsMat& dst, const float scl){
+void convert(const GlsMat& src, GlsMat& dst, const float scl){
 
-	glsMat _dst = glsMat(src.size(), CV_MAKETYPE(CV_32F, CV_MAT_CN(src.type())));
+	GlsMat _dst = GlsMat(src.size(), CV_MAKETYPE(CV_32F, CV_MAT_CN(src.type())));
 	GLS_Assert(_dst.glType() == GL_FLOAT);
 
 	glsShaderConvertBase* shader = 0;
@@ -418,7 +421,7 @@ void glsConvert(const glsMat& src, glsMat& dst, const float scl){
 
 }
 
-void glsCvtColor(const glsMat& src, glsMat& dst, const int code){
+void cvtColor(const GlsMat& src, GlsMat& dst, const int code){
 	GLS_Assert(src.glType() == GL_FLOAT);
 
 	int ch=1;
@@ -450,7 +453,7 @@ void glsCvtColor(const glsMat& src, glsMat& dst, const int code){
 		GLS_Assert(0);
 	}
 
-	glsMat _dst = glsMat(src.size(), CV_MAKETYPE(CV_MAT_DEPTH(src.type()), ch));
+	GlsMat _dst = GlsMat(src.size(), CV_MAKETYPE(CV_MAT_DEPTH(src.type()), ch));
 
 	glsShaderConvertBase* shader = 0;
 
@@ -478,6 +481,7 @@ void glsCvtColor(const glsMat& src, glsMat& dst, const int code){
 }
 
 
+}//namespace gls
 
 
 

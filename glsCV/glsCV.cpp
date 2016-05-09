@@ -142,14 +142,14 @@ GLFWwindow* glsCvInit(const int _width, const int _height){
 
 	}
 
-	glsCopyInit();
-	glsConvertInit();
-	glsDrawInit();
-	glsBasicOperationInit();
-	glsMergeInit();
-	glsReduceInit();
-	glsNormalizeInit();
-	glsFftInit();
+	gls::copyInit();
+	gls::convertInit();
+	gls::drawInit();
+	gls::basicOperationInit();
+	gls::mergeInit();
+	gls::reduceInit();
+	gls::normalizeInit();
+	gls::fftInit();
 
 	GL_CHECK_ERROR();
 
@@ -160,14 +160,14 @@ GLFWwindow* glsCvInit(const int _width, const int _height){
 //Terminate glsFft
 void glsCvTerminate(void){
 
-	glsCopyTerminate();
-	glsConvertTerminate();
-	glsDrawTerminate();
-	glsBasicOperationTerminate();
-	glsMergeTerminate();
-	glsReduceTerminate();
-	glsNormalizeTerminate();
-	glsFftTerminate();
+	gls::copyTerminate();
+	gls::convertTerminate();
+	gls::drawTerminate();
+	gls::basicOperationTerminate();
+	gls::mergeTerminate();
+	gls::reduceTerminate();
+	gls::normalizeTerminate();
+	gls::fftTerminate();
 
 	// Close OpenGL window and terminate GLFW
 	glfwTerminate();

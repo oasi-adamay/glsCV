@@ -33,12 +33,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <memory>
 
+namespace gls
+{
+
 GLenum convCVtype2GLsizedFormat(int type);
 GLenum convCVtype2GLformat(int type);
 GLenum convCVtype2GLtype(int type);
 int convFmtGL2CV(GLenum  format);
 
-class glsMat
+class GlsMat
 {
 private:
 	shared_ptr<GLuint> _texid;
@@ -51,12 +54,12 @@ public:
 	int rows;
 	int cols;
 
-	glsMat(const Mat & cvmat);
-	glsMat(const Size size, const int type);
-	glsMat(void);
-	~glsMat(void);
+	GlsMat(const Mat & cvmat);
+	GlsMat(const Size size, const int type);
+	GlsMat(void);
+	~GlsMat(void);
 
-	glsMat& operator=(const glsMat& rhs);
+	GlsMat& operator=(const GlsMat& rhs);
 
 	GLuint texid(void)const { return *_texid; }
 
@@ -77,10 +80,8 @@ public:
 
 };
 
+}//namespace gls
 
-
-
-
-
+using gls::GlsMat;
 
 #endif

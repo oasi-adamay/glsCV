@@ -34,6 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "glsMerge.h"
 
 
+namespace gls
+{
 
 
 
@@ -69,13 +71,13 @@ glsShaderMerge* shaderMerge = 0;
 glsShaderMergeU* shaderMergeU = 0;
 glsShaderMergeS* shaderMergeS = 0;
 
-void glsMergeInit(void){
+void mergeInit(void){
 	shaderMerge = new glsShaderMerge();
 	shaderMergeU = new glsShaderMergeU();
 	shaderMergeS = new glsShaderMergeS();
 }
 
-void glsMergeTerminate(void){
+void mergeTerminate(void){
 	delete shaderMerge;
 	delete shaderMergeU;
 	delete shaderMergeS;
@@ -179,7 +181,7 @@ glsShaderMergeS::glsShaderMergeS(void)
 
 //---------------------------------------------------------------------------
 //
-static void glsMergeProcess(
+static void mergeProcess(
 	const glsShaderBase* shader,	//progmra ID
 	const vector<GLuint>& texSrc,	//src texture IDs
 	const Rect& rectSrc,			// Merge src rectangel
@@ -243,12 +245,12 @@ glsShaderBase* selectShader(int type){
 }
 
 //Merge texture
-void glsMerge(const vector<glsMat>& plnSrc, glsMat& dst){
+void merge(const vector<GlsMat>& plnSrc, GlsMat& dst){
 	int cn = (int)plnSrc.size();
 	GLS_Assert(1 <= cn);
 	GLS_Assert(cn <= 4);
 
-	glsMat _dst = glsMat(plnSrc[0].size(), CV_MAKE_TYPE(plnSrc[0].depth(), cn));
+	GlsMat _dst = GlsMat(plnSrc[0].size(), CV_MAKE_TYPE(plnSrc[0].depth(), cn));
 
 	glsShaderBase* shader = selectShader(plnSrc[0].type());
 
@@ -267,10 +269,10 @@ void glsMerge(const vector<glsMat>& plnSrc, glsMat& dst){
 		texSrc[c] = plnSrc[c].texid();
 	}
 
-	glsMergeProcess(shader, texSrc, rectSrc, rectDst);
+	mergeProcess(shader, texSrc, rectSrc, rectDst);
 
 	dst = _dst;
 }
 
 
-
+}	//namespace gls

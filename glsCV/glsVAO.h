@@ -31,6 +31,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _GLS_VAO_H_
 #define _GLS_VAO_H_
 
+namespace gls
+{
+
 class glsVAO{
 private:
 	GLuint vao;
@@ -40,6 +43,6 @@ public:
 	~glsVAO(void);
 };
 
-
+}
 
 #endif

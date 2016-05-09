@@ -69,11 +69,11 @@ namespace UnitTest_glsCV
 		}
 
 		//----------------------
-		glsMat glsSrc(imgSrc);		//create glsMat and  upload
-		glsMat glsDst;
+		GlsMat glsSrc(imgSrc);		//create GlsMat and  upload
+		GlsMat glsDst;
 		{
 			_TMR_("-glsCopy:\t");
-			glsCopy(glsSrc, glsDst);	//copy texture
+			gls::copy(glsSrc, glsDst);	//copy texture
 		}
 
 
@@ -174,9 +174,9 @@ namespace UnitTest_glsCV
 
 
 		//----------------------
-		glsMat glsSrc(imgSrc);		//create glsMat and  upload
-		glsMat glsDst;
-		glsCopyRect(glsSrc, glsDst, rect);	//copy texture within rect
+		GlsMat glsSrc(imgSrc);		//create GlsMat and  upload
+		GlsMat glsDst;
+		gls::copyRect(glsSrc, glsDst, rect);	//copy texture within rect
 		glsDst.CopyTo(imgDst);		// download
 
 		int errNum = 0;
@@ -262,9 +262,9 @@ namespace UnitTest_glsCV
 		FillRandU<T>(imgSrc);
 
 		//----------------------
-		glsMat glsSrc(imgSrc);					//create glsMat and  upload
-		vector<vector<glsMat>> glsDst;
-		glsTiled(glsSrc, glsDst, blkNum);		//copy texture
+		GlsMat glsSrc(imgSrc);					//create GlsMat and  upload
+		vector<vector<GlsMat>> glsDst;
+		gls::tiled(glsSrc, glsDst, blkNum);		//copy texture
 
 		if (glsDst.size() != blkNum.height) return -1;
 		if (glsDst[0].size() != blkNum.width) return -1;
@@ -337,7 +337,7 @@ namespace UnitTest_glsCV
 		//init Src image
 		FillRandU<T>(imgSrc);
 
-		vector<vector<glsMat>> glsSrc(blkNum.height, vector<glsMat>(blkNum.width));
+		vector<vector<GlsMat>> glsSrc(blkNum.height, vector<GlsMat>(blkNum.width));
 
 		for (int by = 0; by < blkNum.height; by++){
 			for (int bx = 0; bx < blkNum.width; bx++){
@@ -348,8 +348,8 @@ namespace UnitTest_glsCV
 		}
 
 
-		glsMat glsDst;
-		glsUntiled(glsSrc, glsDst);			//copy texture  with untiling
+		GlsMat glsDst;
+		gls::untiled(glsSrc, glsDst);			//copy texture  with untiling
 		glsDst.CopyTo(imgDst);				// download
 
 		int errNum = 0;

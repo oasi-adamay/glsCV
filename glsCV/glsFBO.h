@@ -31,6 +31,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _GLS_FBO_H_
 #define _GLS_FBO_H_
 
+namespace gls
+{
+
 class glsFBO{
 private:
 	GLuint fbo;
@@ -38,5 +41,7 @@ public:
 	glsFBO(const int attachment_num = 1);
 	~glsFBO(void);
 };
+
+}//namespace gls
 
 #endif

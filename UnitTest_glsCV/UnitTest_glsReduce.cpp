@@ -60,10 +60,10 @@ namespace UnitTest_glsCV
 
 		cv::reduce(imgSrc, imgRef, dim, reduceOp);
 
-		glsMat glsSrc(imgSrc);
-		glsMat glsDst;
+		GlsMat glsSrc(imgSrc);
+		GlsMat glsDst;
 
-		glsReduce(glsSrc, glsDst, dim, reduceOp);
+		gls::reduce(glsSrc, glsDst, dim, reduceOp);
 
 		glsDst.CopyTo(imgDst);		// download
 
@@ -206,8 +206,8 @@ namespace UnitTest_glsCV
 		cv::minMaxLoc(imgSrc, &minValRef, &maxValRef);
 
 
-		glsMat glsSrc(imgSrc);
-		glsMinMaxLoc(glsSrc, &minVal, &maxVal);
+		GlsMat glsSrc(imgSrc);
+		gls::minMaxLoc(glsSrc, &minVal, &maxVal);
 
 		cout << maxValRef << "," << maxVal << endl;
 		cout << minValRef << "," << minVal << endl;

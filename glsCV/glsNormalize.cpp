@@ -33,6 +33,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "glsNormalize.h"
 
+namespace gls
+{
+
+
+
 #if 0
 //-----------------------------------------------------------------------------
 // glsShaderNormalize
@@ -65,13 +70,13 @@ public:
 //glsShaderNormalizeU* shaderNormalizeU = 0;
 //glsShaderNormalizeS* shaderNormalizeS = 0;
 
-void glsNormalizeInit(void){
+void normalizeInit(void){
 //	shaderNormalize = new glsShaderNormalize();
 //	shaderNormalizeU = new glsShaderNormalizeU();
 //	shaderNormalizeS = new glsShaderNormalizeS();
 }
 
-void glsNormalizeTerminate(void){
+void normalizeTerminate(void){
 //	delete shaderNormalize;
 //	delete shaderNormalizeU;
 //	delete shaderNormalizeS;
@@ -80,22 +85,22 @@ void glsNormalizeTerminate(void){
 
 //enum { NORM_INF = 1, NORM_L1 = 2, NORM_L2 = 4, NORM_L2SQR = 5, NORM_HAMMING = 6, NORM_HAMMING2 = 7, NORM_TYPE_MASK = 7, NORM_RELATIVE = 8, NORM_MINMAX = 32 };
 
-void glsNormalize(const glsMat& src, glsMat& dst, double alpha, double beta, int normType){
+void normalize(const GlsMat& src, GlsMat& dst, double alpha, double beta, int normType){
 	GLS_Assert(src.type() == CV_32FC1);
 	GLS_Assert(normType == NORM_MINMAX);
 
-	glsMat _dst;
+	GlsMat _dst;
 
 	double minVal;
 	double maxVal;
 
-	glsMinMaxLoc(src, &minVal, &maxVal);
+	gls::minMaxLoc(src, &minVal, &maxVal);
 	float scl = (float)(beta - alpha) / (float)(maxVal - minVal);
-	glsMultiply(vec4(scl), src, _dst);
-	glsAdd(vec4((float)(alpha - scl*minVal)), _dst, _dst);
+	gls::multiply(vec4(scl), src, _dst);
+	gls::add(vec4((float)(alpha - scl*minVal)), _dst, _dst);
 	dst = _dst;
 }
 
 
-
+}//namespace gls
 

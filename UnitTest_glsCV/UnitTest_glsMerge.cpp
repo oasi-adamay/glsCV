@@ -67,13 +67,13 @@ namespace UnitTest_glsCV
 		cv::merge(plnSrc,imgRef);
 
 		//----------------------
-		vector<glsMat> plnGlsSrc(cn);
+		vector<GlsMat> plnGlsSrc(cn);
 		for (int c = 0; c < cn; c++){
-			plnGlsSrc[c] = glsMat(plnSrc[c]);
+			plnGlsSrc[c] = GlsMat(plnSrc[c]);
 		}
 
-		glsMat glsDst;
-		glsMerge(plnGlsSrc, glsDst);	//copy texture
+		GlsMat glsDst;
+		gls::merge(plnGlsSrc, glsDst);	//copy texture
 
 		glsDst.CopyTo(imgDst);		// download
 

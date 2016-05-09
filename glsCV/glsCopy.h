@@ -32,20 +32,24 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _GLS_COPY_H_
 
 #include "glsCV.h"
-#include "glsMat.h"
+#include "GlsMat.h"
 #include "glsShader.h"
 
+namespace gls
+{
 
 
-void glsCopyInit(void);
-void glsCopyTerminate(void);
+void copyInit(void);
+void copyTerminate(void);
 
-void glsCopy(const glsMat& src, glsMat& dst);
-void glsCopyRect(const glsMat& src, glsMat& dst, const Rect& rect);
+void copy(const GlsMat& src, GlsMat& dst);
+void copyRect(const GlsMat& src, GlsMat& dst, const Rect& rect);
 
 
-void glsTiled(const glsMat& src, vector<vector<glsMat>>& dst, const Size& blkNum);
-void glsUntiled(const vector<vector<glsMat>>& src, glsMat& dst);
+void tiled(const GlsMat& src, vector<vector<GlsMat>>& dst, const Size& blkNum);
+void untiled(const vector<vector<GlsMat>>& src, GlsMat& dst);
+
+}//namespace gls
 
 
 #endif

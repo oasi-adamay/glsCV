@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "stdafx.h"
 
 #include "glsCV.h"
-#include "glsMat.h"
+#include "GlsMat.h"
 #include "Timer.h"
 
 //#ifdef _DEBUG
@@ -40,6 +40,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #else
 #define _TMR_(...)
 #endif
+
+
+namespace gls
+{
+
 
 
 //#define _USE_PBO_UP
@@ -54,27 +59,27 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 static int gTextureNum = 0;
 #endif
 
-glsMat::glsMat(void){
+GlsMat::GlsMat(void){
 	flag = 0;
 	rows = 0;
 	cols = 0;
 }
 
-glsMat::glsMat(const Size size, const int ocvtype){
+GlsMat::GlsMat(const Size size, const int ocvtype){
 
 	createTexture(size.width, size.height, ocvtype);
 }
 
 
 
-glsMat::glsMat(const Mat & cvmat){
+GlsMat::GlsMat(const Mat & cvmat){
 	createTexture(cvmat.cols, cvmat.rows, cvmat.type());
 	CopyFrom(cvmat);
 }
 
 
 
-glsMat& glsMat::operator=(const glsMat& rhs){
+GlsMat& GlsMat::operator=(const GlsMat& rhs){
 	if (_texid.use_count() == 1){
 		deleteTexture();
 	}
@@ -88,7 +93,7 @@ glsMat& glsMat::operator=(const glsMat& rhs){
 }
 
 
-//glsMat::glsMat(const glsMat& src, bool copy){
+//GlsMat::GlsMat(const GlsMat& src, bool copy){
 //	createTexture(src.width, src.height, src.internalFormat, src.blkX, src.blkY);
 //	GLS_Assert(copy == false);	///@TODO Copy tex
 //}
@@ -96,13 +101,13 @@ glsMat& glsMat::operator=(const glsMat& rhs){
 
 
 
-glsMat::~glsMat(void){
+GlsMat::~GlsMat(void){
 	if (_texid.use_count() == 1){
 		deleteTexture();
 	}
 }
 
-void glsMat::createTexture(
+void GlsMat::createTexture(
 	const int _width,				//image width
 	const int _height,				//image height
 	const int _type					//type(OpenCV)
@@ -141,7 +146,7 @@ void glsMat::createTexture(
 #endif
 }
 
-void glsMat::deleteTexture(void){
+void GlsMat::deleteTexture(void){
 #ifdef _DBG_GLS_MAT
 	{
 		std::cout << "delete:" << texid() << endl;
@@ -160,7 +165,7 @@ void glsMat::deleteTexture(void){
 
 
 
-//GLuint glsMat::at(const int y, const int x)  const{
+//GLuint GlsMat::at(const int y, const int x)  const{
 //	GLS_Assert(y*blkX + x < texArray.size());
 //	return texArray[y*blkX + x];
 //}
@@ -190,7 +195,7 @@ static void mat2pbo(const Mat&src, const GLuint pbo){
 
 //-----------------------------------------------------------------------------
 //Upload texture from cv::Mat to GL texture
-void glsMat::CopyFrom(const Mat&src){
+void GlsMat::CopyFrom(const Mat&src){
 	_TMR_("-upload :\t");
 
 	CV_Assert(src.type() == type());
@@ -293,7 +298,7 @@ static void pbo2mat(const GLuint pbo, Mat&dst){
 }
 
 
-void glsMat::CopyTo(Mat&dst) const{
+void GlsMat::CopyTo(Mat&dst) const{
 //	cout << "CopyTo:start" << endl;
 
 	_TMR_("-download:\t");
@@ -504,6 +509,8 @@ GLenum convCVtype2GLtype(int ocvtype){
 	}
 	return type;
 }
+
+}//namespace gls
 
 
 

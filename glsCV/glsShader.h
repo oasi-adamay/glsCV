@@ -31,10 +31,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _GLS_SHADER_H_
 #define _GLS_SHADER_H_
 
-#include "glsMat.h"
+#include "GlsMat.h"
 #include "glsFBO.h"
 #include "glsVAO.h"
 
+namespace gls
+{
 
 // glslBase shader
 class glsShaderBase
@@ -53,6 +55,8 @@ public:
 	GLuint program;
 
 };
+
+}//namespace gls
 
 
 #endif

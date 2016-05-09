@@ -105,17 +105,17 @@ namespace UnitTest_glsCV
 			if (flags & DFT_SCALE)	_flags |= GLS_FFT_SCALE;
 			if (flags & DFT_INVERSE)_flags |= GLS_FFT_INVERSE;
 #if 1
-			glsMat _src(imgSrc);
-			glsMat _dst;
+			GlsMat _src(imgSrc);
+			GlsMat _dst;
 			{
 				Timer tmr("glsFft:  \t");
-				glsFft(_src, _dst,_flags);
+				gls::fft(_src, _dst,_flags);
 			}
 			_dst.CopyTo(imgFft);
 #elif 1
-			glsMat _src(imgSrc.size(), imgSrc.type(),Size(2,2));
+			GlsMat _src(imgSrc.size(), imgSrc.type(),Size(2,2));
 			_src.CopyFrom(imgSrc);
-			glsMat _dst;
+			GlsMat _dst;
 			{
 				Timer tmr("glsFft:  \t");
 				glsFft(_src, _dst, _flags);

@@ -32,74 +32,47 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _GLS_BASIC_OPERATION_H_
 
 #include "glsShader.h"
-#include "glsMat.h"
+#include "GlsMat.h"
 
 
+namespace gls
+{
 
 
+void basicOperationInit(void);
+void basicOperationTerminate(void);
+
+//GlsMat I/F
+void add(const vec4& scalar, const GlsMat& src, GlsMat& dst);
+void add(const GlsMat& src0, const GlsMat& src1, GlsMat& dst);
+
+void subtract(const vec4& scalar, const GlsMat& src, GlsMat& dst);
+void subtract(const GlsMat& src0, const GlsMat& src1, GlsMat& dst);
+
+void multiply(const vec4& scalar, const GlsMat& src, GlsMat& dst);
+void multiply(const GlsMat& src0, const GlsMat& src1, GlsMat& dst);
+
+void divide(const vec4& scalar, const GlsMat& src, GlsMat& dst);
+void divide(const GlsMat& src0, const GlsMat& src1, GlsMat& dst);
+
+void min(const vec4& scalar, const GlsMat& src, GlsMat& dst);
+void min(const GlsMat& src0, const GlsMat& src1, GlsMat& dst);
+
+void max(const vec4& scalar, const GlsMat& src, GlsMat& dst);
+void max(const GlsMat& src0, const GlsMat& src1, GlsMat& dst);
+
+void mulSpectrums(const GlsMat& src0, const GlsMat& src1, GlsMat& dst, bool conj = false);
+void mulSpectrumsPhaseOnly(const GlsMat& src0, const GlsMat& src1, GlsMat& dst);
+void magSpectrums(const GlsMat& src, GlsMat& dst);
+void logMagSpectrums(const GlsMat& src, GlsMat& dst,float offset);
+
+void log(const GlsMat& src, GlsMat& dst);
+void exp(const GlsMat& src, GlsMat& dst);
+void pow(const GlsMat& src, const float& power, GlsMat& dst);
 
 
-void glsBasicOperationInit(void);
-void glsBasicOperationTerminate(void);
-
-//glsMat I/F
-void glsAdd(const vec4& scalar, const glsMat& src, glsMat& dst);
-void glsAdd(const glsMat& src0, const glsMat& src1, glsMat& dst);
-
-void glsSubtract(const vec4& scalar, const glsMat& src, glsMat& dst);
-void glsSubtract(const glsMat& src0, const glsMat& src1, glsMat& dst);
-
-void glsMultiply(const vec4& scalar, const glsMat& src, glsMat& dst);
-void glsMultiply(const glsMat& src0, const glsMat& src1, glsMat& dst);
-
-void glsDivide(const vec4& scalar, const glsMat& src, glsMat& dst);
-void glsDivide(const glsMat& src0, const glsMat& src1, glsMat& dst);
-
-void glsMin(const vec4& scalar, const glsMat& src, glsMat& dst);
-void glsMin(const glsMat& src0, const glsMat& src1, glsMat& dst);
-
-void glsMax(const vec4& scalar, const glsMat& src, glsMat& dst);
-void glsMax(const glsMat& src0, const glsMat& src1, glsMat& dst);
-
-void glsMulSpectrums(const glsMat& src0, const glsMat& src1, glsMat& dst, bool conj = false);
-void glsMulSpectrumsPhaseOnly(const glsMat& src0, const glsMat& src1, glsMat& dst);
-void glsMagSpectrums(const glsMat& src, glsMat& dst);
-void glsLogMagSpectrums(const glsMat& src, glsMat& dst,float offset);
-
-void glsLog(const glsMat& src, glsMat& dst);
-void glsExp(const glsMat& src, glsMat& dst);
-void glsPow(const glsMat& src, const float& power, glsMat& dst);
-
-
-#if 0
-//OpenCV I/F
-void glsAdd(const Vec4f& scalar, const Mat& src, Mat& dst);
-void glsAdd(const Mat& src0, const Mat& src1, Mat& dst);
-
-void glsSubtract(const Vec4f& scalar, const Mat& src, Mat& dst);
-void glsSubtract(const Mat& src0, const Mat& src1, Mat& dst);
-
-void glsMultiply(const Vec4f& scalar, const Mat& src, Mat& dst);
-void glsMultiply(const Mat& src0, const Mat& src1, Mat& dst);
-
-void glsDivide(const Vec4f& scalar, const Mat& src, Mat& dst);
-void glsDivide(const Mat& src0, const Mat& src1, Mat& dst);
-
-void glsMin(const Vec4f& scalar, const Mat& src, Mat& dst);
-void glsMin(const Mat& src0, const Mat& src1, Mat& dst);
-
-void glsMax(const Vec4f& scalar, const Mat& src, Mat& dst);
-void glsMax(const Mat& src0, const Mat& src1, Mat& dst);
-
-void glsMulSpectrums(const Mat& src0, const Mat& src1, Mat& dst, bool conj = false);
-void glsMulSpectrumsPhaseOnly(const Mat& src0, const Mat& src1, Mat& dst);
-void glsMagSpectrums(const Mat& src, Mat& dst);
-
-void glsLog(const Mat& src, Mat& dst);
-void glsExp(const Mat& src, Mat& dst);
-void glsPow(const Mat& src, const float& power, Mat& dst);
-#endif
 	
 
+}//namespace gls
 
 #endif

@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _GLS_CV_H_
 
 
-#include "glsMat.h"
+#include "GlsMat.h"
 #include "glsShader.h"
 #include "glsCopy.h"
 #include "glsConvert.h"

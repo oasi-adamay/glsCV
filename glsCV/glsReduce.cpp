@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "glsReduce.h"
 
+namespace gls
+{
 
 //-----------------------------------------------------------------------------
 // glsShaderReduce
@@ -66,13 +68,13 @@ glsShaderReduce* shaderReduce = 0;
 //glsShaderReduceU* shaderReduceU = 0;
 //glsShaderReduceS* shaderReduceS = 0;
 
-void glsReduceInit(void){
+void reduceInit(void){
 	shaderReduce = new glsShaderReduce();
 //	shaderReduceU = new glsShaderReduceU();
 //	shaderReduceS = new glsShaderReduceS();
 }
 
-void glsReduceTerminate(void){
+void reduceTerminate(void){
 	delete shaderReduce;
 //	delete shaderReduceU;
 //	delete shaderReduceS;
@@ -262,19 +264,19 @@ glsShaderBase* selectShader(int type){
 }
 
 //Reduce texture
-void glsReduce(const glsMat& src, glsMat& dst, int dim, int reduceOp){
+void reduce(const GlsMat& src, GlsMat& dst, int dim, int reduceOp){
 	GLS_Assert(src.depth() == CV_32F);
 
 
-	glsMat _src = src;
+	GlsMat _src = src;
 
 
-	glsMat _dst;
+	GlsMat _dst;
 	if (dim == 0){
-		_dst = glsMat(Size(_src.cols, 1), _src.type());
+		_dst = GlsMat(Size(_src.cols, 1), _src.type());
 	}
 	else{
-		_dst = glsMat(Size(1, _src.rows), _src.type());
+		_dst = GlsMat(Size(1, _src.rows), _src.type());
 	}
 
 
@@ -298,20 +300,20 @@ void glsReduce(const glsMat& src, glsMat& dst, int dim, int reduceOp){
 }
 
 
-void glsMinMaxLoc(const glsMat& src, double* minVal, double* maxVal, Point* minLoc, Point* maxLoc, const glsMat& mask){
+void minMaxLoc(const GlsMat& src, double* minVal, double* maxVal, Point* minLoc, Point* maxLoc, const GlsMat& mask){
 	GLS_Assert(src.depth() == CV_32F);
 	GLS_Assert(maxLoc == 0);	// not implement yet
 	GLS_Assert(minLoc == 0);	// not implement yet
 	GLS_Assert(mask.empty());	// not implement yet
 
-	glsMat _src = src;
+	GlsMat _src = src;
 
 
-	glsMat tmp;
+	GlsMat tmp;
 
 	if (minVal){
-		glsReduce(_src, tmp, 0, CV_REDUCE_MIN);
-		glsReduce(tmp, tmp, 1, CV_REDUCE_MIN);
+		gls::reduce(_src, tmp, 0, CV_REDUCE_MIN);
+		gls::reduce(tmp, tmp, 1, CV_REDUCE_MIN);
 
 		Mat val;
 		tmp.CopyTo(val);
@@ -321,8 +323,8 @@ void glsMinMaxLoc(const glsMat& src, double* minVal, double* maxVal, Point* minL
 	}
 
 	if (maxVal){
-		glsReduce(_src, tmp, 0, CV_REDUCE_MAX);
-		glsReduce(tmp, tmp, 1, CV_REDUCE_MAX);
+		gls::reduce(_src, tmp, 0, CV_REDUCE_MAX);
+		gls::reduce(tmp, tmp, 1, CV_REDUCE_MAX);
 
 		Mat val;
 		tmp.CopyTo(val);
@@ -330,12 +332,10 @@ void glsMinMaxLoc(const glsMat& src, double* minVal, double* maxVal, Point* minL
 		GLS_Assert(val.cols == 1);
 		*maxVal = val.at<float>(0, 0);
 	}
-
-
-
-
-
 }
+
+}//namespace gls
+
 
 
 

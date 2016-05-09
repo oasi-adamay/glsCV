@@ -35,6 +35,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "glsShader.h"
 #include "Timer.h"
 
+namespace gls
+{
 
 
 void glsShaderBase::LoadShadersCode(const std::string& VertexShaderCode, const std::string& FragmentShaderCode){
@@ -152,6 +154,6 @@ void glsShaderBase::LoadShadersFile(const char * vertex_file_path, const char * 
 
 }
 
-
+}//namespace gls
 //-----------------------------------------------------------------------------
 

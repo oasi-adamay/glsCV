@@ -32,16 +32,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _GLS_DRAW_H_
 
 #include "glsCV.h"
-#include "glsMat.h"
+#include "GlsMat.h"
 #include "glsShader.h"
 
+namespace gls
+{
 
 
-void glsDrawInit(void);
-void glsDrawTerminate(void);
+void drawInit(void);
+void drawTerminate(void);
 
-void glsDraw(glsMat& src);
+void draw(GlsMat& src);
 
-
+}//namespace gls
 
 #endif

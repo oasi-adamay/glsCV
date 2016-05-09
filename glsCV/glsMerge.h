@@ -32,15 +32,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _GLS_MERGE_H_
 
 #include "glsCV.h"
-#include "glsMat.h"
+#include "GlsMat.h"
 #include "glsShader.h"
 
+namespace gls
+{
 
+void mergeInit(void);
+void mergeTerminate(void);
 
-void glsMergeInit(void);
-void glsMergeTerminate(void);
+void merge(const vector<GlsMat>& src, GlsMat& dst);
 
-void glsMerge(const vector<glsMat>& src, glsMat& dst);
-
-
+}
 #endif
