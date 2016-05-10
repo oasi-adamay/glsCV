@@ -42,33 +42,6 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 namespace UnitTest_glsCV
 {	
 
-	//static
-	//bool AlmostEqualUlpsAbsEps(float A, float B, int maxUlps, float maxDiff)
-	//{
-	//	// Check if the numbers are really close -- needed
-	//	// when comparing numbers near zero.
-	//	float absDiff = fabs(A - B);
-	//	if (absDiff <= maxDiff)
-	//		return true;
-
-	//	// Make sure maxUlps is non-negative and small enough that the
-	//	// default NAN won't compare as equal to anything.
-	//	GLS_Assert(maxUlps > 0 && maxUlps < 4 * 1024 * 1024);
-	//	int aInt = *(int*)&A;
-	//	// Make aInt lexicographically ordered as a twos-complement int
-	//	if (aInt < 0)
-	//		aInt = 0x80000000 - aInt;
-	//	// Make bInt lexicographically ordered as a twos-complement int
-	//	int bInt = *(int*)&B;
-	//	if (bInt < 0)
-	//		bInt = 0x80000000 - bInt;
-	//	int intDiff = abs(aInt - bInt);
-	//	if (intDiff <= maxUlps)
-	//		return true;
-	//	return false;
-	//}
-
-
 	int test_glsFft(const int N, const int flags){
 		int ULPS = 64;
 		float EPS = 1e-4f;
@@ -104,7 +77,6 @@ namespace UnitTest_glsCV
 			int _flags = 0;
 			if (flags & DFT_SCALE)	_flags |= GLS_FFT_SCALE;
 			if (flags & DFT_INVERSE)_flags |= GLS_FFT_INVERSE;
-#if 1
 			GlsMat _src(imgSrc);
 			GlsMat _dst;
 			{
@@ -112,17 +84,6 @@ namespace UnitTest_glsCV
 				gls::fft(_src, _dst,_flags);
 			}
 			_dst.CopyTo(imgFft);
-#elif 1
-			GlsMat _src(imgSrc.size(), imgSrc.type(),Size(2,2));
-			_src.CopyFrom(imgSrc);
-			GlsMat _dst;
-			{
-				Timer tmr("glsFft:  \t");
-				glsFft(_src, _dst, _flags);
-			}
-			_dst.CopyTo(imgFft);
-#endif
-
 		}
 
 		//verify
@@ -149,19 +110,6 @@ namespace UnitTest_glsCV
 			Assert::AreEqual(0, errNum);
 		}
 
-//		TEST_METHOD(FFT_time)
-//		{
-//			cout << __FUNCTION__ << endl;
-//			const int N = 256;
-////			const int N = 1024;
-//			const int flags = 0;
-//			int errNum = 0;
-//			for (int i = 0; i < 100; i++){
-//				errNum += test_glsFft(N, flags);
-//			}
-//			Assert::AreEqual(0, errNum);
-//		}
-
 
 		TEST_METHOD(FFT_SCALE)
 		{
@@ -187,6 +135,48 @@ namespace UnitTest_glsCV
 			const int N = 32;
 			const int flags = DFT_INVERSE + DFT_SCALE;
 			int errNum = test_glsFft(N, flags);
+			Assert::AreEqual(0, errNum);
+		}
+
+		//! benchmark
+		BEGIN_TEST_METHOD_ATTRIBUTE(FFT_SCALE_1024)
+			//TEST_OWNER(L"OwnerName")
+			//TEST_PRIORITY(1)
+			TEST_MY_TRAIT(L"benchmark")
+		END_TEST_METHOD_ATTRIBUTE()
+
+
+		TEST_METHOD(FFT_SCALE_1024)
+		{
+			cout << __FUNCTION__ << endl;
+			const int N = 1024;
+			const int flags = DFT_SCALE;
+			int errNum = 0;
+			int loop = 5;
+			for (int i = 0; i < loop; i++){
+				errNum += test_glsFft(N, flags);
+			}
+			Assert::AreEqual(0, errNum);
+		}
+
+		//! benchmark
+		BEGIN_TEST_METHOD_ATTRIBUTE(FFT_SCALE_2048)
+			//TEST_OWNER(L"OwnerName")
+			//TEST_PRIORITY(1)
+			TEST_MY_TRAIT(L"benchmark")
+		END_TEST_METHOD_ATTRIBUTE()
+
+
+		TEST_METHOD(FFT_SCALE_2048)
+		{
+			cout << __FUNCTION__ << endl;
+			const int N = 2048;
+			const int flags = DFT_SCALE;
+			int errNum = 0;
+			int loop = 5;
+			for (int i = 0; i < loop; i++){
+				errNum += test_glsFft(N, flags);
+			}
 			Assert::AreEqual(0, errNum);
 		}
 

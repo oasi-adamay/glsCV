@@ -32,10 +32,22 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "glsVAO.h"
 
+
+//#ifdef _DEBUG
+#if 0
+#include "Timer.h"
+#define _TMR_(...)  Timer tmr(__VA_ARGS__)
+#else
+#define _TMR_(...)
+#endif
+
+
 namespace gls
 {
 
 glsVAO::glsVAO(GLuint attrLoc){
+	_TMR_("glsVAO:");
+
 	// [-1, 1] ÇÃê≥ï˚å`
 	static GLfloat position[][2] = {
 		{ -1.0f, -1.0f },

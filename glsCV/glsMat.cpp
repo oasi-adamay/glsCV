@@ -32,10 +32,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "glsCV.h"
 #include "GlsMat.h"
-#include "Timer.h"
 
 //#ifdef _DEBUG
 #if 0
+#include "Timer.h"
 #define _TMR_(...)  Timer tmr(__VA_ARGS__)
 #else
 #define _TMR_(...)
@@ -112,6 +112,7 @@ void GlsMat::createTexture(
 	const int _height,				//image height
 	const int _type					//type(OpenCV)
 	){
+	_TMR_("createTexture:");
 
 	flag = _type;
 

@@ -266,12 +266,26 @@ namespace UnitTest_glsCV
 			int errNum = test_glsMinMaxLoc<float>(CV_32FC1,true);
 			Assert::AreEqual(0, errNum);
 		}
+
+		BEGIN_TEST_METHOD_ATTRIBUTE(glsMinMaxLoc_CV_32FC1_1024x1024)
+			//TEST_OWNER(L"OwnerName")
+			//TEST_PRIORITY(1)
+			TEST_MY_TRAIT(L"benchmark")
+		END_TEST_METHOD_ATTRIBUTE()
+
 		TEST_METHOD(glsMinMaxLoc_CV_32FC1_1024x1024)
 		{
 			cout << __FUNCTION__ << endl;
 			int errNum = test_glsMinMaxLoc<float>(CV_32FC1 , false , Size(1024,1024));
 			Assert::AreEqual(0, errNum);
 		}
+
+		BEGIN_TEST_METHOD_ATTRIBUTE(glsMinMax_CV_32FC1_1024x1024)
+			//TEST_OWNER(L"OwnerName")
+			//TEST_PRIORITY(1)
+			TEST_MY_TRAIT(L"benchmark")
+		END_TEST_METHOD_ATTRIBUTE()
+
 		TEST_METHOD(glsMinMax_CV_32FC1_1024x1024)
 		{
 			cout << __FUNCTION__ << endl;
