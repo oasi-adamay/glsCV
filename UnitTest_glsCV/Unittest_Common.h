@@ -30,6 +30,26 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #pragma once
 
+#include "Timer.h"
+
+//#ifdef _DEBUG
+#if 1
+#define _TMR_(...)  Timer tmr(__VA_ARGS__)
+#else
+#define _TMR_(...)
+#endif
+
+
+#define TEST_MY_TRAIT(traitValue) TEST_METHOD_ATTRIBUTE(L"GlsTrait", traitValue)
+
+//BEGIN_TEST_METHOD_ATTRIBUTE(Method1)
+//	TEST_OWNER(L"OwnerName")
+//	TEST_PRIORITY(1)
+//	TEST_MY_TRAIT(L"thisTraitValue")
+//END_TEST_METHOD_ATTRIBUTE()
+
+
+
 namespace UnitTest_glsCV
 {
 

@@ -299,6 +299,7 @@ void reduce(const GlsMat& src, GlsMat& dst, int dim, int reduceOp){
 	dst = _dst;
 }
 
+#if 0
 
 void minMaxLoc(const GlsMat& src, double* minVal, double* maxVal, Point* minLoc, Point* maxLoc, const GlsMat& mask){
 	GLS_Assert(src.depth() == CV_32F);
@@ -333,6 +334,7 @@ void minMaxLoc(const GlsMat& src, double* minVal, double* maxVal, Point* minLoc,
 		*maxVal = val.at<float>(0, 0);
 	}
 }
+#endif
 
 }//namespace gls
 

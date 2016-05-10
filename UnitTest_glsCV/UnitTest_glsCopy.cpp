@@ -145,6 +145,12 @@ namespace UnitTest_glsCV
 			Assert::AreEqual(0, errNum);
 		}
 
+		BEGIN_TEST_METHOD_ATTRIBUTE(glsCopy_CV_32FC1_1024x1024)
+			//TEST_OWNER(L"OwnerName")
+			//TEST_PRIORITY(1)
+			TEST_MY_TRAIT(L"benchmark")
+		END_TEST_METHOD_ATTRIBUTE()
+
 		TEST_METHOD(glsCopy_CV_32FC1_1024x1024)
 		{
 			cout << __FUNCTION__ << endl;

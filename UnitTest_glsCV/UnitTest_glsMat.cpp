@@ -61,8 +61,19 @@ namespace UnitTest_glsCV
 		//init Src image
 		FillRandU<T>(imgSrc);
 
-		GlsMat glsSrc(imgSrc);		//create GlsMat and  upload
-		glsSrc.CopyTo(imgDst);		// download
+		GlsMat glsSrc(imgSrc.size(), imgSrc.type());		//create GlsMat
+		int loop = 1;
+		if (size.width >= 256)loop = 10;
+		for (int i = 0; i < loop;i++){
+			{
+				_TMR_("GlsMat::CopyFrom:\t");
+				glsSrc.CopyFrom(imgSrc);	//upload
+			}
+			{
+				_TMR_("GlsMat::CopyTo:\t");
+				glsSrc.CopyTo(imgDst);		// download
+			}
+		}
 
 
 		//verify
@@ -275,6 +286,12 @@ namespace UnitTest_glsCV
 			Assert::AreEqual(0, errNum);
 		}
 
+		BEGIN_TEST_METHOD_ATTRIBUTE(GlsMat_Copy_CV_32FC1_1024x1024)
+			//TEST_OWNER(L"OwnerName")
+			//TEST_PRIORITY(1)
+			TEST_MY_TRAIT(L"benchmark")
+		END_TEST_METHOD_ATTRIBUTE()
+
 		TEST_METHOD(GlsMat_Copy_CV_32FC1_1024x1024)
 		{
 			cout << __FUNCTION__ << endl;
@@ -295,6 +312,14 @@ namespace UnitTest_glsCV
 			int errNum = test_GlsMat_CopyTo<float>(CV_32FC1, Size(3, 4));
 			Assert::AreEqual(0, errNum);
 		}
+
+		TEST_METHOD(GlsMat_Copy_CV_32SC1_1x1)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_GlsMat_CopyTo<int>(CV_32SC1, Size(1, 1));
+			Assert::AreEqual(0, errNum);
+		}
+
 
 		//@@@ TODO issue #6
 #if 0

@@ -73,7 +73,7 @@ public:
 	GlsMat& operator=(const GlsMat& rhs);
 
 	//! テクスチャーのIDの取得
-	GLuint texid(void)const { return *_texid; }
+	GLuint texid(void)const { return _texid.use_count() == 0 ? 0 :* _texid; }
 
 	//! 行列サイズ(width,height)
 	Size size(void) const { return Size(cols, rows); }
