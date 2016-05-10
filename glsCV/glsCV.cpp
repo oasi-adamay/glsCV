@@ -148,6 +148,7 @@ GLFWwindow* glsCvInit(const int _width, const int _height){
 	gls::ShaderBasicOperationInit();
 	gls::ShaderMergeInit();
 	gls::ShaderReduceInit();
+	gls::ShaderMinMaxLocInit();
 	gls::ShaderNormalizeInit();
 	gls::ShaderFftInit();
 
@@ -166,6 +167,7 @@ void glsCvTerminate(void){
 	gls::ShaderBasicOperationTerminate();
 	gls::ShaderMergeTerminate();
 	gls::ShaderReduceTerminate();
+	gls::ShaderMinMaxLocTerminate();
 	gls::ShaderNormalizeTerminate();
 	gls::ShaderFftTerminate();
 

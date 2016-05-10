@@ -30,6 +30,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #pragma once
 
+#include "Timer.h"
+
+//#ifdef _DEBUG
+#if 1
+#define _TMR_(...)  Timer tmr(__VA_ARGS__)
+#else
+#define _TMR_(...)
+#endif
+
+
+
+
+
 namespace UnitTest_glsCV
 {
 

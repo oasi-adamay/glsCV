@@ -39,6 +39,7 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 
 
+
 namespace UnitTest_glsCV
 {
 
@@ -185,15 +186,8 @@ namespace UnitTest_glsCV
 	};
 
 	template <typename T>
-	int test_glsMinMaxLoc(int cvtype){
-		const int width = 24;
-		const int height = 32;
-		//		const int width = 8;
-		//		const int height = 6;
-
-
-
-		Mat imgSrc(Size(width, height), cvtype);
+	int test_glsMinMaxLoc(int cvtype, bool minmaxonly = false,Size size = Size(32, 24)){
+		Mat imgSrc(size, cvtype);
 		FillRandU<T>(imgSrc);
 
 		cout << "Size:" << imgSrc.size() << endl;
@@ -202,19 +196,57 @@ namespace UnitTest_glsCV
 		double minValRef;
 		double maxVal;
 		double minVal;
-
-		cv::minMaxLoc(imgSrc, &minValRef, &maxValRef);
-
+		Point minLocRef;
+		Point maxLocRef;
+		Point minLoc;
+		Point maxLoc;
 
 		GlsMat glsSrc(imgSrc);
-		gls::minMaxLoc(glsSrc, &minVal, &maxVal);
+
+		int loop = 1;
+		if (size.width >= 256) loop = 10;
+		if (minmaxonly){
+			for (int i = 0; i < loop; i++){
+				_TMR_("cv::minMaxLoc:");
+				cv::minMaxLoc(imgSrc, &minValRef, &maxValRef);
+			}
+			for (int i = 0; i < loop; i++){
+				_TMR_("gls::minMaxLoc:");
+				gls::minMaxLoc(glsSrc, &minVal, &maxVal);
+			}
+		}
+		else{
+			for (int i = 0; i < loop; i++){
+				_TMR_("cv::minMaxLoc:");
+				cv::minMaxLoc(imgSrc, &minValRef, &maxValRef, &minLocRef, &maxLocRef);
+			}
+			for (int i = 0; i < loop; i++){
+				_TMR_("gls::minMaxLoc:");
+				gls::minMaxLoc(glsSrc, &minVal, &maxVal, &minLoc, &maxLoc);
+			}
+		}
+
+
 
 		cout << maxValRef << "," << maxVal << endl;
 		cout << minValRef << "," << minVal << endl;
 
+		if (!minmaxonly){
+			cout << minLocRef << "," << minLoc << endl;
+			cout << maxLocRef << "," << maxLoc << endl;
+		}
+
 		int errNum = 0;
 		if (!AreEqual<float>((float)maxValRef, (float)maxVal, 0))errNum++;
 		if (!AreEqual<float>((float)minValRef, (float)minVal, 0))errNum++;
+		if (!minmaxonly){
+			if (!AreEqual<int>(minLocRef.x, minLoc.x, 0))errNum++;
+			if (!AreEqual<int>(minLocRef.y, minLoc.y, 0))errNum++;
+			if (!AreEqual<int>(maxLocRef.x, maxLoc.x, 0))errNum++;
+			if (!AreEqual<int>(maxLocRef.y, maxLoc.y, 0))errNum++;
+		}
+
+		cout << "errNum:" << errNum << endl;
 
 		return errNum;
 	}
@@ -222,11 +254,28 @@ namespace UnitTest_glsCV
 	TEST_CLASS(UnitTest_glsMinMaxLoc)
 	{
 	public:
-		//glsMerge
 		TEST_METHOD(glsMinMaxLoc_CV_32FC1)
 		{
 			cout << __FUNCTION__ << endl;
 			int errNum = test_glsMinMaxLoc<float>(CV_32FC1);
+			Assert::AreEqual(0, errNum);
+		}
+		TEST_METHOD(glsMinMax_CV_32FC1)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_glsMinMaxLoc<float>(CV_32FC1,true);
+			Assert::AreEqual(0, errNum);
+		}
+		TEST_METHOD(glsMinMaxLoc_CV_32FC1_1024x1024)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_glsMinMaxLoc<float>(CV_32FC1 , false , Size(1024,1024));
+			Assert::AreEqual(0, errNum);
+		}
+		TEST_METHOD(glsMinMax_CV_32FC1_1024x1024)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_glsMinMaxLoc<float>(CV_32FC1, true, Size(1024, 1024));
 			Assert::AreEqual(0, errNum);
 		}
 	};

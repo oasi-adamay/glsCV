@@ -148,6 +148,7 @@
     <ClInclude Include="glsFft.h" />
     <ClInclude Include="glsMat.h" />
     <ClInclude Include="glsMerge.h" />
+    <ClInclude Include="glsMinMaxLoc.h" />
     <ClInclude Include="glsNormalize.h" />
     <ClInclude Include="glsReduce.h" />
     <ClInclude Include="glsShader.h" />
@@ -166,6 +167,7 @@
     <ClCompile Include="glsFft.cpp" />
     <ClCompile Include="glsMat.cpp" />
     <ClCompile Include="glsMerge.cpp" />
+    <ClCompile Include="glsMinMaxLoc.cpp" />
     <ClCompile Include="glsNormalize.cpp" />
     <ClCompile Include="glsReduce.cpp" />
     <ClCompile Include="glsShader.cpp" />
