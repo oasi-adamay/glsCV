@@ -296,6 +296,14 @@ namespace UnitTest_glsCV
 			Assert::AreEqual(0, errNum);
 		}
 
+		TEST_METHOD(GlsMat_Copy_CV_32SC1_1x1)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_GlsMat_CopyTo<int>(CV_32SC1, Size(1, 1));
+			Assert::AreEqual(0, errNum);
+		}
+
+
 		//@@@ TODO issue #6
 #if 0
 		TEST_METHOD(GlsMat_Copy_CV_8UC1_3x4)
