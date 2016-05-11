@@ -184,8 +184,10 @@ glsShaderConvert::glsShaderConvert(void)
 "}\n"
 ;
 
-	// Create and compile our GLSL program from the shaders
-	LoadShadersCode(vertexShaderCode, fragmentShaderCode);
+	const string bin_filename = shaderBinName(__FUNCTION__);
+	if (!LoadShadersBinary(bin_filename)){
+		LoadShadersCode(vertexShaderCode, fragmentShaderCode, bin_filename);
+	}
 
 	// Attribute & Uniform location
 	position = glGetAttribLocation(program, "position");
@@ -238,8 +240,10 @@ glsShaderConvertU::glsShaderConvertU(void)
 "}\n"
 ;
 
-	// Create and compile our GLSL program from the shaders
-	LoadShadersCode(vertexShaderCode, fragmentShaderCode);
+	const string bin_filename = shaderBinName(__FUNCTION__);
+	if (!LoadShadersBinary(bin_filename)){
+		LoadShadersCode(vertexShaderCode, fragmentShaderCode, bin_filename);
+	}
 
 	// Attribute & Uniform location
 	position = glGetAttribLocation(program, "position");
@@ -291,8 +295,10 @@ glsShaderConvertS::glsShaderConvertS(void)
 "}\n"
 ;
 
-	// Create and compile our GLSL program from the shaders
-	LoadShadersCode(vertexShaderCode, fragmentShaderCode);
+	const string bin_filename = shaderBinName(__FUNCTION__);
+	if (!LoadShadersBinary(bin_filename)){
+		LoadShadersCode(vertexShaderCode, fragmentShaderCode, bin_filename);
+	}
 
 	// Attribute & Uniform location
 	position = glGetAttribLocation(program, "position");

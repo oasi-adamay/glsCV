@@ -38,8 +38,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace gls
 {
 
+void glsShaderBase::LoadShadersCode(const std::string& VertexShaderCode, const std::string& FragmentShaderCode, const std::string& shaderbin_file_path){
+	
+	const bool createBin = !shaderbin_file_path.empty();	//! create shader bin mode
 
-void glsShaderBase::LoadShadersCode(const std::string& VertexShaderCode, const std::string& FragmentShaderCode){
 	// Create the shaders
 	GLuint VertexShaderID = glCreateShader(GL_VERTEX_SHADER);
 	GLuint FragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
@@ -94,6 +96,7 @@ void glsShaderBase::LoadShadersCode(const std::string& VertexShaderCode, const s
 	GLuint ProgramID = glCreateProgram();
 	glAttachShader(ProgramID, VertexShaderID);
 	glAttachShader(ProgramID, FragmentShaderID);
+	if (createBin) glProgramParameteri(ProgramID, GL_PROGRAM_BINARY_RETRIEVABLE_HINT, GL_TRUE);
 	glLinkProgram(ProgramID);
 
 	// Check the program
@@ -108,6 +111,34 @@ void glsShaderBase::LoadShadersCode(const std::string& VertexShaderCode, const s
 	}
 	GLS_Assert(Result == GL_TRUE);
 
+	// save shader bin 
+	if(createBin){
+		GLint formats = 0;
+		glGetIntegerv(GL_NUM_PROGRAM_BINARY_FORMATS, &formats);
+		//cout << "formats:" << formats << endl;
+
+		int length;
+		glGetProgramiv(ProgramID, GL_PROGRAM_BINARY_LENGTH, &length);
+		//cout << "length:" << length << endl;
+
+		if (length > 0 && formats>0){
+			std::vector<char> binary(length);
+			vector<GLenum> binaryFormats(formats);
+			int len;
+			glGetProgramBinary(ProgramID, length, &len, binaryFormats.data(), &binary[0]);
+			if (length == len){
+				cout << "save shader bin to:" << shaderbin_file_path << endl;
+				ofstream ofs;
+				ofs.open(shaderbin_file_path, ios_base::out | ios_base::trunc | ios_base::binary);
+				ofs.write(binary.data(), binary.size());
+				ofs.close();
+			}
+		}
+		else{
+			cout << "shader binary might be not supported." << endl;
+		}
+	}
+
 
 	glDetachShader(ProgramID, VertexShaderID);
 	glDetachShader(ProgramID, FragmentShaderID);
@@ -119,7 +150,8 @@ void glsShaderBase::LoadShadersCode(const std::string& VertexShaderCode, const s
 
 }
 
-void glsShaderBase::LoadShadersFile(const char * vertex_file_path, const char * fragment_file_path){
+
+void glsShaderBase::LoadShadersFile(const std::string& vertex_file_path, const std::string& fragment_file_path, const std::string& shaderbin_file_path){
 
 
 	// Read the Vertex Shader code from the file
@@ -153,6 +185,65 @@ void glsShaderBase::LoadShadersFile(const char * vertex_file_path, const char * 
 	LoadShadersCode(VertexShaderCode, FragmentShaderCode);
 
 }
+
+
+bool glsShaderBase::LoadShadersBinary(const std::string& shaderbin_file_path){
+	GLuint progId = 0;
+	std::vector<char> binary;
+	{
+		std::ifstream ifs(shaderbin_file_path, std::ios::in | ios_base::binary);
+		if (!ifs)return false;
+		size_t length = (size_t)ifs.seekg(0, std::ios::end).tellg();
+		ifs.seekg(0, std::ios::beg);
+		binary.resize(length);
+		ifs.read(binary.data(), length);
+		ifs.close();
+	}
+
+	{
+		GLint formats = 0;
+		glGetIntegerv(GL_NUM_PROGRAM_BINARY_FORMATS, &formats);
+		//cout << "formats:" << formats << endl;
+		if (formats == 0) return false;
+
+		vector<GLenum> binaryFormats(formats);
+		glGetIntegerv(GL_PROGRAM_BINARY_FORMATS, (GLint*)binaryFormats.data());
+
+		progId = glCreateProgram();
+		glProgramBinary(progId, binaryFormats[0], binary.data(), (GLsizei)binary.size());
+
+		GLint success;
+		int InfoLogLength;
+		glGetProgramiv(progId, GL_LINK_STATUS, &success);
+		glGetProgramiv(progId, GL_INFO_LOG_LENGTH, &InfoLogLength);
+		if (InfoLogLength > 0){
+			std::vector<char> ProgramErrorMessage(InfoLogLength + 1);
+			glGetProgramInfoLog(progId, InfoLogLength, NULL, &ProgramErrorMessage[0]);
+			//		printf("%s\n", &ProgramErrorMessage[0]);
+			cout << &ProgramErrorMessage[0] << endl;
+		}
+		assert(success == GL_TRUE);
+
+	}
+
+	program = progId;
+
+	return true;
+}
+
+string glsShaderBase::shaderBinName(const std::string funcname){
+	string binname;
+	size_t pos1 = funcname.rfind(':');
+	if (pos1 != string::npos){
+		binname = funcname.substr(pos1 + 1, funcname.size() - pos1);
+	}
+	else{
+		GLS_Assert(0);
+	}
+
+	return binname + ".bin";
+}
+
 
 }//namespace gls
 //-----------------------------------------------------------------------------

@@ -32,6 +32,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "glsCV.h"
 
+//#ifdef _DEBUG
+#if 0
+#include "Timer.h"
+#define _TMR_(...)  Timer tmr(__VA_ARGS__)
+#else
+#define _TMR_(...)
+#endif
+
 
 //-----------------------------------------------------------------------------
 //global 
@@ -142,15 +150,18 @@ GLFWwindow* glsCvInit(const int _width, const int _height){
 
 	}
 
-	gls::ShaderCopyInit();
-	gls::ShaderConvertInit();
-	gls::ShaderDrawInit();
-	gls::ShaderBasicOperationInit();
-	gls::ShaderMergeInit();
-	gls::ShaderReduceInit();
-	gls::ShaderMinMaxLocInit();
-	gls::ShaderNormalizeInit();
-	gls::ShaderFftInit();
+	{
+		_TMR_("glsCvInit:\t");
+		gls::ShaderCopyInit();
+		gls::ShaderConvertInit();
+		gls::ShaderDrawInit();
+		gls::ShaderBasicOperationInit();
+		gls::ShaderMergeInit();
+		gls::ShaderReduceInit();
+		gls::ShaderMinMaxLocInit();
+		gls::ShaderNormalizeInit();
+		gls::ShaderFftInit();
+	}
 
 	GL_CHECK_ERROR();
 
@@ -161,15 +172,17 @@ GLFWwindow* glsCvInit(const int _width, const int _height){
 //Terminate glsFft
 void glsCvTerminate(void){
 
-	gls::ShaderCopyTerminate();
-	gls::ShaderConvertTerminate();
-	gls::ShaderDrawTerminate();
-	gls::ShaderBasicOperationTerminate();
-	gls::ShaderMergeTerminate();
-	gls::ShaderReduceTerminate();
-	gls::ShaderMinMaxLocTerminate();
-	gls::ShaderNormalizeTerminate();
-	gls::ShaderFftTerminate();
+	{
+		gls::ShaderCopyTerminate();
+		gls::ShaderConvertTerminate();
+		gls::ShaderDrawTerminate();
+		gls::ShaderBasicOperationTerminate();
+		gls::ShaderMergeTerminate();
+		gls::ShaderReduceTerminate();
+		gls::ShaderMinMaxLocTerminate();
+		gls::ShaderNormalizeTerminate();
+		gls::ShaderFftTerminate();
+	}
 
 	// Close OpenGL window and terminate GLFW
 	glfwTerminate();

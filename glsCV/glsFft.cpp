@@ -201,9 +201,10 @@ glsShaderFft::glsShaderFft(void)
 	
 	
 
-	// Create and compile our GLSL program from the shaders
-//	LoadShadersFile("Fft_vs.glsl", "FftRadix2_fs.glsl");
-	LoadShadersCode(vertexShaderCode, fragmentShaderCode);
+	const string bin_filename = shaderBinName(__FUNCTION__);
+	if (!LoadShadersBinary(bin_filename)){
+		LoadShadersCode(vertexShaderCode, fragmentShaderCode, bin_filename);
+	}
 
 	// Attribute & Uniform location
 	position = glGetAttribLocation(program, "position");

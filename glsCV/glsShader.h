@@ -38,7 +38,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace gls
 {
 
-// glslBase shader
+/*!
+glsShader Base Class
+
+ - load from shader source files and compile,link.
+ - load from shader code and compile,link.
+ - load from shader binary files and link.
+*/
 class glsShaderBase
 {
 private:
@@ -48,8 +54,38 @@ private:
 public:
 	glsShaderBase(void){ program = 0;}
 	~glsShaderBase(void){ if (program)glDeleteProgram(program); }
-	void LoadShadersFile(const char * vertex_file_path, const char * fragment_file_path);
-	void LoadShadersCode(const std::string& VertexShaderCode, const std::string& FragmentShaderCode);
+
+	/*!
+	load shader filse(string) , compile and link.
+
+	@param VertexShaderCode vertex shader file path.
+	@param FragmentShaderCode fragment shader file path.
+	@param shaderbin_file_path  option. if it is not empty, shader binary file will be created.
+	*/
+	void LoadShadersFile(const std::string& vertex_file_path, const std::string& fragment_file_path, const std::string& shaderbin_file_path = "");
+
+	/*!
+	load shader code(string) , compile and link.
+
+	@param VertexShaderCode vertex shader code strings.
+	@param FragmentShaderCode fragment shader code strings.
+	@param shaderbin_file_path  option. if it is not empty, shader binary file will be created.
+	*/
+	void LoadShadersCode(const std::string& VertexShaderCode, const std::string& FragmentShaderCode, const std::string& shaderbin_file_path = "");
+
+	/*!
+	load shader binary.
+
+	@param shaderbin_file_path.
+	*/
+	bool LoadShadersBinary(const std::string& shaderbin_file_path);
+
+	/*!
+	get shader binary filename.
+
+	@param classname  __FUNCTION__
+	*/
+	string shaderBinName(const std::string funcname);
 
 	//program
 	GLuint program;

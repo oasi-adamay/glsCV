@@ -155,8 +155,10 @@ glsShaderScalarOperation::glsShaderScalarOperation(void){
 		"}\n"
 		;
 
-
-	LoadShadersCode(vertexShaderCode, fragmentShaderCode);
+	const string bin_filename = shaderBinName(__FUNCTION__);
+	if (!LoadShadersBinary(bin_filename)){
+		LoadShadersCode(vertexShaderCode, fragmentShaderCode, bin_filename);
+	}
 
 	// Attribute & Uniform location
 	position = glGetAttribLocation(program, "position");
@@ -312,8 +314,10 @@ glsShaderBinaryOperation::glsShaderBinaryOperation(void){
 		"}\n"
 		;
 
-
-	LoadShadersCode(vertexShaderCode, fragmentShaderCode);
+	const string bin_filename = shaderBinName(__FUNCTION__);
+	if (!LoadShadersBinary(bin_filename)){
+		LoadShadersCode(vertexShaderCode, fragmentShaderCode, bin_filename);
+	}
 
 	// Attribute & Uniform location
 	position = glGetAttribLocation(program, "position");
