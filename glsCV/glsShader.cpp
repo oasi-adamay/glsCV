@@ -215,12 +215,14 @@ bool glsShaderBase::LoadShadersBinary(const std::string& shaderbin_file_path){
 		GLint success;
 		int InfoLogLength;
 		glGetProgramiv(progId, GL_LINK_STATUS, &success);
-		glGetProgramiv(progId, GL_INFO_LOG_LENGTH, &InfoLogLength);
-		if (InfoLogLength > 0){
-			std::vector<char> ProgramErrorMessage(InfoLogLength + 1);
-			glGetProgramInfoLog(progId, InfoLogLength, NULL, &ProgramErrorMessage[0]);
-			//		printf("%s\n", &ProgramErrorMessage[0]);
-			cout << &ProgramErrorMessage[0] << endl;
+		if (success != GL_TRUE){
+			glGetProgramiv(progId, GL_INFO_LOG_LENGTH, &InfoLogLength);
+			if (InfoLogLength > 0){
+				std::vector<char> ProgramErrorMessage(InfoLogLength + 1);
+				glGetProgramInfoLog(progId, InfoLogLength, NULL, &ProgramErrorMessage[0]);
+				//		printf("%s\n", &ProgramErrorMessage[0]);
+				cout << &ProgramErrorMessage[0] << endl;
+			}
 		}
 		assert(success == GL_TRUE);
 

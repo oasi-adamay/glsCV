@@ -161,6 +161,7 @@ GLFWwindow* glsCvInit(const int _width, const int _height){
 		gls::ShaderMinMaxLocInit();
 		gls::ShaderNormalizeInit();
 		gls::ShaderFftInit();
+		gls::ShaderFilterInit();
 	}
 
 	GL_CHECK_ERROR();
@@ -182,6 +183,8 @@ void glsCvTerminate(void){
 		gls::ShaderMinMaxLocTerminate();
 		gls::ShaderNormalizeTerminate();
 		gls::ShaderFftTerminate();
+		gls::ShaderFilterTerminate();
+
 	}
 
 	// Close OpenGL window and terminate GLFW
