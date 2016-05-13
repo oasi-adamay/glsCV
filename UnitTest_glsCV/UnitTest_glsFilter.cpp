@@ -276,4 +276,124 @@ namespace UnitTest_glsCV
 
 	};
 
+
+	template <typename T>
+	int test_glsSobel(int cvtype, int xorder, int yorder ,int ksize = 3, int ulps = 0, Size size = Size(32, 24)){
+
+		cout << "Size:" << size << endl;
+		cout << "ksize:" << ksize << endl;
+		Mat imgSrc(size, cvtype);
+		FillRandU<T>(imgSrc);
+
+		Mat imgRef;
+		Mat imgDst;
+
+		int loop = (size.width >= 256) ? 10 : 1;
+
+		for (int i = 0; i < loop; i++){
+			_TMR_("cv::Sobel:\t");
+			cv::Sobel(imgSrc, imgRef, imgSrc.depth(), xorder, yorder,ksize);
+		}
+
+		GlsMat glsSrc(imgSrc);
+		GlsMat glsDst;
+
+
+		for (int i = 0; i < loop; i++){
+			_TMR_("gls::Sobel:\t");
+			gls::Sobel(glsSrc, glsDst, glsSrc.depth(), xorder, yorder, ksize);
+		}
+
+		glsDst.CopyTo(imgDst);		// download
+
+		int errNum = 0;
+		if (!AreEqual<T>(imgRef, imgDst, ulps)) errNum = -1;
+
+		//cout << imgRef << endl;
+		//cout << imgDst << endl;
+		//cout << imgDst - imgRef << endl;
+
+
+		return errNum;
+	}
+
+
+
+	TEST_CLASS(UnitTest_glsSobel)
+	{
+	public:
+		TEST_METHOD(glsSobel_CV_32FC1_1_0)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_glsSobel<float>(CV_32FC1,1,0);
+			Assert::AreEqual(0, errNum);
+		}
+
+		TEST_METHOD(glsSobel_CV_32FC1_0_1)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_glsSobel<float>(CV_32FC1, 0, 1);
+			Assert::AreEqual(0, errNum);
+		}
+
+	};
+
+
+
+
+	template <typename T>
+	int test_glsFilter2D(int cvtype, Size ksize = Size(5, 5), int ulps = 0, Size size = Size(32, 24)){
+
+		cout << "Size:" << size << endl;
+		cout << "ksize:" << ksize << endl;
+		Mat imgSrc(size, cvtype);
+		FillRandU<T>(imgSrc);
+
+		Mat imgRef;
+		Mat imgDst;
+
+		Mat kernel = Mat(ksize,CV_32FC1);
+		FillRandU<float>(kernel);
+
+		int loop = (size.width >= 256) ? 10 : 1;
+
+		for (int i = 0; i < loop; i++){
+			_TMR_("cv::filter2D:\t");
+			cv::filter2D(imgSrc, imgRef, -1, kernel);
+		}
+
+		GlsMat glsSrc(imgSrc);
+		GlsMat glsDst;
+
+
+		for (int i = 0; i < loop; i++){
+			_TMR_("gls::filter2D:\t");
+			gls::filter2D(glsSrc, glsDst, -1, kernel);
+		}
+
+		glsDst.CopyTo(imgDst);		// download
+
+		int errNum = 0;
+		if (!AreEqual<T>(imgRef, imgDst, ulps)) errNum = -1;
+
+		//cout << imgRef << endl;
+		//cout << imgDst << endl;
+		//cout << imgDst - imgRef << endl;
+
+
+		return errNum;
+	}
+
+	TEST_CLASS(UnitTest_glsFilter2D)
+	{
+	public:
+		TEST_METHOD(glsFilter2D_CV_32FC1)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_glsFilter2D<float>(CV_32FC1);
+			Assert::AreEqual(0, errNum);
+		}
+	};
+
+
 }

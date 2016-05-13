@@ -56,6 +56,15 @@ void ShaderFilterTerminate(void);
 */
 void sepFilter2D(const GlsMat& src, GlsMat& dst, int ddepth, const Mat& kernelX, const Mat& kernelY);
 
+/*!
+カーネルを用いて画像の畳み込みを行います．
+
+@param src 入力画像．CV_32FC1,CV_32FC2,CV_32FC3,CV_32FC4型の画像がサポートされます．
+@param dst 出力画像． src と同じサイズ，同じチャンネル数になります．
+@param ddepth 出力画像のビット深度(無視されます)
+@param シングルチャンネルの浮動小数点型行列である畳み込みカーネル
+*/
+void filter2D(const GlsMat& src, GlsMat& dst, int ddepth, const Mat& kernel);
 
 /*!
 Gaussian フィルタを用いて，画像を平滑化します．
@@ -76,6 +85,18 @@ void GaussianBlur(const GlsMat& src, GlsMat& dst, Size ksize, double sigmaX, dou
 @param ksize 平滑化カーネルのサイズ．
 */
 void boxFilter(const GlsMat& src, GlsMat& dst, int ddepth, Size ksize);
+
+/*!
+拡張 Sobel オペレータを用いて，1次，2次，3次または混合次数の微分画像を求めます．
+
+@param src 入力画像．CV_32FC1,CV_32FC2,CV_32FC3,CV_32FC4型の画像がサポートされます．
+@param dst 出力画像． src と同じサイズ，同じチャンネル数になります．
+@param ddepth 出力画像のビット深度(無視されます)
+@param xorder xに関する微分の次数．
+@param yorder yに関する微分の次数．
+@param ksize – 拡張Sobelカーネルのサイズ． 1, 3, 5 あるいは 7 のいずれか
+*/
+void Sobel(const GlsMat& src, GlsMat& dst, int ddepth, int xorder, int yorder, int ksize = 3);
 
 }//namespace gls
 

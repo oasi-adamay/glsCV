@@ -44,6 +44,15 @@ public:
 
 };
 
+//-----------------------------------------------------------------------------
+// glsShaderFilter2D
+class glsShaderFilter2D : public glsShaderBase
+{
+public:
+	glsShaderFilter2D(void);
+
+};
+
 #if 0
 //-----------------------------------------------------------------------------
 // glsShaderFilterU unsigned
@@ -68,14 +77,22 @@ glsShaderFilter1D* shaderFilter1D = 0;
 //glsShaderFilterU* shaderFilterU = 0;
 //glsShaderFilterS* shaderFilterS = 0;
 
+glsShaderFilter2D* shaderFilter2D = 0;
+//glsShaderFilterU* shaderFilterU = 0;
+//glsShaderFilterS* shaderFilterS = 0;
+
+
 void ShaderFilterInit(void){
 	shaderFilter1D = new glsShaderFilter1D();
+	shaderFilter2D = new glsShaderFilter2D();
+
 //	shaderFilterU = new glsShaderFilterU();
 //	shaderFilterS = new glsShaderFilterS();
 }
 
 void ShaderFilterTerminate(void){
 	delete shaderFilter1D;
+	delete shaderFilter2D;
 //	delete shaderFilterU;
 //	delete shaderFilterS;
 }
@@ -89,8 +106,6 @@ static const char vertexShaderCode[] =
 "   gl_Position  = vec4(position,0.0,1.0);\n"
 "}\n"
 ;
-
-
 
 
 //-----------------------------------------------------------------------------
@@ -152,6 +167,56 @@ glsShaderFilter1D::glsShaderFilter1D(void)
 }
 
 
+//-----------------------------------------------------------------------------
+//glsShaderFilter2D
+glsShaderFilter2D::glsShaderFilter2D(void)
+	:glsShaderBase()
+{
+	const char fragmentShaderCode[] =
+"#version 330 core\n"
+"precision highp float;\n"
+"uniform sampler2D	texSrc;\n"
+"uniform sampler2D	texKernel;\n"
+"layout (location = 0) out vec4 dst;\n"
+"#define BOUND_PVT(x,pl,pr) ((x)<(pl)?2*(pl)-(x) :(x)>(pr)? 2*(pr)-(x): (x))\n"
+"void main(void)\n"
+"{\n"
+"	ivec2 texSize = textureSize(texSrc,0);\n"
+"	ivec2 texKernelSize = textureSize(texKernel,0);\n"
+"	{\n"
+"		int kxsize = texKernelSize.x ;\n"
+"		int kysize = texKernelSize.y ;\n"
+"		int kxp = kxsize / 2 ;\n"
+"		int kxm = -kxp;\n"
+"		int kyp = kysize / 2 ;\n"
+"		int kym = -kyp;\n"
+"		vec4 sum = vec4(0.0,0.0,0.0,0.0);\n"
+"		for (int ky = kym; ky <= kyp; ky++){\n"
+"				for (int kx = kxm; kx <= kxp; kx++){\n"
+"				vec4 data;\n"
+"				vec4 coef;\n"
+"				int x = int(gl_FragCoord.x) + kx;\n"
+"				int y = int(gl_FragCoord.y) + ky;\n"
+"				x = BOUND_PVT(x,0,texSize.x-1);\n"
+"				y = BOUND_PVT(y,0,texSize.y-1);\n"
+"				data = texelFetch(texSrc, ivec2(x, y), 0);\n"
+"				coef = vec4(texelFetch(texKernel, ivec2(kx+kxp, ky+kyp), 0).r);\n"
+"				sum += data * coef;\n"
+"			}\n"
+"		}\n"
+"		dst = sum;\n"
+"	}\n"
+"}\n"
+		;
+
+	const string bin_filename = shaderBinName(__FUNCTION__);
+	if (!LoadShadersBinary(bin_filename))
+	{
+		LoadShadersCode(vertexShaderCode, fragmentShaderCode, bin_filename);
+	}
+}
+
+
 
 //---------------------------------------------------------------------------
 /*!
@@ -171,7 +236,6 @@ static void glsFilter1DProcess(
 
 	//uniform
 	{
-//		glUniform1i(glGetUniformLocation(shader->program, "dir"), dir);
 	}
 
 	//Bind Texture
@@ -204,8 +268,56 @@ static void glsFilter1DProcess(
 
 }
 
+static void glsFilter2DProcess(
+	const glsShaderBase* shader,	//progmra ID
+	const GLuint& texSrc,			//src   texture ID
+	const GLuint& texKernel,		//Kernel texture ID
+	const Size& texSize				//dst texture size
+	)
+{
+
+	//program
+	{
+		glUseProgram(shader->program);
+	}
+
+	//uniform
+	{
+	}
+
+	//Bind Texture
+	{
+		int id = 0;
+		glActiveTexture(GL_TEXTURE0 + id);
+		glBindTexture(GL_TEXTURE_2D, texSrc);
+		glUniform1i(glGetUniformLocation(shader->program, "texSrc"), id);
+		id++;
+		glActiveTexture(GL_TEXTURE0 + id);
+		glBindTexture(GL_TEXTURE_2D, texKernel);
+		glUniform1i(glGetUniformLocation(shader->program, "texKernel"), id);
+
+	}
+
+	glsVAO vao(glGetAttribLocation(shader->program, "position"));
+
+	//Viewport
+	glViewport(0, 0, texSize.width, texSize.height);
+
+	//Render!!
+	{
+		glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+		glFlush();
+	}
+
+	GL_CHECK_ERROR();
+
+	//	glFinish();
+
+}
+
+
 static 
-glsShaderBase* selectShader(int type){
+glsShaderBase* selectShader1D(int type){
 	glsShaderBase* shader = 0;
 	switch (CV_MAT_DEPTH(type)){
 	case(CV_32F) : shader = shaderFilter1D; break;
@@ -218,6 +330,22 @@ glsShaderBase* selectShader(int type){
 	}
 	return shader;
 }
+
+static
+glsShaderBase* selectShader2D(int type){
+	glsShaderBase* shader = 0;
+	switch (CV_MAT_DEPTH(type)){
+	case(CV_32F) : shader = shaderFilter2D; break;
+		//case(CV_8U) :
+		//case(CV_16U) : shader = shaderFilterU; break;
+		//case(CV_8S) :
+		//case(CV_16S) :
+		//case(CV_32S) : shader = shaderFilterS; break;
+	default: GLS_Assert(0);		//not implement
+	}
+	return shader;
+}
+
 
 
 void sepFilter2D(const GlsMat& src, GlsMat& dst, int ddepth, const Mat& kernelX, const Mat& kernelY){
@@ -244,7 +372,7 @@ void sepFilter2D(const GlsMat& src, GlsMat& dst, int ddepth, const Mat& kernelX,
 
 	GlsMat _tmp = GlsMat(src.size(), src.type());
 
-	glsShaderBase* shader = selectShader(src.type());
+	glsShaderBase* shader = selectShader1D(src.type());
 
 	glsFBO fbo(1);
 	{
@@ -261,6 +389,32 @@ void sepFilter2D(const GlsMat& src, GlsMat& dst, int ddepth, const Mat& kernelX,
 	dst = _dst;
 }
 
+void filter2D(const GlsMat& src, GlsMat& dst, int ddepth, const Mat& kernel){
+	GLS_Assert(src.depth() == CV_32F);
+	GLS_Assert(kernel.type() == CV_32FC1);
+
+	GlsMat _kernel = kernel;
+
+	GlsMat _dst;
+	if (&src == &dst || src.size() != dst.size() || src.type() != dst.type()){
+		_dst = GlsMat(src.size(), src.type());
+	}
+	else{
+		_dst = dst;
+	}
+
+	glsShaderBase* shader = selectShader2D(src.type());
+
+	glsFBO fbo(1);
+	{
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _dst.texid(), 0);
+		glsFilter2DProcess(shader, src.texid(), _kernel.texid(), src.size());
+	}
+
+	dst = _dst;
+}
+
+
 void GaussianBlur(const GlsMat& src, GlsMat& dst, Size ksize, double sigmaX, double sigmaY){
 
 	Mat kernelX = cv::getGaussianKernel(ksize.width, sigmaX, CV_32F);
@@ -276,6 +430,16 @@ void boxFilter(const GlsMat& src, GlsMat& dst, int ddepth, Size ksize){
 	gls::sepFilter2D(src, dst, ddepth, kernelX, kernelY);
 }
 
+void Sobel(const GlsMat& src, GlsMat& dst, int ddepth, int xorder, int yorder, int ksize){
+
+	Mat kernelX;
+	Mat kernelY;
+
+	cv::getDerivKernels(kernelX, kernelY, xorder, yorder, ksize, false, CV_32F);
+
+	gls::sepFilter2D(src, dst, ddepth, kernelX, kernelY);
+
+}
 
 
 
