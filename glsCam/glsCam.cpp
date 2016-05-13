@@ -48,16 +48,22 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 enum E_CAM_MODE {
 	NORMAL,
 	GRAY,
+	GAUSS,
+	SOBEL_H,
+	SOBEL_V,
 	FFT,
 	FFT_RECT,
 };
 
-void controls(GLFWwindow* window, int& mode){
-
-	if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS) mode = E_CAM_MODE::FFT;
-	if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS) mode = E_CAM_MODE::FFT_RECT;
-	if (glfwGetKey(window, GLFW_KEY_9) == GLFW_PRESS) mode = E_CAM_MODE::GRAY;
-	if (glfwGetKey(window, GLFW_KEY_0) == GLFW_PRESS) mode = E_CAM_MODE::NORMAL;
+void controls(GLFWwindow* window, int& mode ,int& ocvwin){
+	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) ocvwin = 1- ocvwin;
+	if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS) mode = E_CAM_MODE::NORMAL;
+	if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS) mode = E_CAM_MODE::GRAY;
+	if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS) mode = E_CAM_MODE::GAUSS;
+	if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS) mode = E_CAM_MODE::SOBEL_H;
+	if (glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS) mode = E_CAM_MODE::SOBEL_V;
+	if (glfwGetKey(window, GLFW_KEY_9) == GLFW_PRESS) mode = E_CAM_MODE::FFT;
+	if (glfwGetKey(window, GLFW_KEY_0) == GLFW_PRESS) mode = E_CAM_MODE::FFT_RECT;
 }
 
 
@@ -95,12 +101,14 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	Rect rectFft((captureWidth - sizeFft.width) / 2, (captureHeight - sizeFft.height) / 2 , sizeFft.width, sizeFft.height);
 
-
 	int camMode = E_CAM_MODE::FFT;
+	int ocvwin = 0;
+
 	do{
 		cv::Mat frame;
 		camera >> frame;						// キャプチャ映像から画像を切り出す
-		imshow("[OCV]", frame.clone());
+		if (ocvwin)	cv::imshow("[OCV]", frame.clone());
+		else cv::destroyWindow("[OCV]");
 
 		cv::flip(frame, frame, 0);				// 上下反転
 
@@ -148,6 +156,26 @@ int _tmain(int argc, _TCHAR* argv[])
 			gls::cvtColor(glsFrame, glsFrame, CV_BGR2GRAY);
 			gls::multiply(glsFftWin, glsFrame, glsFrame);
 		} break;
+		case(E_CAM_MODE::SOBEL_V) : {
+			glsFrame = frame;
+			gls::convert(glsFrame, glsFrame, 1.0f / 256.0f);
+			gls::cvtColor(glsFrame, glsFrame, CV_BGR2GRAY);
+			gls::Sobel(glsFrame, glsFrame, -1, 0,1);
+			gls::add(vec4(0.5), glsFrame, glsFrame);
+		}break;
+		case(E_CAM_MODE::SOBEL_H) : {
+			glsFrame = frame;
+			gls::convert(glsFrame, glsFrame, 1.0f / 256.0f);
+			gls::cvtColor(glsFrame, glsFrame, CV_BGR2GRAY);
+			gls::Sobel(glsFrame, glsFrame, -1, 1, 0);
+			gls::add(vec4(0.5), glsFrame, glsFrame);
+		}break;
+		case(E_CAM_MODE::GAUSS) : {
+			glsFrame = frame;
+			gls::convert(glsFrame, glsFrame, 1.0f / 256.0f);
+			gls::cvtColor(glsFrame, glsFrame, CV_BGR2RGB);
+			gls::GaussianBlur(glsFrame, glsFrame, Size(9, 9), 0, 0);
+		}break;
 		case(E_CAM_MODE::GRAY) : {
 			glsFrame = frame;
 			gls::convert(glsFrame, glsFrame, 1.0f / 256.0f);
@@ -166,7 +194,7 @@ int _tmain(int argc, _TCHAR* argv[])
 
 		glfwSwapBuffers(window);  // Swap buffers
 		glfwPollEvents();
-		controls(window, camMode); // key check
+		controls(window, camMode,ocvwin); // key check
 	}
 	while (glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS &&
 		glfwWindowShouldClose(window) == 0);
