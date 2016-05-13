@@ -342,8 +342,8 @@ namespace UnitTest_glsCV
 
 
 	template <typename T>
-	int test_glsFilter2D(int cvtype, Size ksize = Size(5, 5), int ulps = 0, Size size = Size(32, 24)){
-
+	int test_glsFilter2D(int cvtype, Size ksize = Size(5, 5), Size size = Size(32, 24)){
+		int ulps = 16;
 		cout << "Size:" << size << endl;
 		cout << "ksize:" << ksize << endl;
 		Mat imgSrc(size, cvtype);
