@@ -4,7 +4,28 @@ OpenGLSLを使用したCVライブラリ
 ## LICENSE
 BSD-3clause license  
 
-## 環境
+## 概要
+- OpenGL/OpenGLSLで記述した、OpenCV　Likeなライブラリ
+- cv::gpu(CUDA)と同じように、I/FはOpenCV互換
+- NVIDIA非搭載のNotePCでも実行可能
+- OpenGL　3.3 core profileを使用
+- Frament shader　のみで頑張ってみる。　
+
+## 実装済み
+- 要素毎の操作
+ - add,sub,mul,div,....
+- 行列の縮約
+ - reduce
+ - minMaxLoc
+ - normalize
+- 演算
+ - FFT
+- 画像処理
+ - sepFilter2D
+ - boxFilter
+ - gaussianFilter
+
+## 開発環境
  * Windows8
  * VC2013
   * NupenGL 0.1.0.1  (glew,glfw)
