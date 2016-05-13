@@ -151,8 +151,10 @@ glsShaderMinMaxLoc::glsShaderMinMaxLoc(void)
 "}\n"
 ;
 
-	// Create and compile our GLSL program from the shaders
-	LoadShadersCode(vertexShaderCode, fragmentShaderCode);
+	const string bin_filename = shaderBinName(__FUNCTION__);
+	if (!LoadShadersBinary(bin_filename)){
+		LoadShadersCode(vertexShaderCode, fragmentShaderCode, bin_filename);
+	}
 }
 
 

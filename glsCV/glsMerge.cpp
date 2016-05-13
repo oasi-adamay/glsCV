@@ -119,8 +119,10 @@ glsShaderMerge::glsShaderMerge(void)
 "\n"
 "}\n"
 ;
-	// Create and compile our GLSL program from the shaders
-	LoadShadersCode(vertexShaderCode, fragmentShaderCode);
+	const string bin_filename = shaderBinName(__FUNCTION__);
+	if (!LoadShadersBinary(bin_filename)){
+		LoadShadersCode(vertexShaderCode, fragmentShaderCode, bin_filename);
+	}
 }
 
 
@@ -146,8 +148,10 @@ glsShaderMergeU::glsShaderMergeU(void)
 "	dst.a = texelFetch(texSrc3, ivec2(gl_FragCoord.xy)+offset,0).r;\n"
 "}\n"
 ;
-	// Create and compile our GLSL program from the shaders
-	LoadShadersCode(vertexShaderCode, fragmentShaderCode);
+	const string bin_filename = shaderBinName(__FUNCTION__);
+	if (!LoadShadersBinary(bin_filename)){
+		LoadShadersCode(vertexShaderCode, fragmentShaderCode, bin_filename);
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -172,8 +176,10 @@ glsShaderMergeS::glsShaderMergeS(void)
 "	dst.a = texelFetch(texSrc3, ivec2(gl_FragCoord.xy)+offset,0).r;\n"
 "}\n"
 ;
-	// Create and compile our GLSL program from the shaders
-	LoadShadersCode(vertexShaderCode, fragmentShaderCode);
+	const string bin_filename = shaderBinName(__FUNCTION__);
+	if (!LoadShadersBinary(bin_filename)){
+		LoadShadersCode(vertexShaderCode, fragmentShaderCode, bin_filename);
+	}
 }
 
 

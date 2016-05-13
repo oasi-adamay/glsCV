@@ -44,6 +44,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "glsReduce.h"
 #include "glsMinMaxLoc.h"
 #include "glsNormalize.h"
+#include "glsFilter.h"
+
 
 const char* glsErrorString(GLenum err);
 

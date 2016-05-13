@@ -146,6 +146,7 @@
     <ClInclude Include="glsDraw.h" />
     <ClInclude Include="glsFBO.h" />
     <ClInclude Include="glsFft.h" />
+    <ClInclude Include="glsFilter.h" />
     <ClInclude Include="glsMat.h" />
     <ClInclude Include="glsMerge.h" />
     <ClInclude Include="glsMinMaxLoc.h" />
@@ -165,6 +166,7 @@
     <ClCompile Include="glsDraw.cpp" />
     <ClCompile Include="glsFBO.cpp" />
     <ClCompile Include="glsFft.cpp" />
+    <ClCompile Include="glsFilter.cpp" />
     <ClCompile Include="glsMat.cpp" />
     <ClCompile Include="glsMerge.cpp" />
     <ClCompile Include="glsMinMaxLoc.cpp" />
