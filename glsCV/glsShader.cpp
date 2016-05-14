@@ -146,7 +146,7 @@ void glsShaderBase::LoadShadersCode(const std::string& VertexShaderCode, const s
 	glDeleteShader(VertexShaderID);
 	glDeleteShader(FragmentShaderID);
 
-	program = ProgramID;
+	_program = make_shared<GLuint>(ProgramID);
 
 }
 
@@ -228,7 +228,7 @@ bool glsShaderBase::LoadShadersBinary(const std::string& shaderbin_file_path){
 
 	}
 
-	program = progId;
+	_program = make_shared<GLuint>(progId);
 
 	return true;
 }
@@ -257,6 +257,27 @@ string glsShaderBase::VertexShaderCode(void){
 ;
 
 	return vertexShaderCode;
+}
+
+void glsShaderBase::Init(void){
+	if (_program.use_count() == 0){
+		const string bin_filename = shaderBinName(name);
+		if (!LoadShadersBinary(bin_filename))
+		{
+			LoadShadersCode(VertexShaderCode(), FragmentShaderCode(), bin_filename);
+		}
+	}
+}
+
+//program
+GLuint glsShaderBase::program(void) const{
+	if (_program.use_count() == 0){
+//		Init();
+		const_cast<glsShaderBase&>(*this).Init();
+	}
+
+	return *_program;
+
 }
 
 

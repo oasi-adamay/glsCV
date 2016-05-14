@@ -43,7 +43,7 @@ protected:
 	string FragmentShaderCode(void);
 
 public:
-	glsShaderScalarOperation(void);
+	glsShaderScalarOperation(void) :glsShaderBase(__FUNCTION__) {}
 };
 
 
@@ -53,7 +53,7 @@ class glsShaderBinaryOperation : public glsShaderBase
 protected:
 	string FragmentShaderCode(void);
 public:
-	glsShaderBinaryOperation(void);
+	glsShaderBinaryOperation(void) :glsShaderBase(__FUNCTION__) {}
 
 };
 
@@ -141,17 +141,6 @@ string glsShaderScalarOperation::FragmentShaderCode(void){
 	return fragmentShaderCode;
 }
 
-glsShaderScalarOperation::glsShaderScalarOperation(void)
-	:glsShaderBase(__FUNCTION__)
-{
-	const string bin_filename = shaderBinName(name);
-	if (!LoadShadersBinary(bin_filename))
-	{
-		LoadShadersCode(VertexShaderCode(), FragmentShaderCode(), bin_filename);
-	}
-
-
-}
 
 
 //-------------------------------------------------------------
@@ -183,11 +172,11 @@ const int flags					//flag (opcode)
 
 	
 	glsFBO fbo;		//FBO 
-	glsVAO vao(glGetAttribLocation(shader->program, "position"));	//VAO
+	glsVAO vao(glGetAttribLocation(shader->program(), "position"));	//VAO
 
 	//program
 	{
-		glUseProgram(shader->program);
+		glUseProgram(shader->program());
 	}
 
 	//uniform
@@ -200,8 +189,8 @@ const int flags					//flag (opcode)
 
 		// Attribute & Uniform location
 
-		glUniform1i(glGetUniformLocation(shader->program,"flags"), flags);
-		glUniform4fv(glGetUniformLocation(shader->program, "scalar"), 1, &_scalar[0]);
+		glUniform1i(glGetUniformLocation(shader->program(),"flags"), flags);
+		glUniform4fv(glGetUniformLocation(shader->program(), "scalar"), 1, &_scalar[0]);
 
 	}
 
@@ -210,7 +199,7 @@ const int flags					//flag (opcode)
 		int id = 0;
 		glActiveTexture(GL_TEXTURE0 + id);
 		glBindTexture(GL_TEXTURE_2D, texSrc);
-		glUniform1i(glGetUniformLocation(shader->program,"texSrc"), id);
+		glUniform1i(glGetUniformLocation(shader->program(),"texSrc"), id);
 	}
 
 	//dst texture
@@ -308,18 +297,6 @@ string glsShaderBinaryOperation::FragmentShaderCode(void){
 }
 
 
-glsShaderBinaryOperation::glsShaderBinaryOperation(void)
-	:glsShaderBase(__FUNCTION__)
-{
-
-	const string bin_filename = shaderBinName(name);
-	if (!LoadShadersBinary(bin_filename))
-	{
-		LoadShadersCode(VertexShaderCode(), FragmentShaderCode(), bin_filename);
-	}
-
-
-}
 
 //-------------------------------------------------------------
 // Binary operation
@@ -349,16 +326,16 @@ void glslBinaryOperation(
 	glBindTexture(GL_TEXTURE_2D, 0);
 
 	glsFBO fbo;		//FBO 
-	glsVAO vao(glGetAttribLocation(shader->program, "position"));	//VAO
+	glsVAO vao(glGetAttribLocation(shader->program(), "position"));	//VAO
 
 	//program
 	{
-		glUseProgram(shader->program);
+		glUseProgram(shader->program());
 	}
 
 	//uniform
 	{
-		glUniform1i(glGetUniformLocation(shader->program, "flags"), flags);
+		glUniform1i(glGetUniformLocation(shader->program(), "flags"), flags);
 	}
 
 	//Bind Texture
@@ -366,11 +343,11 @@ void glslBinaryOperation(
 		int id = 0;
 		glActiveTexture(GL_TEXTURE0 + id);
 		glBindTexture(GL_TEXTURE_2D, texSrc0);
-		glUniform1i(glGetUniformLocation(shader->program, "texSrc0"), id);
+		glUniform1i(glGetUniformLocation(shader->program(), "texSrc0"), id);
 		id++;
 		glActiveTexture(GL_TEXTURE0 + id);
 		glBindTexture(GL_TEXTURE_2D, texSrc1);
-		glUniform1i(glGetUniformLocation(shader->program, "texSrc1"), id);
+		glUniform1i(glGetUniformLocation(shader->program(), "texSrc1"), id);
 	}
 	//dst texture
 	{

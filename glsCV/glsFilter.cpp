@@ -237,7 +237,7 @@ static void glsFilter1DProcess(
 
 	//program
 	{
-		glUseProgram(shader->program);
+		glUseProgram(shader->program());
 	}
 
 	//uniform
@@ -249,15 +249,15 @@ static void glsFilter1DProcess(
 		int id = 0;
 		glActiveTexture(GL_TEXTURE0 + id);
 		glBindTexture(GL_TEXTURE_2D, texSrc);
-		glUniform1i(glGetUniformLocation(shader->program, "texSrc"), id);
+		glUniform1i(glGetUniformLocation(shader->program(), "texSrc"), id);
 		id++;
 		glActiveTexture(GL_TEXTURE0 + id);
 		glBindTexture(GL_TEXTURE_2D, texKernel);
-		glUniform1i(glGetUniformLocation(shader->program, "texKernel"), id);
+		glUniform1i(glGetUniformLocation(shader->program(), "texKernel"), id);
 
 	}
 
-	glsVAO vao(glGetAttribLocation(shader->program, "position"));
+	glsVAO vao(glGetAttribLocation(shader->program(), "position"));
 
 	//Viewport
 	glViewport(0, 0, texSize.width, texSize.height);
@@ -284,7 +284,7 @@ static void glsFilter2DProcess(
 
 	//program
 	{
-		glUseProgram(shader->program);
+		glUseProgram(shader->program());
 	}
 
 	//uniform
@@ -296,15 +296,15 @@ static void glsFilter2DProcess(
 		int id = 0;
 		glActiveTexture(GL_TEXTURE0 + id);
 		glBindTexture(GL_TEXTURE_2D, texSrc);
-		glUniform1i(glGetUniformLocation(shader->program, "texSrc"), id);
+		glUniform1i(glGetUniformLocation(shader->program(), "texSrc"), id);
 		id++;
 		glActiveTexture(GL_TEXTURE0 + id);
 		glBindTexture(GL_TEXTURE_2D, texKernel);
-		glUniform1i(glGetUniformLocation(shader->program, "texKernel"), id);
+		glUniform1i(glGetUniformLocation(shader->program(), "texKernel"), id);
 
 	}
 
-	glsVAO vao(glGetAttribLocation(shader->program, "position"));
+	glsVAO vao(glGetAttribLocation(shader->program(), "position"));
 
 	//Viewport
 	glViewport(0, 0, texSize.width, texSize.height);

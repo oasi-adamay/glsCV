@@ -43,7 +43,7 @@ protected:
 	string FragmentShaderCode(void);
 
 public:
-	glsShaderMinMaxLoc(void);
+	glsShaderMinMaxLoc(void) :glsShaderBase(__FUNCTION__){}
 
 };
 
@@ -142,17 +142,6 @@ string glsShaderMinMaxLoc::FragmentShaderCode(void){
 	return fragmentShaderCode;
 }
 
-glsShaderMinMaxLoc::glsShaderMinMaxLoc(void)
-	:glsShaderBase(__FUNCTION__)
-{
-
-	const string bin_filename = shaderBinName(name);
-	if (!LoadShadersBinary(bin_filename))
-	{
-		LoadShadersCode(VertexShaderCode(), FragmentShaderCode(), bin_filename);
-	}
-}
-
 
 
 //---------------------------------------------------------------------------
@@ -169,12 +158,12 @@ static void glsMinMaxLocProcess(
 
 	//program
 	{
-		glUseProgram(shader->program);
+		glUseProgram(shader->program());
 	}
 
 	//uniform
 	{
-		glUniform1i(glGetUniformLocation(shader->program, "path"), path);
+		glUniform1i(glGetUniformLocation(shader->program(), "path"), path);
 	}
 
 	//Bind Texture
@@ -182,10 +171,10 @@ static void glsMinMaxLocProcess(
 		glActiveTexture(GL_TEXTURE0 + id);
 		glBindTexture(GL_TEXTURE_2D, texSrc[id]);
 		string name = "texSrc" + to_string(id);
-		glUniform1i(glGetUniformLocation(shader->program, name.c_str()), id);
+		glUniform1i(glGetUniformLocation(shader->program(), name.c_str()), id);
 	}
 
-	glsVAO vao(glGetAttribLocation(shader->program, "position"));
+	glsVAO vao(glGetAttribLocation(shader->program(), "position"));
 
 	//Viewport
 	glViewport(0, 0, texSize.width, texSize.height);

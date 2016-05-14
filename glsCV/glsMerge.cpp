@@ -47,7 +47,7 @@ protected:
 	string FragmentShaderCode(void);
 
 public:
-	glsShaderMerge(void);
+	glsShaderMerge(void) :glsShaderBase(__FUNCTION__){}
 
 };
 
@@ -59,7 +59,7 @@ protected:
 	string FragmentShaderCode(void);
 
 public:
-	glsShaderMergeU(void);
+	glsShaderMergeU(void) :glsShaderBase(__FUNCTION__){}
 };
 
 //-----------------------------------------------------------------------------
@@ -70,7 +70,7 @@ protected:
 	string FragmentShaderCode(void);
 
 public:
-	glsShaderMergeS(void);
+	glsShaderMergeS(void) :glsShaderBase(__FUNCTION__){}
 };
 
 
@@ -118,15 +118,6 @@ string glsShaderMerge::FragmentShaderCode(void){
 	return fragmentShaderCode;
 }
 
-glsShaderMerge::glsShaderMerge(void)
-	:glsShaderBase(__FUNCTION__)
-{
-	const string bin_filename = shaderBinName(name);
-	if (!LoadShadersBinary(bin_filename))
-	{
-		LoadShadersCode(VertexShaderCode(), FragmentShaderCode(), bin_filename);
-	}
-}
 
 
 //-----------------------------------------------------------------------------
@@ -152,15 +143,6 @@ string glsShaderMergeU::FragmentShaderCode(void){
 	return fragmentShaderCode;
 }
 
-glsShaderMergeU::glsShaderMergeU(void)
-	:glsShaderBase(__FUNCTION__)
-{
-	const string bin_filename = shaderBinName(name);
-	if (!LoadShadersBinary(bin_filename))
-	{
-		LoadShadersCode(VertexShaderCode(), FragmentShaderCode(), bin_filename);
-	}
-}
 
 //-----------------------------------------------------------------------------
 //glsShaderMergeS
@@ -185,17 +167,6 @@ string glsShaderMergeS::FragmentShaderCode(void){
 	return fragmentShaderCode;
 }
 
-glsShaderMergeS::glsShaderMergeS(void)
-	:glsShaderBase(__FUNCTION__)
-{
-	const string bin_filename = shaderBinName(name);
-	if (!LoadShadersBinary(bin_filename))
-	{
-		LoadShadersCode(VertexShaderCode(), FragmentShaderCode(), bin_filename);
-	}
-}
-
-
 
 
 //---------------------------------------------------------------------------
@@ -211,12 +182,12 @@ static void mergeProcess(
 
 	//program
 	{
-		glUseProgram(shader->program);
+		glUseProgram(shader->program());
 	}
 
 	//uniform
 	{
-		glUniform2iv(glGetUniformLocation(shader->program, "offset"), 1,&offset[0]);
+		glUniform2iv(glGetUniformLocation(shader->program(), "offset"), 1,&offset[0]);
 	}
 
 
@@ -226,11 +197,11 @@ static void mergeProcess(
 			glActiveTexture(GL_TEXTURE0 + id);
 			glBindTexture(GL_TEXTURE_2D, texSrc[id]);
 			string name = "texSrc" + to_string(id);
-			glUniform1i(glGetUniformLocation(shader->program, name.c_str()), id);
+			glUniform1i(glGetUniformLocation(shader->program(), name.c_str()), id);
 		}
 	}
 
-	glsVAO vao(glGetAttribLocation(shader->program, "position"));
+	glsVAO vao(glGetAttribLocation(shader->program(), "position"));
 	//Viewport
 	{
 		glViewport(rectDst.x, rectDst.y, rectDst.width, rectDst.height);

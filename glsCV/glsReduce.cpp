@@ -43,7 +43,7 @@ protected:
 	string FragmentShaderCode(void);
 
 public:
-	glsShaderReduce(void);
+	glsShaderReduce(void) :glsShaderBase(__FUNCTION__){}
 
 };
 
@@ -183,17 +183,6 @@ string glsShaderReduce::FragmentShaderCode(void){
 	return fragmentShaderCode;
 }
 
-glsShaderReduce::glsShaderReduce(void)
-	:glsShaderBase(__FUNCTION__)
-{
-
-	const string bin_filename = shaderBinName(name);
-	if (!LoadShadersBinary(bin_filename))
-	{
-		LoadShadersCode(VertexShaderCode(), FragmentShaderCode(), bin_filename);
-	}
-}
-
 
 
 //dim – 行列が縮小される際に従う次元インデックス．0 は行列が1行 に，1 は行列が1列に縮小されることをそれぞれ意味します．
@@ -209,13 +198,13 @@ static void glsReduceProcess(
 
 	//program
 	{
-		glUseProgram(shader->program);
+		glUseProgram(shader->program());
 	}
 
 	//uniform
 	{
-		glUniform1i(glGetUniformLocation(shader->program, "dim"), dim);
-		glUniform1i(glGetUniformLocation(shader->program, "reduceOp"), reduceOp);
+		glUniform1i(glGetUniformLocation(shader->program(), "dim"), dim);
+		glUniform1i(glGetUniformLocation(shader->program(), "reduceOp"), reduceOp);
 	}
 
 
@@ -224,10 +213,10 @@ static void glsReduceProcess(
 		int id = 0;
 		glActiveTexture(GL_TEXTURE0 + id);
 		glBindTexture(GL_TEXTURE_2D, texSrc);
-		glUniform1i(glGetUniformLocation(shader->program, "texSrc"), id);
+		glUniform1i(glGetUniformLocation(shader->program(), "texSrc"), id);
 	}
 
-	glsVAO vao(glGetAttribLocation(shader->program, "position"));
+	glsVAO vao(glGetAttribLocation(shader->program(), "position"));
 
 	//Viewport
 	if (dim == 0){

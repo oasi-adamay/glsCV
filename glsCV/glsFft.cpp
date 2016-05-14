@@ -53,7 +53,7 @@ protected:
 	string FragmentShaderCode(void);
 
 public:
-	glsShaderFft(void);
+	glsShaderFft(void) :glsShaderBase(__FUNCTION__){}
 
 };
 
@@ -175,20 +175,6 @@ string glsShaderFft::FragmentShaderCode(void){
 	return fragmentShaderCode;
 }
 
-glsShaderFft::glsShaderFft(void)
-	:glsShaderBase(__FUNCTION__)
-{
-
-	const string bin_filename = shaderBinName(name);
-	if (!LoadShadersBinary(bin_filename))
-	{
-		LoadShadersCode(VertexShaderCode(), FragmentShaderCode(), bin_filename);
-	}
-
-}
-
-
-
 
 
 //---------------------------------------------------------------------------
@@ -249,21 +235,21 @@ static void glsFftProcess(
 //	Timer tmr("glsFftProcess:\t");
 	//program
 	{
-		glUseProgram(shader->program);
+		glUseProgram(shader->program());
 	}
 
 
 
 	//uniform
 	{
-		glUniform1i(glGetUniformLocation(shader->program, "i_flag"), flag);
-		glUniform1i(glGetUniformLocation(shader->program, "i_p"), p);
-		glUniform1i(glGetUniformLocation(shader->program, "i_q"), q);
-		glUniform1i(glGetUniformLocation(shader->program, "i_N"), N);
-		glUniform1f(glGetUniformLocation(shader->program, "f_xscl"), xscl);
-		glUniform1f(glGetUniformLocation(shader->program, "f_yscl"), yscl);
-		glUniform1f(glGetUniformLocation(shader->program, "f_xconj"), xconj);
-		glUniform1f(glGetUniformLocation(shader->program, "f_yconj"), yconj);
+		glUniform1i(glGetUniformLocation(shader->program(), "i_flag"), flag);
+		glUniform1i(glGetUniformLocation(shader->program(), "i_p"), p);
+		glUniform1i(glGetUniformLocation(shader->program(), "i_q"), q);
+		glUniform1i(glGetUniformLocation(shader->program(), "i_N"), N);
+		glUniform1f(glGetUniformLocation(shader->program(), "f_xscl"), xscl);
+		glUniform1f(glGetUniformLocation(shader->program(), "f_yscl"), yscl);
+		glUniform1f(glGetUniformLocation(shader->program(), "f_xconj"), xconj);
+		glUniform1f(glGetUniformLocation(shader->program(), "f_yconj"), yconj);
 	}
 
 	//Bind Texture
@@ -272,18 +258,18 @@ static void glsFftProcess(
 		{
 			glActiveTexture(GL_TEXTURE0 + id);
 			glBindTexture(GL_TEXTURE_2D, texSrc[id]);
-			glUniform1i(glGetUniformLocation(shader->program, "texSrc0"), id);
+			glUniform1i(glGetUniformLocation(shader->program(), "texSrc0"), id);
 			id++;
 			glActiveTexture(GL_TEXTURE0 + id);
 			glBindTexture(GL_TEXTURE_2D, texSrc[id]);
-			glUniform1i(glGetUniformLocation(shader->program, "texSrc1"), id);
+			glUniform1i(glGetUniformLocation(shader->program(), "texSrc1"), id);
 			id++;
 		}
 
 		{
 			glActiveTexture(GL_TEXTURE0 + id);
 			glBindTexture(GL_TEXTURE_2D, texW);
-			glUniform1i(glGetUniformLocation(shader->program, "texW"), id);
+			glUniform1i(glGetUniformLocation(shader->program(), "texW"), id);
 			id++;
 		}
 	}
@@ -390,7 +376,7 @@ void fft(const GlsMat& src, GlsMat& dst, int flag){
 		_TMR_("-execute:\t");
 
 		glsFBO fbo(2);
-		glsVAO vao(glGetAttribLocation(shaderFft->program,"position"));
+		glsVAO vao(glGetAttribLocation(shaderFft->program(),"position"));
 
 		int Q = 0;
 		while ((1 << Q) < N){ Q++; }

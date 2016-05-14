@@ -55,7 +55,7 @@ protected:
 	string FragmentShaderCode(void);
 
 public:
-	glsShaderDraw(void);
+	glsShaderDraw(void) :glsShaderDrawBase(__FUNCTION__){}
 
 };
 
@@ -67,7 +67,7 @@ protected:
 	string FragmentShaderCode(void);
 
 public:
-	glsShaderDrawU(void);
+	glsShaderDrawU(void) :glsShaderDrawBase(__FUNCTION__){}
 
 };
 
@@ -123,17 +123,6 @@ string glsShaderDraw::FragmentShaderCode(void){
 	return fragmentShaderCode;
 }
 
-glsShaderDraw::glsShaderDraw(void)
-	:glsShaderDrawBase(__FUNCTION__)
-{
-	
-	const string bin_filename = shaderBinName(name);
-	if (!LoadShadersBinary(bin_filename))
-	{
-		LoadShadersCode(VertexShaderCode(), FragmentShaderCode(), bin_filename);
-	}
-
-}
 
 
 //-----------------------------------------------------------------------------
@@ -165,19 +154,6 @@ string glsShaderDrawU::FragmentShaderCode(void){
 ;
 	return fragmentShaderCode;
 }
-
-glsShaderDrawU::glsShaderDrawU(void)
-	:glsShaderDrawBase(__FUNCTION__)
-{
-	const string bin_filename = shaderBinName(name);
-	if (!LoadShadersBinary(bin_filename)){
-		LoadShadersCode(VertexShaderCode(), FragmentShaderCode(), bin_filename);
-	}
-
-}
-
-
-
 
 
 static Size getTextureSize(GLuint tex){
@@ -221,13 +197,13 @@ static void glsDrawProcess(
 
 	//program
 	{
-		glUseProgram(shader->program);
+		glUseProgram(shader->program());
 	}
 
 	//uniform
 	{
-		glUniform1f(glGetUniformLocation(shader->program, "scl"), scl);
-		glUniform1i(glGetUniformLocation(shader->program, "flag"), flag);
+		glUniform1f(glGetUniformLocation(shader->program(), "scl"), scl);
+		glUniform1i(glGetUniformLocation(shader->program(), "flag"), flag);
 	}
 
 
@@ -236,10 +212,10 @@ static void glsDrawProcess(
 		int id = 0;
 		glActiveTexture(GL_TEXTURE0 + id);
 		glBindTexture(GL_TEXTURE_2D, texSrc);
-		glUniform1i(glGetUniformLocation(shader->program,"texSrc"), id);
+		glUniform1i(glGetUniformLocation(shader->program(),"texSrc"), id);
 	}
 
-	glsVAO vao(glGetAttribLocation(shader->program, "position"));
+	glsVAO vao(glGetAttribLocation(shader->program(), "position"));
 	
 
 	//Viewport

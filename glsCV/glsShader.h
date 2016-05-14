@@ -51,6 +51,8 @@ private:
 	glsShaderBase(const glsShaderBase&);              ///  Uncopyable
 	glsShaderBase& operator=(const glsShaderBase&);   ///  Uncopyable
 
+	shared_ptr<GLuint> _program;	//!< program idを保存する、shared_ptr
+
 protected:
 	const string name;		//Shader name;
 
@@ -58,9 +60,10 @@ protected:
 	virtual string FragmentShaderCode(void){ return string(""); }
 
 public:
-	glsShaderBase(const string& _name) : name(_name){ program = 0;}
+	glsShaderBase(const string& _name) : name(_name){ ;}
 
-	~glsShaderBase(void){ if (program)glDeleteProgram(program); }
+	~glsShaderBase(void){ if (_program.use_count() == 1) glDeleteProgram(*_program); }
+
 
 	/*!
 	load shader filse(string) , compile and link.
@@ -95,7 +98,9 @@ public:
 	string shaderBinName(const std::string funcname);
 
 	//program
-	GLuint program;
+	GLuint program(void) const;
+
+	void Init(void);
 
 };
 

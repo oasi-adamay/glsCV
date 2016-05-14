@@ -180,11 +180,11 @@ static void glsCopyProcess(
 	const int offset[2] = { rectSrc.x, rectSrc.y };
 		//program
 	{
-		glUseProgram(shader->program);
+		glUseProgram(shader->program());
 	}
 		//uniform
 	{
-		glUniform2iv(glGetUniformLocation(shader->program, "offset"), 1, &offset[0]);
+		glUniform2iv(glGetUniformLocation(shader->program(), "offset"), 1, &offset[0]);
 	}
 
 
@@ -193,10 +193,10 @@ static void glsCopyProcess(
 		int id = 0;
 		glActiveTexture(GL_TEXTURE0 + id);
 		glBindTexture(GL_TEXTURE_2D, texSrc);
-		glUniform1i(glGetUniformLocation(shader->program, "texSrc"), id);
+		glUniform1i(glGetUniformLocation(shader->program(), "texSrc"), id);
 	}
 
-	glsVAO vao(glGetAttribLocation(shader->program, "position"));
+	glsVAO vao(glGetAttribLocation(shader->program(), "position"));
 	//Viewport
 	{
 		glViewport(rectDst.x, rectDst.y, rectDst.width, rectDst.height);

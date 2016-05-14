@@ -55,7 +55,7 @@ protected:
 	string FragmentShaderCode(void);
 
 public:
-	glsShaderConvert(void);
+	glsShaderConvert(void) :glsShaderConvertBase(__FUNCTION__) {}
 
 };
 
@@ -67,7 +67,7 @@ protected:
 	string FragmentShaderCode(void);
 
 public:
-	glsShaderConvertU(void);
+	glsShaderConvertU(void) :glsShaderConvertBase(__FUNCTION__) {}
 
 };
 
@@ -79,7 +79,7 @@ protected:
 	string FragmentShaderCode(void);
 
 public:
-	glsShaderConvertS(void);
+	glsShaderConvertS(void) :glsShaderConvertBase(__FUNCTION__) {}
 
 };
 
@@ -179,17 +179,6 @@ string glsShaderConvert::FragmentShaderCode(void){
 }
 
 
-glsShaderConvert::glsShaderConvert(void)
-	:glsShaderConvertBase(__FUNCTION__)
-{
-
-	const string bin_filename = shaderBinName(name);
-	if (!LoadShadersBinary(bin_filename))
-	{
-		LoadShadersCode(VertexShaderCode(), FragmentShaderCode(), bin_filename);
-	}
-
-}
 
 
 //-----------------------------------------------------------------------------
@@ -237,18 +226,6 @@ string glsShaderConvertU::FragmentShaderCode(void){
 
 
 
-glsShaderConvertU::glsShaderConvertU(void)
-	:glsShaderConvertBase(__FUNCTION__)
-{
-
-	const string bin_filename = shaderBinName(name);
-	if (!LoadShadersBinary(bin_filename))
-	{
-		LoadShadersCode(VertexShaderCode(), FragmentShaderCode(), bin_filename);
-	}
-
-}
-
 //-----------------------------------------------------------------------------
 //glsShaderConvertS
 string glsShaderConvertS::FragmentShaderCode(void){
@@ -293,17 +270,6 @@ string glsShaderConvertS::FragmentShaderCode(void){
 }
 
 
-glsShaderConvertS::glsShaderConvertS(void)
-	:glsShaderConvertBase(__FUNCTION__)
-{
-
-	const string bin_filename = shaderBinName(name);
-	if (!LoadShadersBinary(bin_filename))
-	{
-		LoadShadersCode(VertexShaderCode(), FragmentShaderCode(), bin_filename);
-	}
-
-}
 
 
 
@@ -348,14 +314,14 @@ static void glsConvertProcess(
 
 	//program
 	{
-		glUseProgram(shader->program);
+		glUseProgram(shader->program());
 	}
 
 
 	//uniform
 	{
-		glUniform1f(glGetUniformLocation(shader->program, "scl"), scl);
-		glUniform1i(glGetUniformLocation(shader->program, "flag"), flag);
+		glUniform1f(glGetUniformLocation(shader->program(), "scl"), scl);
+		glUniform1i(glGetUniformLocation(shader->program(), "flag"), flag);
 	}
 
 
@@ -364,10 +330,10 @@ static void glsConvertProcess(
 		int id = 0;
 		glActiveTexture(GL_TEXTURE0 + id);
 		glBindTexture(GL_TEXTURE_2D, texSrc);
-		glUniform1i(glGetUniformLocation(shader->program, "texSrc"), id);
+		glUniform1i(glGetUniformLocation(shader->program(), "texSrc"), id);
 	}
 
-	glsVAO vao(glGetAttribLocation(shader->program, "position"));
+	glsVAO vao(glGetAttribLocation(shader->program(), "position"));
 
 	//Viewport
 	{
