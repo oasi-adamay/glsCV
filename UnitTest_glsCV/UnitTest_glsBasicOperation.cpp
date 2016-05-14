@@ -76,7 +76,6 @@ namespace UnitTest_glsCV
 		Mat imgDst;
 		Mat imgRef;
 		Scalar scalar;
-		vec4   _scalar;
 
 		cout << "Size:" << imgSrc0.size() << endl;
 
@@ -102,11 +101,6 @@ namespace UnitTest_glsCV
 			scalar[1] = randu<float>();
 			scalar[2] = randu<float>();
 			scalar[3] = randu<float>();
-			_scalar[0] = (float)scalar[0];
-			_scalar[1] = (float)scalar[1];
-			_scalar[2] = (float)scalar[2];
-			_scalar[3] = (float)scalar[3];
-
 
 		}
 
@@ -134,19 +128,19 @@ namespace UnitTest_glsCV
 			break;
 		case(E_TEST::ADD_S) :
 			cv::add(scalar, imgSrc1, imgRef); 
-			gls::add(_scalar, glsSrc1, glsSrc1);
+			gls::add(scalar, glsSrc1, glsSrc1);
 			break;
 		case(E_TEST::SUB_S) :
 			cv::subtract(scalar, imgSrc1, imgRef);
-			gls::subtract(_scalar, glsSrc1, glsSrc1);
+			gls::subtract(scalar, glsSrc1, glsSrc1);
 			break;
 		case(E_TEST::MUL_S) :
 			cv::multiply(scalar, imgSrc1, imgRef); 
-			gls::multiply(_scalar, glsSrc1, glsSrc1);
+			gls::multiply(scalar, glsSrc1, glsSrc1);
 			break;
 		case(E_TEST::DIV_S) :
 			cv::divide(scalar, imgSrc1, imgRef);
-			gls::divide(_scalar, glsSrc1, glsSrc1);
+			gls::divide(scalar, glsSrc1, glsSrc1);
 			break;
 		case(E_TEST::MIN) :
 			cv::min(imgSrc0, imgSrc1, imgRef); 
@@ -158,11 +152,11 @@ namespace UnitTest_glsCV
 			break;
 		case(E_TEST::MIN_S) :
 			cv::min(scalar, imgSrc1, imgRef); 
-			gls::min(_scalar, glsSrc1, glsSrc1);
+			gls::min(scalar, glsSrc1, glsSrc1);
 			break;
 		case(E_TEST::MAX_S) :
 			cv::max(scalar, imgSrc1, imgRef); 
-			gls::max(_scalar, glsSrc1, glsSrc1);
+			gls::max(scalar, glsSrc1, glsSrc1);
 			break;
 		case(E_TEST::MUL_SPECTRUMS) :
 			cv::mulSpectrums(imgSrc0, imgSrc1, imgRef, 0, false); 

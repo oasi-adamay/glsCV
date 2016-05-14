@@ -96,8 +96,8 @@ void normalize(const GlsMat& src, GlsMat& dst, double alpha, double beta, int no
 
 	gls::minMaxLoc(src, &minVal, &maxVal);
 	float scl = (float)(beta - alpha) / (float)(maxVal - minVal);
-	gls::multiply(vec4(scl), src, _dst);
-	gls::add(vec4((float)(alpha - scl*minVal)), _dst, _dst);
+	gls::multiply(Scalar(scl), src, _dst);
+	gls::add(Scalar(alpha - scl*minVal), _dst, _dst);
 	dst = _dst;
 }
 

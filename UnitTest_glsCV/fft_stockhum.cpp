@@ -298,7 +298,7 @@ void fft_dit_Stockham_radix2_type0(const Mat& src, Mat &dst){
 	buf[1] = Mat(src.size(), src.type());
 
 
-	vector<vec2> w(N / 2);
+	vector<Vec2f> w(N / 2);
 
 
 	// --- twidle ----
@@ -322,8 +322,8 @@ void fft_dit_Stockham_radix2_type0(const Mat& src, Mat &dst){
 		int bank = 0;
 
 		for (int p = 0, q = Q - 1; q >= 0; p++, q--, bank = bank ^ 1) {
-			vec2* x = (vec2*)buf[bank].ptr<Vec2f>(row);
-			vec2* y = (vec2*)buf[bank ^ 1].ptr<Vec2f>(row);
+			Vec2f* x = (Vec2f*)buf[bank].ptr<Vec2f>(row);
+			Vec2f* y = (Vec2f*)buf[bank ^ 1].ptr<Vec2f>(row);
 
 			int a = 1 << p;
 			int b = 1 << q;
@@ -347,7 +347,7 @@ void fft_dit_Stockham_radix2_type0(const Mat& src, Mat &dst){
 				//cout << "dst(" << iy0 << "," << iy1 << ")\t";
 				//cout << endl;
 
-				vec2 tmp;
+				Vec2f tmp;
 				tmp[_re_] = x[ix1][_re_] * w[iw][_re_] - x[ix1][_im_] * w[iw][_im_];
 				tmp[_im_] = x[ix1][_re_] * w[iw][_im_] + x[ix1][_im_] * w[iw][_re_];
 
@@ -366,8 +366,8 @@ void fft_dit_Stockham_radix2_type0(const Mat& src, Mat &dst){
 		int bank = (Q & 1);	//FFT rows ‚Ì‰ñ”‚ªŠï”‚È‚ç‚ÎŠï”bank‚©‚ç
 
 		for (int p = 0, q = Q - 1; q >= 0; p++, q--, bank = bank ^ 1) {
-			vec2* x = (vec2*)buf[bank].ptr<Vec2f>(0, col);
-			vec2* y = (vec2*)buf[bank ^ 1].ptr<Vec2f>(0, col);
+			Vec2f* x = (Vec2f*)buf[bank].ptr<Vec2f>(0, col);
+			Vec2f* y = (Vec2f*)buf[bank ^ 1].ptr<Vec2f>(0, col);
 
 			int a = 1 << p;
 			int b = 1 << q;
@@ -395,7 +395,7 @@ void fft_dit_Stockham_radix2_type0(const Mat& src, Mat &dst){
 				//cout << "dst(" << iy0 << "," << iy1 << ")\t";
 				//cout << endl;
 
-				vec2 tmp;
+				Vec2f tmp;
 				tmp[_re_] = x[ix1][_re_] * w[iw][_re_] - x[ix1][_im_] * w[iw][_im_];
 				tmp[_im_] = x[ix1][_re_] * w[iw][_im_] + x[ix1][_im_] * w[iw][_re_];
 
@@ -425,7 +425,7 @@ void fft_dit_Stockham_radix2_type1(const Mat& src, Mat &dst){
 	buf[0] = src.clone();
 	buf[1] = Mat(src.size(), src.type());
 
-	vector<vec2> w(N / 2);
+	vector<Vec2f> w(N / 2);
 
 	// --- twidle ----
 	for (int n = 0; n < N / 2; n++){
@@ -446,8 +446,8 @@ void fft_dit_Stockham_radix2_type1(const Mat& src, Mat &dst){
 
 		for (int p = 0, q = Q - 1; q >= 0; p++, q--, bank = bank ^ 1) {
 
-			vec2* x = (vec2*)buf[bank].ptr<Vec2f>(row);
-			vec2* y = (vec2*)buf[bank ^ 1].ptr<Vec2f>(row);
+			Vec2f* x = (Vec2f*)buf[bank].ptr<Vec2f>(row);
+			Vec2f* y = (Vec2f*)buf[bank ^ 1].ptr<Vec2f>(row);
 
 			//cout << "------------------------" << endl;
 			//cout << "p:" << p << "\t";
@@ -466,7 +466,7 @@ void fft_dit_Stockham_radix2_type1(const Mat& src, Mat &dst){
 				//cout << "dst(" << iy0 << "," << iy1 << ")\t";
 				//cout << endl;
 
-				vec2 tmp;
+				Vec2f tmp;
 				tmp[_re_] = x[ix1][_re_] * w[iw][_re_] - x[ix1][_im_] * w[iw][_im_];
 				tmp[_im_] = x[ix1][_re_] * w[iw][_im_] + x[ix1][_im_] * w[iw][_re_];
 
@@ -486,8 +486,8 @@ void fft_dit_Stockham_radix2_type1(const Mat& src, Mat &dst){
 		int bank = (Q & 1);	//FFT rows ‚Ì‰ñ”‚ªŠï”‚È‚ç‚ÎŠï”bank‚©‚ç
 
 		for (int p = 0, q = Q - 1; q >= 0; p++, q--, bank = bank ^ 1) {
-			vec2* x = (vec2*)buf[bank].ptr<Vec2f>(0, col);
-			vec2* y = (vec2*)buf[bank ^ 1].ptr<Vec2f>(0, col);
+			Vec2f* x = (Vec2f*)buf[bank].ptr<Vec2f>(0, col);
+			Vec2f* y = (Vec2f*)buf[bank ^ 1].ptr<Vec2f>(0, col);
 
 			for (int n = 0; n<N / 2; n = n++) {
 				int iw = (n >> q) << q;
@@ -501,7 +501,7 @@ void fft_dit_Stockham_radix2_type1(const Mat& src, Mat &dst){
 				iy0 *= src.cols;
 				iy1 *= src.cols;
 
-				vec2 tmp;
+				Vec2f tmp;
 				tmp[_re_] = x[ix1][_re_] * w[iw][_re_] - x[ix1][_im_] * w[iw][_im_];
 				tmp[_im_] = x[ix1][_re_] * w[iw][_im_] + x[ix1][_im_] * w[iw][_re_];
 

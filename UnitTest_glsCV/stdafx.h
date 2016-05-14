@@ -68,7 +68,7 @@ using namespace cv;
 #include <GLFW/glfw3.h>
 
 // Include GLM
-#include <glm/glm.hpp>
-#include <glm/matrix.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-using namespace glm;
+//#include <glm/glm.hpp>
+//#include <glm/matrix.hpp>
+//#include <glm/gtc/matrix_transform.hpp>
+//using namespace glm;

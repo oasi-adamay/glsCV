@@ -161,14 +161,14 @@ int _tmain(int argc, _TCHAR* argv[])
 			gls::convert(glsFrame, glsFrame, 1.0f / 256.0f);
 			gls::cvtColor(glsFrame, glsFrame, CV_BGR2GRAY);
 			gls::Sobel(glsFrame, glsFrame, -1, 0,1);
-			gls::add(vec4(0.5), glsFrame, glsFrame);
+			gls::add(Scalar(0.5), glsFrame, glsFrame);
 		}break;
 		case(E_CAM_MODE::SOBEL_H) : {
 			glsFrame = (GlsMat)frame;
 			gls::convert(glsFrame, glsFrame, 1.0f / 256.0f);
 			gls::cvtColor(glsFrame, glsFrame, CV_BGR2GRAY);
 			gls::Sobel(glsFrame, glsFrame, -1, 1, 0);
-			gls::add(vec4(0.5), glsFrame, glsFrame);
+			gls::add(Scalar(0.5), glsFrame, glsFrame);
 		}break;
 		case(E_CAM_MODE::GAUSS) : {
 			glsFrame = (GlsMat)frame;
