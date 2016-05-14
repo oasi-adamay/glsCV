@@ -220,7 +220,9 @@ namespace UnitTest_glsCV
 			break;
 		};
 
-		glsSrc1.download(imgDst);
+//		glsSrc1.download(imgDst);
+		imgDst = (Mat)glsSrc1;
+
 		if (!AreEqual<T>(imgRef, imgDst, maxUlps)) errNum = -1;
 
 		cout << "errNum:" << errNum << endl;

@@ -380,6 +380,13 @@ void GlsMat::download(Mat&dst) const{
 }
 
 
+GlsMat::operator Mat() const{
+	Mat mat;
+	(*this).download(mat);
+	return mat;
+}
+
+
 
 
 GLenum convCVtype2GLsizedFormat(int ocvtype){

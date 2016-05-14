@@ -101,6 +101,8 @@ public:
 
 	//! GPU->CPU‚Ö‚Ìdownload
 	void download(Mat&dst) const;
+	operator Mat() const;
+
 
 };
 
