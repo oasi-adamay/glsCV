@@ -184,10 +184,10 @@ string glsShaderReduce::FragmentShaderCode(void){
 }
 
 glsShaderReduce::glsShaderReduce(void)
-	:glsShaderBase()
+	:glsShaderBase(__FUNCTION__)
 {
 
-	const string bin_filename = shaderBinName(__FUNCTION__);
+	const string bin_filename = shaderBinName(name);
 	if (!LoadShadersBinary(bin_filename))
 	{
 		LoadShadersCode(VertexShaderCode(), FragmentShaderCode(), bin_filename);

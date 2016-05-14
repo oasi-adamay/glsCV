@@ -42,7 +42,7 @@ class glsShaderDrawBase : public glsShaderBase
 {
 
 public:
-//	glsShaderDrawBase(void);
+	glsShaderDrawBase(const string& _name) :glsShaderBase(_name){}
 
 	//attribute location
 	GLuint position;
@@ -131,10 +131,10 @@ string glsShaderDraw::FragmentShaderCode(void){
 }
 
 glsShaderDraw::glsShaderDraw(void)
-	:glsShaderDrawBase()
+	:glsShaderDrawBase(__FUNCTION__)
 {
 	
-	const string bin_filename = shaderBinName(__FUNCTION__);
+	const string bin_filename = shaderBinName(name);
 	if (!LoadShadersBinary(bin_filename))
 	{
 		LoadShadersCode(VertexShaderCode(), FragmentShaderCode(), bin_filename);
@@ -179,9 +179,9 @@ string glsShaderDrawU::FragmentShaderCode(void){
 }
 
 glsShaderDrawU::glsShaderDrawU(void)
-	:glsShaderDrawBase()
+	:glsShaderDrawBase(__FUNCTION__)
 {
-	const string bin_filename = shaderBinName(__FUNCTION__);
+	const string bin_filename = shaderBinName(name);
 	if (!LoadShadersBinary(bin_filename)){
 		LoadShadersCode(VertexShaderCode(), FragmentShaderCode(), bin_filename);
 	}

@@ -42,6 +42,7 @@ namespace gls
 class glsShaderConvertBase : public glsShaderBase
 {
 public:
+	glsShaderConvertBase(const string& _name) :glsShaderBase(_name){}
 
 	//attribute location
 	GLuint position;
@@ -186,10 +187,10 @@ string glsShaderConvert::FragmentShaderCode(void){
 
 
 glsShaderConvert::glsShaderConvert(void)
-	:glsShaderConvertBase()
+	:glsShaderConvertBase(__FUNCTION__)
 {
 
-	const string bin_filename = shaderBinName(__FUNCTION__);
+	const string bin_filename = shaderBinName(name);
 	if (!LoadShadersBinary(bin_filename))
 	{
 		LoadShadersCode(VertexShaderCode(), FragmentShaderCode(), bin_filename);
@@ -249,10 +250,10 @@ string glsShaderConvertU::FragmentShaderCode(void){
 
 
 glsShaderConvertU::glsShaderConvertU(void)
-	:glsShaderConvertBase()
+	:glsShaderConvertBase(__FUNCTION__)
 {
 
-	const string bin_filename = shaderBinName(__FUNCTION__);
+	const string bin_filename = shaderBinName(name);
 	if (!LoadShadersBinary(bin_filename))
 	{
 		LoadShadersCode(VertexShaderCode(), FragmentShaderCode(), bin_filename);
@@ -310,10 +311,10 @@ string glsShaderConvertS::FragmentShaderCode(void){
 
 
 glsShaderConvertS::glsShaderConvertS(void)
-	:glsShaderConvertBase()
+	:glsShaderConvertBase(__FUNCTION__)
 {
 
-	const string bin_filename = shaderBinName(__FUNCTION__);
+	const string bin_filename = shaderBinName(name);
 	if (!LoadShadersBinary(bin_filename))
 	{
 		LoadShadersCode(VertexShaderCode(), FragmentShaderCode(), bin_filename);

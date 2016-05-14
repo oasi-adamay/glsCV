@@ -154,9 +154,10 @@ string glsShaderScalarOperation::FragmentShaderCode(void){
 	return fragmentShaderCode;
 }
 
-glsShaderScalarOperation::glsShaderScalarOperation(void){
-
-	const string bin_filename = shaderBinName(__FUNCTION__);
+glsShaderScalarOperation::glsShaderScalarOperation(void)
+	:glsShaderBase(__FUNCTION__)
+{
+	const string bin_filename = shaderBinName(name);
 	if (!LoadShadersBinary(bin_filename))
 	{
 		LoadShadersCode(VertexShaderCode(), FragmentShaderCode(), bin_filename);
@@ -324,9 +325,11 @@ string glsShaderBinaryOperation::FragmentShaderCode(void){
 }
 
 
-glsShaderBinaryOperation::glsShaderBinaryOperation(void){
+glsShaderBinaryOperation::glsShaderBinaryOperation(void)
+	:glsShaderBase(__FUNCTION__)
+{
 
-	const string bin_filename = shaderBinName(__FUNCTION__);
+	const string bin_filename = shaderBinName(name);
 	if (!LoadShadersBinary(bin_filename))
 	{
 		LoadShadersCode(VertexShaderCode(), FragmentShaderCode(), bin_filename);

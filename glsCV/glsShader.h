@@ -52,12 +52,14 @@ private:
 	glsShaderBase& operator=(const glsShaderBase&);   ///  Uncopyable
 
 protected:
+	const string name;		//Shader name;
 
 	virtual string VertexShaderCode(void);
 	virtual string FragmentShaderCode(void){ return string(""); }
 
 public:
-	glsShaderBase(void){ program = 0;}
+	glsShaderBase(const string& _name) : name(_name){ program = 0;}
+
 	~glsShaderBase(void){ if (program)glDeleteProgram(program); }
 
 	/*!

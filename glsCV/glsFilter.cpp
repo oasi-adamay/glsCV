@@ -158,10 +158,10 @@ string glsShaderFilter1D::FragmentShaderCode(void){
 }
 
 glsShaderFilter1D::glsShaderFilter1D(void)
-	:glsShaderBase()
+	:glsShaderBase(__FUNCTION__)
 {
 
-	const string bin_filename = shaderBinName(__FUNCTION__);
+	const string bin_filename = shaderBinName(name);
 	if (!LoadShadersBinary(bin_filename))
 	{
 		LoadShadersCode(VertexShaderCode(), FragmentShaderCode(), bin_filename);
@@ -212,10 +212,10 @@ string glsShaderFilter2D::FragmentShaderCode(void){
 }
 
 glsShaderFilter2D::glsShaderFilter2D(void)
-	:glsShaderBase()
+	:glsShaderBase(__FUNCTION__)
 {
 
-	const string bin_filename = shaderBinName(__FUNCTION__);
+	const string bin_filename = shaderBinName(name);
 	if (!LoadShadersBinary(bin_filename))
 	{
 		LoadShadersCode(VertexShaderCode(), FragmentShaderCode(), bin_filename);
