@@ -349,7 +349,7 @@ namespace UnitTest_glsCV
 			for (int bx = 0; bx < blkNum.width; bx++){
 				Rect rect(bx* (width / blkNum.width), by* (height / blkNum.height), (width / blkNum.width), (height / blkNum.height));
 				Mat roi = Mat(imgSrc, rect);
-				glsSrc[by][bx] = roi;					// download
+				glsSrc[by][bx] = (GlsMat)roi;					// download
 			}
 		}
 

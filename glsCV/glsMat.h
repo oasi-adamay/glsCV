@@ -60,7 +60,7 @@ public:
 
 
 	//! cv::matと同じサイズ、同じtypeのテクスチャーを生成し、データをuploadします。
-	GlsMat(const Mat & cvmat);
+	explicit GlsMat(const Mat & cvmat);
 	//! size, typeのテクスチャーを生成します。
 	GlsMat(const Size size, const int type);
 	//! 空の行列です。テクスチャーは生成されません。
