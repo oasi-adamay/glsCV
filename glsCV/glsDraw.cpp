@@ -44,13 +44,6 @@ class glsShaderDrawBase : public glsShaderBase
 public:
 	glsShaderDrawBase(const string& _name) :glsShaderBase(_name){}
 
-	//attribute location
-	GLuint position;
-
-	//uniform  location
-	GLuint texSrc;
-	GLuint f_scl;
-	GLuint i_flag;
 };
 
 
@@ -140,11 +133,6 @@ glsShaderDraw::glsShaderDraw(void)
 		LoadShadersCode(VertexShaderCode(), FragmentShaderCode(), bin_filename);
 	}
 
-	// Attribute & Uniform location
-	position = glGetAttribLocation(program, "position");
-	texSrc = glGetUniformLocation(program, "texSrc");
-	f_scl = glGetUniformLocation(program, "scl");
-	i_flag = glGetUniformLocation(program, "flag");
 }
 
 
@@ -185,12 +173,6 @@ glsShaderDrawU::glsShaderDrawU(void)
 	if (!LoadShadersBinary(bin_filename)){
 		LoadShadersCode(VertexShaderCode(), FragmentShaderCode(), bin_filename);
 	}
-
-	// Attribute & Uniform location
-	position = glGetAttribLocation(program, "position");
-	texSrc = glGetUniformLocation(program, "texSrc");
-	f_scl = glGetUniformLocation(program, "scl");
-	i_flag = glGetUniformLocation(program, "flag");
 
 }
 
@@ -244,8 +226,8 @@ static void glsDrawProcess(
 
 	//uniform
 	{
-		glUniform1f(shader->f_scl, scl);
-		glUniform1i(shader->i_flag, flag);
+		glUniform1f(glGetUniformLocation(shader->program, "scl"), scl);
+		glUniform1i(glGetUniformLocation(shader->program, "flag"), flag);
 	}
 
 
@@ -254,10 +236,10 @@ static void glsDrawProcess(
 		int id = 0;
 		glActiveTexture(GL_TEXTURE0 + id);
 		glBindTexture(GL_TEXTURE_2D, texSrc);
-		glUniform1i(shader->texSrc, id);
+		glUniform1i(glGetUniformLocation(shader->program,"texSrc"), id);
 	}
 
-	glsVAO vao(shader->position);
+	glsVAO vao(glGetAttribLocation(shader->program, "position"));
 	
 
 	//Viewport

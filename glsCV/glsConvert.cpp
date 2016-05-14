@@ -44,13 +44,6 @@ class glsShaderConvertBase : public glsShaderBase
 public:
 	glsShaderConvertBase(const string& _name) :glsShaderBase(_name){}
 
-	//attribute location
-	GLuint position;
-
-	//uniform  location
-	GLuint texSrc;
-	GLuint f_scl;
-	GLuint i_flag;
 };
 
 
@@ -196,11 +189,6 @@ glsShaderConvert::glsShaderConvert(void)
 		LoadShadersCode(VertexShaderCode(), FragmentShaderCode(), bin_filename);
 	}
 
-	// Attribute & Uniform location
-	position = glGetAttribLocation(program, "position");
-	texSrc = glGetUniformLocation(program, "texSrc");
-	f_scl = glGetUniformLocation(program, "scl");
-	i_flag = glGetUniformLocation(program, "flag");
 }
 
 
@@ -259,11 +247,6 @@ glsShaderConvertU::glsShaderConvertU(void)
 		LoadShadersCode(VertexShaderCode(), FragmentShaderCode(), bin_filename);
 	}
 
-	// Attribute & Uniform location
-	position = glGetAttribLocation(program, "position");
-	texSrc = glGetUniformLocation(program, "texSrc");
-	f_scl = glGetUniformLocation(program, "scl");
-	i_flag = glGetUniformLocation(program, "flag");
 }
 
 //-----------------------------------------------------------------------------
@@ -320,11 +303,6 @@ glsShaderConvertS::glsShaderConvertS(void)
 		LoadShadersCode(VertexShaderCode(), FragmentShaderCode(), bin_filename);
 	}
 
-	// Attribute & Uniform location
-	position = glGetAttribLocation(program, "position");
-	texSrc = glGetUniformLocation(program, "texSrc");
-	f_scl = glGetUniformLocation(program, "scl");
-	i_flag = glGetUniformLocation(program, "flag");
 }
 
 
@@ -373,10 +351,11 @@ static void glsConvertProcess(
 		glUseProgram(shader->program);
 	}
 
+
 	//uniform
 	{
-		glUniform1f(shader->f_scl, scl);
-		glUniform1i(shader->i_flag, flag);
+		glUniform1f(glGetUniformLocation(shader->program, "scl"), scl);
+		glUniform1i(glGetUniformLocation(shader->program, "flag"), flag);
 	}
 
 
@@ -385,10 +364,10 @@ static void glsConvertProcess(
 		int id = 0;
 		glActiveTexture(GL_TEXTURE0 + id);
 		glBindTexture(GL_TEXTURE_2D, texSrc);
-		glUniform1i(shader->texSrc, id);
+		glUniform1i(glGetUniformLocation(shader->program, "texSrc"), id);
 	}
 
-	glsVAO vao(shader->position);
+	glsVAO vao(glGetAttribLocation(shader->program, "position"));
 
 	//Viewport
 	{

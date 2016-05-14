@@ -44,13 +44,6 @@ protected:
 
 public:
 	glsShaderScalarOperation(void);
-
-	//attribute location
-	GLuint position;
-	//uniform  location
-	GLuint texSrc;
-	GLuint v4_scalar;
-	GLuint i_flags;
 };
 
 
@@ -62,12 +55,6 @@ protected:
 public:
 	glsShaderBinaryOperation(void);
 
-	//attribute location
-	GLuint position;
-	//uniform  location
-	GLuint texSrc0;
-	GLuint texSrc1;
-	GLuint i_flags;
 };
 
 
@@ -163,12 +150,6 @@ glsShaderScalarOperation::glsShaderScalarOperation(void)
 		LoadShadersCode(VertexShaderCode(), FragmentShaderCode(), bin_filename);
 	}
 
-	// Attribute & Uniform location
-	position = glGetAttribLocation(program, "position");
-
-	texSrc = glGetUniformLocation(program, "texSrc");
-	v4_scalar = glGetUniformLocation(program, "scalar");
-	i_flags = glGetUniformLocation(program, "flags");
 
 }
 
@@ -202,7 +183,7 @@ const int flags					//flag (opcode)
 
 	
 	glsFBO fbo;		//FBO 
-	glsVAO vao(shaderBinaryOperation->position);	//VAO
+	glsVAO vao(glGetAttribLocation(shader->program, "position"));	//VAO
 
 	//program
 	{
@@ -217,8 +198,10 @@ const int flags					//flag (opcode)
 		_scalar[2] = (float)scalar[2];
 		_scalar[3] = (float)scalar[3];
 
-		glUniform1i(shader->i_flags, flags);
-		glUniform4fv(shader->v4_scalar, 1, &_scalar[0]);
+		// Attribute & Uniform location
+
+		glUniform1i(glGetUniformLocation(shader->program,"flags"), flags);
+		glUniform4fv(glGetUniformLocation(shader->program, "scalar"), 1, &_scalar[0]);
 
 	}
 
@@ -227,7 +210,7 @@ const int flags					//flag (opcode)
 		int id = 0;
 		glActiveTexture(GL_TEXTURE0 + id);
 		glBindTexture(GL_TEXTURE_2D, texSrc);
-		glUniform1i(shader->texSrc, id);
+		glUniform1i(glGetUniformLocation(shader->program,"texSrc"), id);
 	}
 
 	//dst texture
@@ -335,12 +318,6 @@ glsShaderBinaryOperation::glsShaderBinaryOperation(void)
 		LoadShadersCode(VertexShaderCode(), FragmentShaderCode(), bin_filename);
 	}
 
-	// Attribute & Uniform location
-	position = glGetAttribLocation(program, "position");
-
-	texSrc0  = glGetUniformLocation(program, "texSrc0");
-	texSrc1 = glGetUniformLocation(program, "texSrc1");
-	i_flags = glGetUniformLocation(program, "flags");
 
 }
 
@@ -372,8 +349,7 @@ void glslBinaryOperation(
 	glBindTexture(GL_TEXTURE_2D, 0);
 
 	glsFBO fbo;		//FBO 
-	glsVAO vao(shaderBinaryOperation->position);	//VAO
-
+	glsVAO vao(glGetAttribLocation(shader->program, "position"));	//VAO
 
 	//program
 	{
@@ -382,7 +358,7 @@ void glslBinaryOperation(
 
 	//uniform
 	{
-		glUniform1i(shader->i_flags, flags);
+		glUniform1i(glGetUniformLocation(shader->program, "flags"), flags);
 	}
 
 	//Bind Texture
@@ -390,11 +366,11 @@ void glslBinaryOperation(
 		int id = 0;
 		glActiveTexture(GL_TEXTURE0 + id);
 		glBindTexture(GL_TEXTURE_2D, texSrc0);
-		glUniform1i(shader->texSrc0, id);
+		glUniform1i(glGetUniformLocation(shader->program, "texSrc0"), id);
 		id++;
 		glActiveTexture(GL_TEXTURE0 + id);
 		glBindTexture(GL_TEXTURE_2D, texSrc1);
-		glUniform1i(shader->texSrc1, id);
+		glUniform1i(glGetUniformLocation(shader->program, "texSrc1"), id);
 	}
 	//dst texture
 	{
