@@ -220,7 +220,7 @@ namespace UnitTest_glsCV
 			break;
 		};
 
-		glsSrc1.CopyTo(imgDst);
+		glsSrc1.download(imgDst);
 		if (!AreEqual<T>(imgRef, imgDst, maxUlps)) errNum = -1;
 
 		cout << "errNum:" << errNum << endl;

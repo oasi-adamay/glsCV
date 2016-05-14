@@ -66,7 +66,7 @@ namespace UnitTest_glsCV
 
 		gls::normalize(glsSrc, glsDst, alpha, beta, normType);
 
-		glsDst.CopyTo(imgDst);		// download
+		glsDst.download(imgDst);		// download
 
 		int errNum = 0;
 		if (!AreEqual<T>(imgRef, imgDst, ulps)) errNum = -1;

@@ -319,7 +319,7 @@ void minMaxLoc(const GlsMat& src, double* minVal, double* maxVal, Point* minLoc,
 		gls::reduce(tmp, tmp, 1, CV_REDUCE_MIN);
 
 		Mat val;
-		tmp.CopyTo(val);
+		tmp.download(val);
 		GLS_Assert(val.rows == 1);
 		GLS_Assert(val.cols == 1);
 		*minVal = val.at<float>(0, 0);
@@ -330,7 +330,7 @@ void minMaxLoc(const GlsMat& src, double* minVal, double* maxVal, Point* minLoc,
 		gls::reduce(tmp, tmp, 1, CV_REDUCE_MAX);
 
 		Mat val;
-		tmp.CopyTo(val);
+		tmp.download(val);
 		GLS_Assert(val.rows == 1);
 		GLS_Assert(val.cols == 1);
 		*maxVal = val.at<float>(0, 0);

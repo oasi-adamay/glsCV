@@ -75,7 +75,7 @@ namespace UnitTest_glsCV
 		GlsMat glsDst;
 		gls::merge(plnGlsSrc, glsDst);	//copy texture
 
-		glsDst.CopyTo(imgDst);		// download
+		glsDst.download(imgDst);		// download
 
 		int errNum = 0;
 		if (!AreEqual<T>(imgRef, imgDst)) errNum = -1;

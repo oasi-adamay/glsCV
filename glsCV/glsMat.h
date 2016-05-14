@@ -97,10 +97,10 @@ public:
 
 
 	//! CPU->GPU‚Ö‚Ìupload
-	void CopyFrom(const Mat&src);
+	void upload(const Mat&src);
 
 	//! GPU->CPU‚Ö‚Ìdownload
-	void CopyTo(Mat&dst) const;
+	void download(Mat&dst) const;
 
 };
 

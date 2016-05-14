@@ -390,7 +390,7 @@ void fft(const GlsMat& src, GlsMat& dst, int flag){
 			Vec2f val(cos(jw), sin(jw));
 			w.at<Vec2f>(0, n) = val;
 		}
-		texW.CopyFrom(w);
+		texW.upload(w);
 
 
 		//vector<vec2> w(N / 2);
@@ -486,7 +486,7 @@ void fft(const Mat& src, Mat& dst, int flag){
 
 	//---------------------------------
 	//upload
-	_src.CopyFrom(src);
+	_src.upload(src);
 
 	//---------------------------------
 	//fft
@@ -494,7 +494,7 @@ void fft(const Mat& src, Mat& dst, int flag){
 
 	//---------------------------------
 	//download
-	_dst.CopyTo(dst);
+	_dst.download(dst);
 
 
 }

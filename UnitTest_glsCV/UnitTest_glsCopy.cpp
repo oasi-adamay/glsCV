@@ -77,7 +77,7 @@ namespace UnitTest_glsCV
 		}
 
 
-		glsDst.CopyTo(imgDst);		// download
+		glsDst.download(imgDst);		// download
 
 		int errNum = 0;
 		if (!AreEqual<T>(imgRef, imgDst)) errNum = -1;
@@ -183,7 +183,7 @@ namespace UnitTest_glsCV
 		GlsMat glsSrc(imgSrc);		//create GlsMat and  upload
 		GlsMat glsDst;
 		gls::copyRect(glsSrc, glsDst, rect);	//copy texture within rect
-		glsDst.CopyTo(imgDst);		// download
+		glsDst.download(imgDst);		// download
 
 		int errNum = 0;
 		Mat roi = Mat(imgSrc, rect);
@@ -280,7 +280,7 @@ namespace UnitTest_glsCV
 			for (int bx = 0; bx < blkNum.width ; bx++){
 #if 0
 				Mat tmp;
-				glsDst[by][bx].CopyTo(tmp);					// download
+				glsDst[by][bx].download(tmp);					// download
 
 				//cout << "(" << by << "," << bx << ")" << endl;
 				//cout << tmp << endl;
@@ -291,7 +291,7 @@ namespace UnitTest_glsCV
 #else
 				Rect rect(bx* (width / blkNum.width), by* (height / blkNum.height), (width / blkNum.width), (height / blkNum.height));
 				Mat roi = Mat(imgDst, rect);
-				glsDst[by][bx].CopyTo(roi);					// download
+				glsDst[by][bx].download(roi);					// download
 #endif
 			}
 		}
@@ -356,7 +356,7 @@ namespace UnitTest_glsCV
 
 		GlsMat glsDst;
 		gls::untiled(glsSrc, glsDst);			//copy texture  with untiling
-		glsDst.CopyTo(imgDst);				// download
+		glsDst.download(imgDst);				// download
 
 		int errNum = 0;
 		if (!AreEqual<T>(imgSrc, imgDst)) errNum = -1;
