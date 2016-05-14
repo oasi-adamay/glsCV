@@ -175,7 +175,7 @@ glsShaderScalarOperation::glsShaderScalarOperation(void){
 static
 void glslScalarOperation(
 const glsShaderScalarOperation* shader,	//progmra ID
-const vec4 scalar,				//scalar
+const Scalar scalar,				//scalar
 const GLuint texSrc,			//src texture ID
 const GLuint texDst,			//dst texture ID
 const int flags					//flag (opcode)
@@ -208,8 +208,14 @@ const int flags					//flag (opcode)
 
 	//uniform
 	{
+		float _scalar[4];
+		_scalar[0] = (float)scalar[0];
+		_scalar[1] = (float)scalar[1];
+		_scalar[2] = (float)scalar[2];
+		_scalar[3] = (float)scalar[3];
+
 		glUniform1i(shader->i_flags, flags);
-		glUniform4fv(shader->v4_scalar, 1,&scalar[0]);
+		glUniform4fv(shader->v4_scalar, 1, &_scalar[0]);
 
 	}
 
@@ -407,7 +413,7 @@ void glslBinaryOperation(
 
 }
 
-void add(const vec4& scalar, const GlsMat& src, GlsMat& dst){
+void add(const Scalar& scalar, const GlsMat& src, GlsMat& dst){
 	GLS_Assert(src.glType() == GL_FLOAT);
 	GlsMat _dst = GlsMat(src.size(), src.type());
 	glslScalarOperation(shaderScalarOperation, scalar, src.texid(), _dst.texid(), OPCODE_ADD);
@@ -424,7 +430,7 @@ void add(const GlsMat& src0, const GlsMat& src1, GlsMat& dst)
 }
 
 
-void subtract(const vec4& scalar, const GlsMat& src, GlsMat& dst){
+void subtract(const Scalar& scalar, const GlsMat& src, GlsMat& dst){
 	GLS_Assert(src.glType() == GL_FLOAT);
 	GlsMat _dst = GlsMat(src.size(), src.type());
 	glslScalarOperation(shaderScalarOperation, scalar, src.texid(), _dst.texid(), OPCODE_SUB);
@@ -441,7 +447,7 @@ void subtract(const GlsMat& src0, const GlsMat& src1, GlsMat& dst)
 }
 
 
-void multiply(const vec4& scalar, const GlsMat& src, GlsMat& dst){
+void multiply(const Scalar& scalar, const GlsMat& src, GlsMat& dst){
 	GLS_Assert(src.glType() == GL_FLOAT);
 	GlsMat _dst = GlsMat(src.size(), src.type());
 	glslScalarOperation(shaderScalarOperation, scalar, src.texid(), _dst.texid(), OPCODE_MUL);
@@ -457,7 +463,7 @@ void multiply(const GlsMat& src0, const GlsMat& src1, GlsMat& dst)
 	dst = _dst;
 }
 
-void divide(const vec4& scalar, const GlsMat& src, GlsMat& dst){
+void divide(const Scalar& scalar, const GlsMat& src, GlsMat& dst){
 	GLS_Assert(src.glType() == GL_FLOAT);
 	GlsMat _dst = GlsMat(src.size(), src.type());
 	glslScalarOperation(shaderScalarOperation, scalar, src.texid(), _dst.texid(), OPCODE_DIV);
@@ -473,7 +479,7 @@ void divide(const GlsMat& src0, const GlsMat& src1, GlsMat& dst){
 	dst = _dst;
 }
 
-void min(const vec4& scalar, const GlsMat& src, GlsMat& dst){
+void min(const Scalar& scalar, const GlsMat& src, GlsMat& dst){
 	GLS_Assert(src.glType() == GL_FLOAT);
 	GlsMat _dst = GlsMat(src.size(), src.type());
 	glslScalarOperation(shaderScalarOperation, scalar, src.texid(), _dst.texid(), OPCODE_MIN);
@@ -488,7 +494,7 @@ void min(const GlsMat& src0, const GlsMat& src1, GlsMat& dst){
 	dst = _dst;
 }
 
-void max(const vec4& scalar, const GlsMat& src, GlsMat& dst){
+void max(const Scalar& scalar, const GlsMat& src, GlsMat& dst){
 	GLS_Assert(src.glType() == GL_FLOAT);
 	GlsMat _dst = GlsMat(src.size(), src.type());
 	glslScalarOperation(shaderScalarOperation, scalar, src.texid(), _dst.texid(), OPCODE_MAX);
@@ -522,7 +528,7 @@ void mulSpectrumsPhaseOnly(const GlsMat& src0, const GlsMat& src1, GlsMat& dst){
 
 void magSpectrums(const GlsMat& src, GlsMat& dst){
 	GLS_Assert(src.glSizedFormat() == GL_RG32F);
-	vec4 scalar(1.0, 1.0, 1.0, 1.0);
+	Scalar scalar(1.0, 1.0, 1.0, 1.0);
 	GlsMat _dst = GlsMat(src.size(), CV_MAKE_TYPE(src.depth(), 1));
 	glslScalarOperation(shaderScalarOperation, scalar, src.texid(), _dst.texid(), OPCODE_MAG_SPCETRUM);
 	dst = _dst;
@@ -530,7 +536,7 @@ void magSpectrums(const GlsMat& src, GlsMat& dst){
 
 void logMagSpectrums(const GlsMat& src, GlsMat& dst, float offset){
 	GLS_Assert(src.glSizedFormat() == GL_RG32F);
-	vec4 scalar(offset);
+	Scalar scalar(offset);
 	GlsMat _dst = GlsMat(src.size(), CV_MAKE_TYPE(src.depth(), 1));
 	glslScalarOperation(shaderScalarOperation, scalar, src.texid(), _dst.texid(), OPCODE_LOG_MAG_SPCETRUM);
 	dst = _dst;
@@ -539,7 +545,7 @@ void logMagSpectrums(const GlsMat& src, GlsMat& dst, float offset){
 
 void log(const GlsMat& src, GlsMat& dst){
 	GLS_Assert(src.glType() == GL_FLOAT);
-	vec4 scalar(1.0, 1.0, 1.0, 1.0);
+	Scalar scalar(1.0, 1.0, 1.0, 1.0);
 	GlsMat _dst = GlsMat(src.size(), src.type());
 	glslScalarOperation(shaderScalarOperation, scalar, src.texid(), _dst.texid(), OPCODE_LOG);
 	dst = _dst;
@@ -547,7 +553,7 @@ void log(const GlsMat& src, GlsMat& dst){
 
 void exp(const GlsMat& src, GlsMat& dst){
 	GLS_Assert(src.glType() == GL_FLOAT);
-	vec4 scalar(1.0, 1.0, 1.0, 1.0);
+	Scalar scalar(1.0, 1.0, 1.0, 1.0);
 	GlsMat _dst = GlsMat(src.size(), src.type());
 	glslScalarOperation(shaderScalarOperation, scalar, src.texid(), _dst.texid(), OPCODE_EXP);
 	dst = _dst;
@@ -555,7 +561,7 @@ void exp(const GlsMat& src, GlsMat& dst){
 
 void pow(const GlsMat& src, const float& power, GlsMat& dst){
 	GLS_Assert(src.glType() == GL_FLOAT);
-	vec4 scalar(power, power, power, power);
+	Scalar scalar(power, power, power, power);
 	GlsMat _dst = GlsMat(src.size(), src.type());
 	glslScalarOperation(shaderScalarOperation, scalar, src.texid(), _dst.texid(), OPCODE_POW);
 	dst = _dst;

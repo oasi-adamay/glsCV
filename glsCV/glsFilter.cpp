@@ -355,11 +355,11 @@ void sepFilter2D(const GlsMat& src, GlsMat& dst, int ddepth, const Mat& kernelX,
 
 	GlsMat _kernelX;
 	GlsMat _kernelY;
-	if (kernelX.rows == 1) _kernelX = kernelX;
-	else  _kernelX = kernelX.reshape(0, 1);
+	if (kernelX.rows == 1) _kernelX = (GlsMat)kernelX;
+	else  _kernelX = (GlsMat)kernelX.reshape(0, 1);
 
-	if (kernelY.cols == 1) _kernelY = kernelY;
-	else _kernelY = kernelY.reshape(0, kernelY.cols);
+	if (kernelY.cols == 1) _kernelY = (GlsMat)kernelY;
+	else _kernelY = (GlsMat)kernelY.reshape(0, kernelY.cols);
 
 
 	GlsMat _dst;
@@ -393,7 +393,7 @@ void filter2D(const GlsMat& src, GlsMat& dst, int ddepth, const Mat& kernel){
 	GLS_Assert(src.depth() == CV_32F);
 	GLS_Assert(kernel.type() == CV_32FC1);
 
-	GlsMat _kernel = kernel;
+	GlsMat _kernel = (GlsMat)kernel;
 
 	GlsMat _dst;
 	if (&src == &dst || src.size() != dst.size() || src.type() != dst.type()){

@@ -63,7 +63,7 @@ namespace UnitTest_glsCV
 		GlsMat glsDst;
 
 		gls::convert(glsSrc, glsDst, scale);
-		glsDst.CopyTo(imgDst);		// download
+		glsDst.download(imgDst);		// download
 
 		if (imgDst.size() != imgRef.size()){
 			cout << "imgDst.size() != imgRef.size()" << endl;
@@ -151,7 +151,7 @@ namespace UnitTest_glsCV
 		GlsMat glsDst;				 
 
 		gls::cvtColor(glsSrc, glsDst, code);
-		glsDst.CopyTo(imgDst);		// download
+		glsDst.download(imgDst);		// download
 
 		if (imgDst.size() != imgRef.size()){
 			cout << "imgDst.size() != imgRef.size()" << endl;

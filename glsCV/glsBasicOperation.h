@@ -45,37 +45,37 @@ void ShaderBasicOperationTerminate(void);
 //GlsMat I/F
 
 //! スカラと配列の 要素毎の和を求めます．(dst = scalar + src1)
-void add(const vec4& scalar, const GlsMat& src, GlsMat& dst);
+void add(const Scalar& scalar, const GlsMat& src, GlsMat& dst);
 
 //! 2 つの配列同士の 要素毎の和を求めます(dst = src0 + src1)
 void add(const GlsMat& src0, const GlsMat& src1, GlsMat& dst);
 
 //! スカラと配列の 要素毎の差を求めます．(dst = scalar - src1)
-void subtract(const vec4& scalar, const GlsMat& src, GlsMat& dst);
+void subtract(const Scalar& scalar, const GlsMat& src, GlsMat& dst);
 
 //! 2 つの配列同士の 要素毎の差を求めます(dst = src0 - src1)
 void subtract(const GlsMat& src0, const GlsMat& src1, GlsMat& dst);
 
 //! スカラと配列の 要素毎の積を求めます．(dst = scalar * src1)
-void multiply(const vec4& scalar, const GlsMat& src, GlsMat& dst);
+void multiply(const Scalar& scalar, const GlsMat& src, GlsMat& dst);
 
 //! 2 つの配列同士の 要素毎の積を求めます(dst = src0 * src1)
 void multiply(const GlsMat& src0, const GlsMat& src1, GlsMat& dst);
 
 //! スカラと配列の 要素毎の商を求めます．(dst = scalar / src1)
-void divide(const vec4& scalar, const GlsMat& src, GlsMat& dst);
+void divide(const Scalar& scalar, const GlsMat& src, GlsMat& dst);
 
 //! 2 つの配列同士の  要素毎の商を求めます．(dst = src0 / src1)
 void divide(const GlsMat& src0, const GlsMat& src1, GlsMat& dst);
 
 //! スカラと配列の 要素毎の最小値を求めます．(dst = min(scalar, src))
-void min(const vec4& scalar, const GlsMat& src, GlsMat& dst);
+void min(const Scalar& scalar, const GlsMat& src, GlsMat& dst);
 
 //! 2 つの配列同士の  要素毎の最小値を求めます．(dst = min(src0, src1))
 void min(const GlsMat& src0, const GlsMat& src1, GlsMat& dst);
 
 //! スカラと配列の 要素毎の最大値を求めます．(dst = max(scalar, src))
-void max(const vec4& scalar, const GlsMat& src, GlsMat& dst);
+void max(const Scalar& scalar, const GlsMat& src, GlsMat& dst);
 
 //! 2 つの配列同士の  要素毎の最大値を求めます．(dst = max(src0, src1))
 void max(const GlsMat& src0, const GlsMat& src1, GlsMat& dst);

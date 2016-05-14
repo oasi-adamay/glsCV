@@ -135,7 +135,7 @@ int _tmain(int argc, _TCHAR* argv[])
 			cv::imshow("[CV MAG]",mag);
 #else
 			Mat roi = Mat(frame, rectFft);
-			glsFrame = roi;
+			glsFrame = (GlsMat)roi;
 			gls::convert(glsFrame, glsFrame, 1.0f / 256.0f);
 			gls::cvtColor(glsFrame, glsFrame, CV_BGR2GRAY);
 			gls::multiply(glsFftWin, glsFrame, glsFrame);
@@ -151,39 +151,39 @@ int _tmain(int argc, _TCHAR* argv[])
 		}break;
 		case(E_CAM_MODE::FFT_RECT) : {
 			Mat roi = Mat(frame, rectFft);
-			glsFrame = roi;
+			glsFrame = (GlsMat)roi;
 			gls::convert(glsFrame, glsFrame, 1.0f / 256.0f);
 			gls::cvtColor(glsFrame, glsFrame, CV_BGR2GRAY);
 			gls::multiply(glsFftWin, glsFrame, glsFrame);
 		} break;
 		case(E_CAM_MODE::SOBEL_V) : {
-			glsFrame = frame;
+			glsFrame = (GlsMat)frame;
 			gls::convert(glsFrame, glsFrame, 1.0f / 256.0f);
 			gls::cvtColor(glsFrame, glsFrame, CV_BGR2GRAY);
 			gls::Sobel(glsFrame, glsFrame, -1, 0,1);
-			gls::add(vec4(0.5), glsFrame, glsFrame);
+			gls::add(Scalar(0.5), glsFrame, glsFrame);
 		}break;
 		case(E_CAM_MODE::SOBEL_H) : {
-			glsFrame = frame;
+			glsFrame = (GlsMat)frame;
 			gls::convert(glsFrame, glsFrame, 1.0f / 256.0f);
 			gls::cvtColor(glsFrame, glsFrame, CV_BGR2GRAY);
 			gls::Sobel(glsFrame, glsFrame, -1, 1, 0);
-			gls::add(vec4(0.5), glsFrame, glsFrame);
+			gls::add(Scalar(0.5), glsFrame, glsFrame);
 		}break;
 		case(E_CAM_MODE::GAUSS) : {
-			glsFrame = frame;
+			glsFrame = (GlsMat)frame;
 			gls::convert(glsFrame, glsFrame, 1.0f / 256.0f);
 			gls::cvtColor(glsFrame, glsFrame, CV_BGR2RGB);
 			gls::GaussianBlur(glsFrame, glsFrame, Size(9, 9), 0, 0);
 		}break;
 		case(E_CAM_MODE::GRAY) : {
-			glsFrame = frame;
+			glsFrame = (GlsMat)frame;
 			gls::convert(glsFrame, glsFrame, 1.0f / 256.0f);
 			gls::cvtColor(glsFrame, glsFrame, CV_BGR2GRAY);
 		}break;
 		case(E_CAM_MODE::NORMAL):
 		default:{
-			glsFrame = frame;
+			glsFrame = (GlsMat)frame;
 			gls::convert(glsFrame, glsFrame, 1.0f / 256.0f);
 			gls::cvtColor(glsFrame, glsFrame, CV_BGR2RGB);
 		}break;

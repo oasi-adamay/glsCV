@@ -77,7 +77,7 @@ namespace UnitTest_glsCV
 			gls::sepFilter2D(glsSrc, glsDst, imgSrc.depth(), kernelX, kernelY);
 		}
 
-		glsDst.CopyTo(imgDst);		// download
+		glsDst.download(imgDst);		// download
 
 		int errNum = 0;
 		if (!AreEqual<T>(imgRef, imgDst, ulps)) errNum = -1;
@@ -151,7 +151,7 @@ namespace UnitTest_glsCV
 			gls::GaussianBlur(glsSrc, glsDst, ksize, 0, 0);
 		}
 
-		glsDst.CopyTo(imgDst);		// download
+		glsDst.download(imgDst);		// download
 
 		int errNum = 0;
 		if (!AreEqual<T>(imgRef, imgDst, ulps)) errNum = -1;
@@ -221,7 +221,7 @@ namespace UnitTest_glsCV
 			gls::boxFilter(glsSrc, glsDst, glsSrc.depth(),ksize);
 		}
 
-		glsDst.CopyTo(imgDst);		// download
+		glsDst.download(imgDst);		// download
 
 		int errNum = 0;
 		if (!AreEqual<T>(imgRef, imgDst, ulps)) errNum = -1;
@@ -304,7 +304,7 @@ namespace UnitTest_glsCV
 			gls::Sobel(glsSrc, glsDst, glsSrc.depth(), xorder, yorder, ksize);
 		}
 
-		glsDst.CopyTo(imgDst);		// download
+		glsDst.download(imgDst);		// download
 
 		int errNum = 0;
 		if (!AreEqual<T>(imgRef, imgDst, ulps)) errNum = -1;
@@ -371,7 +371,7 @@ namespace UnitTest_glsCV
 			gls::filter2D(glsSrc, glsDst, -1, kernel);
 		}
 
-		glsDst.CopyTo(imgDst);		// download
+		glsDst.download(imgDst);		// download
 
 		int errNum = 0;
 		if (!AreEqual<T>(imgRef, imgDst, ulps)) errNum = -1;

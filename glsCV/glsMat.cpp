@@ -74,7 +74,7 @@ GlsMat::GlsMat(const Size size, const int ocvtype){
 
 GlsMat::GlsMat(const Mat & cvmat){
 	createTexture(cvmat.cols, cvmat.rows, cvmat.type());
-	CopyFrom(cvmat);
+	upload(cvmat);
 }
 
 
@@ -196,7 +196,7 @@ static void mat2pbo(const Mat&src, const GLuint pbo){
 
 //-----------------------------------------------------------------------------
 //Upload texture from cv::Mat to GL texture
-void GlsMat::CopyFrom(const Mat&src){
+void GlsMat::upload(const Mat&src){
 	_TMR_("-upload :\t");
 
 	CV_Assert(src.type() == type());
@@ -299,8 +299,8 @@ static void pbo2mat(const GLuint pbo, Mat&dst){
 }
 
 
-void GlsMat::CopyTo(Mat&dst) const{
-//	cout << "CopyTo:start" << endl;
+void GlsMat::download(Mat&dst) const{
+//	cout << "download:start" << endl;
 
 	_TMR_("-download:\t");
 
@@ -376,7 +376,14 @@ void GlsMat::CopyTo(Mat&dst) const{
 #endif
 	}
 
-//	cout << "CopyTo:end" << endl;
+//	cout << "download:end" << endl;
+}
+
+
+GlsMat::operator Mat() const{
+	Mat mat;
+	(*this).download(mat);
+	return mat;
 }
 
 

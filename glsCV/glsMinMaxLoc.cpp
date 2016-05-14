@@ -284,10 +284,10 @@ void minMaxLoc(const GlsMat& src, double* minVal, double* maxVal, Point* minLoc,
 		Mat maxval;
 		Mat minloc;
 		Mat maxloc;
-		if (minVal) _minvec1.CopyTo(minval);
-		if (maxVal) _maxvec1.CopyTo(maxval);
-		if (minLoc) _minloc1.CopyTo(minloc);
-		if (maxLoc) _maxloc1.CopyTo(maxloc);
+		if (minVal) _minvec1.download(minval);
+		if (maxVal) _maxvec1.download(maxval);
+		if (minLoc) _minloc1.download(minloc);
+		if (maxLoc) _maxloc1.download(maxloc);
 
 		if (minVal) *minVal = minval.at<float>(0, 0);
 		if (maxVal) *maxVal = maxval.at<float>(0, 0);
@@ -300,10 +300,10 @@ void minMaxLoc(const GlsMat& src, double* minVal, double* maxVal, Point* minLoc,
 	Mat maxvec_row;
 	Mat minloc_row;
 	Mat maxloc_row;
-	if (minVal) _minvec.CopyTo(minvec_row);
-	if (maxVal) _maxvec.CopyTo(maxvec_row);
-	if (minLoc) _minloc.CopyTo(minloc_row);
-	if (maxLoc) _maxloc.CopyTo(maxloc_row);
+	if (minVal) _minvec.download(minvec_row);
+	if (maxVal) _maxvec.download(maxvec_row);
+	if (minLoc) _minloc.download(minloc_row);
+	if (maxLoc) _maxloc.download(maxloc_row);
 
 	//cout << minvec_row << endl;
 	//cout << maxvec_row << endl;

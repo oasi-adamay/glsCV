@@ -83,7 +83,7 @@ namespace UnitTest_glsCV
 				Timer tmr("glsFft:  \t");
 				gls::fft(_src, _dst,_flags);
 			}
-			_dst.CopyTo(imgFft);
+			_dst.download(imgFft);
 		}
 
 		//verify

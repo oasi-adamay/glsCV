@@ -60,7 +60,7 @@ public:
 
 
 	//! cv::matと同じサイズ、同じtypeのテクスチャーを生成し、データをuploadします。
-	GlsMat(const Mat & cvmat);
+	explicit GlsMat(const Mat & cvmat);
 	//! size, typeのテクスチャーを生成します。
 	GlsMat(const Size size, const int type);
 	//! 空の行列です。テクスチャーは生成されません。
@@ -97,10 +97,12 @@ public:
 
 
 	//! CPU->GPUへのupload
-	void CopyFrom(const Mat&src);
+	void upload(const Mat&src);
 
 	//! GPU->CPUへのdownload
-	void CopyTo(Mat&dst) const;
+	void download(Mat&dst) const;
+	operator Mat() const;
+
 
 };
 
