@@ -34,11 +34,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "glsCopy.h"
 //#include "Timer.h"
 
+//#define _GLS_COPY_USE_SHADER
 
 namespace gls
 {
 
 
+#ifdef  _GLS_COPY_USE_SHADER
 
 //-----------------------------------------------------------------------------
 // glsShaderCopy
@@ -226,8 +228,18 @@ glsShaderBase* selectShader(int type){
 	}
 	return shader;
 }
+#else
+void ShaderCopyInit(void){
+}
+
+void ShaderCopyTerminate(void){
+}
+
+#endif
+
 
 void copy(const GlsMat& src, GlsMat& dst){
+#ifdef  _GLS_COPY_USE_SHADER
 	GlsMat _dst = GlsMat(src.size(), src.type());
 	glsShaderBase* shader = selectShader(src.type());
 	Rect rectSrc(0, 0, src.cols, src.rows);
@@ -239,11 +251,46 @@ void copy(const GlsMat& src, GlsMat& dst){
 
 	glsCopyProcess(shader, src.texid(), rectSrc, rectDst);
 	dst = _dst;
+#else
+
+	GlsMat _dst;
+	if (src.size() == dst.size() && src.type() == dst.type()){
+		_dst = dst;
+	}
+	else{
+		_dst = GlsMat(src.size(), src.type());
+	}
+
+	enum {
+		DRAW,
+		READ,
+		SIZEOF
+	};
+
+	GLuint fbo[SIZEOF];		// FBO identifier
+
+	glGenFramebuffers(2, fbo);
+
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo[READ]);
+	glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, src.texid(), 0);
+
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo[DRAW]);
+	glBindTexture(GL_TEXTURE_2D, _dst.texid());
+
+	glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, _dst.cols, _dst.rows);
+	GL_CHECK_ERROR();
+
+	glDeleteFramebuffers(sizeof(fbo) / sizeof(fbo[0]), fbo);
+
+	dst = _dst;
+
+#endif
 }
 
 
 //copy texture with rect
 void copyRect(const GlsMat& src, GlsMat& dst, const Rect& rect){
+#ifdef  _GLS_COPY_USE_SHADER
 	GlsMat _dst = GlsMat(rect.size(), src.type());
 	glsShaderBase* shader = selectShader(src.type());
 
@@ -259,6 +306,42 @@ void copyRect(const GlsMat& src, GlsMat& dst, const Rect& rect){
 	glsCopyProcess(shader, src.texid(), rectSrc, rectDst);
 
 	dst = _dst;
+#else
+	GlsMat _dst;
+	if (src.size() == rect.size() && src.type() == dst.type()){
+		_dst = dst;
+	}
+	else{
+		_dst = GlsMat(rect.size(), src.type());
+	}
+
+	enum {
+		DRAW,
+		READ,
+		SIZEOF
+	};
+
+	Rect rectSrc(rect.x, rect.y, _dst.cols, _dst.rows);
+	Rect rectDst(0, 0, _dst.cols, _dst.rows);
+
+	GLuint fbo[SIZEOF];		// FBO identifier
+
+	glGenFramebuffers(2, fbo);
+
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo[READ]);
+	glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, src.texid(), 0);
+
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo[DRAW]);
+	glBindTexture(GL_TEXTURE_2D, _dst.texid());
+
+	glCopyTexSubImage2D(GL_TEXTURE_2D, 0, rectDst.x, rectDst.y, rectSrc.x, rectSrc.y, rectDst.width, rectDst.height);
+	GL_CHECK_ERROR();
+
+	glDeleteFramebuffers(sizeof(fbo) / sizeof(fbo[0]), fbo);
+
+	dst = _dst;
+
+#endif
 }
 
 
@@ -272,7 +355,7 @@ void tiled(const GlsMat& src, vector<vector<GlsMat>>& dst, const Size& blkNum){
 	Size sizeDst = Size(src.cols / blkNum.width, src.rows / blkNum.height);
 	dst = vector<vector<GlsMat>>(blkNum.height, vector<GlsMat>(blkNum.width));
 
-
+#ifdef  _GLS_COPY_USE_SHADER
 	glsShaderBase* shader = selectShader(src.type());
 
 	glsFBO fbo(1);
@@ -291,6 +374,37 @@ void tiled(const GlsMat& src, vector<vector<GlsMat>>& dst, const Size& blkNum){
 			glsCopyProcess(shader, src.texid(), rectSrc, rectDst);
 		}
 	}
+#else
+	enum {
+		DRAW,
+		READ,
+		SIZEOF
+	};
+
+	GLuint fbo[SIZEOF];		// FBO identifier
+
+	glGenFramebuffers(2, fbo);
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo[READ]);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo[DRAW]);
+
+	for (int by = 0; by < blkNum.height; by++){
+		for (int bx = 0; bx < blkNum.width; bx++){
+			dst[by][bx] = GlsMat(sizeDst, src.type());
+
+			Rect rectSrc(bx* sizeDst.width, by* sizeDst.height, sizeDst.width, sizeDst.height);
+			Rect rectDst(0, 0, sizeDst.width, sizeDst.height);
+
+			glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, src.texid(), 0);
+			glBindTexture(GL_TEXTURE_2D, dst[by][bx].texid());
+
+			glCopyTexSubImage2D(GL_TEXTURE_2D, 0, rectDst.x, rectDst.y, rectSrc.x, rectSrc.y, rectDst.width, rectDst.height);
+			GL_CHECK_ERROR();
+
+		}
+	}
+
+	glDeleteFramebuffers(sizeof(fbo) / sizeof(fbo[0]), fbo);
+#endif
 
 }
 
@@ -303,6 +417,7 @@ void untiled(const vector<vector<GlsMat>>& src, GlsMat& dst){
 
 	dst = GlsMat(sizeDst, src[0][0].type());
 
+#ifdef  _GLS_COPY_USE_SHADER
 	glsShaderBase* shader = selectShader(src[0][0].type());
 	glsFBO fbo(1);
 
@@ -317,6 +432,36 @@ void untiled(const vector<vector<GlsMat>>& src, GlsMat& dst){
 			glsCopyProcess(shader, src[by][bx].texid(), rectSrc, rectDst);
 		}
 	}
+#else
+	enum {
+		DRAW,
+		READ,
+		SIZEOF
+	};
+
+	GLuint fbo[SIZEOF];		// FBO identifier
+
+	glGenFramebuffers(2, fbo);
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo[READ]);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo[DRAW]);
+
+	for (int by = 0; by < blkNum.height; by++){
+		for (int bx = 0; bx < blkNum.width; bx++){
+			Rect rectSrc(0, 0, sizeSrc.width, sizeSrc.height);
+			Rect rectDst(+bx* sizeSrc.width, +by* sizeSrc.height, sizeSrc.width, sizeSrc.height);
+
+			glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, src[by][bx].texid(), 0);
+			glBindTexture(GL_TEXTURE_2D, dst.texid());
+
+			glCopyTexSubImage2D(GL_TEXTURE_2D, 0, rectDst.x, rectDst.y, rectSrc.x, rectSrc.y, rectSrc.width, rectSrc.height);
+			GL_CHECK_ERROR();
+
+		}
+	}
+
+	glDeleteFramebuffers(sizeof(fbo) / sizeof(fbo[0]), fbo);
+
+#endif
 
 }
 

@@ -161,7 +161,7 @@ namespace UnitTest_glsCV
 	};
 
 	template <typename T>
-	int test_glsCopyRect(int cvtype, int flag = 0){
+	int test_glsCopyRect(int cvtype){
 		int width = 32;
 		int height = 24;
 		//		const Rect rect(4, 3, 15, 13);
