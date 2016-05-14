@@ -43,6 +43,9 @@ namespace gls
 // glsShaderMerge
 class glsShaderMerge : public glsShaderBase
 {
+protected:
+	string FragmentShaderCode(void);
+
 public:
 	glsShaderMerge(void);
 
@@ -52,6 +55,9 @@ public:
 // glsShaderMergeU unsigned
 class glsShaderMergeU : public glsShaderBase
 {
+protected:
+	string FragmentShaderCode(void);
+
 public:
 	glsShaderMergeU(void);
 };
@@ -60,6 +66,9 @@ public:
 // glsShaderMergeS unsigned
 class glsShaderMergeS : public glsShaderBase
 {
+protected:
+	string FragmentShaderCode(void);
+
 public:
 	glsShaderMergeS(void);
 };
@@ -84,23 +93,10 @@ void ShaderMergeTerminate(void){
 }
 
 
-static const char vertexShaderCode[] =
-"#version 330 core\n"
-"layout (location = 0)in  vec2 position;\n"
-"void main(void)\n"
-"{\n"
-"   gl_Position  = vec4(position,0.0,1.0);\n"
-"}\n"
-;
-
-
-
 
 //-----------------------------------------------------------------------------
 //glsShaderMerge
-glsShaderMerge::glsShaderMerge(void)
-	:glsShaderBase()
-{
+string glsShaderMerge::FragmentShaderCode(void){
 	const char fragmentShaderCode[] = 
 "#version 330 core\n"
 "precision highp float;\n"
@@ -119,18 +115,23 @@ glsShaderMerge::glsShaderMerge(void)
 "\n"
 "}\n"
 ;
+	return fragmentShaderCode;
+}
+
+glsShaderMerge::glsShaderMerge(void)
+	:glsShaderBase()
+{
 	const string bin_filename = shaderBinName(__FUNCTION__);
-	if (!LoadShadersBinary(bin_filename)){
-		LoadShadersCode(vertexShaderCode, fragmentShaderCode, bin_filename);
+	if (!LoadShadersBinary(bin_filename))
+	{
+		LoadShadersCode(VertexShaderCode(), FragmentShaderCode(), bin_filename);
 	}
 }
 
 
 //-----------------------------------------------------------------------------
 //glsShaderMergeU
-glsShaderMergeU::glsShaderMergeU(void)
-	:glsShaderBase()
-{
+string glsShaderMergeU::FragmentShaderCode(void){
 	const char fragmentShaderCode[] =
 "#version 330 core\n"
 "precision highp float;\n"
@@ -148,17 +149,22 @@ glsShaderMergeU::glsShaderMergeU(void)
 "	dst.a = texelFetch(texSrc3, ivec2(gl_FragCoord.xy)+offset,0).r;\n"
 "}\n"
 ;
+	return fragmentShaderCode;
+}
+
+glsShaderMergeU::glsShaderMergeU(void)
+	:glsShaderBase()
+{
 	const string bin_filename = shaderBinName(__FUNCTION__);
-	if (!LoadShadersBinary(bin_filename)){
-		LoadShadersCode(vertexShaderCode, fragmentShaderCode, bin_filename);
+	if (!LoadShadersBinary(bin_filename))
+	{
+		LoadShadersCode(VertexShaderCode(), FragmentShaderCode(), bin_filename);
 	}
 }
 
 //-----------------------------------------------------------------------------
 //glsShaderMergeS
-glsShaderMergeS::glsShaderMergeS(void)
-	:glsShaderBase()
-{
+string glsShaderMergeS::FragmentShaderCode(void){
 	const char fragmentShaderCode[] =
 "#version 330 core\n"
 "precision highp float;\n"
@@ -176,9 +182,16 @@ glsShaderMergeS::glsShaderMergeS(void)
 "	dst.a = texelFetch(texSrc3, ivec2(gl_FragCoord.xy)+offset,0).r;\n"
 "}\n"
 ;
+	return fragmentShaderCode;
+}
+
+glsShaderMergeS::glsShaderMergeS(void)
+	:glsShaderBase()
+{
 	const string bin_filename = shaderBinName(__FUNCTION__);
-	if (!LoadShadersBinary(bin_filename)){
-		LoadShadersCode(vertexShaderCode, fragmentShaderCode, bin_filename);
+	if (!LoadShadersBinary(bin_filename))
+	{
+		LoadShadersCode(VertexShaderCode(), FragmentShaderCode(), bin_filename);
 	}
 }
 

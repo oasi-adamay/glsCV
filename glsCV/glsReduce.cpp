@@ -39,6 +39,9 @@ namespace gls
 // glsShaderReduce
 class glsShaderReduce : public glsShaderBase
 {
+protected:
+	string FragmentShaderCode(void);
+
 public:
 	glsShaderReduce(void);
 
@@ -81,15 +84,6 @@ void ShaderReduceTerminate(void){
 }
 
 
-static const char vertexShaderCode[] =
-"#version 330 core\n"
-"layout (location = 0)in  vec2 position;\n"
-"void main(void)\n"
-"{\n"
-"   gl_Position  = vec4(position,0.0,1.0);\n"
-"}\n"
-;
-
 
 //#define CV_REDUCE_SUM 0
 //#define CV_REDUCE_AVG 1
@@ -99,9 +93,7 @@ static const char vertexShaderCode[] =
 
 //-----------------------------------------------------------------------------
 //glsShaderReduce
-glsShaderReduce::glsShaderReduce(void)
-	:glsShaderBase()
-{
+string glsShaderReduce::FragmentShaderCode(void){
 	const char fragmentShaderCode[] =
 "#version 330 core\n"
 "precision highp float;\n"
@@ -188,10 +180,17 @@ glsShaderReduce::glsShaderReduce(void)
 "	}\n"
 "}\n"
 ;
+	return fragmentShaderCode;
+}
+
+glsShaderReduce::glsShaderReduce(void)
+	:glsShaderBase()
+{
 
 	const string bin_filename = shaderBinName(__FUNCTION__);
-	if (!LoadShadersBinary(bin_filename)){
-		LoadShadersCode(vertexShaderCode, fragmentShaderCode, bin_filename);
+	if (!LoadShadersBinary(bin_filename))
+	{
+		LoadShadersCode(VertexShaderCode(), FragmentShaderCode(), bin_filename);
 	}
 }
 

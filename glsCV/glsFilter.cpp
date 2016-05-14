@@ -39,6 +39,9 @@ namespace gls
 // glsShaderFilter1D
 class glsShaderFilter1D : public glsShaderBase
 {
+protected:
+	string FragmentShaderCode(void);
+
 public:
 	glsShaderFilter1D(void);
 
@@ -48,6 +51,9 @@ public:
 // glsShaderFilter2D
 class glsShaderFilter2D : public glsShaderBase
 {
+protected:
+	string FragmentShaderCode(void);
+
 public:
 	glsShaderFilter2D(void);
 
@@ -98,21 +104,11 @@ void ShaderFilterTerminate(void){
 }
 
 
-static const char vertexShaderCode[] =
-"#version 330 core\n"
-"layout (location = 0)in  vec2 position;\n"
-"void main(void)\n"
-"{\n"
-"   gl_Position  = vec4(position,0.0,1.0);\n"
-"}\n"
-;
 
 
 //-----------------------------------------------------------------------------
 //glsShaderFilter1D
-glsShaderFilter1D::glsShaderFilter1D(void)
-	:glsShaderBase()
-{
+string glsShaderFilter1D::FragmentShaderCode(void){
 	const char fragmentShaderCode[] =
 "#version 330 core\n"
 "precision highp float;\n"
@@ -158,20 +154,24 @@ glsShaderFilter1D::glsShaderFilter1D(void)
 "	}\n"
 "}\n"
 ;
+	return fragmentShaderCode;
+}
+
+glsShaderFilter1D::glsShaderFilter1D(void)
+	:glsShaderBase()
+{
 
 	const string bin_filename = shaderBinName(__FUNCTION__);
 	if (!LoadShadersBinary(bin_filename))
 	{
-		LoadShadersCode(vertexShaderCode, fragmentShaderCode, bin_filename);
+		LoadShadersCode(VertexShaderCode(), FragmentShaderCode(), bin_filename);
 	}
 }
 
 
 //-----------------------------------------------------------------------------
 //glsShaderFilter2D
-glsShaderFilter2D::glsShaderFilter2D(void)
-	:glsShaderBase()
-{
+string glsShaderFilter2D::FragmentShaderCode(void){
 	const char fragmentShaderCode[] =
 "#version 330 core\n"
 "precision highp float;\n"
@@ -207,12 +207,18 @@ glsShaderFilter2D::glsShaderFilter2D(void)
 "		dst = sum;\n"
 "	}\n"
 "}\n"
-		;
+;
+	return fragmentShaderCode;
+}
+
+glsShaderFilter2D::glsShaderFilter2D(void)
+	:glsShaderBase()
+{
 
 	const string bin_filename = shaderBinName(__FUNCTION__);
 	if (!LoadShadersBinary(bin_filename))
 	{
-		LoadShadersCode(vertexShaderCode, fragmentShaderCode, bin_filename);
+		LoadShadersCode(VertexShaderCode(), FragmentShaderCode(), bin_filename);
 	}
 }
 

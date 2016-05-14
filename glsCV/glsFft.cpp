@@ -49,6 +49,9 @@ namespace gls
 // glsFft shader
 class glsShaderFft : public glsShaderBase
 {
+protected:
+	string FragmentShaderCode(void);
+
 public:
 	glsShaderFft(void);
 
@@ -88,20 +91,7 @@ void ShaderFftTerminate(void){
 
 //-----------------------------------------------------------------------------
 //glsShaderFft
-glsShaderFft::glsShaderFft(void)
-	:glsShaderBase()
-{
-
-	const char vertexShaderCode[] = 
-"#version 330 core\n"
-"layout (location = 0)in  vec2 position;\n"
-"void main(void)\n"
-"{\n"
-"   gl_Position  = vec4(position,0.0,1.0);\n"
-"}\n"
-;
-
-
+string glsShaderFft::FragmentShaderCode(void){
 	const char fragmentShaderCode[] = 
 "#version 330 core\n"
 "precision highp float;\n"
@@ -198,12 +188,17 @@ glsShaderFft::glsShaderFft(void)
 "\n"
 "}\n"
 ;
-	
-	
+	return fragmentShaderCode;
+}
+
+glsShaderFft::glsShaderFft(void)
+	:glsShaderBase()
+{
 
 	const string bin_filename = shaderBinName(__FUNCTION__);
-	if (!LoadShadersBinary(bin_filename)){
-		LoadShadersCode(vertexShaderCode, fragmentShaderCode, bin_filename);
+	if (!LoadShadersBinary(bin_filename))
+	{
+		LoadShadersCode(VertexShaderCode(), FragmentShaderCode(), bin_filename);
 	}
 
 	// Attribute & Uniform location

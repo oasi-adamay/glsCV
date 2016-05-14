@@ -39,6 +39,9 @@ namespace gls
 // glsShaderMinMaxLoc
 class glsShaderMinMaxLoc : public glsShaderBase
 {
+protected:
+	string FragmentShaderCode(void);
+
 public:
 	glsShaderMinMaxLoc(void);
 
@@ -81,23 +84,9 @@ void ShaderMinMaxLocTerminate(void){
 }
 
 
-static const char vertexShaderCode[] =
-"#version 330 core\n"
-"layout (location = 0)in  vec2 position;\n"
-"void main(void)\n"
-"{\n"
-"   gl_Position  = vec4(position,0.0,1.0);\n"
-"}\n"
-;
-
-
-
-
 //-----------------------------------------------------------------------------
 //glsShaderMinMaxLoc
-glsShaderMinMaxLoc::glsShaderMinMaxLoc(void)
-	:glsShaderBase()
-{
+string glsShaderMinMaxLoc::FragmentShaderCode(void){
 	const char fragmentShaderCode[] =
 "#version 330 core\n"
 "precision highp float;\n"
@@ -150,10 +139,17 @@ glsShaderMinMaxLoc::glsShaderMinMaxLoc(void)
 "	}\n"
 "}\n"
 ;
+	return fragmentShaderCode;
+}
+
+glsShaderMinMaxLoc::glsShaderMinMaxLoc(void)
+	:glsShaderBase()
+{
 
 	const string bin_filename = shaderBinName(__FUNCTION__);
-	if (!LoadShadersBinary(bin_filename)){
-		LoadShadersCode(vertexShaderCode, fragmentShaderCode, bin_filename);
+	if (!LoadShadersBinary(bin_filename))
+	{
+		LoadShadersCode(VertexShaderCode(), FragmentShaderCode(), bin_filename);
 	}
 }
 

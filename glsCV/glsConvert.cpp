@@ -57,6 +57,9 @@ public:
 // glsShaderConvert
 class glsShaderConvert : public glsShaderConvertBase
 {
+protected:
+	string FragmentShaderCode(void);
+
 public:
 	glsShaderConvert(void);
 
@@ -66,6 +69,9 @@ public:
 // glsShaderConvertU unsigned to float
 class glsShaderConvertU : public glsShaderConvertBase
 {
+protected:
+	string FragmentShaderCode(void);
+
 public:
 	glsShaderConvertU(void);
 
@@ -75,6 +81,9 @@ public:
 // glsShaderConvertS signed to float
 class glsShaderConvertS : public glsShaderConvertBase
 {
+protected:
+	string FragmentShaderCode(void);
+
 public:
 	glsShaderConvertS(void);
 
@@ -100,15 +109,6 @@ void ShaderConvertTerminate(void){
 	delete shaderConvertS;
 }
 
-
-static const char vertexShaderCode[] =
-"#version 330 core\n"
-"layout (location = 0)in  vec2 position;\n"
-"void main(void)\n"
-"{\n"
-"   gl_Position  = vec4(position,0.0,1.0);\n"
-"}\n"
-;
 
 
 /* Constants for color conversion */
@@ -142,9 +142,7 @@ static const char vertexShaderCode[] =
 
 //-----------------------------------------------------------------------------
 //glsShaderConvert
-glsShaderConvert::glsShaderConvert(void)
-	:glsShaderConvertBase()
-{
+string glsShaderConvert::FragmentShaderCode(void){
 	const char fragmentShaderCode[] = 
 "#version 330 core\n"
 "precision highp float;\n"
@@ -183,10 +181,18 @@ glsShaderConvert::glsShaderConvert(void)
 "\n"
 "}\n"
 ;
+	return fragmentShaderCode;
+}
+
+
+glsShaderConvert::glsShaderConvert(void)
+	:glsShaderConvertBase()
+{
 
 	const string bin_filename = shaderBinName(__FUNCTION__);
-	if (!LoadShadersBinary(bin_filename)){
-		LoadShadersCode(vertexShaderCode, fragmentShaderCode, bin_filename);
+	if (!LoadShadersBinary(bin_filename))
+	{
+		LoadShadersCode(VertexShaderCode(), FragmentShaderCode(), bin_filename);
 	}
 
 	// Attribute & Uniform location
@@ -199,9 +205,7 @@ glsShaderConvert::glsShaderConvert(void)
 
 //-----------------------------------------------------------------------------
 //glsShaderConvertU
-glsShaderConvertU::glsShaderConvertU(void)
-	:glsShaderConvertBase()
-{
+string glsShaderConvertU::FragmentShaderCode(void){
 	const char fragmentShaderCode[] =
 "#version 330 core\n"
 "precision highp float;\n"
@@ -239,10 +243,19 @@ glsShaderConvertU::glsShaderConvertU(void)
 "	dst = color;\n"
 "}\n"
 ;
+	return fragmentShaderCode;
+}
+
+
+
+glsShaderConvertU::glsShaderConvertU(void)
+	:glsShaderConvertBase()
+{
 
 	const string bin_filename = shaderBinName(__FUNCTION__);
-	if (!LoadShadersBinary(bin_filename)){
-		LoadShadersCode(vertexShaderCode, fragmentShaderCode, bin_filename);
+	if (!LoadShadersBinary(bin_filename))
+	{
+		LoadShadersCode(VertexShaderCode(), FragmentShaderCode(), bin_filename);
 	}
 
 	// Attribute & Uniform location
@@ -254,9 +267,7 @@ glsShaderConvertU::glsShaderConvertU(void)
 
 //-----------------------------------------------------------------------------
 //glsShaderConvertS
-glsShaderConvertS::glsShaderConvertS(void)
-	:glsShaderConvertBase()
-{
+string glsShaderConvertS::FragmentShaderCode(void){
 	const char fragmentShaderCode[] =
 "#version 330 core\n"
 "precision highp float;\n"
@@ -294,10 +305,18 @@ glsShaderConvertS::glsShaderConvertS(void)
 "	dst = color;\n"
 "}\n"
 ;
+	return fragmentShaderCode;
+}
+
+
+glsShaderConvertS::glsShaderConvertS(void)
+	:glsShaderConvertBase()
+{
 
 	const string bin_filename = shaderBinName(__FUNCTION__);
-	if (!LoadShadersBinary(bin_filename)){
-		LoadShadersCode(vertexShaderCode, fragmentShaderCode, bin_filename);
+	if (!LoadShadersBinary(bin_filename))
+	{
+		LoadShadersCode(VertexShaderCode(), FragmentShaderCode(), bin_filename);
 	}
 
 	// Attribute & Uniform location
