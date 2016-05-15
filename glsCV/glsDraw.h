@@ -1,4 +1,4 @@
-/*
+ï»¿/*
 Copyright (c) 2016, oasi-adamay
 All rights reserved.
 
@@ -39,14 +39,12 @@ namespace gls
 {
 
 
-void ShaderDrawInit(void);
-void ShaderDrawTerminate(void);
 
 /*!
-ƒeƒNƒXƒ`ƒƒ[‚ðƒJƒŒƒ“ƒg‚ÌƒtƒŒ[ƒ€ƒoƒbƒtƒ@‚ÉƒŒƒ“ƒ_ƒŠƒ“ƒO‚µ‚Ü‚·B
+ãƒ†ã‚¯ã‚¹ãƒãƒ£ãƒ¼ã‚’ã‚«ãƒ¬ãƒ³ãƒˆã®ãƒ•ãƒ¬ãƒ¼ãƒ ãƒãƒƒãƒ•ã‚¡ã«ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ã—ã¾ã™ã€‚
 
-ƒVƒ“ƒOƒ‹ƒ`ƒƒƒ“ƒlƒ‹‚Ígray‚ÅƒŒƒ“ƒ_ƒŠƒ“ƒO‚µ‚Ü‚·B
-3ƒ`ƒƒƒ“ƒlƒ‹‚ÍRGB‚ÅƒŒƒ“ƒ_ƒŠƒ“ƒO‚µ‚Ü‚·B
+ã‚·ãƒ³ã‚°ãƒ«ãƒãƒ£ãƒ³ãƒãƒ«ã¯grayã§ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ã—ã¾ã™ã€‚
+3ãƒãƒ£ãƒ³ãƒãƒ«ã¯RGBã§ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ã—ã¾ã™ã€‚
 */
 void draw(GlsMat& src);
 

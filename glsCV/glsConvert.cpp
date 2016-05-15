@@ -1,4 +1,4 @@
-/*
+﻿/*
 Copyright (c) 2016, oasi-adamay
 All rights reserved.
 
@@ -42,14 +42,8 @@ namespace gls
 class glsShaderConvertBase : public glsShaderBase
 {
 public:
+	glsShaderConvertBase(const string& _name) :glsShaderBase(_name){}
 
-	//attribute location
-	GLuint position;
-
-	//uniform  location
-	GLuint texSrc;
-	GLuint f_scl;
-	GLuint i_flag;
 };
 
 
@@ -57,8 +51,11 @@ public:
 // glsShaderConvert
 class glsShaderConvert : public glsShaderConvertBase
 {
+protected:
+	string FragmentShaderCode(void);
+
 public:
-	glsShaderConvert(void);
+	glsShaderConvert(void) :glsShaderConvertBase(__FUNCTION__) {}
 
 };
 
@@ -66,8 +63,11 @@ public:
 // glsShaderConvertU unsigned to float
 class glsShaderConvertU : public glsShaderConvertBase
 {
+protected:
+	string FragmentShaderCode(void);
+
 public:
-	glsShaderConvertU(void);
+	glsShaderConvertU(void) :glsShaderConvertBase(__FUNCTION__) {}
 
 };
 
@@ -75,40 +75,21 @@ public:
 // glsShaderConvertS signed to float
 class glsShaderConvertS : public glsShaderConvertBase
 {
+protected:
+	string FragmentShaderCode(void);
+
 public:
-	glsShaderConvertS(void);
+	glsShaderConvertS(void) :glsShaderConvertBase(__FUNCTION__) {}
 
 };
 
 
 //-----------------------------------------------------------------------------
 //global 
-glsShaderConvert* shaderConvert = 0;
-glsShaderConvertU* shaderConvertU = 0;
-glsShaderConvertS* shaderConvertS = 0;
+glsShaderConvert ShaderConvert;
+glsShaderConvertU ShaderConvertU;
+glsShaderConvertS ShaderConvertS;
 
-void ShaderConvertInit(void){
-	shaderConvert = new glsShaderConvert();
-	shaderConvertU = new glsShaderConvertU();
-	shaderConvertS = new glsShaderConvertS();
-
-}
-
-void ShaderConvertTerminate(void){
-	delete shaderConvert;
-	delete shaderConvertU;
-	delete shaderConvertS;
-}
-
-
-static const char vertexShaderCode[] =
-"#version 330 core\n"
-"layout (location = 0)in  vec2 position;\n"
-"void main(void)\n"
-"{\n"
-"   gl_Position  = vec4(position,0.0,1.0);\n"
-"}\n"
-;
 
 
 /* Constants for color conversion */
@@ -142,9 +123,7 @@ static const char vertexShaderCode[] =
 
 //-----------------------------------------------------------------------------
 //glsShaderConvert
-glsShaderConvert::glsShaderConvert(void)
-	:glsShaderConvertBase()
-{
+string glsShaderConvert::FragmentShaderCode(void){
 	const char fragmentShaderCode[] = 
 "#version 330 core\n"
 "precision highp float;\n"
@@ -183,25 +162,15 @@ glsShaderConvert::glsShaderConvert(void)
 "\n"
 "}\n"
 ;
-
-	const string bin_filename = shaderBinName(__FUNCTION__);
-	if (!LoadShadersBinary(bin_filename)){
-		LoadShadersCode(vertexShaderCode, fragmentShaderCode, bin_filename);
-	}
-
-	// Attribute & Uniform location
-	position = glGetAttribLocation(program, "position");
-	texSrc = glGetUniformLocation(program, "texSrc");
-	f_scl = glGetUniformLocation(program, "scl");
-	i_flag = glGetUniformLocation(program, "flag");
+	return fragmentShaderCode;
 }
+
+
 
 
 //-----------------------------------------------------------------------------
 //glsShaderConvertU
-glsShaderConvertU::glsShaderConvertU(void)
-	:glsShaderConvertBase()
-{
+string glsShaderConvertU::FragmentShaderCode(void){
 	const char fragmentShaderCode[] =
 "#version 330 core\n"
 "precision highp float;\n"
@@ -239,24 +208,14 @@ glsShaderConvertU::glsShaderConvertU(void)
 "	dst = color;\n"
 "}\n"
 ;
-
-	const string bin_filename = shaderBinName(__FUNCTION__);
-	if (!LoadShadersBinary(bin_filename)){
-		LoadShadersCode(vertexShaderCode, fragmentShaderCode, bin_filename);
-	}
-
-	// Attribute & Uniform location
-	position = glGetAttribLocation(program, "position");
-	texSrc = glGetUniformLocation(program, "texSrc");
-	f_scl = glGetUniformLocation(program, "scl");
-	i_flag = glGetUniformLocation(program, "flag");
+	return fragmentShaderCode;
 }
+
+
 
 //-----------------------------------------------------------------------------
 //glsShaderConvertS
-glsShaderConvertS::glsShaderConvertS(void)
-	:glsShaderConvertBase()
-{
+string glsShaderConvertS::FragmentShaderCode(void){
 	const char fragmentShaderCode[] =
 "#version 330 core\n"
 "precision highp float;\n"
@@ -294,18 +253,10 @@ glsShaderConvertS::glsShaderConvertS(void)
 "	dst = color;\n"
 "}\n"
 ;
-
-	const string bin_filename = shaderBinName(__FUNCTION__);
-	if (!LoadShadersBinary(bin_filename)){
-		LoadShadersCode(vertexShaderCode, fragmentShaderCode, bin_filename);
-	}
-
-	// Attribute & Uniform location
-	position = glGetAttribLocation(program, "position");
-	texSrc = glGetUniformLocation(program, "texSrc");
-	f_scl = glGetUniformLocation(program, "scl");
-	i_flag = glGetUniformLocation(program, "flag");
+	return fragmentShaderCode;
 }
+
+
 
 
 
@@ -350,13 +301,14 @@ static void glsConvertProcess(
 
 	//program
 	{
-		glUseProgram(shader->program);
+		glUseProgram(shader->program());
 	}
+
 
 	//uniform
 	{
-		glUniform1f(shader->f_scl, scl);
-		glUniform1i(shader->i_flag, flag);
+		glUniform1f(glGetUniformLocation(shader->program(), "scl"), scl);
+		glUniform1i(glGetUniformLocation(shader->program(), "flag"), flag);
 	}
 
 
@@ -365,10 +317,10 @@ static void glsConvertProcess(
 		int id = 0;
 		glActiveTexture(GL_TEXTURE0 + id);
 		glBindTexture(GL_TEXTURE_2D, texSrc);
-		glUniform1i(shader->texSrc, id);
+		glUniform1i(glGetUniformLocation(shader->program(), "texSrc"), id);
 	}
 
-	glsVAO vao(shader->position);
+	glsVAO vao(glGetAttribLocation(shader->program(), "position"));
 
 	//Viewport
 	{
@@ -394,23 +346,23 @@ void convert(const GlsMat& src, GlsMat& dst, const float scl){
 	glsShaderConvertBase* shader = 0;
 
 	//switch (src.type){
-	//case(GL_FLOAT) : shader = shaderConvert; break;
+	//case(GL_FLOAT) : shader = &ShaderConvert; break;
 	//case(GL_UNSIGNED_BYTE) :
 	//case(GL_UNSIGNED_SHORT) :
-	//case(GL_UNSIGNED_INT) :	shader = shaderConvertU; break;
+	//case(GL_UNSIGNED_INT) :	shader = &ShaderConvertU; break;
 	//case(GL_BYTE) :
 	//case(GL_SHORT) :
-	//case(GL_INT) : shader = shaderConvertS; break;
+	//case(GL_INT) : shader = &ShaderConvertS; break;
 	//default: GLS_Assert(0);		//not implement
 	//}
 
 	switch (CV_MAT_DEPTH(src.type())){
-	case(CV_32F) : shader = shaderConvert; break;
+	case(CV_32F) : shader = &ShaderConvert; break;
 	case(CV_8U) :
-	case(CV_16U) : shader = shaderConvertU; break;
+	case(CV_16U) : shader = &ShaderConvertU; break;
 	case(CV_8S) :
 	case(CV_16S) :
-	case(CV_32S) : shader = shaderConvertS; break;
+	case(CV_32S) : shader = &ShaderConvertS; break;
 	default: GLS_Assert(0);		//not implement
 	}
 
@@ -463,12 +415,12 @@ void cvtColor(const GlsMat& src, GlsMat& dst, const int code){
 	glsShaderConvertBase* shader = 0;
 
 	switch (CV_MAT_DEPTH(src.type())){
-	case(CV_32F) : shader = shaderConvert; break;
+	case(CV_32F) : shader = &ShaderConvert; break;
 	case(CV_8U) :
-	case(CV_16U) : shader = shaderConvertU; break;
+	case(CV_16U) : shader = &ShaderConvertU; break;
 	case(CV_8S) :
 	case(CV_16S) :
-	case(CV_32S) : shader = shaderConvertS; break;
+	case(CV_32S) : shader = &ShaderConvertS; break;
 	default: GLS_Assert(0);		//not implement
 	}
 

@@ -1,4 +1,4 @@
-/*
+ï»¿/*
 Copyright (c) 2016, oasi-adamay
 All rights reserved.
 
@@ -38,13 +38,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace gls
 {
 
-void ShaderConvertInit(void);
-void ShaderConvertTerminate(void);
 
-//! format‚ğ•ÏX‚µ‚Ü‚·B
+//! formatã‚’å¤‰æ›´ã—ã¾ã™ã€‚
 void convert(const GlsMat& src, GlsMat& dst,const float scl = 1.0);
 
-//! ‰æ‘œ‚ÌF‹óŠÔ‚ğ•ÏŠ·‚µ‚Ü‚·D(ˆê•”‚Ì‚İÀ‘•)
+//! ç”»åƒã®è‰²ç©ºé–“ã‚’å¤‰æ›ã—ã¾ã™ï¼(ä¸€éƒ¨ã®ã¿å®Ÿè£…)
 void cvtColor(const GlsMat& src, GlsMat& dst, const int code);
 
 }//namespace gls

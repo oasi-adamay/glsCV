@@ -39,65 +39,23 @@ namespace gls
 // glsShaderMinMaxLoc
 class glsShaderMinMaxLoc : public glsShaderBase
 {
+protected:
+	string FragmentShaderCode(void);
+
 public:
-	glsShaderMinMaxLoc(void);
+	glsShaderMinMaxLoc(void) :glsShaderBase(__FUNCTION__){}
 
 };
 
-#if 0
-//-----------------------------------------------------------------------------
-// glsShaderMinMaxLocU unsigned
-class glsShaderMinMaxLocU : public glsShaderBase
-{
-public:
-	glsShaderMinMaxLocU(void);
-};
-
-//-----------------------------------------------------------------------------
-// glsShaderMinMaxLocS unsigned
-class glsShaderMinMaxLocS : public glsShaderBase
-{
-public:
-	glsShaderMinMaxLocS(void);
-};
-#endif
 
 //-----------------------------------------------------------------------------
 //global 
-glsShaderMinMaxLoc* shaderMinMaxLoc = 0;
-//glsShaderMinMaxLocU* shaderMinMaxLocU = 0;
-//glsShaderMinMaxLocS* shaderMinMaxLocS = 0;
-
-void ShaderMinMaxLocInit(void){
-	shaderMinMaxLoc = new glsShaderMinMaxLoc();
-//	shaderMinMaxLocU = new glsShaderMinMaxLocU();
-//	shaderMinMaxLocS = new glsShaderMinMaxLocS();
-}
-
-void ShaderMinMaxLocTerminate(void){
-	delete shaderMinMaxLoc;
-//	delete shaderMinMaxLocU;
-//	delete shaderMinMaxLocS;
-}
-
-
-static const char vertexShaderCode[] =
-"#version 330 core\n"
-"layout (location = 0)in  vec2 position;\n"
-"void main(void)\n"
-"{\n"
-"   gl_Position  = vec4(position,0.0,1.0);\n"
-"}\n"
-;
-
-
+glsShaderMinMaxLoc ShaderMinMaxLoc;
 
 
 //-----------------------------------------------------------------------------
 //glsShaderMinMaxLoc
-glsShaderMinMaxLoc::glsShaderMinMaxLoc(void)
-	:glsShaderBase()
-{
+string glsShaderMinMaxLoc::FragmentShaderCode(void){
 	const char fragmentShaderCode[] =
 "#version 330 core\n"
 "precision highp float;\n"
@@ -150,11 +108,7 @@ glsShaderMinMaxLoc::glsShaderMinMaxLoc(void)
 "	}\n"
 "}\n"
 ;
-
-	const string bin_filename = shaderBinName(__FUNCTION__);
-	if (!LoadShadersBinary(bin_filename)){
-		LoadShadersCode(vertexShaderCode, fragmentShaderCode, bin_filename);
-	}
+	return fragmentShaderCode;
 }
 
 
@@ -173,12 +127,12 @@ static void glsMinMaxLocProcess(
 
 	//program
 	{
-		glUseProgram(shader->program);
+		glUseProgram(shader->program());
 	}
 
 	//uniform
 	{
-		glUniform1i(glGetUniformLocation(shader->program, "path"), path);
+		glUniform1i(glGetUniformLocation(shader->program(), "path"), path);
 	}
 
 	//Bind Texture
@@ -186,10 +140,10 @@ static void glsMinMaxLocProcess(
 		glActiveTexture(GL_TEXTURE0 + id);
 		glBindTexture(GL_TEXTURE_2D, texSrc[id]);
 		string name = "texSrc" + to_string(id);
-		glUniform1i(glGetUniformLocation(shader->program, name.c_str()), id);
+		glUniform1i(glGetUniformLocation(shader->program(), name.c_str()), id);
 	}
 
-	glsVAO vao(glGetAttribLocation(shader->program, "position"));
+	glsVAO vao(glGetAttribLocation(shader->program(), "position"));
 
 	//Viewport
 	glViewport(0, 0, texSize.width, texSize.height);
@@ -210,12 +164,12 @@ static
 glsShaderBase* selectShader(int type){
 	glsShaderBase* shader = 0;
 	switch (CV_MAT_DEPTH(type)){
-	case(CV_32F) : shader = shaderMinMaxLoc; break;
+	case(CV_32F) : shader = &ShaderMinMaxLoc; break;
 	//case(CV_8U) :
-	//case(CV_16U) : shader = shaderMinMaxLocU; break;
+	//case(CV_16U) : shader = &ShaderMinMaxLocU; break;
 	//case(CV_8S) :
 	//case(CV_16S) :
-	//case(CV_32S) : shader = shaderMinMaxLocS; break;
+	//case(CV_32S) : shader = &ShaderMinMaxLocS; break;
 	default: GLS_Assert(0);		//not implement
 	}
 	return shader;

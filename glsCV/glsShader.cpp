@@ -38,6 +38,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace gls
 {
 
+//gloabl list
+list<glsShaderBase*> ShaderList;		 
+
 void glsShaderBase::LoadShadersCode(const std::string& VertexShaderCode, const std::string& FragmentShaderCode, const std::string& shaderbin_file_path){
 	
 	const bool createBin = !shaderbin_file_path.empty();	//! create shader bin mode
@@ -146,7 +149,7 @@ void glsShaderBase::LoadShadersCode(const std::string& VertexShaderCode, const s
 	glDeleteShader(VertexShaderID);
 	glDeleteShader(FragmentShaderID);
 
-	program = ProgramID;
+	_program = make_shared<GLuint>(ProgramID);
 
 }
 
@@ -228,7 +231,7 @@ bool glsShaderBase::LoadShadersBinary(const std::string& shaderbin_file_path){
 
 	}
 
-	program = progId;
+	_program = make_shared<GLuint>(progId);
 
 	return true;
 }
@@ -245,6 +248,48 @@ string glsShaderBase::shaderBinName(const std::string funcname){
 
 	return binname + ".bin";
 }
+
+string glsShaderBase::VertexShaderCode(void){
+	static const char vertexShaderCode[] =
+"#version 330 core\n"
+"layout (location = 0)in  vec2 position;\n"
+"void main(void)\n"
+"{\n"
+"   gl_Position  = vec4(position,0.0,1.0);\n"
+"}\n"
+;
+
+	return vertexShaderCode;
+}
+
+void glsShaderBase::Init(void){
+	if (_program.use_count() == 0){
+		const string bin_filename = shaderBinName(name);
+		if (!LoadShadersBinary(bin_filename))
+		{
+			LoadShadersCode(VertexShaderCode(), FragmentShaderCode(), bin_filename);
+		}
+	}
+}
+
+//program
+GLuint glsShaderBase::program(void) const{
+	if (_program.use_count() == 0){
+//		Init();
+		const_cast<glsShaderBase&>(*this).Init();
+	}
+
+	return *_program;
+
+}
+
+void ShaderInitAll(void)
+{
+	for (auto itr = ShaderList.begin(); itr != ShaderList.end(); ++itr) {
+		(*itr)->Init();
+	}
+}
+
 
 
 }//namespace gls

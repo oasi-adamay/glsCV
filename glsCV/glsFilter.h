@@ -39,11 +39,6 @@ namespace gls
 {
 
 
-void ShaderFilterInit(void);
-void ShaderFilterTerminate(void);
-
-
-
 
 /*!
 分離型2次元線形フィルタを，画像に適用します．

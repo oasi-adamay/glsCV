@@ -40,16 +40,10 @@ namespace gls
 // glsDraw shader
 class glsShaderDrawBase : public glsShaderBase
 {
+
 public:
-//	glsShaderDrawBase(void);
+	glsShaderDrawBase(const string& _name) :glsShaderBase(_name){}
 
-	//attribute location
-	GLuint position;
-
-	//uniform  location
-	GLuint texSrc;
-	GLuint f_scl;
-	GLuint i_flag;
 };
 
 
@@ -57,8 +51,11 @@ public:
 // glsDraw shader
 class glsShaderDraw : public glsShaderDrawBase
 {
+protected:
+	string FragmentShaderCode(void);
+
 public:
-	glsShaderDraw(void);
+	glsShaderDraw(void) :glsShaderDrawBase(__FUNCTION__){}
 
 };
 
@@ -66,8 +63,11 @@ public:
 // glsDraw shader
 class glsShaderDrawU : public glsShaderDrawBase
 {
+protected:
+	string FragmentShaderCode(void);
+
 public:
-	glsShaderDrawU(void);
+	glsShaderDrawU(void) :glsShaderDrawBase(__FUNCTION__){}
 
 };
 
@@ -75,137 +75,72 @@ public:
 
 //-----------------------------------------------------------------------------
 //global 
-glsShaderDraw* shaderDraw = 0;
-glsShaderDrawU* shaderDrawU = 0;
-
-void ShaderDrawInit(void){
-	shaderDraw = new glsShaderDraw();
-	shaderDrawU = new glsShaderDrawU();
-
-}
-
-void ShaderDrawTerminate(void){
-	delete shaderDraw;
-	delete shaderDrawU;
-}
-
-
+glsShaderDraw ShaderDraw;
+glsShaderDrawU ShaderDrawU;
 
 
 //-----------------------------------------------------------------------------
 //glsShaderDraw
-glsShaderDraw::glsShaderDraw(void)
-	:glsShaderDrawBase()
-{
-
-	const char vertexShaderCode[] = 
+string glsShaderDraw::FragmentShaderCode(void){
+	const char fragmentShaderCode[] =
 "#version 330 core\n"
-"layout (location = 0)in  vec2 position;\n"
+"precision highp float;\n"
+"uniform sampler2D	texSrc;\n"
+"uniform float	scl;\n"
+"uniform int 	flag;\n"
+"\n"
+"layout (location = 0) out vec4 dst;\n"
+"\n"
 "void main(void)\n"
 "{\n"
-"   gl_Position  = vec4(position,0.0,1.0);\n"
+"	ivec2 texSize = textureSize(texSrc,0);\n"
+"	ivec2 texCord = ivec2(gl_FragCoord.xy)%texSize;\n"
+"	vec4 data = texelFetch(texSrc, texCord,0);\n"
+"	vec4 color;\n"
+"	switch(flag&3){\n"
+"	case(0):color = vec4(data.r*scl,data.g*scl,data.b*scl,data.g*scl);break;\n"
+"	case(1):color = vec4(data.r*scl,data.r*scl,data.r*scl,1.0);break;\n"
+"	case(2):color = vec4(data.r*scl,data.r*scl,data.r*scl,1.0);break;\n"
+"	case(3):color = vec4(data.r*scl,data.g*scl,data.b*scl,1.0);break;\n"
+"	}\n"
+"	dst = color;\n"
+"\n"
 "}\n"
 ;
-
-
-	const char fragmentShaderCode[] =
-		"#version 330 core\n"
-		"precision highp float;\n"
-		"uniform sampler2D	texSrc;\n"
-		"uniform float	scl;\n"
-		"uniform int 	flag;\n"
-		"\n"
-		"layout (location = 0) out vec4 dst;\n"
-		"\n"
-		"void main(void)\n"
-		"{\n"
-		"	ivec2 texSize = textureSize(texSrc,0);\n"
-		"	ivec2 texCord = ivec2(gl_FragCoord.xy)%texSize;\n"
-		"	vec4 data = texelFetch(texSrc, texCord,0);\n"
-		"	vec4 color;\n"
-		"	switch(flag&3){\n"
-		"	case(0):color = vec4(data.r*scl,data.g*scl,data.b*scl,data.g*scl);break;\n"
-		"	case(1):color = vec4(data.r*scl,data.r*scl,data.r*scl,1.0);break;\n"
-		"	case(2):color = vec4(data.r*scl,data.r*scl,data.r*scl,1.0);break;\n"
-		"	case(3):color = vec4(data.r*scl,data.g*scl,data.b*scl,1.0);break;\n"
-		"	}\n"
-		"	dst = color;\n"
-		"\n"
-		"}\n"
-;
-	
-	
-	const string bin_filename = shaderBinName(__FUNCTION__);
-	if (!LoadShadersBinary(bin_filename)){
-		LoadShadersCode(vertexShaderCode, fragmentShaderCode, bin_filename);
-	}
-
-	// Attribute & Uniform location
-	position = glGetAttribLocation(program, "position");
-	texSrc = glGetUniformLocation(program, "texSrc");
-	f_scl = glGetUniformLocation(program, "scl");
-	i_flag = glGetUniformLocation(program, "flag");
+	return fragmentShaderCode;
 }
+
 
 
 //-----------------------------------------------------------------------------
 //glsShaderDrawU
-glsShaderDrawU::glsShaderDrawU(void)
-	:glsShaderDrawBase()
-{
-
-	const char vertexShaderCode[] =
-		"#version 330 core\n"
-		"layout (location = 0)in  vec2 position;\n"
-		"void main(void)\n"
-		"{\n"
-		"   gl_Position  = vec4(position,0.0,1.0);\n"
-		"}\n"
-		;
-
-
+string glsShaderDrawU::FragmentShaderCode(void){
 	const char fragmentShaderCode[] =
-		"#version 330 core\n"
-		"precision highp float;\n"
-		"uniform usampler2D	texSrc;\n"
-		"uniform float	scl;\n"
-		"uniform int 	flag;\n"
-		"\n"
-		"layout (location = 0) out vec4 dst;\n"
-		"\n"
-		"void main(void)\n"
-		"{\n"
-		"	ivec2 texSize = textureSize(texSrc,0);\n"
-		"	ivec2 texCord = ivec2(gl_FragCoord.xy)%texSize;\n"
-		"	vec4 data = vec4(texelFetch(texSrc, texCord,0));\n"
-		"	vec4 color;\n"
-		"	switch(flag&3){\n"
-		"	case(0):color = vec4(data.r*scl,data.g*scl,data.b*scl,data.g*scl);break;\n"
-		"	case(1):color = vec4(data.r*scl,data.r*scl,data.r*scl,1.0);break;\n"
-		"	case(2):color = vec4(data.r*scl,data.r*scl,data.r*scl,1.0);break;\n"
-		"	case(3):color = vec4(data.r*scl,data.g*scl,data.b*scl,1.0);break;\n"
-		"	}\n"
-		"	dst = color;\n"
-		"}\n"
-		;
-
-
-
-	const string bin_filename = shaderBinName(__FUNCTION__);
-	if (!LoadShadersBinary(bin_filename)){
-		LoadShadersCode(vertexShaderCode, fragmentShaderCode, bin_filename);
-	}
-
-	// Attribute & Uniform location
-	position = glGetAttribLocation(program, "position");
-	texSrc = glGetUniformLocation(program, "texSrc");
-	f_scl = glGetUniformLocation(program, "scl");
-	i_flag = glGetUniformLocation(program, "flag");
-
+"#version 330 core\n"
+"precision highp float;\n"
+"uniform usampler2D	texSrc;\n"
+"uniform float	scl;\n"
+"uniform int 	flag;\n"
+"\n"
+"layout (location = 0) out vec4 dst;\n"
+"\n"
+"void main(void)\n"
+"{\n"
+"	ivec2 texSize = textureSize(texSrc,0);\n"
+"	ivec2 texCord = ivec2(gl_FragCoord.xy)%texSize;\n"
+"	vec4 data = vec4(texelFetch(texSrc, texCord,0));\n"
+"	vec4 color;\n"
+"	switch(flag&3){\n"
+"	case(0):color = vec4(data.r*scl,data.g*scl,data.b*scl,data.g*scl);break;\n"
+"	case(1):color = vec4(data.r*scl,data.r*scl,data.r*scl,1.0);break;\n"
+"	case(2):color = vec4(data.r*scl,data.r*scl,data.r*scl,1.0);break;\n"
+"	case(3):color = vec4(data.r*scl,data.g*scl,data.b*scl,1.0);break;\n"
+"	}\n"
+"	dst = color;\n"
+"}\n"
+;
+	return fragmentShaderCode;
 }
-
-
-
 
 
 static Size getTextureSize(GLuint tex){
@@ -249,13 +184,13 @@ static void glsDrawProcess(
 
 	//program
 	{
-		glUseProgram(shader->program);
+		glUseProgram(shader->program());
 	}
 
 	//uniform
 	{
-		glUniform1f(shader->f_scl, scl);
-		glUniform1i(shader->i_flag, flag);
+		glUniform1f(glGetUniformLocation(shader->program(), "scl"), scl);
+		glUniform1i(glGetUniformLocation(shader->program(), "flag"), flag);
 	}
 
 
@@ -264,10 +199,10 @@ static void glsDrawProcess(
 		int id = 0;
 		glActiveTexture(GL_TEXTURE0 + id);
 		glBindTexture(GL_TEXTURE_2D, texSrc);
-		glUniform1i(shader->texSrc, id);
+		glUniform1i(glGetUniformLocation(shader->program(),"texSrc"), id);
 	}
 
-	glsVAO vao(shader->position);
+	glsVAO vao(glGetAttribLocation(shader->program(), "position"));
 	
 
 	//Viewport
@@ -300,23 +235,23 @@ void draw(GlsMat& src){
 	switch (src.glType()){
 	case(GL_FLOAT) :
 		scl = 1.0f;
-		shader = shaderDraw;
+		shader = &ShaderDraw;
 		break;
 	case(GL_UNSIGNED_BYTE) :
 		scl = 1.0f / 256.0f;
-		shader = shaderDrawU;
+		shader = &ShaderDrawU;
 		break;
 	case(GL_UNSIGNED_SHORT) :
 		scl = 1.0f / 65536.0f;
-		shader = shaderDrawU;
+		shader = &ShaderDrawU;
 		break;
 	case(GL_UNSIGNED_INT) :
 		scl = 1.0f / (65536.0f * 65536.0f);
-		shader = shaderDrawU;
+		shader = &ShaderDrawU;
 		break;
 	//case(GL_BYTE) :
 	//case(GL_SHORT) :
-	//case(GL_INT) : shader = shaderDrawI; break;
+	//case(GL_INT) : shader = &ShaderDrawI; break;
 	default: GLS_Assert(0);		//not implement
 	}
 

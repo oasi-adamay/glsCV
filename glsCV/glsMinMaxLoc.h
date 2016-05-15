@@ -1,4 +1,4 @@
-/*
+ï»¿/*
 Copyright (c) 2016, oasi-adamay
 All rights reserved.
 
@@ -39,15 +39,9 @@ namespace gls
 {
 
 
-void ShaderMinMaxLocInit(void);
-void ShaderMinMaxLocTerminate(void);
-
-
-
-
 /*!
-”z—ñ‘S‘Ì‚ ‚é‚¢‚Í•”•ª”z—ñ‚É‘Î‚·‚éC‘åˆæ“IÅ¬’l‚¨‚æ‚ÑÅ‘å’l‚ğ‹‚ß‚Ü‚·D
-Œ»İAmask‚ÍÀ‘•‚³‚ê‚Ä‚¢‚Ü‚¹‚ñB
+é…åˆ—å…¨ä½“ã‚ã‚‹ã„ã¯éƒ¨åˆ†é…åˆ—ã«å¯¾ã™ã‚‹ï¼Œå¤§åŸŸçš„æœ€å°å€¤ãŠã‚ˆã³æœ€å¤§å€¤ã‚’æ±‚ã‚ã¾ã™ï¼
+ç¾åœ¨ã€maskã¯å®Ÿè£…ã•ã‚Œã¦ã„ã¾ã›ã‚“ã€‚
 */
 void minMaxLoc(const GlsMat& src, double* minVal, double* maxVal = 0, Point* minLoc = 0, Point* maxLoc = 0, const GlsMat& mask = GlsMat());
 

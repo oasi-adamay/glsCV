@@ -38,6 +38,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace gls
 {
 
+class glsShaderBase;
+/*!
+Shader List
+*/
+extern list<glsShaderBase*> ShaderList;
+/*!
+Initialize all shader 
+*/
+void ShaderInitAll(void);
+
+
+
 /*!
 glsShader Base Class
 
@@ -51,9 +63,19 @@ private:
 	glsShaderBase(const glsShaderBase&);              ///  Uncopyable
 	glsShaderBase& operator=(const glsShaderBase&);   ///  Uncopyable
 
+	shared_ptr<GLuint> _program;	//!< program idを保存する、shared_ptr
+
+protected:
+	const string name;		//Shader name;
+
+	virtual string VertexShaderCode(void);
+	virtual string FragmentShaderCode(void){ return string(""); }
+
 public:
-	glsShaderBase(void){ program = 0;}
-	~glsShaderBase(void){ if (program)glDeleteProgram(program); }
+	glsShaderBase(const string& _name) : name(_name){ ShaderList.push_back(this); }
+
+	~glsShaderBase(void){ if (_program.use_count() == 1) glDeleteProgram(*_program); }
+
 
 	/*!
 	load shader filse(string) , compile and link.
@@ -87,10 +109,21 @@ public:
 	*/
 	string shaderBinName(const std::string funcname);
 
-	//program
-	GLuint program;
+	/*!
+	get program id.
+
+	if program is not loaded yet, it will be  compiled and loaded.
+	*/
+	GLuint program(void) const;
+
+	/*!
+	initalize porgram
+
+	*/
+	void Init(void);
 
 };
+
 
 }//namespace gls
 

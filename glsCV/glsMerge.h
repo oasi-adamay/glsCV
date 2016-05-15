@@ -1,4 +1,4 @@
-/*
+ï»¿/*
 Copyright (c) 2016, oasi-adamay
 All rights reserved.
 
@@ -38,13 +38,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace gls
 {
 
-void ShaderMergeInit(void);
-void ShaderMergeTerminate(void);
-
 /*!
-•¡”‚ÌƒVƒ“ƒOƒ‹ƒ`ƒƒƒ“ƒlƒ‹s—ñ‚©‚çCƒ}ƒ‹ƒ`ƒ`ƒƒƒ“ƒlƒ‹s—ñ‚ğì¬‚µ‚Ü‚·D
+è¤‡æ•°ã®ã‚·ãƒ³ã‚°ãƒ«ãƒãƒ£ãƒ³ãƒãƒ«è¡Œåˆ—ã‹ã‚‰ï¼Œãƒãƒ«ãƒãƒãƒ£ãƒ³ãƒãƒ«è¡Œåˆ—ã‚’ä½œæˆã—ã¾ã™ï¼
 
-Å‘å4ƒ`ƒƒƒ“ƒlƒ‹‚Ü‚Å‘Î‰
+æœ€å¤§4ãƒãƒ£ãƒ³ãƒãƒ«ã¾ã§å¯¾å¿œ
 */
 void merge(const vector<GlsMat>& src, GlsMat& dst);
 

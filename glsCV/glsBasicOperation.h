@@ -1,4 +1,4 @@
-/*
+ï»¿/*
 Copyright (c) 2016, oasi-adamay
 All rights reserved.
 
@@ -38,69 +38,65 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace gls
 {
 
-
-void ShaderBasicOperationInit(void);
-void ShaderBasicOperationTerminate(void);
-
 //GlsMat I/F
 
-//! ƒXƒJƒ‰‚Æ”z—ñ‚Ì —v‘f–ˆ‚Ì˜a‚ğ‹‚ß‚Ü‚·D(dst = scalar + src1)
+//! ã‚¹ã‚«ãƒ©ã¨é…åˆ—ã® è¦ç´ æ¯ã®å’Œã‚’æ±‚ã‚ã¾ã™ï¼(dst = scalar + src1)
 void add(const Scalar& scalar, const GlsMat& src, GlsMat& dst);
 
-//! 2 ‚Â‚Ì”z—ñ“¯m‚Ì —v‘f–ˆ‚Ì˜a‚ğ‹‚ß‚Ü‚·(dst = src0 + src1)
+//! 2 ã¤ã®é…åˆ—åŒå£«ã® è¦ç´ æ¯ã®å’Œã‚’æ±‚ã‚ã¾ã™(dst = src0 + src1)
 void add(const GlsMat& src0, const GlsMat& src1, GlsMat& dst);
 
-//! ƒXƒJƒ‰‚Æ”z—ñ‚Ì —v‘f–ˆ‚Ì·‚ğ‹‚ß‚Ü‚·D(dst = scalar - src1)
+//! ã‚¹ã‚«ãƒ©ã¨é…åˆ—ã® è¦ç´ æ¯ã®å·®ã‚’æ±‚ã‚ã¾ã™ï¼(dst = scalar - src1)
 void subtract(const Scalar& scalar, const GlsMat& src, GlsMat& dst);
 
-//! 2 ‚Â‚Ì”z—ñ“¯m‚Ì —v‘f–ˆ‚Ì·‚ğ‹‚ß‚Ü‚·(dst = src0 - src1)
+//! 2 ã¤ã®é…åˆ—åŒå£«ã® è¦ç´ æ¯ã®å·®ã‚’æ±‚ã‚ã¾ã™(dst = src0 - src1)
 void subtract(const GlsMat& src0, const GlsMat& src1, GlsMat& dst);
 
-//! ƒXƒJƒ‰‚Æ”z—ñ‚Ì —v‘f–ˆ‚ÌÏ‚ğ‹‚ß‚Ü‚·D(dst = scalar * src1)
+//! ã‚¹ã‚«ãƒ©ã¨é…åˆ—ã® è¦ç´ æ¯ã®ç©ã‚’æ±‚ã‚ã¾ã™ï¼(dst = scalar * src1)
 void multiply(const Scalar& scalar, const GlsMat& src, GlsMat& dst);
 
-//! 2 ‚Â‚Ì”z—ñ“¯m‚Ì —v‘f–ˆ‚ÌÏ‚ğ‹‚ß‚Ü‚·(dst = src0 * src1)
+//! 2 ã¤ã®é…åˆ—åŒå£«ã® è¦ç´ æ¯ã®ç©ã‚’æ±‚ã‚ã¾ã™(dst = src0 * src1)
 void multiply(const GlsMat& src0, const GlsMat& src1, GlsMat& dst);
 
-//! ƒXƒJƒ‰‚Æ”z—ñ‚Ì —v‘f–ˆ‚Ì¤‚ğ‹‚ß‚Ü‚·D(dst = scalar / src1)
+//! ã‚¹ã‚«ãƒ©ã¨é…åˆ—ã® è¦ç´ æ¯ã®å•†ã‚’æ±‚ã‚ã¾ã™ï¼(dst = scalar / src1)
 void divide(const Scalar& scalar, const GlsMat& src, GlsMat& dst);
 
-//! 2 ‚Â‚Ì”z—ñ“¯m‚Ì  —v‘f–ˆ‚Ì¤‚ğ‹‚ß‚Ü‚·D(dst = src0 / src1)
+//! 2 ã¤ã®é…åˆ—åŒå£«ã®  è¦ç´ æ¯ã®å•†ã‚’æ±‚ã‚ã¾ã™ï¼(dst = src0 / src1)
 void divide(const GlsMat& src0, const GlsMat& src1, GlsMat& dst);
 
-//! ƒXƒJƒ‰‚Æ”z—ñ‚Ì —v‘f–ˆ‚ÌÅ¬’l‚ğ‹‚ß‚Ü‚·D(dst = min(scalar, src))
+//! ã‚¹ã‚«ãƒ©ã¨é…åˆ—ã® è¦ç´ æ¯ã®æœ€å°å€¤ã‚’æ±‚ã‚ã¾ã™ï¼(dst = min(scalar, src))
 void min(const Scalar& scalar, const GlsMat& src, GlsMat& dst);
 
-//! 2 ‚Â‚Ì”z—ñ“¯m‚Ì  —v‘f–ˆ‚ÌÅ¬’l‚ğ‹‚ß‚Ü‚·D(dst = min(src0, src1))
+//! 2 ã¤ã®é…åˆ—åŒå£«ã®  è¦ç´ æ¯ã®æœ€å°å€¤ã‚’æ±‚ã‚ã¾ã™ï¼(dst = min(src0, src1))
 void min(const GlsMat& src0, const GlsMat& src1, GlsMat& dst);
 
-//! ƒXƒJƒ‰‚Æ”z—ñ‚Ì —v‘f–ˆ‚ÌÅ‘å’l‚ğ‹‚ß‚Ü‚·D(dst = max(scalar, src))
+//! ã‚¹ã‚«ãƒ©ã¨é…åˆ—ã® è¦ç´ æ¯ã®æœ€å¤§å€¤ã‚’æ±‚ã‚ã¾ã™ï¼(dst = max(scalar, src))
 void max(const Scalar& scalar, const GlsMat& src, GlsMat& dst);
 
-//! 2 ‚Â‚Ì”z—ñ“¯m‚Ì  —v‘f–ˆ‚ÌÅ‘å’l‚ğ‹‚ß‚Ü‚·D(dst = max(src0, src1))
+//! 2 ã¤ã®é…åˆ—åŒå£«ã®  è¦ç´ æ¯ã®æœ€å¤§å€¤ã‚’æ±‚ã‚ã¾ã™ï¼(dst = max(src0, src1))
 void max(const GlsMat& src0, const GlsMat& src1, GlsMat& dst);
 
-//! 2 ‚Â‚Ìƒt[ƒŠƒGƒXƒyƒNƒgƒ‹“¯m‚Ì—v‘f–ˆ‚ÌæZ‚ğs‚¢‚Ü‚·D
-//! conj = ture ‚Ìê‡A2 ”Ô–Ú‚Ì”z—ñ‚ğ•¡‘f‹¤–ğ‚É•ÏX‚Å‚«‚Ü‚·D
+//! 2 ã¤ã®ãƒ•ãƒ¼ãƒªã‚¨ã‚¹ãƒšã‚¯ãƒˆãƒ«åŒå£«ã®è¦ç´ æ¯ã®ä¹—ç®—ã‚’è¡Œã„ã¾ã™ï¼
+//! conj = ture ã®å ´åˆã€2 ç•ªç›®ã®é…åˆ—ã‚’è¤‡ç´ å…±å½¹ã«å¤‰æ›´ã§ãã¾ã™ï¼
 void mulSpectrums(const GlsMat& src0, const GlsMat& src1, GlsMat& dst, bool conj = false);
 
-//! 2 ‚Â‚Ìƒt[ƒŠƒGƒXƒyƒNƒgƒ‹“¯m‚Ì  —v‘f–ˆ‚ÌˆÊ‘ŠŒÀ’è‘ŠŠÖ‚ğ‹‚ß‚Ü‚·D
+//! 2 ã¤ã®ãƒ•ãƒ¼ãƒªã‚¨ã‚¹ãƒšã‚¯ãƒˆãƒ«åŒå£«ã®  è¦ç´ æ¯ã®ä½ç›¸é™å®šç›¸é–¢ã‚’æ±‚ã‚ã¾ã™ï¼
 void mulSpectrumsPhaseOnly(const GlsMat& src0, const GlsMat& src1, GlsMat& dst);
 
-//! •¡‘fs—ñ—v‘f‚Ì‘å‚«‚³‚ğ‹‚ß‚Ü‚·D(dst = sqrt(src.re**2 + src.im**2 )
+//! è¤‡ç´ è¡Œåˆ—è¦ç´ ã®å¤§ãã•ã‚’æ±‚ã‚ã¾ã™ï¼(dst = sqrt(src.re**2 + src.im**2 )
 void magSpectrums(const GlsMat& src, GlsMat& dst);
 
-//! •¡‘fs—ñ—v‘f‚Ìâ‘Î’l‚Ì2æ‚Éoffset‰ÁZ‚µAâ‘Î’l‚Ì©‘R‘Î”‚ğ‹‚ß‚Ü‚·D
+//! è¤‡ç´ è¡Œåˆ—è¦ç´ ã®çµ¶å¯¾å€¤ã®2ä¹—ã«offsetåŠ ç®—ã—ã€çµ¶å¯¾å€¤ã®è‡ªç„¶å¯¾æ•°ã‚’æ±‚ã‚ã¾ã™ï¼
 //! (dst = log( sqrt(src.re**2 + src.im**2) + offset )
 void logMagSpectrums(const GlsMat& src, GlsMat& dst,float offset);
 
-//! Še”z—ñ—v‘f‚Ìâ‘Î’l‚Ì©‘R‘Î”‚ğ‹‚ß‚Ü‚·D(dst = log(src))
+//! å„é…åˆ—è¦ç´ ã®çµ¶å¯¾å€¤ã®è‡ªç„¶å¯¾æ•°ã‚’æ±‚ã‚ã¾ã™ï¼(dst = log(src))
 void log(const GlsMat& src, GlsMat& dst);
 
-//! Še”z—ñ—v‘f‚ğw”‚Æ‚µ‚ÄC©‘R‘Î”‚Ì’êiƒlƒCƒsƒA”je ‚Ì‚×‚«æ‚ğ‹‚ß‚Ü‚·D(dst = exp(src))
+//! å„é…åˆ—è¦ç´ ã‚’æŒ‡æ•°ã¨ã—ã¦ï¼Œè‡ªç„¶å¯¾æ•°ã®åº•ï¼ˆãƒã‚¤ãƒ”ã‚¢æ•°ï¼‰e ã®ã¹ãä¹—ã‚’æ±‚ã‚ã¾ã™ï¼(dst = exp(src))
 void exp(const GlsMat& src, GlsMat& dst);
 
-//! Še”z—ñ—v‘f‚ğ—İæ‚µ‚Ü‚·D (dst = src**power)
+//! å„é…åˆ—è¦ç´ ã‚’ç´¯ä¹—ã—ã¾ã™ï¼ (dst = src**power)
 void pow(const GlsMat& src, const float& power, GlsMat& dst);
 
 

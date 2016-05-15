@@ -1,4 +1,4 @@
-/*
+ï»¿/*
 Copyright (c) 2016, oasi-adamay
 All rights reserved.
 
@@ -38,20 +38,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace gls
 {
 
-
-void ShaderCopyInit(void);
-void ShaderCopyTerminate(void);
-
-//! s—ñ‚Ì•¡»‚ğì¬‚µ‚Ü‚·B dst = src
+//! è¡Œåˆ—ã®è¤‡è£½ã‚’ä½œæˆã—ã¾ã™ã€‚ dst = src
 void copy(const GlsMat& src, GlsMat& dst);
 
-//! s—ñ‚Ì•¡»‚ğì¬‚µ‚Ü‚·B dst = src(rect)
+//! è¡Œåˆ—ã®è¤‡è£½ã‚’ä½œæˆã—ã¾ã™ã€‚ dst = src(rect)
 void copyRect(const GlsMat& src, GlsMat& dst, const Rect& rect);
 
-//! s—ñ‚Ì•¡”‚Ìƒ^ƒCƒ‹‚É•ªŠ„‚µ‚Ü‚·B
+//! è¡Œåˆ—ã®è¤‡æ•°ã®ã‚¿ã‚¤ãƒ«ã«åˆ†å‰²ã—ã¾ã™ã€‚
 void tiled(const GlsMat& src, vector<vector<GlsMat>>& dst, const Size& blkNum);
 
-//! •ªŠ„‚³‚ê‚½ƒ^ƒCƒ‹‚ğˆê‚Â‚Ìs—ñ‚É“‡‚µ‚Ü‚·B
+//! åˆ†å‰²ã•ã‚ŒãŸã‚¿ã‚¤ãƒ«ã‚’ä¸€ã¤ã®è¡Œåˆ—ã«çµ±åˆã—ã¾ã™ã€‚
 void untiled(const vector<vector<GlsMat>>& src, GlsMat& dst);
 
 }//namespace gls

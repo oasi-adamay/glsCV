@@ -1,4 +1,4 @@
-/*
+ï»¿/*
 Copyright (c) 2016, oasi-adamay
 All rights reserved.
 
@@ -74,7 +74,7 @@ const char* glsErrorString(GLenum err){
 
 
 //-----------------------------------------------------------------------------
-// GLFW‚ÅƒGƒ‰[‚Æ‚È‚Á‚½‚Æ‚«‚ÉŒÄ‚Ño‚³‚ê‚éŠÖ”
+// GLFWã§ã‚¨ãƒ©ãƒ¼ã¨ãªã£ãŸã¨ãã«å‘¼ã³å‡ºã•ã‚Œã‚‹é–¢æ•°
 static void glfw_error_callback_func(int error, const char* description){
 	std::cout << "GLFW Error: " << description << std::endl;
 }
@@ -117,7 +117,7 @@ GLFWwindow* glsCvInit(const int _width, const int _height){
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 	if (offscreen){
-		glfwWindowHint(GLFW_VISIBLE, 0);	//ƒIƒtƒXƒNƒŠ[ƒ“
+		glfwWindowHint(GLFW_VISIBLE, 0);	//ã‚ªãƒ•ã‚¹ã‚¯ãƒªãƒ¼ãƒ³
 	}
 
 	// Open a window and create its OpenGL context
@@ -131,7 +131,7 @@ GLFWwindow* glsCvInit(const int _width, const int _height){
 
 #if defined _WIN32
 	// Initialize GLEW
-	glewExperimental = GL_TRUE;			///!!!! important for core profile // ƒRƒAƒvƒƒtƒ@ƒCƒ‹‚Å•K—v‚Æ‚È‚è‚Ü‚·
+	glewExperimental = GL_TRUE;			///!!!! important for core profile // ã‚³ã‚¢ãƒ—ãƒ­ãƒ•ã‚¡ã‚¤ãƒ«ã§å¿…è¦ã¨ãªã‚Šã¾ã™
 	if (glewInit() != GLEW_OK) {
 		cerr << "Failed to initialize GLEW." << endl;
 		glfwTerminate();
@@ -150,19 +150,6 @@ GLFWwindow* glsCvInit(const int _width, const int _height){
 
 	}
 
-	{
-		_TMR_("glsCvInit:\t");
-		gls::ShaderCopyInit();
-		gls::ShaderConvertInit();
-		gls::ShaderDrawInit();
-		gls::ShaderBasicOperationInit();
-		gls::ShaderMergeInit();
-		gls::ShaderReduceInit();
-		gls::ShaderMinMaxLocInit();
-		gls::ShaderNormalizeInit();
-		gls::ShaderFftInit();
-		gls::ShaderFilterInit();
-	}
 
 	GL_CHECK_ERROR();
 
@@ -173,19 +160,6 @@ GLFWwindow* glsCvInit(const int _width, const int _height){
 //Terminate glsFft
 void glsCvTerminate(void){
 
-	{
-		gls::ShaderCopyTerminate();
-		gls::ShaderConvertTerminate();
-		gls::ShaderDrawTerminate();
-		gls::ShaderBasicOperationTerminate();
-		gls::ShaderMergeTerminate();
-		gls::ShaderReduceTerminate();
-		gls::ShaderMinMaxLocTerminate();
-		gls::ShaderNormalizeTerminate();
-		gls::ShaderFftTerminate();
-		gls::ShaderFilterTerminate();
-
-	}
 
 	// Close OpenGL window and terminate GLFW
 	glfwTerminate();

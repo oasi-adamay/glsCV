@@ -39,56 +39,17 @@ namespace gls
 // glsShaderReduce
 class glsShaderReduce : public glsShaderBase
 {
+protected:
+	string FragmentShaderCode(void);
+
 public:
-	glsShaderReduce(void);
+	glsShaderReduce(void) :glsShaderBase(__FUNCTION__){}
 
 };
-
-#if 0
-//-----------------------------------------------------------------------------
-// glsShaderReduceU unsigned
-class glsShaderReduceU : public glsShaderBase
-{
-public:
-	glsShaderReduceU(void);
-};
-
-//-----------------------------------------------------------------------------
-// glsShaderReduceS unsigned
-class glsShaderReduceS : public glsShaderBase
-{
-public:
-	glsShaderReduceS(void);
-};
-#endif
 
 //-----------------------------------------------------------------------------
 //global 
-glsShaderReduce* shaderReduce = 0;
-//glsShaderReduceU* shaderReduceU = 0;
-//glsShaderReduceS* shaderReduceS = 0;
-
-void ShaderReduceInit(void){
-	shaderReduce = new glsShaderReduce();
-//	shaderReduceU = new glsShaderReduceU();
-//	shaderReduceS = new glsShaderReduceS();
-}
-
-void ShaderReduceTerminate(void){
-	delete shaderReduce;
-//	delete shaderReduceU;
-//	delete shaderReduceS;
-}
-
-
-static const char vertexShaderCode[] =
-"#version 330 core\n"
-"layout (location = 0)in  vec2 position;\n"
-"void main(void)\n"
-"{\n"
-"   gl_Position  = vec4(position,0.0,1.0);\n"
-"}\n"
-;
+glsShaderReduce ShaderReduce;
 
 
 //#define CV_REDUCE_SUM 0
@@ -99,9 +60,7 @@ static const char vertexShaderCode[] =
 
 //-----------------------------------------------------------------------------
 //glsShaderReduce
-glsShaderReduce::glsShaderReduce(void)
-	:glsShaderBase()
-{
+string glsShaderReduce::FragmentShaderCode(void){
 	const char fragmentShaderCode[] =
 "#version 330 core\n"
 "precision highp float;\n"
@@ -188,11 +147,7 @@ glsShaderReduce::glsShaderReduce(void)
 "	}\n"
 "}\n"
 ;
-
-	const string bin_filename = shaderBinName(__FUNCTION__);
-	if (!LoadShadersBinary(bin_filename)){
-		LoadShadersCode(vertexShaderCode, fragmentShaderCode, bin_filename);
-	}
+	return fragmentShaderCode;
 }
 
 
@@ -210,13 +165,13 @@ static void glsReduceProcess(
 
 	//program
 	{
-		glUseProgram(shader->program);
+		glUseProgram(shader->program());
 	}
 
 	//uniform
 	{
-		glUniform1i(glGetUniformLocation(shader->program, "dim"), dim);
-		glUniform1i(glGetUniformLocation(shader->program, "reduceOp"), reduceOp);
+		glUniform1i(glGetUniformLocation(shader->program(), "dim"), dim);
+		glUniform1i(glGetUniformLocation(shader->program(), "reduceOp"), reduceOp);
 	}
 
 
@@ -225,10 +180,10 @@ static void glsReduceProcess(
 		int id = 0;
 		glActiveTexture(GL_TEXTURE0 + id);
 		glBindTexture(GL_TEXTURE_2D, texSrc);
-		glUniform1i(glGetUniformLocation(shader->program, "texSrc"), id);
+		glUniform1i(glGetUniformLocation(shader->program(), "texSrc"), id);
 	}
 
-	glsVAO vao(glGetAttribLocation(shader->program, "position"));
+	glsVAO vao(glGetAttribLocation(shader->program(), "position"));
 
 	//Viewport
 	if (dim == 0){
@@ -254,12 +209,12 @@ static
 glsShaderBase* selectShader(int type){
 	glsShaderBase* shader = 0;
 	switch (CV_MAT_DEPTH(type)){
-	case(CV_32F) : shader = shaderReduce; break;
+	case(CV_32F) : shader = &ShaderReduce; break;
 	//case(CV_8U) :
-	//case(CV_16U) : shader = shaderReduceU; break;
+	//case(CV_16U) : shader = &ShaderReduceU; break;
 	//case(CV_8S) :
 	//case(CV_16S) :
-	//case(CV_32S) : shader = shaderReduceS; break;
+	//case(CV_32S) : shader = &ShaderReduceS; break;
 	default: GLS_Assert(0);		//not implement
 	}
 	return shader;
