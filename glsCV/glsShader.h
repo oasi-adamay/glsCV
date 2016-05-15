@@ -38,6 +38,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace gls
 {
 
+class glsShaderBase;
+/*!
+Shader List
+*/
+extern list<glsShaderBase*> ShaderList;
+/*!
+Initialize all shader 
+*/
+void ShaderInitAll(void);
+
+
+
 /*!
 glsShader Base Class
 
@@ -60,7 +72,7 @@ protected:
 	virtual string FragmentShaderCode(void){ return string(""); }
 
 public:
-	glsShaderBase(const string& _name) : name(_name){ ;}
+	glsShaderBase(const string& _name) : name(_name){ ShaderList.push_back(this); }
 
 	~glsShaderBase(void){ if (_program.use_count() == 1) glDeleteProgram(*_program); }
 
@@ -97,12 +109,21 @@ public:
 	*/
 	string shaderBinName(const std::string funcname);
 
-	//program
+	/*!
+	get program id.
+
+	if program is not loaded yet, it will be  compiled and loaded.
+	*/
 	GLuint program(void) const;
 
+	/*!
+	initalize porgram
+
+	*/
 	void Init(void);
 
 };
+
 
 }//namespace gls
 

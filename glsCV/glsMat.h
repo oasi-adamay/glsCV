@@ -1,4 +1,4 @@
-/*
+ï»¿/*
 Copyright (c) 2016, oasi-adamay
 All rights reserved.
 
@@ -41,65 +41,65 @@ GLenum convCVtype2GLformat(int type);
 GLenum convCVtype2GLtype(int type);
 int convFmtGL2CV(GLenum  format);
 
-//! QÆƒJƒEƒ“ƒ^‚ğ‚ÂCOpenGL texture—p‚ÌŠî’êƒXƒgƒŒ[ƒWƒNƒ‰ƒX
+//! å‚ç…§ã‚«ã‚¦ãƒ³ã‚¿ã‚’æŒã¤ï¼ŒOpenGL textureç”¨ã®åŸºåº•ã‚¹ãƒˆãƒ¬ãƒ¼ã‚¸ã‚¯ãƒ©ã‚¹
 class GlsMat
 {
 private:
-	shared_ptr<GLuint> _texid;	//!< ƒeƒNƒXƒ`ƒƒid‚ğ•Û‘¶‚·‚éAshared_ptr
-	int flag;					//!< ƒtƒH[ƒ}ƒbƒg“™‚ğ•Û‘¶‚·‚éƒtƒ‰ƒO
+	shared_ptr<GLuint> _texid;	//!< ãƒ†ã‚¯ã‚¹ãƒãƒ£idã‚’ä¿å­˜ã™ã‚‹ã€shared_ptr
+	int flag;					//!< ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆç­‰ã‚’ä¿å­˜ã™ã‚‹ãƒ•ãƒ©ã‚°
 
-	//! ƒeƒNƒXƒ`ƒƒ¶¬
+	//! ãƒ†ã‚¯ã‚¹ãƒãƒ£ç”Ÿæˆ
 	void createTexture(const int _width, const int _height, int _type);
-	//! ƒeƒNƒXƒ`ƒƒíœ
+	//! ãƒ†ã‚¯ã‚¹ãƒãƒ£å‰Šé™¤
 	void deleteTexture(void);
 
 public:
 	
-	int rows;	//!< s”(height)
-	int cols;	//!< —ñ”(width)
+	int rows;	//!< è¡Œæ•°(height)
+	int cols;	//!< åˆ—æ•°(width)
 
 
-	//! cv::mat‚Æ“¯‚¶ƒTƒCƒYA“¯‚¶type‚ÌƒeƒNƒXƒ`ƒƒ[‚ğ¶¬‚µAƒf[ƒ^‚ğupload‚µ‚Ü‚·B
+	//! cv::matã¨åŒã˜ã‚µã‚¤ã‚ºã€åŒã˜typeã®ãƒ†ã‚¯ã‚¹ãƒãƒ£ãƒ¼ã‚’ç”Ÿæˆã—ã€ãƒ‡ãƒ¼ã‚¿ã‚’uploadã—ã¾ã™ã€‚
 	explicit GlsMat(const Mat & cvmat);
-	//! size, type‚ÌƒeƒNƒXƒ`ƒƒ[‚ğ¶¬‚µ‚Ü‚·B
+	//! size, typeã®ãƒ†ã‚¯ã‚¹ãƒãƒ£ãƒ¼ã‚’ç”Ÿæˆã—ã¾ã™ã€‚
 	GlsMat(const Size size, const int type);
-	//! ‹ó‚Ìs—ñ‚Å‚·BƒeƒNƒXƒ`ƒƒ[‚Í¶¬‚³‚ê‚Ü‚¹‚ñB
+	//! ç©ºã®è¡Œåˆ—ã§ã™ã€‚ãƒ†ã‚¯ã‚¹ãƒãƒ£ãƒ¼ã¯ç”Ÿæˆã•ã‚Œã¾ã›ã‚“ã€‚
 	GlsMat(void);
 
-	//! ƒfƒXƒgƒ‰ƒNƒ^@QÆƒJƒEƒ“ƒg‚ªÅŒã‚ÌƒGƒ“ƒgƒŠ‚ğ¦‚·‚Æ‚«‚ÉAƒeƒNƒXƒ`ƒƒ[‚ğíœ‚µ‚Ü‚·B
+	//! ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ã€€å‚ç…§ã‚«ã‚¦ãƒ³ãƒˆãŒæœ€å¾Œã®ã‚¨ãƒ³ãƒˆãƒªã‚’ç¤ºã™ã¨ãã«ã€ãƒ†ã‚¯ã‚¹ãƒãƒ£ãƒ¼ã‚’å‰Šé™¤ã—ã¾ã™ã€‚
 	~GlsMat(void);
 
-	//! ‘ã“ü@ƒwƒbƒ_[î•ñ‚Ì‚İ‚ÌƒRƒs[‚ÅAƒf[ƒ^©‘Ì‚ÌƒRƒs[‚Í”­¶‚µ‚Ü‚¹‚ñB
+	//! ä»£å…¥ã€€ãƒ˜ãƒƒãƒ€ãƒ¼æƒ…å ±ã®ã¿ã®ã‚³ãƒ”ãƒ¼ã§ã€ãƒ‡ãƒ¼ã‚¿è‡ªä½“ã®ã‚³ãƒ”ãƒ¼ã¯ç™ºç”Ÿã—ã¾ã›ã‚“ã€‚
 	GlsMat& operator=(const GlsMat& rhs);
 
-	//! ƒeƒNƒXƒ`ƒƒ[‚ÌID‚Ìæ“¾
+	//! ãƒ†ã‚¯ã‚¹ãƒãƒ£ãƒ¼ã®IDã®å–å¾—
 	GLuint texid(void)const { return _texid.use_count() == 0 ? 0 :* _texid; }
 
-	//! s—ñƒTƒCƒY(width,height)
+	//! è¡Œåˆ—ã‚µã‚¤ã‚º(width,height)
 	Size size(void) const { return Size(cols, rows); }
-	//! s—ñ—v‘f‚ÌŒ^‚ğ•Ô‚µ‚Ü‚·DOpenCV‚ÌMat.type()‚Æ“¯‚¶‚Å‚·B
+	//! è¡Œåˆ—è¦ç´ ã®å‹ã‚’è¿”ã—ã¾ã™ï¼OpenCVã®Mat.type()ã¨åŒã˜ã§ã™ã€‚
 	int type(void) const { return CV_MAT_TYPE(flag); }
-	//! ƒ`ƒƒƒ“ƒlƒ‹”@(1-4)
+	//! ãƒãƒ£ãƒ³ãƒãƒ«æ•°ã€€(1-4)
 	int channels(void) const { return CV_MAT_CN(flag); }
-	//! s—ñ—v‘f‚Ìƒrƒbƒg[“x‚ğ•Ô‚µ‚Ü‚·DOpenCV‚ÌMat.depth()‚Æ“¯‚¶‚Å‚·B
+	//! è¡Œåˆ—è¦ç´ ã®ãƒ“ãƒƒãƒˆæ·±åº¦ã‚’è¿”ã—ã¾ã™ï¼OpenCVã®Mat.depth()ã¨åŒã˜ã§ã™ã€‚
 	int depth(void) const { return CV_MAT_DEPTH(flag); }
 
-	//! OpenGL internal format (SizedFormat‚ğg—p‚µ‚Ü‚·BGL_RGB32F‚È‚Ç)
+	//! OpenGL internal format (SizedFormatã‚’ä½¿ç”¨ã—ã¾ã™ã€‚GL_RGB32Fãªã©)
 	GLenum glSizedFormat(void) const{ return convCVtype2GLsizedFormat(CV_MAT_TYPE(flag)); }
-	//! OpenGL format (GL_RED,GL_RG,GL_RGB,GL_RED_INTEGER“™)
+	//! OpenGL format (GL_RED,GL_RG,GL_RGB,GL_RED_INTEGERç­‰)
 	GLenum glFormat(void) const{ return convCVtype2GLformat(CV_MAT_TYPE(flag)); }
-	//! OpenGL type (GL_FLOAT,GL_UNSIGED_BYTET“™)
+	//! OpenGL type (GL_FLOAT,GL_UNSIGED_BYTETç­‰)
 	GLenum glType(void) const{ return convCVtype2GLtype(CV_MAT_TYPE(flag)); }
 
-	//! ”z—ñ‚ª—v‘f‚ğ‚½‚È‚¢iƒeƒNƒXƒ`ƒƒ[‚ª¶¬‚³‚ê‚Ä‚¢‚È‚¢jê‡‚É true ‚ğ•Ô‚µ‚Ü‚·D
+	//! é…åˆ—ãŒè¦ç´ ã‚’æŒãŸãªã„ï¼ˆãƒ†ã‚¯ã‚¹ãƒãƒ£ãƒ¼ãŒç”Ÿæˆã•ã‚Œã¦ã„ãªã„ï¼‰å ´åˆã« true ã‚’è¿”ã—ã¾ã™ï¼
 	bool empty(void) const { return _texid.use_count() == 0; }
 	bool isContinuous(void) const { return true; }
 
 
-	//! CPU->GPU‚Ö‚Ìupload
+	//! CPU->GPUã¸ã®upload
 	void upload(const Mat&src);
 
-	//! GPU->CPU‚Ö‚Ìdownload
+	//! GPU->CPUã¸ã®download
 	void download(Mat&dst) const;
 	operator Mat() const;
 

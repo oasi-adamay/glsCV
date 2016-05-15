@@ -43,7 +43,7 @@ protected:
 	string FragmentShaderCode(void);
 
 public:
-	glsShaderFilter1D(void);
+	glsShaderFilter1D(void) : glsShaderBase(__FUNCTION__){}
 
 };
 
@@ -55,7 +55,7 @@ protected:
 	string FragmentShaderCode(void);
 
 public:
-	glsShaderFilter2D(void);
+	glsShaderFilter2D(void) : glsShaderBase(__FUNCTION__){}
 
 };
 
@@ -79,29 +79,9 @@ public:
 
 //-----------------------------------------------------------------------------
 //global 
-glsShaderFilter1D* shaderFilter1D = 0;
-//glsShaderFilterU* shaderFilterU = 0;
-//glsShaderFilterS* shaderFilterS = 0;
+glsShaderFilter1D ShaderFilter1D;
+glsShaderFilter2D ShaderFilter2D;
 
-glsShaderFilter2D* shaderFilter2D = 0;
-//glsShaderFilterU* shaderFilterU = 0;
-//glsShaderFilterS* shaderFilterS = 0;
-
-
-void ShaderFilterInit(void){
-	shaderFilter1D = new glsShaderFilter1D();
-	shaderFilter2D = new glsShaderFilter2D();
-
-//	shaderFilterU = new glsShaderFilterU();
-//	shaderFilterS = new glsShaderFilterS();
-}
-
-void ShaderFilterTerminate(void){
-	delete shaderFilter1D;
-	delete shaderFilter2D;
-//	delete shaderFilterU;
-//	delete shaderFilterS;
-}
 
 
 
@@ -157,17 +137,6 @@ string glsShaderFilter1D::FragmentShaderCode(void){
 	return fragmentShaderCode;
 }
 
-glsShaderFilter1D::glsShaderFilter1D(void)
-	:glsShaderBase(__FUNCTION__)
-{
-
-	const string bin_filename = shaderBinName(name);
-	if (!LoadShadersBinary(bin_filename))
-	{
-		LoadShadersCode(VertexShaderCode(), FragmentShaderCode(), bin_filename);
-	}
-}
-
 
 //-----------------------------------------------------------------------------
 //glsShaderFilter2D
@@ -209,17 +178,6 @@ string glsShaderFilter2D::FragmentShaderCode(void){
 "}\n"
 ;
 	return fragmentShaderCode;
-}
-
-glsShaderFilter2D::glsShaderFilter2D(void)
-	:glsShaderBase(__FUNCTION__)
-{
-
-	const string bin_filename = shaderBinName(name);
-	if (!LoadShadersBinary(bin_filename))
-	{
-		LoadShadersCode(VertexShaderCode(), FragmentShaderCode(), bin_filename);
-	}
 }
 
 
@@ -326,7 +284,7 @@ static
 glsShaderBase* selectShader1D(int type){
 	glsShaderBase* shader = 0;
 	switch (CV_MAT_DEPTH(type)){
-	case(CV_32F) : shader = shaderFilter1D; break;
+	case(CV_32F) : shader = &ShaderFilter1D; break;
 	//case(CV_8U) :
 	//case(CV_16U) : shader = shaderFilterU; break;
 	//case(CV_8S) :
@@ -341,7 +299,7 @@ static
 glsShaderBase* selectShader2D(int type){
 	glsShaderBase* shader = 0;
 	switch (CV_MAT_DEPTH(type)){
-	case(CV_32F) : shader = shaderFilter2D; break;
+	case(CV_32F) : shader = &ShaderFilter2D; break;
 		//case(CV_8U) :
 		//case(CV_16U) : shader = shaderFilterU; break;
 		//case(CV_8S) :

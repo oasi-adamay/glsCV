@@ -1,4 +1,4 @@
-/*
+﻿/*
 Copyright (c) 2016, oasi-adamay
 All rights reserved.
 
@@ -86,22 +86,9 @@ public:
 
 //-----------------------------------------------------------------------------
 //global 
-glsShaderConvert* shaderConvert = 0;
-glsShaderConvertU* shaderConvertU = 0;
-glsShaderConvertS* shaderConvertS = 0;
-
-void ShaderConvertInit(void){
-	shaderConvert = new glsShaderConvert();
-	shaderConvertU = new glsShaderConvertU();
-	shaderConvertS = new glsShaderConvertS();
-
-}
-
-void ShaderConvertTerminate(void){
-	delete shaderConvert;
-	delete shaderConvertU;
-	delete shaderConvertS;
-}
+glsShaderConvert ShaderConvert;
+glsShaderConvertU ShaderConvertU;
+glsShaderConvertS ShaderConvertS;
 
 
 
@@ -359,23 +346,23 @@ void convert(const GlsMat& src, GlsMat& dst, const float scl){
 	glsShaderConvertBase* shader = 0;
 
 	//switch (src.type){
-	//case(GL_FLOAT) : shader = shaderConvert; break;
+	//case(GL_FLOAT) : shader = &ShaderConvert; break;
 	//case(GL_UNSIGNED_BYTE) :
 	//case(GL_UNSIGNED_SHORT) :
-	//case(GL_UNSIGNED_INT) :	shader = shaderConvertU; break;
+	//case(GL_UNSIGNED_INT) :	shader = &ShaderConvertU; break;
 	//case(GL_BYTE) :
 	//case(GL_SHORT) :
-	//case(GL_INT) : shader = shaderConvertS; break;
+	//case(GL_INT) : shader = &ShaderConvertS; break;
 	//default: GLS_Assert(0);		//not implement
 	//}
 
 	switch (CV_MAT_DEPTH(src.type())){
-	case(CV_32F) : shader = shaderConvert; break;
+	case(CV_32F) : shader = &ShaderConvert; break;
 	case(CV_8U) :
-	case(CV_16U) : shader = shaderConvertU; break;
+	case(CV_16U) : shader = &ShaderConvertU; break;
 	case(CV_8S) :
 	case(CV_16S) :
-	case(CV_32S) : shader = shaderConvertS; break;
+	case(CV_32S) : shader = &ShaderConvertS; break;
 	default: GLS_Assert(0);		//not implement
 	}
 
@@ -428,12 +415,12 @@ void cvtColor(const GlsMat& src, GlsMat& dst, const int code){
 	glsShaderConvertBase* shader = 0;
 
 	switch (CV_MAT_DEPTH(src.type())){
-	case(CV_32F) : shader = shaderConvert; break;
+	case(CV_32F) : shader = &ShaderConvert; break;
 	case(CV_8U) :
-	case(CV_16U) : shader = shaderConvertU; break;
+	case(CV_16U) : shader = &ShaderConvertU; break;
 	case(CV_8S) :
 	case(CV_16S) :
-	case(CV_32S) : shader = shaderConvertS; break;
+	case(CV_32S) : shader = &ShaderConvertS; break;
 	default: GLS_Assert(0);		//not implement
 	}
 

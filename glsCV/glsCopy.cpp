@@ -1,4 +1,4 @@
-/*
+﻿/*
 Copyright (c) 2016, oasi-adamay
 All rights reserved.
 
@@ -227,12 +227,6 @@ glsShaderBase* selectShader(int type){
 	default: GLS_Assert(0);		//not implement
 	}
 	return shader;
-}
-#else
-void ShaderCopyInit(void){
-}
-
-void ShaderCopyTerminate(void){
 }
 
 #endif

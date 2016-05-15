@@ -1,4 +1,4 @@
-/*
+ï»¿/*
 Copyright (c) 2016, oasi-adamay
 All rights reserved.
 
@@ -39,13 +39,10 @@ namespace gls
 {
 
 
-void ShaderNormalizeInit(void);
-void ShaderNormalizeTerminate(void);
-
 /*!
-”z—ñ‚Ìƒmƒ‹ƒ€C‚Ü‚½‚Í‚»‚Ì”ÍˆÍ‚ğ³‹K‰»‚µ‚Ü‚·D
+é…åˆ—ã®ãƒãƒ«ãƒ ï¼Œã¾ãŸã¯ãã®ç¯„å›²ã‚’æ­£è¦åŒ–ã—ã¾ã™ï¼
 
-Œ»İ‚ÍANORM_MINMAX‚Ì‚İ‘Î‰‚µ‚Ä‚¢‚Ü‚·B
+ç¾åœ¨ã¯ã€NORM_MINMAXã®ã¿å¯¾å¿œã—ã¦ã„ã¾ã™ã€‚
 */
 void normalize(const GlsMat& src, GlsMat& dst, double alpha = 0, double beta = 1, int normType = NORM_MINMAX);
 

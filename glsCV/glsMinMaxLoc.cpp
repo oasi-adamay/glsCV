@@ -47,41 +47,10 @@ public:
 
 };
 
-#if 0
-//-----------------------------------------------------------------------------
-// glsShaderMinMaxLocU unsigned
-class glsShaderMinMaxLocU : public glsShaderBase
-{
-public:
-	glsShaderMinMaxLocU(void);
-};
-
-//-----------------------------------------------------------------------------
-// glsShaderMinMaxLocS unsigned
-class glsShaderMinMaxLocS : public glsShaderBase
-{
-public:
-	glsShaderMinMaxLocS(void);
-};
-#endif
 
 //-----------------------------------------------------------------------------
 //global 
-glsShaderMinMaxLoc* shaderMinMaxLoc = 0;
-//glsShaderMinMaxLocU* shaderMinMaxLocU = 0;
-//glsShaderMinMaxLocS* shaderMinMaxLocS = 0;
-
-void ShaderMinMaxLocInit(void){
-	shaderMinMaxLoc = new glsShaderMinMaxLoc();
-//	shaderMinMaxLocU = new glsShaderMinMaxLocU();
-//	shaderMinMaxLocS = new glsShaderMinMaxLocS();
-}
-
-void ShaderMinMaxLocTerminate(void){
-	delete shaderMinMaxLoc;
-//	delete shaderMinMaxLocU;
-//	delete shaderMinMaxLocS;
-}
+glsShaderMinMaxLoc ShaderMinMaxLoc;
 
 
 //-----------------------------------------------------------------------------
@@ -195,12 +164,12 @@ static
 glsShaderBase* selectShader(int type){
 	glsShaderBase* shader = 0;
 	switch (CV_MAT_DEPTH(type)){
-	case(CV_32F) : shader = shaderMinMaxLoc; break;
+	case(CV_32F) : shader = &ShaderMinMaxLoc; break;
 	//case(CV_8U) :
-	//case(CV_16U) : shader = shaderMinMaxLocU; break;
+	//case(CV_16U) : shader = &ShaderMinMaxLocU; break;
 	//case(CV_8S) :
 	//case(CV_16S) :
-	//case(CV_32S) : shader = shaderMinMaxLocS; break;
+	//case(CV_32S) : shader = &ShaderMinMaxLocS; break;
 	default: GLS_Assert(0);		//not implement
 	}
 	return shader;

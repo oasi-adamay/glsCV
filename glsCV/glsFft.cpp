@@ -60,16 +60,7 @@ public:
 
 //-----------------------------------------------------------------------------
 //global 
-glsShaderFft* shaderFft = 0;
-
-void ShaderFftInit(void){
-	shaderFft = new glsShaderFft();
-}
-
-void ShaderFftTerminate(void){
-	delete shaderFft;
-}
-
+glsShaderFft ShaderFft;
 
 
 
@@ -376,7 +367,7 @@ void fft(const GlsMat& src, GlsMat& dst, int flag){
 		_TMR_("-execute:\t");
 
 		glsFBO fbo(2);
-		glsVAO vao(glGetAttribLocation(shaderFft->program(),"position"));
+		glsVAO vao(glGetAttribLocation(ShaderFft.program(),"position"));
 
 		int Q = 0;
 		while ((1 << Q) < N){ Q++; }
@@ -395,7 +386,7 @@ void fft(const GlsMat& src, GlsMat& dst, int flag){
 				float xscl = 1.0f;
 				float xconj = ((flag & GLS_FFT_INVERSE) && (p == 0)) ? -1.0f : 1.0f;
 				float yconj = 1.0f;
-				glsFftProcess(shaderFft, texSrc, texDst, texW.texid(), 0, p, q, N, xscl, yscl, xconj, yconj);
+				glsFftProcess(&ShaderFft, texSrc, texDst, texW.texid(), 0, p, q, N, xscl, yscl, xconj, yconj);
 			}
 		}
 		// --- FFT cols ----
@@ -409,7 +400,7 @@ void fft(const GlsMat& src, GlsMat& dst, int flag){
 				float xscl = 1.0f;
 				float xconj = 1.0f;
 				float yconj = ((flag & GLS_FFT_INVERSE) && (q == 0)) ? -1.0f : 1.0f;
-				glsFftProcess(shaderFft, texSrc, texDst, texW.texid(), 1, p, q, N, xscl, yscl, xconj, yconj);
+				glsFftProcess(&ShaderFft, texSrc, texDst, texW.texid(), 1, p, q, N, xscl, yscl, xconj, yconj);
 			}
 		}
 	}

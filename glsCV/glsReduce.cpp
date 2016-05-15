@@ -47,42 +47,9 @@ public:
 
 };
 
-#if 0
-//-----------------------------------------------------------------------------
-// glsShaderReduceU unsigned
-class glsShaderReduceU : public glsShaderBase
-{
-public:
-	glsShaderReduceU(void);
-};
-
-//-----------------------------------------------------------------------------
-// glsShaderReduceS unsigned
-class glsShaderReduceS : public glsShaderBase
-{
-public:
-	glsShaderReduceS(void);
-};
-#endif
-
 //-----------------------------------------------------------------------------
 //global 
-glsShaderReduce* shaderReduce = 0;
-//glsShaderReduceU* shaderReduceU = 0;
-//glsShaderReduceS* shaderReduceS = 0;
-
-void ShaderReduceInit(void){
-	shaderReduce = new glsShaderReduce();
-//	shaderReduceU = new glsShaderReduceU();
-//	shaderReduceS = new glsShaderReduceS();
-}
-
-void ShaderReduceTerminate(void){
-	delete shaderReduce;
-//	delete shaderReduceU;
-//	delete shaderReduceS;
-}
-
+glsShaderReduce ShaderReduce;
 
 
 //#define CV_REDUCE_SUM 0
@@ -242,12 +209,12 @@ static
 glsShaderBase* selectShader(int type){
 	glsShaderBase* shader = 0;
 	switch (CV_MAT_DEPTH(type)){
-	case(CV_32F) : shader = shaderReduce; break;
+	case(CV_32F) : shader = &ShaderReduce; break;
 	//case(CV_8U) :
-	//case(CV_16U) : shader = shaderReduceU; break;
+	//case(CV_16U) : shader = &ShaderReduceU; break;
 	//case(CV_8S) :
 	//case(CV_16S) :
-	//case(CV_32S) : shader = shaderReduceS; break;
+	//case(CV_32S) : shader = &ShaderReduceS; break;
 	default: GLS_Assert(0);		//not implement
 	}
 	return shader;

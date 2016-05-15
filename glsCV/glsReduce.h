@@ -1,4 +1,4 @@
-/*
+﻿/*
 Copyright (c) 2016, oasi-adamay
 All rights reserved.
 
@@ -39,26 +39,22 @@ namespace gls
 {
 
 
-void ShaderReduceInit(void);
-void ShaderReduceTerminate(void);
-
-
 /*!
-�s����x�N�g���ɏk�����܂��D
+行列をベクトルに縮小します．
 
-@param dim �s�񂪏k�������ۂɏ]�������C���f�b�N�X�D0 �͍s��1�s �ɁC1 �͍s��1��ɏk������邱�Ƃ����ꂼ��Ӗ����܂��D
-@param reduceOp �k�������C�ȉ��̂�����1�F
- * CV_REDUCE_SUM �o�͂́C�s��̍s�i�܂��͗�j�̍��v�D
- * CV_REDUCE_AVG �o�͂́C�s��̍s�i�܂��͗�j�̕��ρD
- * CV_REDUCE_MAX �o�͂́C�s��̍s�i�܂��͗�j�̍ő�l�D
- * CV_REDUCE_MIN �o�͂́C�s��̍s�i�܂��͗�j�̍ŏ��l�D
+@param dim 行列が縮小される際に従う次元インデックス．0 は行列が1行 に，1 は行列が1列に縮小されることをそれぞれ意味します．
+@param reduceOp 縮小処理，以下のうちの1つ：
+ * CV_REDUCE_SUM 出力は，行列の行（または列）の合計．
+ * CV_REDUCE_AVG 出力は，行列の行（または列）の平均．
+ * CV_REDUCE_MAX 出力は，行列の行（または列）の最大値．
+ * CV_REDUCE_MIN 出力は，行列の行（または列）の最小値．
 */
 void reduce(const GlsMat& src, GlsMat& dst, int dim, int reduceOp);
 
 #if 0
 /*!
-�z��S�̂��邢�͕����z��ɑ΂���C���I�ŏ��l����эő�l�����߂܂��D
-���݁AmaxLoc,minLoc,mask�͎�������Ă��܂���B
+配列全体あるいは部分配列に対する，大域的最小値および最大値を求めます．
+現在、maxLoc,minLoc,maskは実装されていません。
 */
 void minMaxLoc(const GlsMat& src, double* minVal, double* maxVal = 0, Point* minLoc = 0, Point* maxLoc = 0, const GlsMat& mask = GlsMat());
 #endif

@@ -75,21 +75,8 @@ public:
 
 //-----------------------------------------------------------------------------
 //global 
-glsShaderDraw* shaderDraw = 0;
-glsShaderDrawU* shaderDrawU = 0;
-
-void ShaderDrawInit(void){
-	shaderDraw = new glsShaderDraw();
-	shaderDrawU = new glsShaderDrawU();
-
-}
-
-void ShaderDrawTerminate(void){
-	delete shaderDraw;
-	delete shaderDrawU;
-}
-
-
+glsShaderDraw ShaderDraw;
+glsShaderDrawU ShaderDrawU;
 
 
 //-----------------------------------------------------------------------------
@@ -248,23 +235,23 @@ void draw(GlsMat& src){
 	switch (src.glType()){
 	case(GL_FLOAT) :
 		scl = 1.0f;
-		shader = shaderDraw;
+		shader = &ShaderDraw;
 		break;
 	case(GL_UNSIGNED_BYTE) :
 		scl = 1.0f / 256.0f;
-		shader = shaderDrawU;
+		shader = &ShaderDrawU;
 		break;
 	case(GL_UNSIGNED_SHORT) :
 		scl = 1.0f / 65536.0f;
-		shader = shaderDrawU;
+		shader = &ShaderDrawU;
 		break;
 	case(GL_UNSIGNED_INT) :
 		scl = 1.0f / (65536.0f * 65536.0f);
-		shader = shaderDrawU;
+		shader = &ShaderDrawU;
 		break;
 	//case(GL_BYTE) :
 	//case(GL_SHORT) :
-	//case(GL_INT) : shader = shaderDrawI; break;
+	//case(GL_INT) : shader = &ShaderDrawI; break;
 	default: GLS_Assert(0);		//not implement
 	}
 

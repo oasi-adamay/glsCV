@@ -1,4 +1,4 @@
-/*
+ï»¿/*
 Copyright (c) 2016, oasi-adamay
 All rights reserved.
 
@@ -43,12 +43,10 @@ namespace gls
 #define GLS_FFT_INVERSE   (1<<2)
 #define GLS_FFT_SHIFT	   (1<<3)	
 
-void ShaderFftInit(void);
-void ShaderFftTerminate(void);
 
 /*!
-•‚“®¬”“_Œ^‚Ìs—ñ‚É‘Î‚µ‚ÄC2ŽŸŒ³‚Ìƒt[ƒŠƒG‡•ÏŠ·‚Ü‚½‚Í‹t•ÏŠ·‚ðs‚¢‚Ü‚·D
-ƒCƒ“ƒ^ƒŠ[ƒuƒtƒH[ƒ}ƒbƒg‚Ì•¡‘fs—ñi CV32FC2j‚ðˆµ‚¤‚±‚Æ‚ª‚Å‚«‚Ü‚·D
+æµ®å‹•å°æ•°ç‚¹åž‹ã®è¡Œåˆ—ã«å¯¾ã—ã¦ï¼Œ2æ¬¡å…ƒã®ãƒ•ãƒ¼ãƒªã‚¨é †å¤‰æ›ã¾ãŸã¯é€†å¤‰æ›ã‚’è¡Œã„ã¾ã™ï¼Ž
+ã‚¤ãƒ³ã‚¿ãƒªãƒ¼ãƒ–ãƒ•ã‚©ãƒ¼ãƒžãƒƒãƒˆã®è¤‡ç´ è¡Œåˆ—ï¼ˆ CV32FC2ï¼‰ã‚’æ‰±ã†ã“ã¨ãŒã§ãã¾ã™ï¼Ž
 
 */
 void fft(const GlsMat& src, GlsMat& dst, int flag = 0);

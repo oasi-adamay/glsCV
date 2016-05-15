@@ -53,7 +53,7 @@ namespace UnitTest_glsCV
 	TEST_MODULE_INITIALIZE(test_module_initialize) {
 		cout << __FUNCTION__ << endl;
 		glsCvInit();
-
+		gls::ShaderInitAll();
 	}
 	TEST_MODULE_CLEANUP(test_module_cleanup)  {
 		cout << __FUNCTION__ << endl;

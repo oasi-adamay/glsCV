@@ -76,22 +76,9 @@ public:
 
 //-----------------------------------------------------------------------------
 //global 
-glsShaderMerge* shaderMerge = 0;
-glsShaderMergeU* shaderMergeU = 0;
-glsShaderMergeS* shaderMergeS = 0;
-
-void ShaderMergeInit(void){
-	shaderMerge = new glsShaderMerge();
-	shaderMergeU = new glsShaderMergeU();
-	shaderMergeS = new glsShaderMergeS();
-}
-
-void ShaderMergeTerminate(void){
-	delete shaderMerge;
-	delete shaderMergeU;
-	delete shaderMergeS;
-}
-
+glsShaderMerge ShaderMerge;
+glsShaderMergeU ShaderMergeU;
+glsShaderMergeS ShaderMergeS;
 
 
 //-----------------------------------------------------------------------------
@@ -223,12 +210,12 @@ static
 glsShaderBase* selectShader(int type){
 	glsShaderBase* shader = 0;
 	switch (CV_MAT_DEPTH(type)){
-	case(CV_32F) : shader = shaderMerge; break;
+	case(CV_32F) : shader = &ShaderMerge; break;
 	case(CV_8U) :
-	case(CV_16U) : shader = shaderMergeU; break;
+	case(CV_16U) : shader = &ShaderMergeU; break;
 	case(CV_8S) :
 	case(CV_16S) :
-	case(CV_32S) : shader = shaderMergeS; break;
+	case(CV_32S) : shader = &ShaderMergeS; break;
 	default: GLS_Assert(0);		//not implement
 	}
 	return shader;
