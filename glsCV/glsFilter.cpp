@@ -326,13 +326,7 @@ void sepFilter2D(const GlsMat& src, GlsMat& dst, int ddepth, const Mat& kernelX,
 	else _kernelY = (GlsMat)kernelY.reshape(0, kernelY.cols);
 
 
-	GlsMat _dst;
-	if (&src == &dst || src.size() != dst.size() || src.type() != dst.type()){
-		_dst = GlsMat(src.size(), src.type());
-	}
-	else{
-		_dst = dst;
-	}
+	GlsMat _dst = getDstMat(src,dst);
 
 	GlsMat _tmp = GlsMat(src.size(), src.type());
 
@@ -359,13 +353,7 @@ void filter2D(const GlsMat& src, GlsMat& dst, int ddepth, const Mat& kernel){
 
 	GlsMat _kernel = (GlsMat)kernel;
 
-	GlsMat _dst;
-	if (&src == &dst || src.size() != dst.size() || src.type() != dst.type()){
-		_dst = GlsMat(src.size(), src.type());
-	}
-	else{
-		_dst = dst;
-	}
+	GlsMat _dst = getDstMat(src, dst);
 
 	glsShaderBase* shader = selectShader2D(src.type());
 

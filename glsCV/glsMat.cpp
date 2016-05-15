@@ -390,7 +390,7 @@ GlsMat::operator Mat() const{
 
 
 GLenum convCVtype2GLsizedFormat(int ocvtype){
-	GLenum format;
+	GLenum format = 0;
 	switch (ocvtype){
 	case(CV_32FC1) : format = GL_R32F; break;
 	case(CV_32FC2) : format = GL_RG32F; break;
@@ -429,7 +429,7 @@ GLenum convCVtype2GLsizedFormat(int ocvtype){
 
 
 int convFmtGL2CV(GLenum  format){
-	int ocvtype;
+	int ocvtype = 0;
 	switch (format){
 	case(GL_R16F) : ocvtype = CV_32FC1; break;
 	case(GL_R32F) : ocvtype = CV_32FC1; break;
@@ -476,7 +476,7 @@ int convFmtGL2CV(GLenum  format){
 
 
 GLenum convCVtype2GLformat(int ocvtype){
-	GLenum format;
+	GLenum format = 0;
 	int ch = CV_MAT_CN(ocvtype);
 	int depth = CV_MAT_DEPTH(ocvtype);
 	bool isFloat = depth == (CV_32F);
@@ -503,7 +503,7 @@ GLenum convCVtype2GLformat(int ocvtype){
 
 
 GLenum convCVtype2GLtype(int ocvtype){
-	GLenum type;
+	GLenum type = 0;
 	int depth = CV_MAT_DEPTH(ocvtype);
 	switch (depth){
 	case(CV_8U) : type = GL_UNSIGNED_BYTE; break;

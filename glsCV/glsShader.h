@@ -72,7 +72,8 @@ protected:
 	virtual string FragmentShaderCode(void){ return string(""); }
 
 public:
-	glsShaderBase(const string& _name) : name(_name){ ShaderList.push_back(this); }
+//	glsShaderBase(const string& _name) : name(_name){ ShaderList.push_back(this); }
+	glsShaderBase(const string& _name) : name(_name){ ; }
 
 	~glsShaderBase(void){ if (_program.use_count() == 1) glDeleteProgram(*_program); }
 

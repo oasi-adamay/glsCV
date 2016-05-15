@@ -227,7 +227,8 @@ void merge(const vector<GlsMat>& plnSrc, GlsMat& dst){
 	GLS_Assert(1 <= cn);
 	GLS_Assert(cn <= 4);
 
-	GlsMat _dst = GlsMat(plnSrc[0].size(), CV_MAKE_TYPE(plnSrc[0].depth(), cn));
+//	GlsMat _dst = GlsMat(plnSrc[0].size(), CV_MAKE_TYPE(plnSrc[0].depth(), cn));
+	GlsMat _dst = getDstMat(plnSrc[0].size(), CV_MAKE_TYPE(plnSrc[0].depth(), cn),dst);
 
 	glsShaderBase* shader = selectShader(plnSrc[0].type());
 
