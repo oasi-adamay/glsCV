@@ -24,6 +24,8 @@ BSD-3clause license
  - sepFilter2D
  - boxFilter
  - gaussianFilter
+ - sobel
+ - adaptiveThreshold / threshold
 
 ## 開発環境
  * Windows8
