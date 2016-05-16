@@ -38,17 +38,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace gls
 {
 
-class glsShaderBase;
-/*!
-Shader List
-*/
-extern list<glsShaderBase*> ShaderList;
-/*!
-Initialize all shader 
-*/
-void ShaderInitAll(void);
-
-
 
 /*!
 glsShader Base Class
@@ -70,6 +59,9 @@ protected:
 
 	virtual string VertexShaderCode(void);
 	virtual string FragmentShaderCode(void){ return string(""); }
+
+	//gloabl list
+//	static list<glsShaderBase*> ShaderList;
 
 public:
 //	glsShaderBase(const string& _name) : name(_name){ ShaderList.push_back(this); }
@@ -123,7 +115,17 @@ public:
 	*/
 	void Init(void);
 
+	void InitAll(void);
+
+
 };
+
+
+
+/*!
+Initialize all shader
+*/
+void ShaderInitAll(void);
 
 
 }//namespace gls
