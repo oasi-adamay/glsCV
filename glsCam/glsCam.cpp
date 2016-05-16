@@ -51,6 +51,7 @@ enum E_CAM_MODE {
 	GAUSS,
 	SOBEL_H,
 	SOBEL_V,
+	THRESH,
 	FFT,
 	FFT_RECT,
 };
@@ -62,6 +63,7 @@ void controls(GLFWwindow* window, int& mode ,int& ocvwin){
 	if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS) mode = E_CAM_MODE::GAUSS;
 	if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS) mode = E_CAM_MODE::SOBEL_H;
 	if (glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS) mode = E_CAM_MODE::SOBEL_V;
+	if (glfwGetKey(window, GLFW_KEY_6) == GLFW_PRESS) mode = E_CAM_MODE::THRESH;
 	if (glfwGetKey(window, GLFW_KEY_9) == GLFW_PRESS) mode = E_CAM_MODE::FFT;
 	if (glfwGetKey(window, GLFW_KEY_0) == GLFW_PRESS) mode = E_CAM_MODE::FFT_RECT;
 }
@@ -148,6 +150,12 @@ int _tmain(int argc, _TCHAR* argv[])
 			gls::logMagSpectrums(glsComplx, glsFrame, 1.0);
 			gls::normalize(glsFrame, glsFrame, 0, 1, NORM_MINMAX);
 #endif
+		}break;
+		case(E_CAM_MODE::THRESH) : {
+			glsFrame = (GlsMat)frame;
+			gls::convert(glsFrame, glsFrame, 1.0f / 256.0f);
+			gls::cvtColor(glsFrame, glsFrame, CV_BGR2GRAY);
+			gls::threshold(glsFrame, glsFrame, 0.5, 1.0, THRESH_BINARY);
 		}break;
 		case(E_CAM_MODE::FFT_RECT) : {
 			Mat roi = Mat(frame, rectFft);
