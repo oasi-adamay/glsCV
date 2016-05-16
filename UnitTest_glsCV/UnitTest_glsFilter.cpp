@@ -44,7 +44,7 @@ namespace UnitTest_glsCV
 {
 
 	template <typename T>
-	int test_glsSepFilter2D(int cvtype, Size ksize = Size(5, 5), int ulps = 0, Size size = Size(32, 24) ){
+	int test_glsSepFilter2D(int cvtype, int ulps = 0, Size ksize = Size(5, 5), Size size = Size(32, 24)){
 
 		cout << "Size:" << size << endl;
 		cout << "ksize:" << ksize << endl;
@@ -125,7 +125,7 @@ namespace UnitTest_glsCV
 
 
 	template <typename T>
-	int test_glsGaussianBlur(int cvtype, Size ksize = Size(5, 5), int ulps = 0, Size size = Size(32, 24)){
+	int test_glsGaussianBlur(int cvtype, int ulps = 0,Size ksize = Size(5, 5), Size size = Size(32, 24)){
 
 		cout << "Size:" << size << endl;
 		cout << "ksize:" << ksize << endl;
@@ -176,6 +176,21 @@ namespace UnitTest_glsCV
 			Assert::AreEqual(0, errNum);
 		}
 
+		TEST_METHOD(glsGaussianBlur_CV_8UC1)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_glsGaussianBlur<uchar>(CV_8UC1,1);
+			Assert::AreEqual(0, errNum);
+		}
+
+		TEST_METHOD(glsGaussianBlur_CV_16UC1)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_glsGaussianBlur<ushort>(CV_16UC1, 1);
+			Assert::AreEqual(0, errNum);
+		}
+
+
 		//! benchmark
 		BEGIN_TEST_METHOD_ATTRIBUTE(glsGaussianBlur_CV_32FC1_5x5_1024x1024)
 			//TEST_OWNER(L"OwnerName")
@@ -186,7 +201,7 @@ namespace UnitTest_glsCV
 		TEST_METHOD(glsGaussianBlur_CV_32FC1_5x5_1024x1024)
 		{
 			cout << __FUNCTION__ << endl;
-			int errNum = test_glsGaussianBlur<float>(CV_32FC1, Size(5, 5), 0, Size(1024, 1024));
+			int errNum = test_glsGaussianBlur<float>(CV_32FC1, 0, Size(5, 5),  Size(1024, 1024));
 			Assert::AreEqual(0, errNum);
 		}
 
@@ -195,7 +210,7 @@ namespace UnitTest_glsCV
 
 
 	template <typename T>
-	int test_glsBoxFilter(int cvtype, Size ksize = Size(5, 5), int ulps = 0, Size size = Size(32, 24)){
+	int test_glsBoxFilter(int cvtype, int ulps = 0, Size ksize = Size(5, 5), Size size = Size(32, 24)){
 
 		cout << "Size:" << size << endl;
 		cout << "ksize:" << ksize << endl;
@@ -245,6 +260,20 @@ namespace UnitTest_glsCV
 			int errNum = test_glsBoxFilter<float>(CV_32FC1);
 			Assert::AreEqual(0, errNum);
 		}
+		TEST_METHOD(glsBoxFilter_CV_8UC1)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_glsBoxFilter<uchar>(CV_8UC1,1);
+			Assert::AreEqual(0, errNum);
+		}
+		TEST_METHOD(glsBoxFilter_CV_16UC1)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_glsBoxFilter<ushort>(CV_16UC1,1);
+			Assert::AreEqual(0, errNum);
+		}
+
+
 
 		//! benchmark
 		BEGIN_TEST_METHOD_ATTRIBUTE(glsBoxFilter_CV_32FC1_5x5_1024x1024)
@@ -256,7 +285,7 @@ namespace UnitTest_glsCV
 			TEST_METHOD(glsBoxFilter_CV_32FC1_5x5_1024x1024)
 		{
 			cout << __FUNCTION__ << endl;
-			int errNum = test_glsBoxFilter<float>(CV_32FC1, Size(5, 5), 0, Size(1024, 1024));
+			int errNum = test_glsBoxFilter<float>(CV_32FC1, 0, Size(5, 5), Size(1024, 1024));
 			Assert::AreEqual(0, errNum);
 		}
 
@@ -269,7 +298,7 @@ namespace UnitTest_glsCV
 			TEST_METHOD(glsBoxFilter_CV_32FC1_33x33_1024x1024)
 		{
 			cout << __FUNCTION__ << endl;
-			int errNum = test_glsBoxFilter<float>(CV_32FC1, Size(33, 33), 0, Size(1024, 1024));
+			int errNum = test_glsBoxFilter<float>(CV_32FC1, 0, Size(33, 33), Size(1024, 1024));
 			Assert::AreEqual(0, errNum);
 		}
 

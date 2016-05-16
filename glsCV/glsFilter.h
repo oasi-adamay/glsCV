@@ -43,7 +43,7 @@ namespace gls
 /*!
 分離型2次元線形フィルタを，画像に適用します．
 
-@param src 入力画像．CV_32FC1,CV_32FC2,CV_32FC3,CV_32FC4型の画像がサポートされます．
+@param src 入力画像．CV_8U,CV_16U,CV_32F型 1-4chの画像がサポートされます．
 @param dst 出力画像． src と同じサイズ，同じチャンネル数になります．
 @param ddepth 出力画像のビット深度(無視されます)
 @param kernelX　row方向フィルタ係数(1ch)　奇数TAPのみサポートします。
@@ -64,7 +64,7 @@ void filter2D(const GlsMat& src, GlsMat& dst, int ddepth, const Mat& kernel);
 /*!
 Gaussian フィルタを用いて，画像を平滑化します．
 
-@param src 入力画像．CV_32FC1,CV_32FC2,CV_32FC3,CV_32FC4型の画像がサポートされます．
+@param src 入力画像．CV_8U,CV_16U,CV_32F型 1-4chの画像がサポートされます．
 @param dst 出力画像． src と同じサイズ，同じチャンネル数になります．
 @param ksize Gaussian カーネルサイズ． ksize.width と ksize.height を別々に指定できますが，共に正の奇数でなければいけません．または，0を指定することも可能で，その場合， sigmaX と sigmaY から計算されます．
 @param sigmaX (sigmaY) – X および Y 方向の，Gaussian カーネルの標準偏差． sigmaY が0の場合， sigmaX と同じ値にセットされます．どちらも0だった場合は， ksize.width と ksize.height から，それぞれ計算されます．
@@ -74,7 +74,7 @@ void GaussianBlur(const GlsMat& src, GlsMat& dst, Size ksize, double sigmaX, dou
 /*!
 ボックスフィルタを用いて画像を平滑化します．
 
-@param src 入力画像．CV_32FC1,CV_32FC2,CV_32FC3,CV_32FC4型の画像がサポートされます．
+@param src 入力画像．CV_8U,CV_16U,CV_32F型 1-4chの画像がサポートされます．
 @param dst 出力画像． src と同じサイズ，同じチャンネル数になります．
 @param ddepth 出力画像のビット深度(無視されます)
 @param ksize 平滑化カーネルのサイズ．
