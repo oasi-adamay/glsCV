@@ -182,6 +182,8 @@
     <ClCompile Include="UnitTest_glsMerge.cpp" />
     <ClCompile Include="UnitTest_glsNormalize.cpp" />
     <ClCompile Include="UnitTest_glsReduce.cpp" />
+    <ClCompile Include="UnitTest_glsSplit.cpp" />
+    <ClCompile Include="UnitTest_glsThreshold.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

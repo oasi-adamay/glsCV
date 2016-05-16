@@ -106,6 +106,42 @@ public:
 
 };
 
+/*!
+出力GlsMatの取得
+
+in-placeの時、dstのサイズ、タイプがsrcのサイズ、タイプと異なるときに、新しいGlsMatを生成(新しいtextureの生成)
+それ以外はdstのテクスチャを利用する。
+*/
+static GlsMat getDstMat(const GlsMat& src, GlsMat& dst){
+	GlsMat _dst;
+	if (&src == &dst || dst.size() != src.size() || dst.type() != src.type()){
+		_dst = GlsMat(src.size(), src.type());
+	}
+	else{
+		_dst = dst;
+	}
+	return _dst;
+}
+
+/*!
+出力GlsMatの取得
+
+dstのサイズ、タイプが要求のサイズ、タイプと異なるときに、新しいGlsMatを生成(新しいtextureの生成)
+それ以外はdstのテクスチャを利用する。
+*/
+static GlsMat getDstMat(const Size size, const int type, GlsMat& dst){
+	GlsMat _dst;
+	if (dst.size() != size || dst.type() != type){
+		_dst = GlsMat(size, type);
+	}
+	else{
+		_dst = dst;
+	}
+	return _dst;
+}
+
+
+
 }//namespace gls
 
 using gls::GlsMat;

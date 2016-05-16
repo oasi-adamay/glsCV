@@ -230,10 +230,10 @@ void reduce(const GlsMat& src, GlsMat& dst, int dim, int reduceOp){
 
 	GlsMat _dst;
 	if (dim == 0){
-		_dst = GlsMat(Size(_src.cols, 1), _src.type());
+		_dst = getDstMat(Size(_src.cols, 1), _src.type(),dst);
 	}
 	else{
-		_dst = GlsMat(Size(1, _src.rows), _src.type());
+		_dst = getDstMat(Size(1, _src.rows), _src.type(),dst);
 	}
 
 

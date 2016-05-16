@@ -38,8 +38,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace gls
 {
 
-//gloabl list
-list<glsShaderBase*> ShaderList;		 
 
 void glsShaderBase::LoadShadersCode(const std::string& VertexShaderCode, const std::string& FragmentShaderCode, const std::string& shaderbin_file_path){
 	
@@ -263,6 +261,7 @@ string glsShaderBase::VertexShaderCode(void){
 }
 
 void glsShaderBase::Init(void){
+	if (name == "") return;
 	if (_program.use_count() == 0){
 		const string bin_filename = shaderBinName(name);
 		if (!LoadShadersBinary(bin_filename))
@@ -271,6 +270,13 @@ void glsShaderBase::Init(void){
 		}
 	}
 }
+
+void glsShaderBase::InitAll(void){
+	//for (auto itr = ShaderList.begin(); itr != ShaderList.end(); ++itr) {
+	//	(*itr)->Init();
+	//}
+}
+
 
 //program
 GLuint glsShaderBase::program(void) const{
@@ -283,11 +289,13 @@ GLuint glsShaderBase::program(void) const{
 
 }
 
+
+//list<glsShaderBase*> glsShaderBase::ShaderList;
+//glsShaderBase ShaderBase("");
+
 void ShaderInitAll(void)
 {
-	for (auto itr = ShaderList.begin(); itr != ShaderList.end(); ++itr) {
-		(*itr)->Init();
-	}
+//	ShaderBase.InitAll();
 }
 
 

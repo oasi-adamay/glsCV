@@ -247,13 +247,7 @@ void copy(const GlsMat& src, GlsMat& dst){
 	dst = _dst;
 #else
 
-	GlsMat _dst;
-	if (src.size() == dst.size() && src.type() == dst.type()){
-		_dst = dst;
-	}
-	else{
-		_dst = GlsMat(src.size(), src.type());
-	}
+	GlsMat _dst = getDstMat(src,dst);
 
 	enum {
 		DRAW,
@@ -301,13 +295,7 @@ void copyRect(const GlsMat& src, GlsMat& dst, const Rect& rect){
 
 	dst = _dst;
 #else
-	GlsMat _dst;
-	if (src.size() == rect.size() && src.type() == dst.type()){
-		_dst = dst;
-	}
-	else{
-		_dst = GlsMat(rect.size(), src.type());
-	}
+	GlsMat _dst = getDstMat(rect.size(),src.type(),dst);
 
 	enum {
 		DRAW,
@@ -409,7 +397,9 @@ void untiled(const vector<vector<GlsMat>>& src, GlsMat& dst){
 	Size sizeDst = Size(sizeSrc.width * blkNum.width, sizeSrc.height * blkNum.height);
 
 
-	dst = GlsMat(sizeDst, src[0][0].type());
+//	dst = GlsMat(sizeDst, src[0][0].type());
+	dst = getDstMat(sizeDst, src[0][0].type(),dst);
+
 
 #ifdef  _GLS_COPY_USE_SHADER
 	glsShaderBase* shader = selectShader(src[0][0].type());

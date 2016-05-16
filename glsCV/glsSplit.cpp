@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "stdafx.h"
 
 
-#include "glsMerge.h"
+#include "glsSplit.h"
 
 
 namespace gls
@@ -40,64 +40,64 @@ namespace gls
 
 
 //-----------------------------------------------------------------------------
-// glsShaderMerge
-class glsShaderMerge : public glsShaderBase
+// glsShaderSplit
+class glsShaderSplit : public glsShaderBase
 {
 protected:
 	string FragmentShaderCode(void);
 
 public:
-	glsShaderMerge(void) :glsShaderBase(__FUNCTION__){}
+	glsShaderSplit(void) :glsShaderBase(__FUNCTION__){}
 
 };
 
 //-----------------------------------------------------------------------------
-// glsShaderMergeU unsigned
-class glsShaderMergeU : public glsShaderBase
+// glsShaderSplitU unsigned
+class glsShaderSplitU : public glsShaderBase
 {
 protected:
 	string FragmentShaderCode(void);
 
 public:
-	glsShaderMergeU(void) :glsShaderBase(__FUNCTION__){}
+	glsShaderSplitU(void) :glsShaderBase(__FUNCTION__){}
 };
 
 //-----------------------------------------------------------------------------
-// glsShaderMergeS unsigned
-class glsShaderMergeS : public glsShaderBase
+// glsShaderSplitS unsigned
+class glsShaderSplitS : public glsShaderBase
 {
 protected:
 	string FragmentShaderCode(void);
 
 public:
-	glsShaderMergeS(void) :glsShaderBase(__FUNCTION__){}
+	glsShaderSplitS(void) :glsShaderBase(__FUNCTION__){}
 };
 
 
 //-----------------------------------------------------------------------------
 //global 
-glsShaderMerge ShaderMerge;
-glsShaderMergeU ShaderMergeU;
-glsShaderMergeS ShaderMergeS;
+glsShaderSplit ShaderSplit;
+glsShaderSplitU ShaderSplitU;
+glsShaderSplitS ShaderSplitS;
 
 
 //-----------------------------------------------------------------------------
-//glsShaderMerge
-string glsShaderMerge::FragmentShaderCode(void){
+//glsShaderSplit
+string glsShaderSplit::FragmentShaderCode(void){
 	const char fragmentShaderCode[] = 
 "#version 330 core\n"
 "precision highp float;\n"
-"uniform sampler2D	texSrc0;\n"
-"uniform sampler2D	texSrc1;\n"
-"uniform sampler2D	texSrc2;\n"
-"uniform sampler2D	texSrc3;\n"
-"layout (location = 0) out vec4 dst;\n"
+"uniform sampler2D	texSrc;\n"
+"layout (location = 0) out float dst0;\n"
+"layout (location = 1) out float dst1;\n"
+"layout (location = 2) out float dst2;\n"
+"layout (location = 3) out float dst3;\n"
 "void main(void)\n"
 "{\n"
-"	dst.r = texelFetch(texSrc0, ivec2(gl_FragCoord.xy),0).r;\n"
-"	dst.g = texelFetch(texSrc1, ivec2(gl_FragCoord.xy),0).r;\n"
-"	dst.b = texelFetch(texSrc2, ivec2(gl_FragCoord.xy),0).r;\n"
-"	dst.a = texelFetch(texSrc3, ivec2(gl_FragCoord.xy),0).r;\n"
+"	dst0 = texelFetch(texSrc, ivec2(gl_FragCoord.xy),0).r;\n"
+"	dst1 = texelFetch(texSrc, ivec2(gl_FragCoord.xy),0).g;\n"
+"	dst2 = texelFetch(texSrc, ivec2(gl_FragCoord.xy),0).b;\n"
+"	dst3 = texelFetch(texSrc, ivec2(gl_FragCoord.xy),0).a;\n"
 "\n"
 "}\n"
 ;
@@ -107,22 +107,22 @@ string glsShaderMerge::FragmentShaderCode(void){
 
 
 //-----------------------------------------------------------------------------
-//glsShaderMergeU
-string glsShaderMergeU::FragmentShaderCode(void){
+//glsShaderSplitU
+string glsShaderSplitU::FragmentShaderCode(void){
 	const char fragmentShaderCode[] =
 "#version 330 core\n"
 "precision highp float;\n"
-"uniform usampler2D	texSrc0;\n"
-"uniform usampler2D	texSrc1;\n"
-"uniform usampler2D	texSrc2;\n"
-"uniform usampler2D	texSrc3;\n"
-"layout (location = 0) out uvec4 dst;\n"
+"uniform usampler2D	texSrc;\n"
+"layout (location = 0) out uint dst0;\n"
+"layout (location = 1) out uint dst1;\n"
+"layout (location = 2) out uint dst2;\n"
+"layout (location = 3) out uint dst3;\n"
 "void main(void)\n"
 "{\n"
-"	dst.r = texelFetch(texSrc0, ivec2(gl_FragCoord.xy),0).r;\n"
-"	dst.g = texelFetch(texSrc1, ivec2(gl_FragCoord.xy),0).r;\n"
-"	dst.b = texelFetch(texSrc2, ivec2(gl_FragCoord.xy),0).r;\n"
-"	dst.a = texelFetch(texSrc3, ivec2(gl_FragCoord.xy),0).r;\n"
+"	dst0 = texelFetch(texSrc, ivec2(gl_FragCoord.xy),0).r;\n"
+"	dst1 = texelFetch(texSrc, ivec2(gl_FragCoord.xy),0).g;\n"
+"	dst2 = texelFetch(texSrc, ivec2(gl_FragCoord.xy),0).b;\n"
+"	dst3 = texelFetch(texSrc, ivec2(gl_FragCoord.xy),0).a;\n"
 "}\n"
 ;
 	return fragmentShaderCode;
@@ -130,22 +130,22 @@ string glsShaderMergeU::FragmentShaderCode(void){
 
 
 //-----------------------------------------------------------------------------
-//glsShaderMergeS
-string glsShaderMergeS::FragmentShaderCode(void){
+//glsShaderSplitS
+string glsShaderSplitS::FragmentShaderCode(void){
 	const char fragmentShaderCode[] =
 "#version 330 core\n"
 "precision highp float;\n"
-"uniform isampler2D	texSrc0;\n"
-"uniform isampler2D	texSrc1;\n"
-"uniform isampler2D	texSrc2;\n"
-"uniform isampler2D	texSrc3;\n"
-"layout (location = 0) out ivec4 dst;\n"
+"uniform isampler2D	texSrc;\n"
+"layout (location = 0) out int dst0;\n"
+"layout (location = 1) out int dst1;\n"
+"layout (location = 2) out int dst2;\n"
+"layout (location = 3) out int dst3;\n"
 "void main(void)\n"
 "{\n"
-"	dst.r = texelFetch(texSrc0, ivec2(gl_FragCoord.xy),0).r;\n"
-"	dst.g = texelFetch(texSrc1, ivec2(gl_FragCoord.xy),0).r;\n"
-"	dst.b = texelFetch(texSrc2, ivec2(gl_FragCoord.xy),0).r;\n"
-"	dst.a = texelFetch(texSrc3, ivec2(gl_FragCoord.xy),0).r;\n"
+"	dst0 = texelFetch(texSrc, ivec2(gl_FragCoord.xy),0).r;\n"
+"	dst1 = texelFetch(texSrc, ivec2(gl_FragCoord.xy),0).g;\n"
+"	dst2 = texelFetch(texSrc, ivec2(gl_FragCoord.xy),0).b;\n"
+"	dst3 = texelFetch(texSrc, ivec2(gl_FragCoord.xy),0).a;\n"
 "}\n"
 ;
 	return fragmentShaderCode;
@@ -155,10 +155,10 @@ string glsShaderMergeS::FragmentShaderCode(void){
 
 //---------------------------------------------------------------------------
 //
-static void mergeProcess(
+static void splitProcess(
 	const glsShaderBase* shader,	//progmra ID
-	const vector<GLuint>& texSrc,	//src texture IDs
-	const Rect& rectDst 			// Merge dst rectangel
+	const GLuint texSrc,			//src texture IDs
+	const Rect& rectDst 			//dst rectangel
 	)
 {
 
@@ -174,12 +174,10 @@ static void mergeProcess(
 
 	//Bind Texture
 	{
-		for (int id = 0; id < texSrc.size(); id++){
-			glActiveTexture(GL_TEXTURE0 + id);
-			glBindTexture(GL_TEXTURE_2D, texSrc[id]);
-			string name = "texSrc" + to_string(id);
-			glUniform1i(glGetUniformLocation(shader->program(), name.c_str()), id);
-		}
+		int id = 0;
+		glActiveTexture(GL_TEXTURE0 + id);
+		glBindTexture(GL_TEXTURE_2D, texSrc);
+		glUniform1i(glGetUniformLocation(shader->program(), "texSrc"), id);
 	}
 
 	glsVAO vao(glGetAttribLocation(shader->program(), "position"));
@@ -204,45 +202,45 @@ static
 glsShaderBase* selectShader(int type){
 	glsShaderBase* shader = 0;
 	switch (CV_MAT_DEPTH(type)){
-	case(CV_32F) : shader = &ShaderMerge; break;
+	case(CV_32F) : shader = &ShaderSplit; break;
 	case(CV_8U) :
-	case(CV_16U) : shader = &ShaderMergeU; break;
+	case(CV_16U) : shader = &ShaderSplitU; break;
 	case(CV_8S) :
 	case(CV_16S) :
-	case(CV_32S) : shader = &ShaderMergeS; break;
+	case(CV_32S) : shader = &ShaderSplitS; break;
 	default: GLS_Assert(0);		//not implement
 	}
 	return shader;
 }
 
 //Merge texture
-void merge(const vector<GlsMat>& plnSrc, GlsMat& dst){
-	int cn = (int)plnSrc.size();
+void split(const GlsMat& src, vector<GlsMat>& dst){
+	int cn = (int)src.channels();
 	GLS_Assert(1 <= cn);
 	GLS_Assert(cn <= 4);
 
-	GlsMat _dst = getDstMat(plnSrc[0].size(), CV_MAKE_TYPE(plnSrc[0].depth(), cn),dst);
-
-	glsShaderBase* shader = selectShader(plnSrc[0].type());
-
-	Rect rectSrc(0, 0, plnSrc[0].cols, plnSrc[0].rows);
-	Rect rectDst = rectSrc;
-
-	glsFBO fbo(1);
-
-
-	//dst texture
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _dst.texid(), 0);
-	GLS_Assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
-
-	vector<GLuint> texSrc(cn);
-	for (int c = 0; c < cn; c++){
-		texSrc[c] = plnSrc[c].texid();
+	dst.resize(cn);
+	for (size_t c = 0; c < cn; c++){
+		dst[c] = GlsMat(src.size(), CV_MAKE_TYPE(src.depth(), 1));
 	}
 
-	mergeProcess(shader, texSrc, rectDst);
 
-	dst = _dst;
+
+	glsShaderBase* shader = selectShader(src.type());
+
+	Rect rectDst(0, 0, src.cols, src.rows);
+
+	glsFBO fbo(cn);
+
+	for (int c = 0; c < cn; c++){
+		//dst texture
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0+c, GL_TEXTURE_2D, dst[c].texid(), 0);
+		GLS_Assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
+	}
+
+
+	splitProcess(shader, src.texid(), rectDst);
+
 }
 
 

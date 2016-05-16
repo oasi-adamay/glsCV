@@ -27,7 +27,6 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-
 #include "stdafx.h"
 #include "CppUnitTest.h"
 
@@ -38,44 +37,49 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 #include "UnitTest_Common.h"
 
 
-
 namespace UnitTest_glsCV
 {
 
 	template <typename T>
-	int test_glsMerge(int cvtype, int cn){
-//		const int width = 32;
-//		const int height = 24;
-		const int width = 8;
-		const int height = 6;
+	int test_glsThreshold(int cvtype, int threshold){
+		Size size(32, 24);
+		cout << "Size:" << size << endl;
+		int ulps = 0;
 
-		vector<Mat> plnSrc(cn);
-		for (int c = 0; c < cn; c++){
-			plnSrc[c] = Mat(Size(width, height), cvtype);
-			//init Src image
-			FillRandU<T>(plnSrc[c]);
+		double thresh = 0;
+		double maxVal = 0;
+		if (CV_MAT_DEPTH(cvtype) == CV_32F){
+			thresh = 0.5;
+			maxVal = 0.75;
 		}
+		else if (CV_MAT_DEPTH(cvtype) == CV_8U){
+			thresh = 128;
+			maxVal = 192;
+		}
+		else if (CV_MAT_DEPTH(cvtype) == CV_16U){
+			thresh = 32768;
+			maxVal = 45000;
+		}
+
+
+		Mat imgSrc(size, cvtype);
+		FillRandU<T>(imgSrc);
 
 		Mat imgRef;
 		Mat imgDst;
 
-		cout << "Size:" << plnSrc[0].size() << endl;
 
-		cv::merge(plnSrc,imgRef);
+		cv::threshold(imgSrc, imgRef, thresh, maxVal, threshold);
 
-		//----------------------
-		vector<GlsMat> plnGlsSrc(cn);
-		for (int c = 0; c < cn; c++){
-			plnGlsSrc[c] = GlsMat(plnSrc[c]);
-		}
-
+		GlsMat glsSrc(imgSrc);
 		GlsMat glsDst;
-		gls::merge(plnGlsSrc, glsDst);	//copy texture
+
+		gls::threshold(glsSrc, glsDst, thresh, maxVal, threshold);
 
 		glsDst.download(imgDst);		// download
 
 		int errNum = 0;
-		if (!AreEqual<T>(imgRef, imgDst)) errNum = -1;
+		if (!AreEqual<T>(imgRef, imgDst, ulps)) errNum = -1;
 
 		//cout << imgRef << endl;
 		//cout << imgDst << endl;
@@ -87,37 +91,55 @@ namespace UnitTest_glsCV
 
 
 
-
-	TEST_CLASS(UnitTest_glsMerge)
+	TEST_CLASS(UnitTest_glsThreshold)
 	{
 	public:
-		//glsMerge
-		TEST_METHOD(glsMerge_CV_8UC1_2)
+		//glsThreshold
+		TEST_METHOD(glsThreshold_CV_32FC1_THRESH_BINARY)
 		{
 			cout << __FUNCTION__ << endl;
-			int errNum = test_glsMerge<uchar>(CV_8UC1, 2);
+			int errNum = test_glsThreshold<float>(CV_32FC1, THRESH_BINARY);
 			Assert::AreEqual(0, errNum);
 		}
-		TEST_METHOD(glsMerge_CV_8UC1_3)
+		TEST_METHOD(glsThreshold_CV_32FC1_THRESH_BINARY_INV)
 		{
 			cout << __FUNCTION__ << endl;
-			int errNum = test_glsMerge<uchar>(CV_8UC1, 3);
+			int errNum = test_glsThreshold<float>(CV_32FC1, THRESH_BINARY_INV);
 			Assert::AreEqual(0, errNum);
 		}
-		TEST_METHOD(glsMerge_CV_8UC1_4)
+		TEST_METHOD(glsThreshold_CV_32FC1_THRESH_TRUNC)
 		{
 			cout << __FUNCTION__ << endl;
-			int errNum = test_glsMerge<uchar>(CV_8UC1, 4);
+			int errNum = test_glsThreshold<float>(CV_32FC1, THRESH_TRUNC);
 			Assert::AreEqual(0, errNum);
 		}
-		TEST_METHOD(glsMerge_CV_32FC1_2)
+		TEST_METHOD(glsThreshold_CV_32FC1_THRESH_TOZERO)
 		{
 			cout << __FUNCTION__ << endl;
-			int errNum = test_glsMerge<float>(CV_32FC1,2);
+			int errNum = test_glsThreshold<float>(CV_32FC1, THRESH_TOZERO);
 			Assert::AreEqual(0, errNum);
 		}
+		TEST_METHOD(glsThreshold_CV_32FC1_THRESH_TOZERO_INV)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_glsThreshold<float>(CV_32FC1, THRESH_TOZERO_INV);
+			Assert::AreEqual(0, errNum);
+		}
+
+		TEST_METHOD(glsThreshold_CV_8UC1_THRESH_BINARY)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_glsThreshold<uchar>(CV_8UC1, THRESH_BINARY);
+			Assert::AreEqual(0, errNum);
+		}
+
+		//TEST_METHOD(glsThreshold_CV_16UC1_THRESH_BINARY)
+		//{
+		//	cout << __FUNCTION__ << endl;
+		//	int errNum = test_glsThreshold<ushort>(CV_16UC1, THRESH_BINARY);
+		//	Assert::AreEqual(0, errNum);
+		//}
+
 
 	};
-
-
 }

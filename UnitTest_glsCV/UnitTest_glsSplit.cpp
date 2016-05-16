@@ -43,39 +43,28 @@ namespace UnitTest_glsCV
 {
 
 	template <typename T>
-	int test_glsMerge(int cvtype, int cn){
-//		const int width = 32;
-//		const int height = 24;
-		const int width = 8;
-		const int height = 6;
+	int test_glsSplit(int cvtype){
+		Size size(8, 6);
+		cout << "Size:" << size << endl;
 
-		vector<Mat> plnSrc(cn);
-		for (int c = 0; c < cn; c++){
-			plnSrc[c] = Mat(Size(width, height), cvtype);
-			//init Src image
-			FillRandU<T>(plnSrc[c]);
-		}
+		Mat imgSrc = Mat(size, cvtype);
+		FillRandU<T>(imgSrc);
 
-		Mat imgRef;
-		Mat imgDst;
-
-		cout << "Size:" << plnSrc[0].size() << endl;
-
-		cv::merge(plnSrc,imgRef);
+		vector<Mat> plnRef;
+		cv::split(imgSrc, plnRef);
 
 		//----------------------
-		vector<GlsMat> plnGlsSrc(cn);
-		for (int c = 0; c < cn; c++){
-			plnGlsSrc[c] = GlsMat(plnSrc[c]);
-		}
-
-		GlsMat glsDst;
-		gls::merge(plnGlsSrc, glsDst);	//copy texture
-
-		glsDst.download(imgDst);		// download
+		GlsMat glsSrc = (GlsMat)imgSrc;
+		vector<GlsMat> plnDst;
+		gls::split(glsSrc, plnDst);
 
 		int errNum = 0;
-		if (!AreEqual<T>(imgRef, imgDst)) errNum = -1;
+		for (int i = 0; i < (int)plnRef.size();i++){
+			Mat imgRef = plnRef[i];
+			Mat imgDst = (Mat)plnDst[i];
+
+			if (!AreEqual<T>(imgRef, imgDst)) errNum++;
+		}
 
 		//cout << imgRef << endl;
 		//cout << imgDst << endl;
@@ -88,32 +77,32 @@ namespace UnitTest_glsCV
 
 
 
-	TEST_CLASS(UnitTest_glsMerge)
+	TEST_CLASS(UnitTest_glsSplit)
 	{
 	public:
-		//glsMerge
-		TEST_METHOD(glsMerge_CV_8UC1_2)
+		//glsSplit
+		TEST_METHOD(glsSplit_CV_8UC2)
 		{
 			cout << __FUNCTION__ << endl;
-			int errNum = test_glsMerge<uchar>(CV_8UC1, 2);
+			int errNum = test_glsSplit<uchar>(CV_8UC2);
 			Assert::AreEqual(0, errNum);
 		}
-		TEST_METHOD(glsMerge_CV_8UC1_3)
+		TEST_METHOD(glsSplit_CV_8UC3)
 		{
 			cout << __FUNCTION__ << endl;
-			int errNum = test_glsMerge<uchar>(CV_8UC1, 3);
+			int errNum = test_glsSplit<uchar>(CV_8UC3);
 			Assert::AreEqual(0, errNum);
 		}
-		TEST_METHOD(glsMerge_CV_8UC1_4)
+		TEST_METHOD(glsSplit_CV_8UC4)
 		{
 			cout << __FUNCTION__ << endl;
-			int errNum = test_glsMerge<uchar>(CV_8UC1, 4);
+			int errNum = test_glsSplit<uchar>(CV_8UC4);
 			Assert::AreEqual(0, errNum);
 		}
-		TEST_METHOD(glsMerge_CV_32FC1_2)
+		TEST_METHOD(glsSplit_CV_32FC4)
 		{
 			cout << __FUNCTION__ << endl;
-			int errNum = test_glsMerge<float>(CV_32FC1,2);
+			int errNum = test_glsSplit<float>(CV_32FC4);
 			Assert::AreEqual(0, errNum);
 		}
 
