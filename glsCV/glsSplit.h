@@ -1,4 +1,4 @@
-/*
+﻿/*
 Copyright (c) 2016, oasi-adamay
 All rights reserved.
 
@@ -28,43 +28,22 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#ifndef _GLS_SPLIT_H_
+#define _GLS_SPLIT_H_
 
-#ifndef _GLS_CV_H_
-#define _GLS_CV_H_
-
-
+#include "glsCV.h"
 #include "GlsMat.h"
 #include "glsShader.h"
-#include "glsCopy.h"
-#include "glsConvert.h"
-#include "glsDraw.h"
-#include "glsMerge.h"
-#include "glsSplit.h"
-#include "glsFft.h"
-#include "glsBasicOperation.h"
-#include "glsReduce.h"
-#include "glsMinMaxLoc.h"
-#include "glsNormalize.h"
-#include "glsFilter.h"
 
+namespace gls
+{
 
-const char* glsErrorString(GLenum err);
+/*!
+マルチチャンネル行列から、複数のシングルチャンネル行列を作成します．
 
-//macro 
-#define GLS_Assert(exp)	 CV_Assert(exp)  
-//#define GLS_Assert(exp)	 assert(exp)  
+最大4チャンネルまで対応
+*/
+void split(const GlsMat& src, vector<GlsMat>& dst);
 
-#ifdef _DEBUG
-#define GL_CHECK_ERROR()  { int err = glGetError(); if(err!= GL_NO_ERROR){cerr << "[ERR]" << glsErrorString(err) <<" at " <<__FILE__ <<":" << __LINE__ << endl;}; GLS_Assert(err == GL_NO_ERROR); }
-#else
-#define GL_CHECK_ERROR()  GLS_Assert(glGetError() == GL_NO_ERROR)
-#endif
-
-
-
-
-GLFWwindow* glsCvInit(const int _width = 0, const int _height = 0);
-void glsCvTerminate(void);
-
-
+}
 #endif
