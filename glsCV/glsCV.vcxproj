@@ -139,6 +139,7 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="glsAdaptiveThreshold.h" />
     <ClInclude Include="glsBasicOperation.h" />
     <ClInclude Include="glsConvert.h" />
     <ClInclude Include="glsCopy.h" />
@@ -161,6 +162,7 @@
     <ClInclude Include="Timer.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="glsAdaptiveThreshold.cpp" />
     <ClCompile Include="glsBasicOperation.cpp" />
     <ClCompile Include="glsConvert.cpp" />
     <ClCompile Include="glsCopy.cpp" />

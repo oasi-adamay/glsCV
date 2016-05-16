@@ -1,4 +1,4 @@
-/*
+﻿/*
 Copyright (c) 2016, oasi-adamay
 All rights reserved.
 
@@ -28,46 +28,32 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#ifndef _GLS_ADAPTIVE_THRESHOLD_H_
+#define _GLS_ADAPTIVE_THRESHOLD_H_
 
-#ifndef _GLS_CV_H_
-#define _GLS_CV_H_
-
-
+#include "glsCV.h"
 #include "GlsMat.h"
 #include "glsShader.h"
-#include "glsCopy.h"
-#include "glsConvert.h"
-#include "glsDraw.h"
-#include "glsMerge.h"
-#include "glsSplit.h"
-#include "glsFft.h"
-#include "glsBasicOperation.h"
-#include "glsReduce.h"
-#include "glsMinMaxLoc.h"
-#include "glsNormalize.h"
-#include "glsFilter.h"
-#include "glsThreshold.h"
-#include "glsAdaptiveThreshold.h"
 
+namespace gls
+{
 
+/*!
+配列の要素に対して，ある定数での閾値処理を行います．
 
-const char* glsErrorString(GLenum err);
-
-//macro 
-#define GLS_Assert(exp)	 CV_Assert(exp)  
-//#define GLS_Assert(exp)	 assert(exp)  
-
-#ifdef _DEBUG
-#define GL_CHECK_ERROR()  { int err = glGetError(); if(err!= GL_NO_ERROR){cerr << "[ERR]" << glsErrorString(err) <<" at " <<__FILE__ <<":" << __LINE__ << endl;}; GLS_Assert(err == GL_NO_ERROR); }
-#else
-#define GL_CHECK_ERROR()  GLS_Assert(glGetError() == GL_NO_ERROR)
-#endif
+@param src 入力配列（シングルチャンネル，8ビット，あるいは32ビット浮動小数点型）．
+@param dst src と同じサイズ，同じ型の出力配列．
+@param maxVal  閾値処理の種類が THRESH_BINARY や THRESH_BINARY_INV の場合に利用される，最大値の値．
+@param adaptiveMethod  利用される適応的閾値アルゴリズム： ADAPTIVE_THRESH_MEAN_C または ADAPTIVE_THRESH_GAUSSIAN_C
+@param thresholdType  THRESH_BINARY,THRESH_BINARY_INV
+@param blockSize – ピクセルの閾値を求めるために利用される近傍領域のサイズ．3, 5, 7, など．
+@param C – 平均または加重平均から引かれる定数
+*/
+void adaptiveThreshold(const GlsMat& src, GlsMat& dst, double maxVal, int adaptiveMethod, int thresholdType, int blockSize, double C);
 
 
 
 
-GLFWwindow* glsCvInit(const int _width = 0, const int _height = 0);
-void glsCvTerminate(void);
-
+}//namespace gls
 
 #endif
