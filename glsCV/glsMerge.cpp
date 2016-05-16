@@ -87,7 +87,6 @@ string glsShaderMerge::FragmentShaderCode(void){
 	const char fragmentShaderCode[] = 
 "#version 330 core\n"
 "precision highp float;\n"
-"uniform ivec2	offset;\n"
 "uniform sampler2D	texSrc0;\n"
 "uniform sampler2D	texSrc1;\n"
 "uniform sampler2D	texSrc2;\n"
@@ -95,10 +94,10 @@ string glsShaderMerge::FragmentShaderCode(void){
 "layout (location = 0) out vec4 dst;\n"
 "void main(void)\n"
 "{\n"
-"	dst.r = texelFetch(texSrc0, ivec2(gl_FragCoord.xy)+offset,0).r;\n"
-"	dst.g = texelFetch(texSrc1, ivec2(gl_FragCoord.xy)+offset,0).r;\n"
-"	dst.b = texelFetch(texSrc2, ivec2(gl_FragCoord.xy)+offset,0).r;\n"
-"	dst.a = texelFetch(texSrc3, ivec2(gl_FragCoord.xy)+offset,0).r;\n"
+"	dst.r = texelFetch(texSrc0, ivec2(gl_FragCoord.xy),0).r;\n"
+"	dst.g = texelFetch(texSrc1, ivec2(gl_FragCoord.xy),0).r;\n"
+"	dst.b = texelFetch(texSrc2, ivec2(gl_FragCoord.xy),0).r;\n"
+"	dst.a = texelFetch(texSrc3, ivec2(gl_FragCoord.xy),0).r;\n"
 "\n"
 "}\n"
 ;
@@ -113,7 +112,6 @@ string glsShaderMergeU::FragmentShaderCode(void){
 	const char fragmentShaderCode[] =
 "#version 330 core\n"
 "precision highp float;\n"
-"uniform ivec2	offset;\n"
 "uniform usampler2D	texSrc0;\n"
 "uniform usampler2D	texSrc1;\n"
 "uniform usampler2D	texSrc2;\n"
@@ -121,10 +119,10 @@ string glsShaderMergeU::FragmentShaderCode(void){
 "layout (location = 0) out uvec4 dst;\n"
 "void main(void)\n"
 "{\n"
-"	dst.r = texelFetch(texSrc0, ivec2(gl_FragCoord.xy)+offset,0).r;\n"
-"	dst.g = texelFetch(texSrc1, ivec2(gl_FragCoord.xy)+offset,0).r;\n"
-"	dst.b = texelFetch(texSrc2, ivec2(gl_FragCoord.xy)+offset,0).r;\n"
-"	dst.a = texelFetch(texSrc3, ivec2(gl_FragCoord.xy)+offset,0).r;\n"
+"	dst.r = texelFetch(texSrc0, ivec2(gl_FragCoord.xy),0).r;\n"
+"	dst.g = texelFetch(texSrc1, ivec2(gl_FragCoord.xy),0).r;\n"
+"	dst.b = texelFetch(texSrc2, ivec2(gl_FragCoord.xy),0).r;\n"
+"	dst.a = texelFetch(texSrc3, ivec2(gl_FragCoord.xy),0).r;\n"
 "}\n"
 ;
 	return fragmentShaderCode;
@@ -137,7 +135,6 @@ string glsShaderMergeS::FragmentShaderCode(void){
 	const char fragmentShaderCode[] =
 "#version 330 core\n"
 "precision highp float;\n"
-"uniform ivec2	offset;\n"
 "uniform isampler2D	texSrc0;\n"
 "uniform isampler2D	texSrc1;\n"
 "uniform isampler2D	texSrc2;\n"
@@ -145,10 +142,10 @@ string glsShaderMergeS::FragmentShaderCode(void){
 "layout (location = 0) out ivec4 dst;\n"
 "void main(void)\n"
 "{\n"
-"	dst.r = texelFetch(texSrc0, ivec2(gl_FragCoord.xy)+offset,0).r;\n"
-"	dst.g = texelFetch(texSrc1, ivec2(gl_FragCoord.xy)+offset,0).r;\n"
-"	dst.b = texelFetch(texSrc2, ivec2(gl_FragCoord.xy)+offset,0).r;\n"
-"	dst.a = texelFetch(texSrc3, ivec2(gl_FragCoord.xy)+offset,0).r;\n"
+"	dst.r = texelFetch(texSrc0, ivec2(gl_FragCoord.xy),0).r;\n"
+"	dst.g = texelFetch(texSrc1, ivec2(gl_FragCoord.xy),0).r;\n"
+"	dst.b = texelFetch(texSrc2, ivec2(gl_FragCoord.xy),0).r;\n"
+"	dst.a = texelFetch(texSrc3, ivec2(gl_FragCoord.xy),0).r;\n"
 "}\n"
 ;
 	return fragmentShaderCode;
@@ -161,11 +158,9 @@ string glsShaderMergeS::FragmentShaderCode(void){
 static void mergeProcess(
 	const glsShaderBase* shader,	//progmra ID
 	const vector<GLuint>& texSrc,	//src texture IDs
-	const Rect& rectSrc,			// Merge src rectangel
 	const Rect& rectDst 			// Merge dst rectangel
 	)
 {
-	const int offset[2] = { rectSrc.x, rectSrc.y };
 
 	//program
 	{
@@ -174,7 +169,6 @@ static void mergeProcess(
 
 	//uniform
 	{
-		glUniform2iv(glGetUniformLocation(shader->program(), "offset"), 1,&offset[0]);
 	}
 
 
@@ -227,7 +221,6 @@ void merge(const vector<GlsMat>& plnSrc, GlsMat& dst){
 	GLS_Assert(1 <= cn);
 	GLS_Assert(cn <= 4);
 
-//	GlsMat _dst = GlsMat(plnSrc[0].size(), CV_MAKE_TYPE(plnSrc[0].depth(), cn));
 	GlsMat _dst = getDstMat(plnSrc[0].size(), CV_MAKE_TYPE(plnSrc[0].depth(), cn),dst);
 
 	glsShaderBase* shader = selectShader(plnSrc[0].type());
@@ -247,7 +240,7 @@ void merge(const vector<GlsMat>& plnSrc, GlsMat& dst){
 		texSrc[c] = plnSrc[c].texid();
 	}
 
-	mergeProcess(shader, texSrc, rectSrc, rectDst);
+	mergeProcess(shader, texSrc, rectDst);
 
 	dst = _dst;
 }

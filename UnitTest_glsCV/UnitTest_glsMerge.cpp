@@ -43,14 +43,11 @@ namespace UnitTest_glsCV
 {
 
 	template <typename T>
-	int test_glsMerge(int cvtype, int cn,int flag = 0){
+	int test_glsMerge(int cvtype, int cn){
 //		const int width = 32;
 //		const int height = 24;
 		const int width = 8;
 		const int height = 6;
-		Size blkNum;
-		if (flag == 0)blkNum = Size(1, 1);
-		else blkNum = Size(2, 2);
 
 		vector<Mat> plnSrc(cn);
 		for (int c = 0; c < cn; c++){
@@ -117,12 +114,6 @@ namespace UnitTest_glsCV
 		{
 			cout << __FUNCTION__ << endl;
 			int errNum = test_glsMerge<float>(CV_32FC1,2);
-			Assert::AreEqual(0, errNum);
-		}
-		TEST_METHOD(glsMerge_CV_32FC1_2_TILED)
-		{
-			cout << __FUNCTION__ << endl;
-			int errNum = test_glsMerge<float>(CV_32FC1, 2 , 1);
 			Assert::AreEqual(0, errNum);
 		}
 
