@@ -51,13 +51,6 @@ namespace gls
 */
 void reduce(const GlsMat& src, GlsMat& dst, int dim, int reduceOp);
 
-#if 0
-/*!
-配列全体あるいは部分配列に対する，大域的最小値および最大値を求めます．
-現在、maxLoc,minLoc,maskは実装されていません。
-*/
-void minMaxLoc(const GlsMat& src, double* minVal, double* maxVal = 0, Point* minLoc = 0, Point* maxLoc = 0, const GlsMat& mask = GlsMat());
-#endif
 }//namespace gls
 
 #endif

@@ -181,6 +181,8 @@
     <ClCompile Include="UnitTest_glsFilter.cpp" />
     <ClCompile Include="UnitTest_glsMat.cpp" />
     <ClCompile Include="UnitTest_glsMerge.cpp" />
+    <ClCompile Include="UnitTest_glsMinMaxLoc.cpp" />
+    <ClCompile Include="UnitTest_glsNorm.cpp" />
     <ClCompile Include="UnitTest_glsNormalize.cpp" />
     <ClCompile Include="UnitTest_glsReduce.cpp" />
     <ClCompile Include="UnitTest_glsSplit.cpp" />
