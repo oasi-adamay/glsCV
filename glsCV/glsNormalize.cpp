@@ -42,17 +42,29 @@ namespace gls
 
 void normalize(const GlsMat& src, GlsMat& dst, double alpha, double beta, int normType){
 	GLS_Assert(src.type() == CV_32FC1);
-	GLS_Assert(normType == NORM_MINMAX);
+	GLS_Assert(normType == NORM_MINMAX || normType == NORM_L1 || normType == NORM_L2);
 
 	GlsMat _dst;
 
-	double minVal;
-	double maxVal;
+	switch (normType){
+	case(NORM_MINMAX) : {
+		double minVal;
+		double maxVal;
 
-	gls::minMaxLoc(src, &minVal, &maxVal);
-	float scl = (float)(beta - alpha) / (float)(maxVal - minVal);
-	gls::multiply(Scalar(scl), src, _dst);
-	gls::add(Scalar(alpha - scl*minVal), _dst, _dst);
+		gls::minMaxLoc(src, &minVal, &maxVal);
+		float scl = (float)(beta - alpha) / (float)(maxVal - minVal);
+		gls::multiply(Scalar(scl), src, _dst);
+		gls::add(Scalar(alpha - scl*minVal), _dst, _dst);
+	}; break;
+	case(NORM_L1) : 
+	case(NORM_L2) :
+	{
+		float norm = (float)gls::norm(src, normType);
+		float scl = (float)(alpha) / (float)norm;
+		gls::multiply(Scalar(scl), src, _dst);
+	}; break;
+
+	}
 	dst = _dst;
 }
 

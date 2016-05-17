@@ -42,7 +42,7 @@ namespace UnitTest_glsCV
 {
 
 	template <typename T>
-	int test_glsNormalize(int cvtype, double alpha, double beta ,int normType, int ulps = 0){
+	int test_glsNormalize(int cvtype, int normType, double alpha, double beta, int ulps = 0){
 		const int width = 24;
 		const int height = 32;
 //		const int width = 8;
@@ -85,18 +85,35 @@ namespace UnitTest_glsCV
 	{
 	public:
 		//glsNormalize
-		TEST_METHOD(glsNormalize_CV_32FC1_0_1_NORM_MINMAX)
+		TEST_METHOD(glsNormalize_CV_32FC1_NORM_MINMAX_0_1)
 		{
 			cout << __FUNCTION__ << endl;
-			int errNum = test_glsNormalize<float>(CV_32FC1, 0.0, 1.0, NORM_MINMAX,4);
+			int errNum = test_glsNormalize<float>(CV_32FC1, NORM_MINMAX ,0.0, 1.0, 4);
 			Assert::AreEqual(0, errNum);
 		}
-		TEST_METHOD(glsNormalize_CV_32FC1_05_2_NORM_MINMAX)
+		TEST_METHOD(glsNormalize_CV_32FC1_NORM_MINMAX_05_2)
 		{
 			cout << __FUNCTION__ << endl;
-			int errNum = test_glsNormalize<float>(CV_32FC1, 0.5, 2.0, NORM_MINMAX,4);
+			int errNum = test_glsNormalize<float>(CV_32FC1, NORM_MINMAX, 0.5, 2.0, 4);
 			Assert::AreEqual(0, errNum);
 		}
+
+		//glsNormalize
+		TEST_METHOD(glsNormalize_CV_32FC1_NORM_L1)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_glsNormalize<float>(CV_32FC1, NORM_L1, 1.0, 0.0, 4);
+			Assert::AreEqual(0, errNum);
+		}
+
+		//glsNormalize
+		TEST_METHOD(glsNormalize_CV_32FC1_NORM_L2)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_glsNormalize<float>(CV_32FC1, NORM_L2, 1.0, 0.0, 4);
+			Assert::AreEqual(0, errNum);
+		}
+
 
 	};
 }

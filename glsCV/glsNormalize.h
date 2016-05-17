@@ -42,9 +42,13 @@ namespace gls
 /*!
 配列のノルム，またはその範囲を正規化します．
 
-現在は、NORM_MINMAXのみ対応しています。
+@param src – 入力配列
+@param dst – src と同じサイズの出力配列．
+@param alpha – ノルム正規化の場合は，正規化されるノルム値．範囲正規化の場合は，範囲の下界です．
+@param beta – ノルム正規化の場合は，不使用．範囲正規化の場合は，範囲の上界です．
+@param normType – 正規化の種類． NORM_L1,NORM_L2,NORM_MINMAX
 */
-void normalize(const GlsMat& src, GlsMat& dst, double alpha = 0, double beta = 1, int normType = NORM_MINMAX);
+void normalize(const GlsMat& src, GlsMat& dst, double alpha = 1, double beta = 0, int normType = NORM_L2);
 
 
 }//namespace gls
