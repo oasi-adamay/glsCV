@@ -139,6 +139,7 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="glsAdaptiveThreshold.h" />
     <ClInclude Include="glsBasicOperation.h" />
     <ClInclude Include="glsConvert.h" />
     <ClInclude Include="glsCopy.h" />
@@ -150,6 +151,7 @@
     <ClInclude Include="glsMat.h" />
     <ClInclude Include="glsMerge.h" />
     <ClInclude Include="glsMinMaxLoc.h" />
+    <ClInclude Include="glsNorm.h" />
     <ClInclude Include="glsNormalize.h" />
     <ClInclude Include="glsReduce.h" />
     <ClInclude Include="glsShader.h" />
@@ -161,6 +163,7 @@
     <ClInclude Include="Timer.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="glsAdaptiveThreshold.cpp" />
     <ClCompile Include="glsBasicOperation.cpp" />
     <ClCompile Include="glsConvert.cpp" />
     <ClCompile Include="glsCopy.cpp" />
@@ -172,6 +175,7 @@
     <ClCompile Include="glsMat.cpp" />
     <ClCompile Include="glsMerge.cpp" />
     <ClCompile Include="glsMinMaxLoc.cpp" />
+    <ClCompile Include="glsNorm.cpp" />
     <ClCompile Include="glsNormalize.cpp" />
     <ClCompile Include="glsReduce.cpp" />
     <ClCompile Include="glsShader.cpp" />

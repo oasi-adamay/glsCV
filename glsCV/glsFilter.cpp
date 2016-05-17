@@ -48,6 +48,19 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+// glsShaderFilter1DU
+class glsShaderFilter1DU : public glsShaderBase
+{
+protected:
+	string FragmentShaderCode(void);
+
+public:
+	glsShaderFilter1DU(void) : glsShaderBase(__FUNCTION__){}
+
+};
+
+
+//-----------------------------------------------------------------------------
 // glsShaderFilter2D
 class glsShaderFilter2D : public glsShaderBase
 {
@@ -80,11 +93,8 @@ public:
 //-----------------------------------------------------------------------------
 //global 
 glsShaderFilter1D ShaderFilter1D;
+glsShaderFilter1DU ShaderFilter1DU;
 glsShaderFilter2D ShaderFilter2D;
-
-
-
-
 
 //-----------------------------------------------------------------------------
 //glsShaderFilter1D
@@ -131,6 +141,57 @@ string glsShaderFilter1D::FragmentShaderCode(void){
 "			sum += data * coef;\n"
 "		}\n"
 "		dst = sum;\n"
+"	}\n"
+"}\n"
+;
+	return fragmentShaderCode;
+}
+
+//-----------------------------------------------------------------------------
+//glsShaderFilter1DU
+string glsShaderFilter1DU::FragmentShaderCode(void){
+	const char fragmentShaderCode[] =
+"#version 330 core\n"
+"precision highp float;\n"
+"uniform usampler2D	texSrc;\n"
+"uniform sampler2D	texKernel;\n"
+"layout (location = 0) out uvec4 dst;\n"
+"#define BOUND_PVT(x,pl,pr) ((x)<(pl)?2*(pl)-(x) :(x)>(pr)? 2*(pr)-(x): (x))\n"
+"void main(void)\n"
+"{\n"
+"	ivec2 texSize = textureSize(texSrc,0);\n"
+"	ivec2 texKernelSize = textureSize(texKernel,0);\n"
+"	if(texKernelSize.y==1){\n"
+"		int ksize = texKernelSize.x ;\n"
+"		int kp = ksize / 2 ;\n"
+"		int km = -kp;\n"
+"		vec4 sum = vec4(0.0,0.0,0.0,0.0);\n"
+"		for (int k = km; k <= kp; k++){\n"
+"			vec4 data;\n"
+"			vec4 coef;\n"
+"			int x = int(gl_FragCoord.x) + k;\n"
+"			x = BOUND_PVT(x,0,texSize.x-1);\n"
+"			data = vec4(texelFetch(texSrc, ivec2(x, gl_FragCoord.y), 0));\n"
+"			coef = vec4(texelFetch(texKernel, ivec2(k+kp, 0), 0).r);\n"
+"			sum += data * coef;\n"
+"		}\n"
+"		dst = uvec4(roundEven(sum));\n"
+"	}\n"
+"	else{\n"
+"		int ksize = texKernelSize.y ;\n"
+"		int kp = ksize / 2 ;\n"
+"		int km = -kp;\n"
+"		vec4 sum = vec4(0.0,0.0,0.0,0.0);\n"
+"		for (int k = km; k <= kp; k++){\n"
+"			vec4 data;\n"
+"			vec4 coef;\n"
+"			int y = int(gl_FragCoord.y) + k;\n"
+"			y = BOUND_PVT(y,0,texSize.y-1);\n"
+"			data = vec4(texelFetch(texSrc, ivec2(gl_FragCoord.x,y), 0));\n"
+"			coef = vec4(texelFetch(texKernel, ivec2(0,k+kp), 0).r);\n"
+"			sum += data * coef;\n"
+"		}\n"
+"		dst = uvec4(roundEven(sum));\n"
 "	}\n"
 "}\n"
 ;
@@ -285,8 +346,8 @@ glsShaderBase* selectShader1D(int type){
 	glsShaderBase* shader = 0;
 	switch (CV_MAT_DEPTH(type)){
 	case(CV_32F) : shader = &ShaderFilter1D; break;
-	//case(CV_8U) :
-	//case(CV_16U) : shader = shaderFilterU; break;
+	case(CV_8U) :
+	case(CV_16U) : shader = &ShaderFilter1DU; break;
 	//case(CV_8S) :
 	//case(CV_16S) :
 	//case(CV_32S) : shader = shaderFilterS; break;
@@ -313,7 +374,7 @@ glsShaderBase* selectShader2D(int type){
 
 
 void sepFilter2D(const GlsMat& src, GlsMat& dst, int ddepth, const Mat& kernelX, const Mat& kernelY){
-	GLS_Assert(src.depth() == CV_32F);
+	GLS_Assert(src.depth() == CV_32F || src.depth() == CV_16U || src.depth() == CV_8U);
 	GLS_Assert(kernelX.rows == 1 || kernelX.cols == 1);
 	GLS_Assert(kernelY.rows == 1 || kernelY.cols == 1);
 

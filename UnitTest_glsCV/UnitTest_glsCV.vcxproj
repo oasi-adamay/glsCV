@@ -173,6 +173,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="UnitTest_Common.cpp" />
+    <ClCompile Include="UnitTest_glsAdaptiveThreshold.cpp" />
     <ClCompile Include="UnitTest_glsBasicOperation.cpp" />
     <ClCompile Include="UnitTest_glsConvert.cpp" />
     <ClCompile Include="UnitTest_glsCopy.cpp" />
@@ -180,6 +181,8 @@
     <ClCompile Include="UnitTest_glsFilter.cpp" />
     <ClCompile Include="UnitTest_glsMat.cpp" />
     <ClCompile Include="UnitTest_glsMerge.cpp" />
+    <ClCompile Include="UnitTest_glsMinMaxLoc.cpp" />
+    <ClCompile Include="UnitTest_glsNorm.cpp" />
     <ClCompile Include="UnitTest_glsNormalize.cpp" />
     <ClCompile Include="UnitTest_glsReduce.cpp" />
     <ClCompile Include="UnitTest_glsSplit.cpp" />

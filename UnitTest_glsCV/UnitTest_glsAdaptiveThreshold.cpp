@@ -37,43 +37,58 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 #include "UnitTest_Common.h"
 
 
-
 namespace UnitTest_glsCV
 {
 
 	template <typename T>
-	int test_glsNormalize(int cvtype, int normType, double alpha, double beta, int ulps = 0){
-		const int width = 24;
-		const int height = 32;
-//		const int width = 8;
-//		const int height = 6;
+	int test_glsAdaptiveThreshold(int cvtype, int adaptiveMethod, int thresholdType, int blockSize){
+		Size size(32, 24);
+		cout << "Size:" << size << endl;
+
+		
+		int ulps = 1;
+
+		double thresh = 0;
+		double maxVal = 0;
+		double C = 0;
+		if (CV_MAT_DEPTH(cvtype) == CV_32F){
+			thresh = 0.5;
+			maxVal = 0.75;
+		}
+		else if (CV_MAT_DEPTH(cvtype) == CV_8U){
+			thresh = 128;
+			maxVal = 192;
+			C = 5;
+		}
+		else if (CV_MAT_DEPTH(cvtype) == CV_16U){
+			thresh = 32768;
+			maxVal = 45000;
+		}
 
 
-
-		Mat imgSrc(Size(width, height), cvtype);
+		Mat imgSrc(size, cvtype);
 		FillRandU<T>(imgSrc);
 
 		Mat imgRef;
 		Mat imgDst;
 
-		cout << "Size:" << imgSrc.size() << endl;
 
-		cv::normalize(imgSrc, imgRef, alpha, beta, normType);
+		cv::adaptiveThreshold(imgSrc, imgRef, maxVal, adaptiveMethod, thresholdType, blockSize,C);
 
 		GlsMat glsSrc(imgSrc);
-
 		GlsMat glsDst;
 
-		gls::normalize(glsSrc, glsDst, alpha, beta, normType);
+		gls::adaptiveThreshold(glsSrc, glsDst, maxVal, adaptiveMethod, thresholdType, blockSize,C);
 
 		glsDst.download(imgDst);		// download
 
 		int errNum = 0;
-		if (!AreEqual<T>(imgRef, imgDst, ulps)) errNum = -1;
+		/// TODO 2値化なのでどのようにエラーを定義するか。
+//		if (!AreEqual<T>(imgRef, imgDst, ulps)) errNum = -1;
 
-		//cout << imgRef << endl;
-		//cout << imgDst << endl;
-		//cout << imgDst - imgRef << endl;
+		cout << imgRef << endl;
+		cout << imgDst << endl;
+		cout << imgDst - imgRef << endl;
 
 
 		return errNum;
@@ -81,36 +96,19 @@ namespace UnitTest_glsCV
 
 
 
-	TEST_CLASS(UnitTest_glsNormalize)
+	TEST_CLASS(UnitTest_glsAdaptiveThreshold)
 	{
 	public:
-		//glsNormalize
-		TEST_METHOD(glsNormalize_CV_32FC1_NORM_MINMAX_0_1)
+		TEST_METHOD(glsAdaptiveThreshold_CV_8UC1_ADAPTIVE_THRESH_MEAN_Cx5)
 		{
 			cout << __FUNCTION__ << endl;
-			int errNum = test_glsNormalize<float>(CV_32FC1, NORM_MINMAX ,0.0, 1.0, 4);
+			int errNum = test_glsAdaptiveThreshold<uchar>(CV_8UC1, ADAPTIVE_THRESH_MEAN_C, THRESH_BINARY,5);
 			Assert::AreEqual(0, errNum);
 		}
-		TEST_METHOD(glsNormalize_CV_32FC1_NORM_MINMAX_05_2)
+		TEST_METHOD(glsAdaptiveThreshold_CV_8UC1_ADAPTIVE_THRESH_GAUSSIAN_C_Cx5)
 		{
 			cout << __FUNCTION__ << endl;
-			int errNum = test_glsNormalize<float>(CV_32FC1, NORM_MINMAX, 0.5, 2.0, 4);
-			Assert::AreEqual(0, errNum);
-		}
-
-		//glsNormalize
-		TEST_METHOD(glsNormalize_CV_32FC1_NORM_L1)
-		{
-			cout << __FUNCTION__ << endl;
-			int errNum = test_glsNormalize<float>(CV_32FC1, NORM_L1, 1.0, 0.0, 4);
-			Assert::AreEqual(0, errNum);
-		}
-
-		//glsNormalize
-		TEST_METHOD(glsNormalize_CV_32FC1_NORM_L2)
-		{
-			cout << __FUNCTION__ << endl;
-			int errNum = test_glsNormalize<float>(CV_32FC1, NORM_L2, 1.0, 0.0, 4);
+			int errNum = test_glsAdaptiveThreshold<uchar>(CV_8UC1, ADAPTIVE_THRESH_GAUSSIAN_C, THRESH_BINARY, 5);
 			Assert::AreEqual(0, errNum);
 		}
 
