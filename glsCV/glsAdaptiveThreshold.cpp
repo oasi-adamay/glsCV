@@ -37,25 +37,46 @@ namespace gls
 
 //-----------------------------------------------------------------------------
 // glsShaderAdaptiveThreshold
-class glsShaderAdaptiveThreshold : public glsShaderBase
+class glsShaderAdaptiveThresholdBase : public glsShaderBase
+{
+protected:
+	list<string> UniformNameList(void){
+		list<string> lst;
+		lst.push_back("texSrc");
+		lst.push_back("texTh");
+		lst.push_back("c");
+		lst.push_back("maxVal");
+		lst.push_back("thresholdType");
+		return lst;
+	}
+
+public:
+	glsShaderAdaptiveThresholdBase(const string& _name) :glsShaderBase(_name){}
+
+};
+
+
+//-----------------------------------------------------------------------------
+// glsShaderAdaptiveThreshold
+class glsShaderAdaptiveThreshold : public glsShaderAdaptiveThresholdBase
 {
 protected:
 	string FragmentShaderCode(void);
 
 public:
-	glsShaderAdaptiveThreshold(void) : glsShaderBase(__FUNCTION__){}
+	glsShaderAdaptiveThreshold(void) : glsShaderAdaptiveThresholdBase(__FUNCTION__){}
 
 };
 
 //-----------------------------------------------------------------------------
 // glsShaderAdaptiveThresholdU
-class glsShaderAdaptiveThresholdU : public glsShaderBase
+class glsShaderAdaptiveThresholdU : public glsShaderAdaptiveThresholdBase
 {
 protected:
 	string FragmentShaderCode(void);
 
 public:
-	glsShaderAdaptiveThresholdU(void) : glsShaderBase(__FUNCTION__){}
+	glsShaderAdaptiveThresholdU(void) : glsShaderAdaptiveThresholdBase(__FUNCTION__){}
 
 };
 
@@ -144,63 +165,6 @@ string glsShaderAdaptiveThresholdU::FragmentShaderCode(void){
 }
 
 
-//---------------------------------------------------------------------------
-/*!
-*/
-static void glsThresholdProcess(
-	const glsShaderBase* shader,	//progmra ID
-	const GLuint& texSrc,			//src   texture ID
-	const GLuint& texTh,			//threshold  texture ID
-	const Size& texSize,			//dst texture size
-	double maxVal,
-	int thresholdType,
-	double c
-	)
-{
-
-	//program
-	{
-		glUseProgram(shader->program());
-	}
-
-	//uniform
-	{
-		glUniform1f(glGetUniformLocation(shader->program(), "c"), (float)c);
-		glUniform1f(glGetUniformLocation(shader->program(), "maxVal"), (float)maxVal);
-		glUniform1i(glGetUniformLocation(shader->program(), "thresholdType"), thresholdType);
-	}
-
-	//Bind Texture
-	{
-		int id = 0;
-		glActiveTexture(GL_TEXTURE0 + id);
-		glBindTexture(GL_TEXTURE_2D, texSrc);
-		glUniform1i(glGetUniformLocation(shader->program(), "texSrc"), id);
-		id++;
-		glActiveTexture(GL_TEXTURE0 + id);
-		glBindTexture(GL_TEXTURE_2D, texTh);
-		glUniform1i(glGetUniformLocation(shader->program(), "texTh"), id);
-
-	}
-
-	glsVAO vao(glGetAttribLocation(shader->program(), "position"));
-
-	//Viewport
-	glViewport(0, 0, texSize.width, texSize.height);
-
-	//Render!!
-	{
-		glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
-		glFlush();
-	}
-
-	GL_CHECK_ERROR();
-
-	//	glFinish();
-
-}
-
-
 static 
 glsShaderBase* selectShader(int type){
 	glsShaderBase* shader = 0;
@@ -235,13 +199,7 @@ void adaptiveThreshold(const GlsMat& src, GlsMat& dst, double maxVal, int adapti
 
 
 	glsShaderBase* shader = selectShader(src.type());
-
-	glsFBO fbo(1);
-	{
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _dst.texid(), 0);
-		glsThresholdProcess(shader, src.texid(), _lpf.texid(),_dst.size(), maxVal, thresholdType,C);
-	}
-
+	shader->Execute(src, _lpf, C, maxVal, thresholdType, _dst);
 	dst = _dst;
 }
 

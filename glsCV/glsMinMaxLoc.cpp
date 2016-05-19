@@ -41,6 +41,7 @@ class glsShaderMinMaxLoc : public glsShaderBase
 {
 protected:
 	string FragmentShaderCode(void);
+	list<string> UniformNameList(void);
 
 public:
 	glsShaderMinMaxLoc(void) :glsShaderBase(__FUNCTION__){}
@@ -111,54 +112,16 @@ string glsShaderMinMaxLoc::FragmentShaderCode(void){
 	return fragmentShaderCode;
 }
 
-
-
-//---------------------------------------------------------------------------
-/*!
-各rowごとのminmaxloc
-*/
-static void glsMinMaxLocProcess(
-	const glsShaderBase* shader,	//progmra ID
-	const vector<GLuint>& texSrc,			//src texture IDs
-	const Size& texSize,				//dst texture size
-	const int path					// path id
-	)
-{
-
-	//program
-	{
-		glUseProgram(shader->program());
-	}
-
-	//uniform
-	{
-		glUniform1i(glGetUniformLocation(shader->program(), "path"), path);
-	}
-
-	//Bind Texture
-	for (int id = 0; id < (int)texSrc.size();id++){
-		glActiveTexture(GL_TEXTURE0 + id);
-		glBindTexture(GL_TEXTURE_2D, texSrc[id]);
-		string name = "texSrc" + to_string(id);
-		glUniform1i(glGetUniformLocation(shader->program(), name.c_str()), id);
-	}
-
-	glsVAO vao(glGetAttribLocation(shader->program(), "position"));
-
-	//Viewport
-	glViewport(0, 0, texSize.width, texSize.height);
-
-	//Render!!
-	{
-		glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
-		glFlush();
-	}
-
-	GL_CHECK_ERROR();
-
-	//	glFinish();
-
+list<string> glsShaderMinMaxLoc::UniformNameList(void){
+	list<string> lst;
+	lst.push_back("path");
+	lst.push_back("texSrc0");
+	lst.push_back("texSrc1");
+	lst.push_back("texSrc2");
+	lst.push_back("texSrc3");
+	return lst;
 }
+
 
 static 
 glsShaderBase* selectShader(int type){
@@ -193,21 +156,10 @@ void minMaxLoc(const GlsMat& src, double* minVal, double* maxVal, Point* minLoc,
 
 	glsShaderBase* shader = selectShader(src.type());
 
-	glsFBO fbo(4);
 	{		//path:0
-		//src texture
-		vector<GLuint> texArray(1);
-		texArray[0] = src.texid();
-
-		//dst texture
-		if (minVal)glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _minvec.texid(), 0);
-		if (maxVal)glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, _maxvec.texid(), 0);
-		if (minLoc)glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, _minloc.texid(), 0);
-		if (maxLoc)glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT3, GL_TEXTURE_2D, _maxloc.texid(), 0);
-		GLS_Assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
-		glsMinMaxLocProcess(shader, texArray, Size(1, src.rows), 0);
+		GlsMat _stub;
+		shader->Execute(0, src, _stub, _stub, _stub, _minvec, _maxvec, _minloc, _maxloc);
 	}
-#if 1
 	{		//path:1
 		GlsMat _minvec1;
 		GlsMat _maxvec1;
@@ -219,20 +171,7 @@ void minMaxLoc(const GlsMat& src, double* minVal, double* maxVal, Point* minLoc,
 		if (minLoc) _minloc1 = GlsMat(Size(1, 1), CV_32SC2);
 		if (maxLoc) _maxloc1 = GlsMat(Size(1, 1), CV_32SC2);
 
-		//src texture
-		vector<GLuint> texArray(4);
-		texArray[0] = _minvec.texid();
-		texArray[1] = _maxvec.texid();
-		texArray[2] = _minloc.texid();
-		texArray[3] = _maxloc.texid();
-
-		//dst texture
-		if (minVal)glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _minvec1.texid(), 0);
-		if (maxVal)glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, _maxvec1.texid(), 0);
-		if (minLoc)glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, _minloc1.texid(), 0);
-		if (maxLoc)glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT3, GL_TEXTURE_2D, _maxloc1.texid(), 0);
-		GLS_Assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
-		glsMinMaxLocProcess(shader, texArray, Size(1,1), 1);
+		shader->Execute(1, _minvec, _maxvec, _minloc, _maxloc, _minvec1, _maxvec1, _minloc1, _maxloc1);
 
 		Mat minval;
 		Mat maxval;
@@ -249,29 +188,7 @@ void minMaxLoc(const GlsMat& src, double* minVal, double* maxVal, Point* minLoc,
 		if (maxLoc) *maxLoc = maxloc.at<Vec2i>(0, 0);
 	}
 
-#else
-	Mat minvec_row;
-	Mat maxvec_row;
-	Mat minloc_row;
-	Mat maxloc_row;
-	if (minVal) _minvec.download(minvec_row);
-	if (maxVal) _maxvec.download(maxvec_row);
-	if (minLoc) _minloc.download(minloc_row);
-	if (maxLoc) _maxloc.download(maxloc_row);
 
-	//cout << minvec_row << endl;
-	//cout << maxvec_row << endl;
-	//cout << minloc_row << endl;
-	//cout << maxloc_row << endl;
-
-
-	///! col方向のminMaxはcvの関数で
-	cv::minMaxLoc(minvec_row, minVal, 0, minLoc, 0);
-	cv::minMaxLoc(maxvec_row, 0, maxVal, 0, maxLoc);
-	if (minLoc) minLoc->x = minloc_row.at<int>(minLoc->y);
-	if (maxLoc) maxLoc->x = maxloc_row.at<int>(maxLoc->y);
-
-#endif
 
 
 }

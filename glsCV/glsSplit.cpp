@@ -37,40 +37,55 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace gls
 {
 
+//-----------------------------------------------------------------------------
+// glsShaderSplit
+class glsShaderSplitBase : public glsShaderBase
+{
+protected:
+	list<string> UniformNameList(void){
+		list<string> lst;
+		lst.push_back("texSrc");
+		return lst;
+	}
+public:
+	glsShaderSplitBase(const string& _name) :glsShaderBase(_name){}
+
+};
+
 
 
 //-----------------------------------------------------------------------------
 // glsShaderSplit
-class glsShaderSplit : public glsShaderBase
+class glsShaderSplit : public glsShaderSplitBase
 {
 protected:
 	string FragmentShaderCode(void);
 
 public:
-	glsShaderSplit(void) :glsShaderBase(__FUNCTION__){}
+	glsShaderSplit(void) :glsShaderSplitBase(__FUNCTION__){}
 
 };
 
 //-----------------------------------------------------------------------------
 // glsShaderSplitU unsigned
-class glsShaderSplitU : public glsShaderBase
+class glsShaderSplitU : public glsShaderSplitBase
 {
 protected:
 	string FragmentShaderCode(void);
 
 public:
-	glsShaderSplitU(void) :glsShaderBase(__FUNCTION__){}
+	glsShaderSplitU(void) :glsShaderSplitBase(__FUNCTION__){}
 };
 
 //-----------------------------------------------------------------------------
 // glsShaderSplitS unsigned
-class glsShaderSplitS : public glsShaderBase
+class glsShaderSplitS : public glsShaderSplitBase
 {
 protected:
 	string FragmentShaderCode(void);
 
 public:
-	glsShaderSplitS(void) :glsShaderBase(__FUNCTION__){}
+	glsShaderSplitS(void) :glsShaderSplitBase(__FUNCTION__){}
 };
 
 
@@ -152,52 +167,6 @@ string glsShaderSplitS::FragmentShaderCode(void){
 }
 
 
-
-//---------------------------------------------------------------------------
-//
-static void splitProcess(
-	const glsShaderBase* shader,	//progmra ID
-	const GLuint texSrc,			//src texture IDs
-	const Rect& rectDst 			//dst rectangel
-	)
-{
-
-	//program
-	{
-		glUseProgram(shader->program());
-	}
-
-	//uniform
-	{
-	}
-
-
-	//Bind Texture
-	{
-		int id = 0;
-		glActiveTexture(GL_TEXTURE0 + id);
-		glBindTexture(GL_TEXTURE_2D, texSrc);
-		glUniform1i(glGetUniformLocation(shader->program(), "texSrc"), id);
-	}
-
-	glsVAO vao(glGetAttribLocation(shader->program(), "position"));
-	//Viewport
-	{
-		glViewport(rectDst.x, rectDst.y, rectDst.width, rectDst.height);
-	}
-
-	//Render!!
-	{
-		glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
-		glFlush();
-	}
-
-	GL_CHECK_ERROR();
-
-	//	glFinish();
-
-}
-
 static 
 glsShaderBase* selectShader(int type){
 	glsShaderBase* shader = 0;
@@ -224,22 +193,13 @@ void split(const GlsMat& src, vector<GlsMat>& dst){
 		dst[c] = GlsMat(src.size(), CV_MAKE_TYPE(src.depth(), 1));
 	}
 
-
-
 	glsShaderBase* shader = selectShader(src.type());
-
-	Rect rectDst(0, 0, src.cols, src.rows);
-
-	glsFBO fbo(cn);
-
-	for (int c = 0; c < cn; c++){
-		//dst texture
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0+c, GL_TEXTURE_2D, dst[c].texid(), 0);
-		GLS_Assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
+	switch (cn){
+	case(1) : shader->Execute(src, dst[0]); break;
+	case(2) : shader->Execute(src, dst[0], dst[1]); break;
+	case(3) : shader->Execute(src, dst[0], dst[1], dst[2]); break;
+	case(4) : shader->Execute(src, dst[0], dst[1], dst[2], dst[3]); break;
 	}
-
-
-	splitProcess(shader, src.texid(), rectDst);
 
 }
 

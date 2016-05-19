@@ -117,6 +117,20 @@ private:
 	}
 
 	template<>
+	void setup<double>(int i, const double& t)
+	{
+		setupInfo.argnum++;
+		GLuint loc = uniformLocArray[i];
+		float val = (float)t;
+		glUniform1f(loc, val);
+#ifdef _DEBUG_SHADER
+		std::cout << "i:" << i << "\t";
+		std::cout << "loc:" << loc << "\t";
+		std::cout << "val:" << t << endl;
+#endif
+	}
+
+	template<>
 	void setup<Scalar>(int i, const Scalar& t)
 	{
 		setupInfo.argnum++;
@@ -136,33 +150,36 @@ private:
 	{
 		setupInfo.argnum++;
 		if (i<uniformLocArray.size()){	//src texture
-			GLuint loc = uniformLocArray[i];
-			int id = setupInfo.texSrcNum;
-			glActiveTexture(GL_TEXTURE0 + id);
-			glBindTexture(GL_TEXTURE_2D, t.texid());
-			glUniform1i(loc, id);
-			setupInfo.texSrcNum++;
-
+			if (!t.empty()){
+				GLuint loc = uniformLocArray[i];
+				int id = setupInfo.texSrcNum;
+				glActiveTexture(GL_TEXTURE0 + id);
+				glBindTexture(GL_TEXTURE_2D, t.texid());
+				glUniform1i(loc, id);
+				setupInfo.texSrcNum++;
 #ifdef _DEBUG_SHADER
-			std::cout << "i:" << i << "\t";
-			std::cout << "loc:" << loc << "\t";
-			std::cout << "texunit:" << id << "\t";
-			std::cout << "texSrc:" << t.texid() << endl;
+				std::cout << "i:" << i << "\t";
+				std::cout << "loc:" << loc << "\t";
+				std::cout << "texunit:" << id << "\t";
+				std::cout << "texSrc:" << t.texid() << endl;
 #endif
+			}
 
 		}
 		else{	//dst texture
-			int id = setupInfo.texDstNum;
-			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + id, GL_TEXTURE_2D, t.texid(), 0);
-//			GLS_Assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
+			if (!t.empty()){
+				int id = setupInfo.texDstNum;
+				glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + id, GL_TEXTURE_2D, t.texid(), 0);
+				//GLS_Assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
 
-			setupInfo.texDstNum++;
-			setupInfo.texDstSize = t.size();
+				setupInfo.texDstNum++;
+				setupInfo.texDstSize = t.size();
 #ifdef _DEBUG_SHADER
-			std::cout << "i:" << i << "\t";
-			std::cout << "attach:" << id << "\t";
-			std::cout << "texdst:" << t.texid() << endl;
+				std::cout << "i:" << i << "\t";
+				std::cout << "attach:" << id << "\t";
+				std::cout << "texdst:" << t.texid() << endl;
 #endif
+			}
 
 		}
 	}

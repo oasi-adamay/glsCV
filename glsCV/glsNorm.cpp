@@ -41,6 +41,7 @@ class glsShaderNorm : public glsShaderBase
 {
 protected:
 	string FragmentShaderCode(void);
+	list<string> UniformNameList(void);
 
 public:
 	glsShaderNorm(void) :glsShaderBase(__FUNCTION__){}
@@ -120,54 +121,14 @@ string glsShaderNorm::FragmentShaderCode(void){
 	return fragmentShaderCode;
 }
 
-
-
-//---------------------------------------------------------------------------
-static void glsNormProcess(
-	const glsShaderBase* shader,	//progmra ID
-	const GLuint& texSrc,			//src texture IDs
-	const Size& texSize,			//texture size
-	const int cn,					//channels
-	const int normType				//normType
-	)
-{
-
-	//program
-	{
-		glUseProgram(shader->program());
-	}
-
-	//uniform
-	{
-		glUniform1i(glGetUniformLocation(shader->program(), "cn"), cn);
-		glUniform1i(glGetUniformLocation(shader->program(), "normType"), normType);
-	}
-
-
-	//Bind Texture
-	{
-		int id = 0;
-		glActiveTexture(GL_TEXTURE0 + id);
-		glBindTexture(GL_TEXTURE_2D, texSrc);
-		glUniform1i(glGetUniformLocation(shader->program(), "texSrc"), id);
-	}
-
-	glsVAO vao(glGetAttribLocation(shader->program(), "position"));
-
-	//Viewport
-	glViewport(0, 0, texSize.width, texSize.height);
-
-	//Render!!
-	{
-		glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
-		glFlush();
-	}
-
-	GL_CHECK_ERROR();
-
-	//	glFinish();
-
+list<string> glsShaderNorm::UniformNameList(void){
+	list<string> lst;
+	lst.push_back("texSrc");
+	lst.push_back("cn");
+	lst.push_back("normType");
+	return lst;
 }
+
 
 static 
 glsShaderBase* selectShader(int type){
@@ -196,21 +157,7 @@ double norm(const GlsMat& src1, int normType){
 
 	glsShaderBase* shader = selectShader(src1.type());
 
-	{
-		glsFBO fbo(1);
-
-		//dst texture
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _tmp.texid(), 0);
-		GLS_Assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
-
-		glsNormProcess(shader, src1.texid(), _tmp.size(), src1.channels(),normType);
-
-	}
-
-	{
-		Mat tmp = (Mat)_tmp;
-		cout << tmp << endl;
-	}
+	shader->Execute(src1, src1.channels(), normType, _tmp);
 
 	GlsMat _val;
 	if (normType == NORM_INF){

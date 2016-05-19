@@ -37,25 +37,44 @@ namespace gls
 
 //-----------------------------------------------------------------------------
 // glsShaderThreshold
-class glsShaderThreshold : public glsShaderBase
+class glsShaderThresholdBase : public glsShaderBase
+{
+protected:
+	list<string> UniformNameList(void){
+		list<string> lst;
+		lst.push_back("texSrc");
+		lst.push_back("thresh");
+		lst.push_back("maxVal");
+		lst.push_back("thresholdType");
+		return lst;
+	}
+public:
+	glsShaderThresholdBase(const string& _name) :glsShaderBase(_name){}
+
+
+};
+
+//-----------------------------------------------------------------------------
+// glsShaderThreshold
+class glsShaderThreshold : public glsShaderThresholdBase
 {
 protected:
 	string FragmentShaderCode(void);
 
 public:
-	glsShaderThreshold(void) : glsShaderBase(__FUNCTION__){}
+	glsShaderThreshold(void) : glsShaderThresholdBase(__FUNCTION__){}
 
 };
 
 //-----------------------------------------------------------------------------
 // glsShaderThresholdU
-class glsShaderThresholdU : public glsShaderBase
+class glsShaderThresholdU : public glsShaderThresholdBase
 {
 protected:
 	string FragmentShaderCode(void);
 
 public:
-	glsShaderThresholdU(void) : glsShaderBase(__FUNCTION__){}
+	glsShaderThresholdU(void) : glsShaderThresholdBase(__FUNCTION__){}
 
 };
 
@@ -147,58 +166,6 @@ string glsShaderThresholdU::FragmentShaderCode(void){
 }
 
 
-//---------------------------------------------------------------------------
-/*!
-*/
-static void glsThresholdProcess(
-	const glsShaderBase* shader,	//progmra ID
-	const GLuint& texSrc,			//src   texture ID
-	const Size& texSize,			//dst texture size
-	double thresh,
-	double maxVal,
-	int thresholdType
-	)
-{
-
-	//program
-	{
-		glUseProgram(shader->program());
-	}
-
-	//uniform
-	{
-		glUniform1f(glGetUniformLocation(shader->program(), "thresh"), (float)thresh);
-		glUniform1f(glGetUniformLocation(shader->program(), "maxVal"), (float)maxVal);
-		glUniform1i(glGetUniformLocation(shader->program(), "thresholdType"), thresholdType);
-	}
-
-	//Bind Texture
-	{
-		int id = 0;
-		glActiveTexture(GL_TEXTURE0 + id);
-		glBindTexture(GL_TEXTURE_2D, texSrc);
-		glUniform1i(glGetUniformLocation(shader->program(), "texSrc"), id);
-
-	}
-
-	glsVAO vao(glGetAttribLocation(shader->program(), "position"));
-
-	//Viewport
-	glViewport(0, 0, texSize.width, texSize.height);
-
-	//Render!!
-	{
-		glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
-		glFlush();
-	}
-
-	GL_CHECK_ERROR();
-
-	//	glFinish();
-
-}
-
-
 static 
 glsShaderBase* selectShader(int type){
 	glsShaderBase* shader = 0;
@@ -223,12 +190,7 @@ void threshold(const GlsMat& src, GlsMat& dst, double thresh, double maxVal, int
 	GlsMat _dst = getDstMat(src.size(), CV_MAKE_TYPE(src.depth(),1), dst);
 
 	glsShaderBase* shader = selectShader(src.type());
-
-	glsFBO fbo(1);
-	{
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _dst.texid(), 0);
-		glsThresholdProcess(shader, src.texid(), _dst.size(), thresh, maxVal, thresholdType);
-	}
+	shader->Execute(src, thresh, maxVal, thresholdType,_dst);
 
 	dst = _dst;
 }

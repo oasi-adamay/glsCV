@@ -38,39 +38,55 @@ namespace gls
 {
 
 
+class glsShaderMergeBase : public glsShaderBase
+{
+protected:
+	list<string> UniformNameList(void){
+		list<string> lst;
+		lst.push_back("texSrc0");
+		lst.push_back("texSrc1");
+		lst.push_back("texSrc2");
+		lst.push_back("texSrc3");
+		return lst;
+	}
+public:
+	glsShaderMergeBase(const string& _name) :glsShaderBase(_name){}
+
+};
+
 
 //-----------------------------------------------------------------------------
 // glsShaderMerge
-class glsShaderMerge : public glsShaderBase
+class glsShaderMerge : public glsShaderMergeBase
 {
 protected:
 	string FragmentShaderCode(void);
 
 public:
-	glsShaderMerge(void) :glsShaderBase(__FUNCTION__){}
+	glsShaderMerge(void) :glsShaderMergeBase(__FUNCTION__){}
 
 };
 
 //-----------------------------------------------------------------------------
 // glsShaderMergeU unsigned
-class glsShaderMergeU : public glsShaderBase
+class glsShaderMergeU : public glsShaderMergeBase
 {
 protected:
 	string FragmentShaderCode(void);
 
 public:
-	glsShaderMergeU(void) :glsShaderBase(__FUNCTION__){}
+	glsShaderMergeU(void) :glsShaderMergeBase(__FUNCTION__){}
 };
 
 //-----------------------------------------------------------------------------
 // glsShaderMergeS unsigned
-class glsShaderMergeS : public glsShaderBase
+class glsShaderMergeS : public glsShaderMergeBase
 {
 protected:
 	string FragmentShaderCode(void);
 
 public:
-	glsShaderMergeS(void) :glsShaderBase(__FUNCTION__){}
+	glsShaderMergeS(void) :glsShaderMergeBase(__FUNCTION__){}
 };
 
 
@@ -152,54 +168,6 @@ string glsShaderMergeS::FragmentShaderCode(void){
 }
 
 
-
-//---------------------------------------------------------------------------
-//
-static void mergeProcess(
-	const glsShaderBase* shader,	//progmra ID
-	const vector<GLuint>& texSrc,	//src texture IDs
-	const Rect& rectDst 			// Merge dst rectangel
-	)
-{
-
-	//program
-	{
-		glUseProgram(shader->program());
-	}
-
-	//uniform
-	{
-	}
-
-
-	//Bind Texture
-	{
-		for (int id = 0; id < texSrc.size(); id++){
-			glActiveTexture(GL_TEXTURE0 + id);
-			glBindTexture(GL_TEXTURE_2D, texSrc[id]);
-			string name = "texSrc" + to_string(id);
-			glUniform1i(glGetUniformLocation(shader->program(), name.c_str()), id);
-		}
-	}
-
-	glsVAO vao(glGetAttribLocation(shader->program(), "position"));
-	//Viewport
-	{
-		glViewport(rectDst.x, rectDst.y, rectDst.width, rectDst.height);
-	}
-
-	//Render!!
-	{
-		glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
-		glFlush();
-	}
-
-	GL_CHECK_ERROR();
-
-	//	glFinish();
-
-}
-
 static 
 glsShaderBase* selectShader(int type){
 	glsShaderBase* shader = 0;
@@ -222,25 +190,16 @@ void merge(const vector<GlsMat>& plnSrc, GlsMat& dst){
 	GLS_Assert(cn <= 4);
 
 	GlsMat _dst = getDstMat(plnSrc[0].size(), CV_MAKE_TYPE(plnSrc[0].depth(), cn),dst);
+	GlsMat _stub;
 
 	glsShaderBase* shader = selectShader(plnSrc[0].type());
 
-	Rect rectSrc(0, 0, plnSrc[0].cols, plnSrc[0].rows);
-	Rect rectDst = rectSrc;
-
-	glsFBO fbo(1);
-
-
-	//dst texture
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _dst.texid(), 0);
-	GLS_Assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
-
-	vector<GLuint> texSrc(cn);
-	for (int c = 0; c < cn; c++){
-		texSrc[c] = plnSrc[c].texid();
+	switch (cn){
+	case (1) : shader->Execute(plnSrc[0], _stub, _stub, _stub,_dst); break;
+	case (2) : shader->Execute(plnSrc[0], plnSrc[1], _stub, _stub,_dst); break;
+	case (3) : shader->Execute(plnSrc[0], plnSrc[1], plnSrc[2], _stub,_dst); break;
+	case (4) : shader->Execute(plnSrc[0], plnSrc[1], plnSrc[2], plnSrc[3], _dst); break;
 	}
-
-	mergeProcess(shader, texSrc, rectDst);
 
 	dst = _dst;
 }

@@ -41,6 +41,14 @@ namespace gls
 // glsDraw shader
 class glsShaderConvertBase : public glsShaderBase
 {
+protected:
+	list<string> UniformNameList(void){
+		list<string> lst;
+		lst.push_back("texSrc");
+		lst.push_back("scl");
+		lst.push_back("flag");
+		return lst;
+	}
 public:
 	glsShaderConvertBase(const string& _name) :glsShaderBase(_name){}
 
@@ -258,103 +266,12 @@ string glsShaderConvertS::FragmentShaderCode(void){
 
 
 
-
-
-
-static Size getTextureSize(GLuint tex){
-	int width;
-	int height;
-
-	//get texture size
-
-	glBindTexture(GL_TEXTURE_2D, tex);
-	glGetTexLevelParameteriv(
-		GL_TEXTURE_2D, 0,
-		GL_TEXTURE_WIDTH, &width
-		);
-
-	glGetTexLevelParameteriv(
-		GL_TEXTURE_2D, 0,
-		GL_TEXTURE_HEIGHT, &height
-		);
-
-	glBindTexture(GL_TEXTURE_2D, 0);
-
-	return Size(width, height);
-}
-
-
-
-
-//---------------------------------------------------------------------------
-//
-static void glsConvertProcess(
-	const glsShaderConvertBase* shader,	//progmra ID
-	const GLuint& texSrc,			//src texture IDs
-	const float scl,				// scaling 
-	const int flag	= -1			// flag 
-	)
-{
-	Size size = getTextureSize(texSrc);
-	int width = size.width;
-	int height = size.height;
-
-	//program
-	{
-		glUseProgram(shader->program());
-	}
-
-
-	//uniform
-	{
-		glUniform1f(glGetUniformLocation(shader->program(), "scl"), scl);
-		glUniform1i(glGetUniformLocation(shader->program(), "flag"), flag);
-	}
-
-
-	//Bind Texture
-	{
-		int id = 0;
-		glActiveTexture(GL_TEXTURE0 + id);
-		glBindTexture(GL_TEXTURE_2D, texSrc);
-		glUniform1i(glGetUniformLocation(shader->program(), "texSrc"), id);
-	}
-
-	glsVAO vao(glGetAttribLocation(shader->program(), "position"));
-
-	//Viewport
-	{
-		glViewport(0, 0, width, height);
-	}
-
-	//Render!!
-	{
-		glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
-		glFlush();
-	}
-
-	//	glFinish();
-
-}
-
-
 void convert(const GlsMat& src, GlsMat& dst, const float scl){
 
 	GlsMat _dst = GlsMat(src.size(), CV_MAKETYPE(CV_32F, CV_MAT_CN(src.type())));
 	GLS_Assert(_dst.glType() == GL_FLOAT);
 
 	glsShaderConvertBase* shader = 0;
-
-	//switch (src.type){
-	//case(GL_FLOAT) : shader = &ShaderConvert; break;
-	//case(GL_UNSIGNED_BYTE) :
-	//case(GL_UNSIGNED_SHORT) :
-	//case(GL_UNSIGNED_INT) :	shader = &ShaderConvertU; break;
-	//case(GL_BYTE) :
-	//case(GL_SHORT) :
-	//case(GL_INT) : shader = &ShaderConvertS; break;
-	//default: GLS_Assert(0);		//not implement
-	//}
 
 	switch (CV_MAT_DEPTH(src.type())){
 	case(CV_32F) : shader = &ShaderConvert; break;
@@ -365,15 +282,7 @@ void convert(const GlsMat& src, GlsMat& dst, const float scl){
 	case(CV_32S) : shader = &ShaderConvertS; break;
 	default: GLS_Assert(0);		//not implement
 	}
-
-	glsFBO fbo(1);
-
-	//dst texture
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _dst.texid(), 0);
-	GLS_Assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
-
-	glsConvertProcess(shader, src.texid(), scl);
-	
+	shader->Execute(src, scl, -1, _dst);
 	dst = _dst;
 
 }
@@ -424,15 +333,8 @@ void cvtColor(const GlsMat& src, GlsMat& dst, const int code){
 	default: GLS_Assert(0);		//not implement
 	}
 
-	glsFBO fbo(1);
-
-	//dst texture
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _dst.texid(), 0);
-	GLS_Assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
 	float scl = 1.0f;
-	glsConvertProcess(shader, src.texid(), scl, code);
-
-
+	shader->Execute(src, scl, code, _dst);
 	dst = _dst;
 
 }
