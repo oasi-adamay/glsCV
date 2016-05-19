@@ -42,6 +42,8 @@ class glsShaderScalarOperation : public glsShaderBase
 {
 protected:
 	string FragmentShaderCode(void);
+	list<string> UniformNameList(void);
+
 
 public:
 	glsShaderScalarOperation(void) :glsShaderBase(__FUNCTION__) {}
@@ -53,6 +55,8 @@ class glsShaderBinaryOperation : public glsShaderBase
 {
 protected:
 	string FragmentShaderCode(void);
+	list<string> UniformNameList(void);
+
 public:
 	glsShaderBinaryOperation(void) :glsShaderBase(__FUNCTION__) {}
 
@@ -86,8 +90,8 @@ string glsShaderScalarOperation::FragmentShaderCode(void){
 "#version 330 core\n"
 "precision highp float;\n"
 "uniform sampler2D	texSrc;\n"
-"uniform vec4 scalar;\n"
 "uniform int	flags;\n"
+"uniform vec4 scalar;\n"
 "layout (location = 0) out vec4 dst;\n"
 "\n"
 "void main(void)\n"
@@ -132,7 +136,13 @@ string glsShaderScalarOperation::FragmentShaderCode(void){
 	return fragmentShaderCode;
 }
 
-
+list<string> glsShaderScalarOperation::UniformNameList(void){
+	list<string> lst;
+	lst.push_back("texSrc");
+	lst.push_back("flags");
+	lst.push_back("scalar");
+	return lst;
+}
 
 
 
@@ -172,7 +182,7 @@ const int flags					//flag (opcode)
 	{
 		glUseProgram(shader->program());
 	}
-
+#if 1
 	//uniform
 	{
 		float _scalar[4];
@@ -187,6 +197,16 @@ const int flags					//flag (opcode)
 		glUniform4fv(glGetUniformLocation(shader->program(), "scalar"), 1, &_scalar[0]);
 
 	}
+#elif 1
+	{
+		shader->setUniform("flags", flags);
+		shader->setUniform("scalar", scalar);
+	}
+#else
+	{
+		setUniforms(shader->uniformLocArray,0, flags, scalar);
+	}
+#endif
 
 	//Bind Texture
 	{
@@ -194,6 +214,8 @@ const int flags					//flag (opcode)
 		glActiveTexture(GL_TEXTURE0 + id);
 		glBindTexture(GL_TEXTURE_2D, texSrc);
 		glUniform1i(glGetUniformLocation(shader->program(),"texSrc"), id);
+//		shader->setUniform("texSrc", id);
+
 	}
 
 	//dst texture
@@ -290,6 +312,13 @@ string glsShaderBinaryOperation::FragmentShaderCode(void){
 	return fragmentShaderCode;
 }
 
+list<string> glsShaderBinaryOperation::UniformNameList(void){
+	list<string> lst;
+	lst.push_back("texSrc0");
+	lst.push_back("texSrc1");
+	lst.push_back("flags");
+	return lst;
+}
 
 
 //-------------------------------------------------------------
@@ -373,7 +402,8 @@ void glslBinaryOperation(
 void add(const Scalar& scalar, const GlsMat& src, GlsMat& dst){
 	GLS_Assert(src.glType() == GL_FLOAT);
 	GlsMat _dst = getDstMat(src,dst);
-	glslScalarOperation(&ShaderScalarOperation, scalar, src.texid(), _dst.texid(), OPCODE_ADD);
+	ShaderScalarOperation.Execute(src, OPCODE_ADD, scalar, _dst);
+//	glslScalarOperation(&ShaderScalarOperation, scalar, src.texid(), _dst.texid(), OPCODE_ADD);
 	dst = _dst;
 }
 
@@ -381,8 +411,9 @@ void add(const GlsMat& src0, const GlsMat& src1, GlsMat& dst)
 {
 	GLS_Assert(src0.glType() == GL_FLOAT);
 	GLS_Assert(src1.glType() == GL_FLOAT);
-	GlsMat _dst = getDstMat(src0, dst);
-	glslBinaryOperation(&ShaderBinaryOperation, src0.texid(), src1.texid(), _dst.texid(), OPCODE_ADD);
+	GlsMat _dst = getDstMat(src0 , src1, dst);
+	ShaderBinaryOperation.Execute(src0, src1, OPCODE_ADD ,_dst);
+//	glslBinaryOperation(&ShaderBinaryOperation, src0.texid(), src1.texid(), _dst.texid(), OPCODE_ADD);
 	dst = _dst;
 }
 
@@ -390,7 +421,8 @@ void add(const GlsMat& src0, const GlsMat& src1, GlsMat& dst)
 void subtract(const Scalar& scalar, const GlsMat& src, GlsMat& dst){
 	GLS_Assert(src.glType() == GL_FLOAT);
 	GlsMat _dst = getDstMat(src, dst);
-	glslScalarOperation(&ShaderScalarOperation, scalar, src.texid(), _dst.texid(), OPCODE_SUB);
+	ShaderScalarOperation.Execute(src, OPCODE_SUB, scalar, _dst);
+//	glslScalarOperation(&ShaderScalarOperation, scalar, src.texid(), _dst.texid(), OPCODE_SUB);
 	dst = _dst;
 }
 
@@ -398,8 +430,9 @@ void subtract(const GlsMat& src0, const GlsMat& src1, GlsMat& dst)
 {
 	GLS_Assert(src0.glType() == GL_FLOAT);
 	GLS_Assert(src1.glType() == GL_FLOAT);
-	GlsMat _dst = getDstMat(src0, dst);
-	glslBinaryOperation(&ShaderBinaryOperation, src0.texid(), src1.texid(), _dst.texid(), OPCODE_SUB);
+	GlsMat _dst = getDstMat(src0 , src1, dst);
+	ShaderBinaryOperation.Execute(src0, src1, OPCODE_SUB, _dst);
+//	glslBinaryOperation(&ShaderBinaryOperation, src0.texid(), src1.texid(), _dst.texid(), OPCODE_SUB);
 	dst = _dst;
 }
 
@@ -407,7 +440,8 @@ void subtract(const GlsMat& src0, const GlsMat& src1, GlsMat& dst)
 void multiply(const Scalar& scalar, const GlsMat& src, GlsMat& dst){
 	GLS_Assert(src.glType() == GL_FLOAT);
 	GlsMat _dst = getDstMat(src, dst);
-	glslScalarOperation(&ShaderScalarOperation, scalar, src.texid(), _dst.texid(), OPCODE_MUL);
+	ShaderScalarOperation.Execute(src, OPCODE_MUL, scalar, _dst);
+//	glslScalarOperation(&ShaderScalarOperation, scalar, src.texid(), _dst.texid(), OPCODE_MUL);
 	dst = _dst;
 }
 
@@ -415,15 +449,17 @@ void multiply(const GlsMat& src0, const GlsMat& src1, GlsMat& dst)
 {
 	GLS_Assert(src0.glType() == GL_FLOAT);
 	GLS_Assert(src1.glType() == GL_FLOAT);
-	GlsMat _dst = getDstMat(src0, dst);
-	glslBinaryOperation(&ShaderBinaryOperation, src0.texid(), src1.texid(), _dst.texid(), OPCODE_MUL);
+	GlsMat _dst = getDstMat(src0 , src1, dst);
+	ShaderBinaryOperation.Execute(src0, src1, OPCODE_MUL, _dst);
+//	glslBinaryOperation(&ShaderBinaryOperation, src0.texid(), src1.texid(), _dst.texid(), OPCODE_MUL);
 	dst = _dst;
 }
 
 void divide(const Scalar& scalar, const GlsMat& src, GlsMat& dst){
 	GLS_Assert(src.glType() == GL_FLOAT);
 	GlsMat _dst = getDstMat(src, dst);
-	glslScalarOperation(&ShaderScalarOperation, scalar, src.texid(), _dst.texid(), OPCODE_DIV);
+	ShaderScalarOperation.Execute(src, OPCODE_DIV, scalar, _dst);
+//	glslScalarOperation(&ShaderScalarOperation, scalar, src.texid(), _dst.texid(), OPCODE_DIV);
 	dst = _dst;
 }
 
@@ -431,55 +467,63 @@ void divide(const Scalar& scalar, const GlsMat& src, GlsMat& dst){
 void divide(const GlsMat& src0, const GlsMat& src1, GlsMat& dst){
 	GLS_Assert(src0.glType() == GL_FLOAT);
 	GLS_Assert(src1.glType() == GL_FLOAT);
-	GlsMat _dst = getDstMat(src0, dst);
-	glslBinaryOperation(&ShaderBinaryOperation, src0.texid(), src1.texid(), _dst.texid(), OPCODE_DIV);
+	GlsMat _dst = getDstMat(src0 , src1, dst);
+	ShaderBinaryOperation.Execute(src0, src1, OPCODE_DIV, _dst);
+//	glslBinaryOperation(&ShaderBinaryOperation, src0.texid(), src1.texid(), _dst.texid(), OPCODE_DIV);
 	dst = _dst;
 }
 
 void min(const Scalar& scalar, const GlsMat& src, GlsMat& dst){
 	GLS_Assert(src.glType() == GL_FLOAT);
 	GlsMat _dst = getDstMat(src, dst);
-	glslScalarOperation(&ShaderScalarOperation, scalar, src.texid(), _dst.texid(), OPCODE_MIN);
+	ShaderScalarOperation.Execute(src, OPCODE_MIN, scalar, _dst);
+//	glslScalarOperation(&ShaderScalarOperation, scalar, src.texid(), _dst.texid(), OPCODE_MIN);
 	dst = _dst;
 }
 
 void min(const GlsMat& src0, const GlsMat& src1, GlsMat& dst){
 	GLS_Assert(src0.glType() == GL_FLOAT);
 	GLS_Assert(src1.glType() == GL_FLOAT);
-	GlsMat _dst = getDstMat(src0, dst);
-	glslBinaryOperation(&ShaderBinaryOperation, src0.texid(), src1.texid(), _dst.texid(), OPCODE_MIN);
+	GlsMat _dst = getDstMat(src0 , src1, dst);
+	ShaderBinaryOperation.Execute(src0, src1, OPCODE_MIN, _dst);
+//	glslBinaryOperation(&ShaderBinaryOperation, src0.texid(), src1.texid(), _dst.texid(), OPCODE_MIN);
 	dst = _dst;
 }
 
 void max(const Scalar& scalar, const GlsMat& src, GlsMat& dst){
 	GLS_Assert(src.glType() == GL_FLOAT);
 	GlsMat _dst = getDstMat(src, dst);
-	glslScalarOperation(&ShaderScalarOperation, scalar, src.texid(), _dst.texid(), OPCODE_MAX);
+	ShaderScalarOperation.Execute(src, OPCODE_MAX, scalar, _dst);
+//	glslScalarOperation(&ShaderScalarOperation, scalar, src.texid(), _dst.texid(), OPCODE_MAX);
 	dst = _dst;
 }
 
 void max(const GlsMat& src0, const GlsMat& src1, GlsMat& dst){
 	GLS_Assert(src0.glType() == GL_FLOAT);
 	GLS_Assert(src1.glType() == GL_FLOAT);
-	GlsMat _dst = getDstMat(src0, dst);
-	glslBinaryOperation(&ShaderBinaryOperation, src0.texid(), src1.texid(), _dst.texid(), OPCODE_MAX);
+	GlsMat _dst = getDstMat(src0 , src1, dst);
+	ShaderBinaryOperation.Execute(src0, src1, OPCODE_MAX, _dst);
+//	glslBinaryOperation(&ShaderBinaryOperation, src0.texid(), src1.texid(), _dst.texid(), OPCODE_MAX);
 	dst = _dst;
 }
 
 void mulSpectrums(const GlsMat& src0, const GlsMat& src1, GlsMat& dst, bool conj){
 	GLS_Assert(src0.glSizedFormat() == GL_RG32F);
 	GLS_Assert(src1.glSizedFormat() == GL_RG32F);
-	GlsMat _dst = getDstMat(src0, dst);
-	if (conj)glslBinaryOperation(&ShaderBinaryOperation, src0.texid(), src1.texid(), _dst.texid(), OPCODE_MUL_SPCETRUM_CONJ);
-	else glslBinaryOperation(&ShaderBinaryOperation, src0.texid(), src1.texid(), _dst.texid(), OPCODE_MUL_SPCETRUM);
+	GlsMat _dst = getDstMat(src0 , src1, dst);
+	if (conj)ShaderBinaryOperation.Execute(src0, src1, OPCODE_MUL_SPCETRUM_CONJ, _dst);
+	else ShaderBinaryOperation.Execute(src0, src1, OPCODE_MUL_SPCETRUM, _dst);
+//	if (conj)glslBinaryOperation(&ShaderBinaryOperation, src0.texid(), src1.texid(), _dst.texid(), OPCODE_MUL_SPCETRUM_CONJ);
+//	else glslBinaryOperation(&ShaderBinaryOperation, src0.texid(), src1.texid(), _dst.texid(), OPCODE_MUL_SPCETRUM);
 	dst = _dst;
 }
 
 void mulSpectrumsPhaseOnly(const GlsMat& src0, const GlsMat& src1, GlsMat& dst){
 	GLS_Assert(src0.glSizedFormat() == GL_RG32F);
 	GLS_Assert(src1.glSizedFormat() == GL_RG32F);
-	GlsMat _dst = getDstMat(src0, dst);
-	glslBinaryOperation(&ShaderBinaryOperation, src0.texid(), src1.texid(), _dst.texid(), OPCODE_MUL_SPCETRUM_POC);
+	GlsMat _dst = getDstMat(src0 , src1, dst);
+	ShaderBinaryOperation.Execute(src0, src1, OPCODE_MUL_SPCETRUM_POC, _dst);
+//	glslBinaryOperation(&ShaderBinaryOperation, src0.texid(), src1.texid(), _dst.texid(), OPCODE_MUL_SPCETRUM_POC);
 	dst = _dst;
 }
 
@@ -487,7 +531,8 @@ void magSpectrums(const GlsMat& src, GlsMat& dst){
 	GLS_Assert(src.glSizedFormat() == GL_RG32F);
 	Scalar scalar(1.0, 1.0, 1.0, 1.0);
 	GlsMat _dst = getDstMat(src.size(), CV_MAKE_TYPE(src.depth(), 1),dst);
-	glslScalarOperation(&ShaderScalarOperation, scalar, src.texid(), _dst.texid(), OPCODE_MAG_SPCETRUM);
+	ShaderScalarOperation.Execute(src, OPCODE_MAG_SPCETRUM, scalar, _dst);
+//	glslScalarOperation(&ShaderScalarOperation, scalar, src.texid(), _dst.texid(), OPCODE_MAG_SPCETRUM);
 	dst = _dst;
 }
 
@@ -495,7 +540,8 @@ void logMagSpectrums(const GlsMat& src, GlsMat& dst, float offset){
 	GLS_Assert(src.glSizedFormat() == GL_RG32F);
 	Scalar scalar(offset);
 	GlsMat _dst = getDstMat(src.size(), CV_MAKE_TYPE(src.depth(), 1),dst);
-	glslScalarOperation(&ShaderScalarOperation, scalar, src.texid(), _dst.texid(), OPCODE_LOG_MAG_SPCETRUM);
+	ShaderScalarOperation.Execute(src, OPCODE_LOG_MAG_SPCETRUM, scalar, _dst);
+//	glslScalarOperation(&ShaderScalarOperation, scalar, src.texid(), _dst.texid(), OPCODE_LOG_MAG_SPCETRUM);
 	dst = _dst;
 }
 
@@ -504,7 +550,8 @@ void log(const GlsMat& src, GlsMat& dst){
 	GLS_Assert(src.glType() == GL_FLOAT);
 	Scalar scalar(1.0, 1.0, 1.0, 1.0);
 	GlsMat _dst = getDstMat(src, dst);
-	glslScalarOperation(&ShaderScalarOperation, scalar, src.texid(), _dst.texid(), OPCODE_LOG);
+	ShaderScalarOperation.Execute(src, OPCODE_LOG, scalar, _dst);
+//	glslScalarOperation(&ShaderScalarOperation, scalar, src.texid(), _dst.texid(), OPCODE_LOG);
 	dst = _dst;
 }
 
@@ -512,7 +559,8 @@ void exp(const GlsMat& src, GlsMat& dst){
 	GLS_Assert(src.glType() == GL_FLOAT);
 	Scalar scalar(1.0, 1.0, 1.0, 1.0);
 	GlsMat _dst = getDstMat(src, dst);
-	glslScalarOperation(&ShaderScalarOperation, scalar, src.texid(), _dst.texid(), OPCODE_EXP);
+	ShaderScalarOperation.Execute(src, OPCODE_EXP, scalar, _dst);
+//	glslScalarOperation(&ShaderScalarOperation, scalar, src.texid(), _dst.texid(), OPCODE_EXP);
 	dst = _dst;
 }
 
@@ -520,7 +568,8 @@ void pow(const GlsMat& src, const float& power, GlsMat& dst){
 	GLS_Assert(src.glType() == GL_FLOAT);
 	Scalar scalar(power, power, power, power);
 	GlsMat _dst = getDstMat(src, dst);
-	glslScalarOperation(&ShaderScalarOperation, scalar, src.texid(), _dst.texid(), OPCODE_POW);
+	ShaderScalarOperation.Execute(src, OPCODE_POW, scalar, _dst);
+//	glslScalarOperation(&ShaderScalarOperation, scalar, src.texid(), _dst.texid(), OPCODE_POW);
 	dst = _dst;
 }
 

@@ -35,6 +35,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "glsShader.h"
 #include "Timer.h"
 
+#define _ENABLE_SHADER_BIN
+
 namespace gls
 {
 
@@ -264,9 +266,18 @@ void glsShaderBase::Init(void){
 	if (name == "") return;
 	if (_program.use_count() == 0){
 		const string bin_filename = shaderBinName(name);
+#ifdef	_ENABLE_SHADER_BIN
 		if (!LoadShadersBinary(bin_filename))
+#endif
 		{
 			LoadShadersCode(VertexShaderCode(), FragmentShaderCode(), bin_filename);
+		}
+
+		list<string> lst = UniformNameList();
+		uniformLocArray.resize(lst.size());
+		int i = 0;
+		for (auto itr = lst.begin(); itr != lst.end(); ++itr,i++) {
+			uniformLocArray[i] = glGetUniformLocation(program(), (*itr).c_str());
 		}
 	}
 }
@@ -288,6 +299,30 @@ GLuint glsShaderBase::program(void) const{
 	return *_program;
 
 }
+
+void glsShaderBase::DrawBuffers(const int attachment_num){
+	GLenum bufs[] =
+	{
+		GL_COLOR_ATTACHMENT0,
+		GL_COLOR_ATTACHMENT1,
+		GL_COLOR_ATTACHMENT2,
+		GL_COLOR_ATTACHMENT3,
+		GL_COLOR_ATTACHMENT4,
+		GL_COLOR_ATTACHMENT5,
+		GL_COLOR_ATTACHMENT6,
+		GL_COLOR_ATTACHMENT7,
+		GL_COLOR_ATTACHMENT8,
+		GL_COLOR_ATTACHMENT9,
+		GL_COLOR_ATTACHMENT10,
+		GL_COLOR_ATTACHMENT11,
+		GL_COLOR_ATTACHMENT12,
+		GL_COLOR_ATTACHMENT13,
+		GL_COLOR_ATTACHMENT14,
+		GL_COLOR_ATTACHMENT15,
+	};
+	glDrawBuffers(attachment_num, bufs);
+}
+
 
 
 //list<glsShaderBase*> glsShaderBase::ShaderList;
