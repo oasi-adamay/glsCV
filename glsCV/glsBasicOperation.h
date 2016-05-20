@@ -31,9 +31,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _GLS_BASIC_OPERATION_H_
 #define _GLS_BASIC_OPERATION_H_
 
-#include "glsShader.h"
-#include "GlsMat.h"
-
 
 namespace gls
 {

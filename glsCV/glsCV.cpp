@@ -29,7 +29,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "stdafx.h"
 
-
+/*-----------------------------------------------------------------------------
+include
+*/
+#include "glsMacro.h"
 #include "glsCV.h"
 
 //#ifdef _DEBUG

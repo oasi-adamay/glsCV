@@ -29,33 +29,62 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "stdafx.h"
 
-
+/*-----------------------------------------------------------------------------
+include
+*/
+#include "glsMacro.h"
+#include "GlsMat.h"
+#include "glsShader.h"
 #include "glsAdaptiveThreshold.h"
+
+#include "glsFilter.h"	//boxfilter
+
 
 namespace gls
 {
 
 //-----------------------------------------------------------------------------
 // glsShaderAdaptiveThreshold
-class glsShaderAdaptiveThreshold : public glsShaderBase
+class glsShaderAdaptiveThresholdBase : public glsShaderBase
+{
+protected:
+	list<string> UniformNameList(void){
+		list<string> lst;
+		lst.push_back("texSrc");
+		lst.push_back("texTh");
+		lst.push_back("c");
+		lst.push_back("maxVal");
+		lst.push_back("thresholdType");
+		return lst;
+	}
+
+public:
+	glsShaderAdaptiveThresholdBase(const string& _name) :glsShaderBase(_name){}
+
+};
+
+
+//-----------------------------------------------------------------------------
+// glsShaderAdaptiveThreshold
+class glsShaderAdaptiveThreshold : public glsShaderAdaptiveThresholdBase
 {
 protected:
 	string FragmentShaderCode(void);
 
 public:
-	glsShaderAdaptiveThreshold(void) : glsShaderBase(__FUNCTION__){}
+	glsShaderAdaptiveThreshold(void) : glsShaderAdaptiveThresholdBase(__FUNCTION__){}
 
 };
 
 //-----------------------------------------------------------------------------
 // glsShaderAdaptiveThresholdU
-class glsShaderAdaptiveThresholdU : public glsShaderBase
+class glsShaderAdaptiveThresholdU : public glsShaderAdaptiveThresholdBase
 {
 protected:
 	string FragmentShaderCode(void);
 
 public:
-	glsShaderAdaptiveThresholdU(void) : glsShaderBase(__FUNCTION__){}
+	glsShaderAdaptiveThresholdU(void) : glsShaderAdaptiveThresholdBase(__FUNCTION__){}
 
 };
 
@@ -79,125 +108,68 @@ glsShaderAdaptiveThresholdU ShaderAdaptiveThresholdU;
 //-----------------------------------------------------------------------------
 //glsShaderAdaptiveThreshold
 string glsShaderAdaptiveThreshold::FragmentShaderCode(void){
-	const char fragmentShaderCode[] =
-"#version 330 core\n"
-"precision highp float;\n"
-"uniform sampler2D	texSrc;\n"
-"uniform sampler2D	texTh;\n"
-"uniform float	c;\n"
-"uniform float	maxVal;\n"
-"uniform int	thresholdType;\n"
-"layout (location = 0) out float dst;\n"
-"#define CV_THRESH_BINARY  0\n"
-"#define CV_THRESH_BINARY_INV 1\n"
-"#define CV_THRESH_TRUNC 2\n"
-"#define CV_THRESH_TOZERO 3\n"
-"#define CV_THRESH_TOZERO_INV 4\n"
-"void main(void)\n"
-"{\n"
-"	float value = texelFetch(texSrc, ivec2(gl_FragCoord.xy), 0).r;\n"
-"	float thresh = texelFetch(texTh, ivec2(gl_FragCoord.xy), 0).r - c;\n"
-"	switch(thresholdType){\n"
-"   case(CV_THRESH_BINARY): dst = value > thresh? maxVal : 0.0; break;\n"
-"   case(CV_THRESH_BINARY_INV): dst = value > thresh? 0.0 : maxVal; break;\n"
-"   case(CV_THRESH_TRUNC): dst = value > thresh? thresh : value; break;\n"
-"   case(CV_THRESH_TOZERO): dst = value > thresh? value : 0.0; break;\n"
-"   case(CV_THRESH_TOZERO_INV): dst = value > thresh? 0.0 : value; break;\n"
-"	}\n"
-"}\n"
-;
+	const char fragmentShaderCode[] = TO_STR(
+#version 330 core\n
+precision highp float;\n
+uniform sampler2D	texSrc;\n
+uniform sampler2D	texTh;\n
+uniform float	c;\n
+uniform float	maxVal;\n
+uniform int	thresholdType;\n
+layout (location = 0) out float dst;\n
+#define CV_THRESH_BINARY  0\n
+#define CV_THRESH_BINARY_INV 1\n
+#define CV_THRESH_TRUNC 2\n
+#define CV_THRESH_TOZERO 3\n
+#define CV_THRESH_TOZERO_INV 4\n
+void main(void)\n
+{\n
+	float value = texelFetch(texSrc, ivec2(gl_FragCoord.xy), 0).r;\n
+	float thresh = texelFetch(texTh, ivec2(gl_FragCoord.xy), 0).r - c;\n
+	switch(thresholdType){\n
+   case(CV_THRESH_BINARY): dst = value > thresh? maxVal : 0.0; break;\n
+   case(CV_THRESH_BINARY_INV): dst = value > thresh? 0.0 : maxVal; break;\n
+   case(CV_THRESH_TRUNC): dst = value > thresh? thresh : value; break;\n
+   case(CV_THRESH_TOZERO): dst = value > thresh? value : 0.0; break;\n
+   case(CV_THRESH_TOZERO_INV): dst = value > thresh? 0.0 : value; break;\n
+	}\n
+}\n
+);
 	return fragmentShaderCode;
 }
 
 //-----------------------------------------------------------------------------
 //glsShaderAdaptiveThresholdU
 string glsShaderAdaptiveThresholdU::FragmentShaderCode(void){
-	const char fragmentShaderCode[] =
-"#version 330 core\n"
-"precision highp float;\n"
-"uniform usampler2D	texSrc;\n"
-"uniform usampler2D	texTh;\n"
-"uniform float	c;\n"
-"uniform float	maxVal;\n"
-"uniform int	thresholdType;\n"
-"layout (location = 0) out uint dst;\n"
-"#define CV_THRESH_BINARY  0\n"
-"#define CV_THRESH_BINARY_INV 1\n"
-"#define CV_THRESH_TRUNC 2\n"
-"#define CV_THRESH_TOZERO 3\n"
-"#define CV_THRESH_TOZERO_INV 4\n"
-"void main(void)\n"
-"{\n"
-"	uint value = texelFetch(texSrc, ivec2(gl_FragCoord.xy), 0).r;\n"
-"	uint _thresh = texelFetch(texTh, ivec2(gl_FragCoord.xy), 0).r - uint(c);\n"
-"	uint _maxVal = uint(maxVal);\n"
-"	switch(thresholdType){\n"
-"   case(CV_THRESH_BINARY): dst = value > _thresh? _maxVal : 0u ; break;\n"
-"   case(CV_THRESH_BINARY_INV): dst = value > _thresh? 0u : _maxVal; break;\n"
-"   case(CV_THRESH_TRUNC): dst = value > _thresh? _thresh : value; break;\n"
-"   case(CV_THRESH_TOZERO): dst = value > _thresh? value : 0u; break;\n"
-"   case(CV_THRESH_TOZERO_INV): dst = value > _thresh? 0u : value; break;\n"
-"	}\n"
-"}\n"
-;
+	const char fragmentShaderCode[] = TO_STR(
+#version 330 core\n
+precision highp float;\n
+uniform usampler2D	texSrc;\n
+uniform usampler2D	texTh;\n
+uniform float	c;\n
+uniform float	maxVal;\n
+uniform int	thresholdType;\n
+layout (location = 0) out uint dst;\n
+#define CV_THRESH_BINARY  0\n
+#define CV_THRESH_BINARY_INV 1\n
+#define CV_THRESH_TRUNC 2\n
+#define CV_THRESH_TOZERO 3\n
+#define CV_THRESH_TOZERO_INV 4\n
+void main(void)\n
+{\n
+	uint value = texelFetch(texSrc, ivec2(gl_FragCoord.xy), 0).r;\n
+	uint _thresh = texelFetch(texTh, ivec2(gl_FragCoord.xy), 0).r - uint(c);\n
+	uint _maxVal = uint(maxVal);\n
+	switch(thresholdType){\n
+	case(CV_THRESH_BINARY): dst = value > _thresh? _maxVal : 0u ; break;\n
+    case(CV_THRESH_BINARY_INV): dst = value > _thresh? 0u : _maxVal; break;\n
+    case(CV_THRESH_TRUNC): dst = value > _thresh? _thresh : value; break;\n
+    case(CV_THRESH_TOZERO): dst = value > _thresh? value : 0u; break;\n
+    case(CV_THRESH_TOZERO_INV): dst = value > _thresh? 0u : value; break;\n
+ 	}\n
+}\n
+);
 	return fragmentShaderCode;
-}
-
-
-//---------------------------------------------------------------------------
-/*!
-*/
-static void glsThresholdProcess(
-	const glsShaderBase* shader,	//progmra ID
-	const GLuint& texSrc,			//src   texture ID
-	const GLuint& texTh,			//threshold  texture ID
-	const Size& texSize,			//dst texture size
-	double maxVal,
-	int thresholdType,
-	double c
-	)
-{
-
-	//program
-	{
-		glUseProgram(shader->program());
-	}
-
-	//uniform
-	{
-		glUniform1f(glGetUniformLocation(shader->program(), "c"), (float)c);
-		glUniform1f(glGetUniformLocation(shader->program(), "maxVal"), (float)maxVal);
-		glUniform1i(glGetUniformLocation(shader->program(), "thresholdType"), thresholdType);
-	}
-
-	//Bind Texture
-	{
-		int id = 0;
-		glActiveTexture(GL_TEXTURE0 + id);
-		glBindTexture(GL_TEXTURE_2D, texSrc);
-		glUniform1i(glGetUniformLocation(shader->program(), "texSrc"), id);
-		id++;
-		glActiveTexture(GL_TEXTURE0 + id);
-		glBindTexture(GL_TEXTURE_2D, texTh);
-		glUniform1i(glGetUniformLocation(shader->program(), "texTh"), id);
-
-	}
-
-	glsVAO vao(glGetAttribLocation(shader->program(), "position"));
-
-	//Viewport
-	glViewport(0, 0, texSize.width, texSize.height);
-
-	//Render!!
-	{
-		glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
-		glFlush();
-	}
-
-	GL_CHECK_ERROR();
-
-	//	glFinish();
-
 }
 
 
@@ -235,13 +207,7 @@ void adaptiveThreshold(const GlsMat& src, GlsMat& dst, double maxVal, int adapti
 
 
 	glsShaderBase* shader = selectShader(src.type());
-
-	glsFBO fbo(1);
-	{
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _dst.texid(), 0);
-		glsThresholdProcess(shader, src.texid(), _lpf.texid(),_dst.size(), maxVal, thresholdType,C);
-	}
-
+	shader->Execute(src, _lpf, C, maxVal, thresholdType, _dst);
 	dst = _dst;
 }
 

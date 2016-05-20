@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _GLS_MAT_H_
 #define _GLS_MAT_H_
 
-#include <memory>
+#include <memory>	//shared_ptr
 
 namespace gls
 {
@@ -114,7 +114,7 @@ in-placeの時、dstのサイズ、タイプがsrcのサイズ、タイプと異
 */
 static GlsMat getDstMat(const GlsMat& src, GlsMat& dst){
 	GlsMat _dst;
-	if (&src == &dst || dst.size() != src.size() || dst.type() != src.type()){
+	if (src.texid() == dst.texid() || dst.size() != src.size() || dst.type() != src.type()){
 		_dst = GlsMat(src.size(), src.type());
 	}
 	else{
@@ -122,6 +122,20 @@ static GlsMat getDstMat(const GlsMat& src, GlsMat& dst){
 	}
 	return _dst;
 }
+
+static GlsMat getDstMat(const GlsMat& src0, const GlsMat& src1, GlsMat& dst){
+//	Gls_Assert(src0.size()==src1.size() && src0.type()==src1.type());
+	GlsMat _dst;
+	if (src0.texid() == dst.texid() || src1.texid() == dst.texid() ||
+		dst.size() != src0.size() || dst.type() != src0.type()){
+		_dst = GlsMat(src0.size(), src0.type());
+	}
+	else{
+		_dst = dst;
+	}
+	return _dst;
+}
+
 
 /*!
 出力GlsMatの取得

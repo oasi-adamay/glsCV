@@ -36,6 +36,7 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 #include "HookCoutCerr.h"
 #include "Timer.h"
 
+#include "glsMacro.h"
 #include "glsCV.h"
 
 //Lib 

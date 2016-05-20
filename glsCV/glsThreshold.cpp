@@ -29,6 +29,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "stdafx.h"
 
+/*-----------------------------------------------------------------------------
+include
+*/
+#include "glsMacro.h"
+#include "GlsMat.h"
+#include "glsShader.h"
 
 #include "glsThreshold.h"
 
@@ -37,25 +43,44 @@ namespace gls
 
 //-----------------------------------------------------------------------------
 // glsShaderThreshold
-class glsShaderThreshold : public glsShaderBase
+class glsShaderThresholdBase : public glsShaderBase
+{
+protected:
+	list<string> UniformNameList(void){
+		list<string> lst;
+		lst.push_back("texSrc");
+		lst.push_back("thresh");
+		lst.push_back("maxVal");
+		lst.push_back("thresholdType");
+		return lst;
+	}
+public:
+	glsShaderThresholdBase(const string& _name) :glsShaderBase(_name){}
+
+
+};
+
+//-----------------------------------------------------------------------------
+// glsShaderThreshold
+class glsShaderThreshold : public glsShaderThresholdBase
 {
 protected:
 	string FragmentShaderCode(void);
 
 public:
-	glsShaderThreshold(void) : glsShaderBase(__FUNCTION__){}
+	glsShaderThreshold(void) : glsShaderThresholdBase(__FUNCTION__){}
 
 };
 
 //-----------------------------------------------------------------------------
 // glsShaderThresholdU
-class glsShaderThresholdU : public glsShaderBase
+class glsShaderThresholdU : public glsShaderThresholdBase
 {
 protected:
 	string FragmentShaderCode(void);
 
 public:
-	glsShaderThresholdU(void) : glsShaderBase(__FUNCTION__){}
+	glsShaderThresholdU(void) : glsShaderThresholdBase(__FUNCTION__){}
 
 };
 
@@ -85,117 +110,65 @@ glsShaderThresholdU ShaderThresholdU;
 //-----------------------------------------------------------------------------
 //glsShaderThreshold
 string glsShaderThreshold::FragmentShaderCode(void){
-	const char fragmentShaderCode[] =
-"#version 330 core\n"
-"precision highp float;\n"
-"uniform sampler2D	texSrc;\n"
-"uniform float	thresh;\n"
-"uniform float	maxVal;\n"
-"uniform int	thresholdType;\n"
-"layout (location = 0) out float dst;\n"
-"#define CV_THRESH_BINARY  0\n"
-"#define CV_THRESH_BINARY_INV 1\n"
-"#define CV_THRESH_TRUNC 2\n"
-"#define CV_THRESH_TOZERO 3\n"
-"#define CV_THRESH_TOZERO_INV 4\n"
-"void main(void)\n"
-"{\n"
-"	float value = texelFetch(texSrc, ivec2(gl_FragCoord.xy), 0).r;\n"
-"	switch(thresholdType){\n"
-"   case(CV_THRESH_BINARY): dst = value > thresh? maxVal : 0.0; break;\n"
-"   case(CV_THRESH_BINARY_INV): dst = value > thresh? 0.0 : maxVal; break;\n"
-"   case(CV_THRESH_TRUNC): dst = value > thresh? thresh : value; break;\n"
-"   case(CV_THRESH_TOZERO): dst = value > thresh? value : 0.0; break;\n"
-"   case(CV_THRESH_TOZERO_INV): dst = value > thresh? 0.0 : value; break;\n"
-"	}\n"
-"}\n"
-;
+	const char fragmentShaderCode[] = TO_STR(
+#version 330 core\n
+precision highp float;\n
+uniform sampler2D	texSrc;\n
+uniform float	thresh;\n
+uniform float	maxVal;\n
+uniform int	thresholdType;\n
+layout (location = 0) out float dst;\n
+#define CV_THRESH_BINARY  0\n
+#define CV_THRESH_BINARY_INV 1\n
+#define CV_THRESH_TRUNC 2\n
+#define CV_THRESH_TOZERO 3\n
+#define CV_THRESH_TOZERO_INV 4\n
+void main(void)\n
+{\n
+	float value = texelFetch(texSrc, ivec2(gl_FragCoord.xy), 0).r;\n
+	switch(thresholdType){\n
+   case(CV_THRESH_BINARY): dst = value > thresh? maxVal : 0.0; break;\n
+   case(CV_THRESH_BINARY_INV): dst = value > thresh? 0.0 : maxVal; break;\n
+   case(CV_THRESH_TRUNC): dst = value > thresh? thresh : value; break;\n
+   case(CV_THRESH_TOZERO): dst = value > thresh? value : 0.0; break;\n
+   case(CV_THRESH_TOZERO_INV): dst = value > thresh? 0.0 : value; break;\n
+	}\n
+}\n
+);
 	return fragmentShaderCode;
 }
 
 //-----------------------------------------------------------------------------
 //glsShaderThresholdU
 string glsShaderThresholdU::FragmentShaderCode(void){
-	const char fragmentShaderCode[] =
-"#version 330 core\n"
-"precision highp float;\n"
-"uniform usampler2D	texSrc;\n"
-"uniform float	thresh;\n"
-"uniform float	maxVal;\n"
-"uniform int	thresholdType;\n"
-"layout (location = 0) out uint dst;\n"
-"#define CV_THRESH_BINARY  0\n"
-"#define CV_THRESH_BINARY_INV 1\n"
-"#define CV_THRESH_TRUNC 2\n"
-"#define CV_THRESH_TOZERO 3\n"
-"#define CV_THRESH_TOZERO_INV 4\n"
-"void main(void)\n"
-"{\n"
-"	uint value = texelFetch(texSrc, ivec2(gl_FragCoord.xy), 0).r;\n"
-"	uint _thresh = uint(thresh);\n"
-"	uint _maxVal = uint(maxVal);\n"
-"	switch(thresholdType){\n"
-"   case(CV_THRESH_BINARY): dst = value > _thresh? _maxVal : 0u ; break;\n"
-"   case(CV_THRESH_BINARY_INV): dst = value > _thresh? 0u : _maxVal; break;\n"
-"   case(CV_THRESH_TRUNC): dst = value > _thresh? _thresh : value; break;\n"
-"   case(CV_THRESH_TOZERO): dst = value > _thresh? value : 0u; break;\n"
-"   case(CV_THRESH_TOZERO_INV): dst = value > _thresh? 0u : value; break;\n"
-"	}\n"
-"}\n"
-;
+	const char fragmentShaderCode[] = TO_STR(
+#version 330 core\n
+precision highp float;\n
+uniform usampler2D	texSrc;\n
+uniform float	thresh;\n
+uniform float	maxVal;\n
+uniform int	thresholdType;\n
+layout (location = 0) out uint dst;\n
+#define CV_THRESH_BINARY  0\n
+#define CV_THRESH_BINARY_INV 1\n
+#define CV_THRESH_TRUNC 2\n
+#define CV_THRESH_TOZERO 3\n
+#define CV_THRESH_TOZERO_INV 4\n
+void main(void)\n
+{\n
+	uint value = texelFetch(texSrc, ivec2(gl_FragCoord.xy), 0).r;\n
+	uint _thresh = uint(thresh);\n
+	uint _maxVal = uint(maxVal);\n
+	switch(thresholdType){\n
+   case(CV_THRESH_BINARY): dst = value > _thresh? _maxVal : 0u ; break;\n
+   case(CV_THRESH_BINARY_INV): dst = value > _thresh? 0u : _maxVal; break;\n
+   case(CV_THRESH_TRUNC): dst = value > _thresh? _thresh : value; break;\n
+   case(CV_THRESH_TOZERO): dst = value > _thresh? value : 0u; break;\n
+   case(CV_THRESH_TOZERO_INV): dst = value > _thresh? 0u : value; break;\n
+	}\n
+}\n
+);
 	return fragmentShaderCode;
-}
-
-
-//---------------------------------------------------------------------------
-/*!
-*/
-static void glsThresholdProcess(
-	const glsShaderBase* shader,	//progmra ID
-	const GLuint& texSrc,			//src   texture ID
-	const Size& texSize,			//dst texture size
-	double thresh,
-	double maxVal,
-	int thresholdType
-	)
-{
-
-	//program
-	{
-		glUseProgram(shader->program());
-	}
-
-	//uniform
-	{
-		glUniform1f(glGetUniformLocation(shader->program(), "thresh"), (float)thresh);
-		glUniform1f(glGetUniformLocation(shader->program(), "maxVal"), (float)maxVal);
-		glUniform1i(glGetUniformLocation(shader->program(), "thresholdType"), thresholdType);
-	}
-
-	//Bind Texture
-	{
-		int id = 0;
-		glActiveTexture(GL_TEXTURE0 + id);
-		glBindTexture(GL_TEXTURE_2D, texSrc);
-		glUniform1i(glGetUniformLocation(shader->program(), "texSrc"), id);
-
-	}
-
-	glsVAO vao(glGetAttribLocation(shader->program(), "position"));
-
-	//Viewport
-	glViewport(0, 0, texSize.width, texSize.height);
-
-	//Render!!
-	{
-		glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
-		glFlush();
-	}
-
-	GL_CHECK_ERROR();
-
-	//	glFinish();
-
 }
 
 
@@ -223,12 +196,7 @@ void threshold(const GlsMat& src, GlsMat& dst, double thresh, double maxVal, int
 	GlsMat _dst = getDstMat(src.size(), CV_MAKE_TYPE(src.depth(),1), dst);
 
 	glsShaderBase* shader = selectShader(src.type());
-
-	glsFBO fbo(1);
-	{
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _dst.texid(), 0);
-		glsThresholdProcess(shader, src.texid(), _dst.size(), thresh, maxVal, thresholdType);
-	}
+	shader->Execute(src, thresh, maxVal, thresholdType,_dst);
 
 	dst = _dst;
 }

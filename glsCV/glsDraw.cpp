@@ -29,9 +29,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "stdafx.h"
 
+/*-----------------------------------------------------------------------------
+include
+*/
+#include "glsMacro.h"
+#include "GlsMat.h"
+#include "glsShader.h"
 
 #include "glsDraw.h"
-#include "Timer.h"
 
 namespace gls
 {
@@ -82,31 +87,31 @@ glsShaderDrawU ShaderDrawU;
 //-----------------------------------------------------------------------------
 //glsShaderDraw
 string glsShaderDraw::FragmentShaderCode(void){
-	const char fragmentShaderCode[] =
-"#version 330 core\n"
-"precision highp float;\n"
-"uniform sampler2D	texSrc;\n"
-"uniform float	scl;\n"
-"uniform int 	flag;\n"
-"\n"
-"layout (location = 0) out vec4 dst;\n"
-"\n"
-"void main(void)\n"
-"{\n"
-"	ivec2 texSize = textureSize(texSrc,0);\n"
-"	ivec2 texCord = ivec2(gl_FragCoord.xy)%texSize;\n"
-"	vec4 data = texelFetch(texSrc, texCord,0);\n"
-"	vec4 color;\n"
-"	switch(flag&3){\n"
-"	case(0):color = vec4(data.r*scl,data.g*scl,data.b*scl,data.g*scl);break;\n"
-"	case(1):color = vec4(data.r*scl,data.r*scl,data.r*scl,1.0);break;\n"
-"	case(2):color = vec4(data.r*scl,data.r*scl,data.r*scl,1.0);break;\n"
-"	case(3):color = vec4(data.r*scl,data.g*scl,data.b*scl,1.0);break;\n"
-"	}\n"
-"	dst = color;\n"
-"\n"
-"}\n"
-;
+	const char fragmentShaderCode[] = TO_STR(
+#version 330 core\n
+precision highp float;\n
+uniform sampler2D	texSrc;\n
+uniform float	scl;\n
+uniform int 	flag;\n
+\n
+layout (location = 0) out vec4 dst;\n
+\n
+void main(void)\n
+{\n
+	ivec2 texSize = textureSize(texSrc,0);\n
+	ivec2 texCord = ivec2(gl_FragCoord.xy)%texSize;\n
+	vec4 data = texelFetch(texSrc, texCord,0);\n
+	vec4 color;\n
+	switch(flag&3){\n
+	case(0):color = vec4(data.r*scl,data.g*scl,data.b*scl,data.g*scl);break;\n
+	case(1):color = vec4(data.r*scl,data.r*scl,data.r*scl,1.0);break;\n
+	case(2):color = vec4(data.r*scl,data.r*scl,data.r*scl,1.0);break;\n
+	case(3):color = vec4(data.r*scl,data.g*scl,data.b*scl,1.0);break;\n
+	}\n
+	dst = color;\n
+\n
+}\n
+);
 	return fragmentShaderCode;
 }
 
@@ -115,57 +120,32 @@ string glsShaderDraw::FragmentShaderCode(void){
 //-----------------------------------------------------------------------------
 //glsShaderDrawU
 string glsShaderDrawU::FragmentShaderCode(void){
-	const char fragmentShaderCode[] =
-"#version 330 core\n"
-"precision highp float;\n"
-"uniform usampler2D	texSrc;\n"
-"uniform float	scl;\n"
-"uniform int 	flag;\n"
-"\n"
-"layout (location = 0) out vec4 dst;\n"
-"\n"
-"void main(void)\n"
-"{\n"
-"	ivec2 texSize = textureSize(texSrc,0);\n"
-"	ivec2 texCord = ivec2(gl_FragCoord.xy)%texSize;\n"
-"	vec4 data = vec4(texelFetch(texSrc, texCord,0));\n"
-"	vec4 color;\n"
-"	switch(flag&3){\n"
-"	case(0):color = vec4(data.r*scl,data.g*scl,data.b*scl,data.g*scl);break;\n"
-"	case(1):color = vec4(data.r*scl,data.r*scl,data.r*scl,1.0);break;\n"
-"	case(2):color = vec4(data.r*scl,data.r*scl,data.r*scl,1.0);break;\n"
-"	case(3):color = vec4(data.r*scl,data.g*scl,data.b*scl,1.0);break;\n"
-"	}\n"
-"	dst = color;\n"
-"}\n"
-;
+	const char fragmentShaderCode[] = TO_STR(
+#version 330 core\n
+precision highp float;\n
+uniform usampler2D	texSrc;\n
+uniform float	scl;\n
+uniform int 	flag;\n
+\n
+layout (location = 0) out vec4 dst;\n
+\n
+void main(void)\n
+{\n
+	ivec2 texSize = textureSize(texSrc,0);\n
+	ivec2 texCord = ivec2(gl_FragCoord.xy)%texSize;\n
+	vec4 data = vec4(texelFetch(texSrc, texCord,0));\n
+	vec4 color;\n
+	switch(flag&3){\n
+	case(0):color = vec4(data.r*scl,data.g*scl,data.b*scl,data.g*scl);break;\n
+	case(1):color = vec4(data.r*scl,data.r*scl,data.r*scl,1.0);break;\n
+	case(2):color = vec4(data.r*scl,data.r*scl,data.r*scl,1.0);break;\n
+	case(3):color = vec4(data.r*scl,data.g*scl,data.b*scl,1.0);break;\n
+	}\n
+	dst = color;\n
+}\n
+);
 	return fragmentShaderCode;
 }
-
-
-static Size getTextureSize(GLuint tex){
-	int width;
-	int height;
-
-	//get texture size
-
-	glBindTexture(GL_TEXTURE_2D, tex);
-	glGetTexLevelParameteriv(
-		GL_TEXTURE_2D, 0,
-		GL_TEXTURE_WIDTH, &width
-		);
-
-	glGetTexLevelParameteriv(
-		GL_TEXTURE_2D, 0,
-		GL_TEXTURE_HEIGHT, &height
-		);
-
-	glBindTexture(GL_TEXTURE_2D, 0);
-
-	return Size(width, height);
-}
-
-
 
 
 //---------------------------------------------------------------------------

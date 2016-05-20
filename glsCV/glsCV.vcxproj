@@ -148,6 +148,7 @@
     <ClInclude Include="glsFBO.h" />
     <ClInclude Include="glsFft.h" />
     <ClInclude Include="glsFilter.h" />
+    <ClInclude Include="glsMacro.h" />
     <ClInclude Include="glsMat.h" />
     <ClInclude Include="glsMerge.h" />
     <ClInclude Include="glsMinMaxLoc.h" />

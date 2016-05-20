@@ -31,14 +31,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _GLS_FILTER_H_
 #define _GLS_FILTER_H_
 
-#include "glsCV.h"
-#include "GlsMat.h"
-#include "glsShader.h"
-
 namespace gls
 {
-
-
 
 /*!
 分離型2次元線形フィルタを，画像に適用します．
