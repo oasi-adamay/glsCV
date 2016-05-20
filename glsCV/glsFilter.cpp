@@ -108,51 +108,51 @@ glsShaderFilter2D ShaderFilter2D;
 //-----------------------------------------------------------------------------
 //glsShaderFilter1D
 string glsShaderFilter1D::FragmentShaderCode(void){
-	const char fragmentShaderCode[] =
-"#version 330 core\n"
-"precision highp float;\n"
-"uniform sampler2D	texSrc;\n"
-"uniform sampler2D	texKernel;\n"
-"layout (location = 0) out vec4 dst;\n"
-"#define BOUND_PVT(x,pl,pr) ((x)<(pl)?2*(pl)-(x) :(x)>(pr)? 2*(pr)-(x): (x))\n"
-"void main(void)\n"
-"{\n"
-"	ivec2 texSize = textureSize(texSrc,0);\n"
-"	ivec2 texKernelSize = textureSize(texKernel,0);\n"
-"	if(texKernelSize.y==1){\n"
-"		int ksize = texKernelSize.x ;\n"
-"		int kp = ksize / 2 ;\n"
-"		int km = -kp;\n"
-"		vec4 sum = vec4(0.0,0.0,0.0,0.0);\n"
-"		for (int k = km; k <= kp; k++){\n"
-"			vec4 data;\n"
-"			vec4 coef;\n"
-"			int x = int(gl_FragCoord.x) + k;\n"
-"			x = BOUND_PVT(x,0,texSize.x-1);\n"
-"			data = texelFetch(texSrc, ivec2(x, gl_FragCoord.y), 0);\n"
-"			coef = vec4(texelFetch(texKernel, ivec2(k+kp, 0), 0).r);\n"
-"			sum += data * coef;\n"
-"		}\n"
-"		dst = sum;\n"
-"	}\n"
-"	else{\n"
-"		int ksize = texKernelSize.y ;\n"
-"		int kp = ksize / 2 ;\n"
-"		int km = -kp;\n"
-"		vec4 sum = vec4(0.0,0.0,0.0,0.0);\n"
-"		for (int k = km; k <= kp; k++){\n"
-"			vec4 data;\n"
-"			vec4 coef;\n"
-"			int y = int(gl_FragCoord.y) + k;\n"
-"			y = BOUND_PVT(y,0,texSize.y-1);\n"
-"			data = texelFetch(texSrc, ivec2(gl_FragCoord.x,y), 0);\n"
-"			coef = vec4(texelFetch(texKernel, ivec2(0,k+kp), 0).r);\n"
-"			sum += data * coef;\n"
-"		}\n"
-"		dst = sum;\n"
-"	}\n"
-"}\n"
-;
+	const char fragmentShaderCode[] = TO_STR(
+#version 330 core\n
+precision highp float;\n
+uniform sampler2D	texSrc;\n
+uniform sampler2D	texKernel;\n
+layout (location = 0) out vec4 dst;\n
+#define BOUND_PVT(x,pl,pr) ((x)<(pl)?2*(pl)-(x) :(x)>(pr)? 2*(pr)-(x): (x))\n
+void main(void)\n
+{\n
+	ivec2 texSize = textureSize(texSrc,0);\n
+	ivec2 texKernelSize = textureSize(texKernel,0);\n
+	if(texKernelSize.y==1){\n
+		int ksize = texKernelSize.x ;\n
+		int kp = ksize / 2 ;\n
+		int km = -kp;\n
+		vec4 sum = vec4(0.0,0.0,0.0,0.0);\n
+		for (int k = km; k <= kp; k++){\n
+			vec4 data;\n
+			vec4 coef;\n
+			int x = int(gl_FragCoord.x) + k;\n
+			x = BOUND_PVT(x,0,texSize.x-1);\n
+			data = texelFetch(texSrc, ivec2(x, gl_FragCoord.y), 0);\n
+			coef = vec4(texelFetch(texKernel, ivec2(k+kp, 0), 0).r);\n
+			sum += data * coef;\n
+		}\n
+		dst = sum;\n
+	}\n
+	else{\n
+		int ksize = texKernelSize.y ;\n
+		int kp = ksize / 2 ;\n
+		int km = -kp;\n
+		vec4 sum = vec4(0.0,0.0,0.0,0.0);\n
+		for (int k = km; k <= kp; k++){\n
+			vec4 data;\n
+			vec4 coef;\n
+			int y = int(gl_FragCoord.y) + k;\n
+			y = BOUND_PVT(y,0,texSize.y-1);\n
+			data = texelFetch(texSrc, ivec2(gl_FragCoord.x,y), 0);\n
+			coef = vec4(texelFetch(texKernel, ivec2(0,k+kp), 0).r);\n
+			sum += data * coef;\n
+		}\n
+		dst = sum;\n
+	}\n
+}\n
+);
 	return fragmentShaderCode;
 }
 
@@ -167,51 +167,51 @@ list<string> glsShaderFilter1D::UniformNameList(void){
 //-----------------------------------------------------------------------------
 //glsShaderFilter1DU
 string glsShaderFilter1DU::FragmentShaderCode(void){
-	const char fragmentShaderCode[] =
-"#version 330 core\n"
-"precision highp float;\n"
-"uniform usampler2D	texSrc;\n"
-"uniform sampler2D	texKernel;\n"
-"layout (location = 0) out uvec4 dst;\n"
-"#define BOUND_PVT(x,pl,pr) ((x)<(pl)?2*(pl)-(x) :(x)>(pr)? 2*(pr)-(x): (x))\n"
-"void main(void)\n"
-"{\n"
-"	ivec2 texSize = textureSize(texSrc,0);\n"
-"	ivec2 texKernelSize = textureSize(texKernel,0);\n"
-"	if(texKernelSize.y==1){\n"
-"		int ksize = texKernelSize.x ;\n"
-"		int kp = ksize / 2 ;\n"
-"		int km = -kp;\n"
-"		vec4 sum = vec4(0.0,0.0,0.0,0.0);\n"
-"		for (int k = km; k <= kp; k++){\n"
-"			vec4 data;\n"
-"			vec4 coef;\n"
-"			int x = int(gl_FragCoord.x) + k;\n"
-"			x = BOUND_PVT(x,0,texSize.x-1);\n"
-"			data = vec4(texelFetch(texSrc, ivec2(x, gl_FragCoord.y), 0));\n"
-"			coef = vec4(texelFetch(texKernel, ivec2(k+kp, 0), 0).r);\n"
-"			sum += data * coef;\n"
-"		}\n"
-"		dst = uvec4(roundEven(sum));\n"
-"	}\n"
-"	else{\n"
-"		int ksize = texKernelSize.y ;\n"
-"		int kp = ksize / 2 ;\n"
-"		int km = -kp;\n"
-"		vec4 sum = vec4(0.0,0.0,0.0,0.0);\n"
-"		for (int k = km; k <= kp; k++){\n"
-"			vec4 data;\n"
-"			vec4 coef;\n"
-"			int y = int(gl_FragCoord.y) + k;\n"
-"			y = BOUND_PVT(y,0,texSize.y-1);\n"
-"			data = vec4(texelFetch(texSrc, ivec2(gl_FragCoord.x,y), 0));\n"
-"			coef = vec4(texelFetch(texKernel, ivec2(0,k+kp), 0).r);\n"
-"			sum += data * coef;\n"
-"		}\n"
-"		dst = uvec4(roundEven(sum));\n"
-"	}\n"
-"}\n"
-;
+	const char fragmentShaderCode[] = TO_STR(
+#version 330 core\n
+precision highp float;\n
+uniform usampler2D	texSrc;\n
+uniform sampler2D	texKernel;\n
+layout (location = 0) out uvec4 dst;\n
+#define BOUND_PVT(x,pl,pr) ((x)<(pl)?2*(pl)-(x) :(x)>(pr)? 2*(pr)-(x): (x))\n
+void main(void)\n
+{\n
+	ivec2 texSize = textureSize(texSrc,0);\n
+	ivec2 texKernelSize = textureSize(texKernel,0);\n
+	if(texKernelSize.y==1){\n
+		int ksize = texKernelSize.x ;\n
+		int kp = ksize / 2 ;\n
+		int km = -kp;\n
+		vec4 sum = vec4(0.0,0.0,0.0,0.0);\n
+		for (int k = km; k <= kp; k++){\n
+			vec4 data;\n
+			vec4 coef;\n
+			int x = int(gl_FragCoord.x) + k;\n
+			x = BOUND_PVT(x,0,texSize.x-1);\n
+			data = vec4(texelFetch(texSrc, ivec2(x, gl_FragCoord.y), 0));\n
+			coef = vec4(texelFetch(texKernel, ivec2(k+kp, 0), 0).r);\n
+			sum += data * coef;\n
+		}\n
+		dst = uvec4(roundEven(sum));\n
+	}\n
+	else{\n
+		int ksize = texKernelSize.y ;\n
+		int kp = ksize / 2 ;\n
+		int km = -kp;\n
+		vec4 sum = vec4(0.0,0.0,0.0,0.0);\n
+		for (int k = km; k <= kp; k++){\n
+			vec4 data;\n
+			vec4 coef;\n
+			int y = int(gl_FragCoord.y) + k;\n
+			y = BOUND_PVT(y,0,texSize.y-1);\n
+			data = vec4(texelFetch(texSrc, ivec2(gl_FragCoord.x,y), 0));\n
+			coef = vec4(texelFetch(texKernel, ivec2(0,k+kp), 0).r);\n
+			sum += data * coef;\n
+		}\n
+		dst = uvec4(roundEven(sum));\n
+	}\n
+}\n
+);
 	return fragmentShaderCode;
 }
 
@@ -226,42 +226,42 @@ list<string> glsShaderFilter1DU::UniformNameList(void){
 //-----------------------------------------------------------------------------
 //glsShaderFilter2D
 string glsShaderFilter2D::FragmentShaderCode(void){
-	const char fragmentShaderCode[] =
-"#version 330 core\n"
-"precision highp float;\n"
-"uniform sampler2D	texSrc;\n"
-"uniform sampler2D	texKernel;\n"
-"layout (location = 0) out vec4 dst;\n"
-"#define BOUND_PVT(x,pl,pr) ((x)<(pl)?2*(pl)-(x) :(x)>(pr)? 2*(pr)-(x): (x))\n"
-"void main(void)\n"
-"{\n"
-"	ivec2 texSize = textureSize(texSrc,0);\n"
-"	ivec2 texKernelSize = textureSize(texKernel,0);\n"
-"	{\n"
-"		int kxsize = texKernelSize.x ;\n"
-"		int kysize = texKernelSize.y ;\n"
-"		int kxp = kxsize / 2 ;\n"
-"		int kxm = -kxp;\n"
-"		int kyp = kysize / 2 ;\n"
-"		int kym = -kyp;\n"
-"		vec4 sum = vec4(0.0,0.0,0.0,0.0);\n"
-"		for (int ky = kym; ky <= kyp; ky++){\n"
-"				for (int kx = kxm; kx <= kxp; kx++){\n"
-"				vec4 data;\n"
-"				vec4 coef;\n"
-"				int x = int(gl_FragCoord.x) + kx;\n"
-"				int y = int(gl_FragCoord.y) + ky;\n"
-"				x = BOUND_PVT(x,0,texSize.x-1);\n"
-"				y = BOUND_PVT(y,0,texSize.y-1);\n"
-"				data = texelFetch(texSrc, ivec2(x, y), 0);\n"
-"				coef = vec4(texelFetch(texKernel, ivec2(kx+kxp, ky+kyp), 0).r);\n"
-"				sum += data * coef;\n"
-"			}\n"
-"		}\n"
-"		dst = sum;\n"
-"	}\n"
-"}\n"
-;
+	const char fragmentShaderCode[] = TO_STR(
+#version 330 core\n
+precision highp float;\n
+uniform sampler2D	texSrc;\n
+uniform sampler2D	texKernel;\n
+layout (location = 0) out vec4 dst;\n
+#define BOUND_PVT(x,pl,pr) ((x)<(pl)?2*(pl)-(x) :(x)>(pr)? 2*(pr)-(x): (x))\n
+void main(void)\n
+{\n
+	ivec2 texSize = textureSize(texSrc,0);\n
+	ivec2 texKernelSize = textureSize(texKernel,0);\n
+	{\n
+		int kxsize = texKernelSize.x ;\n
+		int kysize = texKernelSize.y ;\n
+		int kxp = kxsize / 2 ;\n
+		int kxm = -kxp;\n
+		int kyp = kysize / 2 ;\n
+		int kym = -kyp;\n
+		vec4 sum = vec4(0.0,0.0,0.0,0.0);\n
+		for (int ky = kym; ky <= kyp; ky++){\n
+				for (int kx = kxm; kx <= kxp; kx++){\n
+				vec4 data;\n
+				vec4 coef;\n
+				int x = int(gl_FragCoord.x) + kx;\n
+				int y = int(gl_FragCoord.y) + ky;\n
+				x = BOUND_PVT(x,0,texSize.x-1);\n
+				y = BOUND_PVT(y,0,texSize.y-1);\n
+				data = texelFetch(texSrc, ivec2(x, y), 0);\n
+				coef = vec4(texelFetch(texKernel, ivec2(kx+kxp, ky+kyp), 0).r);\n
+				sum += data * coef;\n
+			}\n
+		}\n
+		dst = sum;\n
+	}\n
+}\n
+);
 	return fragmentShaderCode;
 }
 

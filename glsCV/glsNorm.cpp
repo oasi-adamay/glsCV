@@ -64,67 +64,67 @@ glsShaderNorm ShaderNorm;
 //-----------------------------------------------------------------------------
 //glsShaderNorm
 string glsShaderNorm::FragmentShaderCode(void){
-	const char fragmentShaderCode[] =
-"#version 330 core\n"
-"precision highp float;\n"
-"uniform sampler2D	texSrc;\n"
-"uniform int cn;\n"
-"uniform int normType;\n"
-"layout (location = 0) out float dst;\n"
-"#define FLT_MAX  3.402823e+38\n"
-"#define NORM_INF 1\n"
-"#define NORM_L1 2\n"
-"#define NORM_L2 4\n"
-"void main(void)\n"
-"{\n"
-"	ivec2 texSize = textureSize(texSrc,0);\n"
-"	vec4 data;\n"
-"	switch (normType){\n"
-"	case(NORM_INF) : {\n"
-"		vec4 maxv = vec4(-FLT_MAX);\n"
-"		for (int x = 0; x < texSize.x; x++){\n"
-"			data = texelFetch(texSrc, ivec2(x, gl_FragCoord.y), 0);\n"
-"			data = abs(data);\n"
-"			maxv = max(data,maxv);\n"
-"		}\n"
-"		switch (cn){\n"
-"		case(1) : dst = maxv.r ; break;\n"
-"		case(2) : dst = max(maxv.r,maxv.g); break;\n"
-"		case(3) : dst = max(max(maxv.r,maxv.g),maxv.b); break;\n"
-"		case(4) : dst = max(max(maxv.r,maxv.g),max(maxv.b,maxv.a)); break;\n"
-"		}\n"
-"	}break;\n"
-"	case(NORM_L1) : {\n"
-"		vec4 sumv = vec4(0.0);\n"
-"		for (int x = 0; x < texSize.x; x++){\n"
-"			data = texelFetch(texSrc, ivec2(x, gl_FragCoord.y), 0);\n"
-"			data = abs(data);\n"
-"			sumv = sumv + data;\n"
-"		}\n"
-"		switch (cn){\n"
-"		case(1) : dst = sumv.r ; break;\n"
-"		case(2) : dst = sumv.r+sumv.g; break;\n"
-"		case(3) : dst = sumv.r+sumv.g+sumv.b; break;\n"
-"		case(4) : dst = sumv.r+sumv.g+sumv.b+sumv.a; break;\n"
-"		}\n"
-"	}break;\n"
-"	case(NORM_L2) : {\n"
-"		vec4 sumv = vec4(0.0);\n"
-"		for (int x = 0; x < texSize.x; x++){\n"
-"			data = texelFetch(texSrc, ivec2(x, gl_FragCoord.y), 0);\n"
-"			data = data * data;\n"
-"			sumv = sumv + data;\n"
-"		}\n"
-"		switch (cn){\n"
-"		case(1) : dst = sumv.r ; break;\n"
-"		case(2) : dst = sumv.r+sumv.g; break;\n"
-"		case(3) : dst = sumv.r+sumv.g+sumv.b; break;\n"
-"		case(4) : dst = sumv.r+sumv.g+sumv.b+sumv.a; break;\n"
-"		}\n"
-"	}break;\n"
-"	}\n"
-"}\n"
-;
+	const char fragmentShaderCode[] = TO_STR(
+#version 330 core\n
+precision highp float;\n
+uniform sampler2D	texSrc;\n
+uniform int cn;\n
+uniform int normType;\n
+layout (location = 0) out float dst;\n
+#define FLT_MAX  3.402823e+38\n
+#define NORM_INF 1\n
+#define NORM_L1 2\n
+#define NORM_L2 4\n
+void main(void)\n
+{\n
+	ivec2 texSize = textureSize(texSrc,0);\n
+	vec4 data;\n
+	switch (normType){\n
+	case(NORM_INF) : {\n
+		vec4 maxv = vec4(-FLT_MAX);\n
+		for (int x = 0; x < texSize.x; x++){\n
+			data = texelFetch(texSrc, ivec2(x, gl_FragCoord.y), 0);\n
+			data = abs(data);\n
+			maxv = max(data,maxv);\n
+		}\n
+		switch (cn){\n
+		case(1) : dst = maxv.r ; break;\n
+		case(2) : dst = max(maxv.r,maxv.g); break;\n
+		case(3) : dst = max(max(maxv.r,maxv.g),maxv.b); break;\n
+		case(4) : dst = max(max(maxv.r,maxv.g),max(maxv.b,maxv.a)); break;\n
+		}\n
+	}break;\n
+	case(NORM_L1) : {\n
+		vec4 sumv = vec4(0.0);\n
+		for (int x = 0; x < texSize.x; x++){\n
+			data = texelFetch(texSrc, ivec2(x, gl_FragCoord.y), 0);\n
+			data = abs(data);\n
+			sumv = sumv + data;\n
+		}\n
+		switch (cn){\n
+		case(1) : dst = sumv.r ; break;\n
+		case(2) : dst = sumv.r+sumv.g; break;\n
+		case(3) : dst = sumv.r+sumv.g+sumv.b; break;\n
+		case(4) : dst = sumv.r+sumv.g+sumv.b+sumv.a; break;\n
+		}\n
+	}break;\n
+	case(NORM_L2) : {\n
+		vec4 sumv = vec4(0.0);\n
+		for (int x = 0; x < texSize.x; x++){\n
+			data = texelFetch(texSrc, ivec2(x, gl_FragCoord.y), 0);\n
+			data = data * data;\n
+			sumv = sumv + data;\n
+		}\n
+		switch (cn){\n
+		case(1) : dst = sumv.r ; break;\n
+		case(2) : dst = sumv.r+sumv.g; break;\n
+		case(3) : dst = sumv.r+sumv.g+sumv.b; break;\n
+		case(4) : dst = sumv.r+sumv.g+sumv.b+sumv.a; break;\n
+		}\n
+	}break;\n
+	}\n
+}\n
+);
 	return fragmentShaderCode;
 }
 

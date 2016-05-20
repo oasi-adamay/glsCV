@@ -110,64 +110,64 @@ glsShaderThresholdU ShaderThresholdU;
 //-----------------------------------------------------------------------------
 //glsShaderThreshold
 string glsShaderThreshold::FragmentShaderCode(void){
-	const char fragmentShaderCode[] =
-"#version 330 core\n"
-"precision highp float;\n"
-"uniform sampler2D	texSrc;\n"
-"uniform float	thresh;\n"
-"uniform float	maxVal;\n"
-"uniform int	thresholdType;\n"
-"layout (location = 0) out float dst;\n"
-"#define CV_THRESH_BINARY  0\n"
-"#define CV_THRESH_BINARY_INV 1\n"
-"#define CV_THRESH_TRUNC 2\n"
-"#define CV_THRESH_TOZERO 3\n"
-"#define CV_THRESH_TOZERO_INV 4\n"
-"void main(void)\n"
-"{\n"
-"	float value = texelFetch(texSrc, ivec2(gl_FragCoord.xy), 0).r;\n"
-"	switch(thresholdType){\n"
-"   case(CV_THRESH_BINARY): dst = value > thresh? maxVal : 0.0; break;\n"
-"   case(CV_THRESH_BINARY_INV): dst = value > thresh? 0.0 : maxVal; break;\n"
-"   case(CV_THRESH_TRUNC): dst = value > thresh? thresh : value; break;\n"
-"   case(CV_THRESH_TOZERO): dst = value > thresh? value : 0.0; break;\n"
-"   case(CV_THRESH_TOZERO_INV): dst = value > thresh? 0.0 : value; break;\n"
-"	}\n"
-"}\n"
-;
+	const char fragmentShaderCode[] = TO_STR(
+#version 330 core\n
+precision highp float;\n
+uniform sampler2D	texSrc;\n
+uniform float	thresh;\n
+uniform float	maxVal;\n
+uniform int	thresholdType;\n
+layout (location = 0) out float dst;\n
+#define CV_THRESH_BINARY  0\n
+#define CV_THRESH_BINARY_INV 1\n
+#define CV_THRESH_TRUNC 2\n
+#define CV_THRESH_TOZERO 3\n
+#define CV_THRESH_TOZERO_INV 4\n
+void main(void)\n
+{\n
+	float value = texelFetch(texSrc, ivec2(gl_FragCoord.xy), 0).r;\n
+	switch(thresholdType){\n
+   case(CV_THRESH_BINARY): dst = value > thresh? maxVal : 0.0; break;\n
+   case(CV_THRESH_BINARY_INV): dst = value > thresh? 0.0 : maxVal; break;\n
+   case(CV_THRESH_TRUNC): dst = value > thresh? thresh : value; break;\n
+   case(CV_THRESH_TOZERO): dst = value > thresh? value : 0.0; break;\n
+   case(CV_THRESH_TOZERO_INV): dst = value > thresh? 0.0 : value; break;\n
+	}\n
+}\n
+);
 	return fragmentShaderCode;
 }
 
 //-----------------------------------------------------------------------------
 //glsShaderThresholdU
 string glsShaderThresholdU::FragmentShaderCode(void){
-	const char fragmentShaderCode[] =
-"#version 330 core\n"
-"precision highp float;\n"
-"uniform usampler2D	texSrc;\n"
-"uniform float	thresh;\n"
-"uniform float	maxVal;\n"
-"uniform int	thresholdType;\n"
-"layout (location = 0) out uint dst;\n"
-"#define CV_THRESH_BINARY  0\n"
-"#define CV_THRESH_BINARY_INV 1\n"
-"#define CV_THRESH_TRUNC 2\n"
-"#define CV_THRESH_TOZERO 3\n"
-"#define CV_THRESH_TOZERO_INV 4\n"
-"void main(void)\n"
-"{\n"
-"	uint value = texelFetch(texSrc, ivec2(gl_FragCoord.xy), 0).r;\n"
-"	uint _thresh = uint(thresh);\n"
-"	uint _maxVal = uint(maxVal);\n"
-"	switch(thresholdType){\n"
-"   case(CV_THRESH_BINARY): dst = value > _thresh? _maxVal : 0u ; break;\n"
-"   case(CV_THRESH_BINARY_INV): dst = value > _thresh? 0u : _maxVal; break;\n"
-"   case(CV_THRESH_TRUNC): dst = value > _thresh? _thresh : value; break;\n"
-"   case(CV_THRESH_TOZERO): dst = value > _thresh? value : 0u; break;\n"
-"   case(CV_THRESH_TOZERO_INV): dst = value > _thresh? 0u : value; break;\n"
-"	}\n"
-"}\n"
-;
+	const char fragmentShaderCode[] = TO_STR(
+#version 330 core\n
+precision highp float;\n
+uniform usampler2D	texSrc;\n
+uniform float	thresh;\n
+uniform float	maxVal;\n
+uniform int	thresholdType;\n
+layout (location = 0) out uint dst;\n
+#define CV_THRESH_BINARY  0\n
+#define CV_THRESH_BINARY_INV 1\n
+#define CV_THRESH_TRUNC 2\n
+#define CV_THRESH_TOZERO 3\n
+#define CV_THRESH_TOZERO_INV 4\n
+void main(void)\n
+{\n
+	uint value = texelFetch(texSrc, ivec2(gl_FragCoord.xy), 0).r;\n
+	uint _thresh = uint(thresh);\n
+	uint _maxVal = uint(maxVal);\n
+	switch(thresholdType){\n
+   case(CV_THRESH_BINARY): dst = value > _thresh? _maxVal : 0u ; break;\n
+   case(CV_THRESH_BINARY_INV): dst = value > _thresh? 0u : _maxVal; break;\n
+   case(CV_THRESH_TRUNC): dst = value > _thresh? _thresh : value; break;\n
+   case(CV_THRESH_TOZERO): dst = value > _thresh? value : 0u; break;\n
+   case(CV_THRESH_TOZERO_INV): dst = value > _thresh? 0u : value; break;\n
+	}\n
+}\n
+);
 	return fragmentShaderCode;
 }
 

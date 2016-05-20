@@ -105,23 +105,23 @@ glsShaderSplitS ShaderSplitS;
 //-----------------------------------------------------------------------------
 //glsShaderSplit
 string glsShaderSplit::FragmentShaderCode(void){
-	const char fragmentShaderCode[] = 
-"#version 330 core\n"
-"precision highp float;\n"
-"uniform sampler2D	texSrc;\n"
-"layout (location = 0) out float dst0;\n"
-"layout (location = 1) out float dst1;\n"
-"layout (location = 2) out float dst2;\n"
-"layout (location = 3) out float dst3;\n"
-"void main(void)\n"
-"{\n"
-"	dst0 = texelFetch(texSrc, ivec2(gl_FragCoord.xy),0).r;\n"
-"	dst1 = texelFetch(texSrc, ivec2(gl_FragCoord.xy),0).g;\n"
-"	dst2 = texelFetch(texSrc, ivec2(gl_FragCoord.xy),0).b;\n"
-"	dst3 = texelFetch(texSrc, ivec2(gl_FragCoord.xy),0).a;\n"
-"\n"
-"}\n"
-;
+	const char fragmentShaderCode[] = TO_STR(
+#version 330 core\n
+precision highp float;\n
+uniform sampler2D	texSrc;\n
+layout (location = 0) out float dst0;\n
+layout (location = 1) out float dst1;\n
+layout (location = 2) out float dst2;\n
+layout (location = 3) out float dst3;\n
+void main(void)\n
+{\n
+	dst0 = texelFetch(texSrc, ivec2(gl_FragCoord.xy),0).r;\n
+	dst1 = texelFetch(texSrc, ivec2(gl_FragCoord.xy),0).g;\n
+	dst2 = texelFetch(texSrc, ivec2(gl_FragCoord.xy),0).b;\n
+	dst3 = texelFetch(texSrc, ivec2(gl_FragCoord.xy),0).a;\n
+\n
+}\n
+);
 	return fragmentShaderCode;
 }
 
@@ -130,22 +130,22 @@ string glsShaderSplit::FragmentShaderCode(void){
 //-----------------------------------------------------------------------------
 //glsShaderSplitU
 string glsShaderSplitU::FragmentShaderCode(void){
-	const char fragmentShaderCode[] =
-"#version 330 core\n"
-"precision highp float;\n"
-"uniform usampler2D	texSrc;\n"
-"layout (location = 0) out uint dst0;\n"
-"layout (location = 1) out uint dst1;\n"
-"layout (location = 2) out uint dst2;\n"
-"layout (location = 3) out uint dst3;\n"
-"void main(void)\n"
-"{\n"
-"	dst0 = texelFetch(texSrc, ivec2(gl_FragCoord.xy),0).r;\n"
-"	dst1 = texelFetch(texSrc, ivec2(gl_FragCoord.xy),0).g;\n"
-"	dst2 = texelFetch(texSrc, ivec2(gl_FragCoord.xy),0).b;\n"
-"	dst3 = texelFetch(texSrc, ivec2(gl_FragCoord.xy),0).a;\n"
-"}\n"
-;
+	const char fragmentShaderCode[] = TO_STR(
+#version 330 core\n
+precision highp float;\n
+uniform usampler2D	texSrc;\n
+layout (location = 0) out uint dst0;\n
+layout (location = 1) out uint dst1;\n
+layout (location = 2) out uint dst2;\n
+layout (location = 3) out uint dst3;\n
+void main(void)\n
+{\n
+	dst0 = texelFetch(texSrc, ivec2(gl_FragCoord.xy),0).r;\n
+	dst1 = texelFetch(texSrc, ivec2(gl_FragCoord.xy),0).g;\n
+	dst2 = texelFetch(texSrc, ivec2(gl_FragCoord.xy),0).b;\n
+	dst3 = texelFetch(texSrc, ivec2(gl_FragCoord.xy),0).a;\n
+}\n
+);
 	return fragmentShaderCode;
 }
 
@@ -153,22 +153,22 @@ string glsShaderSplitU::FragmentShaderCode(void){
 //-----------------------------------------------------------------------------
 //glsShaderSplitS
 string glsShaderSplitS::FragmentShaderCode(void){
-	const char fragmentShaderCode[] =
-"#version 330 core\n"
-"precision highp float;\n"
-"uniform isampler2D	texSrc;\n"
-"layout (location = 0) out int dst0;\n"
-"layout (location = 1) out int dst1;\n"
-"layout (location = 2) out int dst2;\n"
-"layout (location = 3) out int dst3;\n"
-"void main(void)\n"
-"{\n"
-"	dst0 = texelFetch(texSrc, ivec2(gl_FragCoord.xy),0).r;\n"
-"	dst1 = texelFetch(texSrc, ivec2(gl_FragCoord.xy),0).g;\n"
-"	dst2 = texelFetch(texSrc, ivec2(gl_FragCoord.xy),0).b;\n"
-"	dst3 = texelFetch(texSrc, ivec2(gl_FragCoord.xy),0).a;\n"
-"}\n"
-;
+	const char fragmentShaderCode[] = TO_STR(
+#version 330 core\n
+precision highp float;\n
+uniform isampler2D	texSrc;\n
+layout (location = 0) out int dst0;\n
+layout (location = 1) out int dst1;\n
+layout (location = 2) out int dst2;\n
+layout (location = 3) out int dst3;\n
+void main(void)\n
+{\n
+	dst0 = texelFetch(texSrc, ivec2(gl_FragCoord.xy),0).r;\n
+	dst1 = texelFetch(texSrc, ivec2(gl_FragCoord.xy),0).g;\n
+	dst2 = texelFetch(texSrc, ivec2(gl_FragCoord.xy),0).b;\n
+	dst3 = texelFetch(texSrc, ivec2(gl_FragCoord.xy),0).a;\n
+}\n
+);
 	return fragmentShaderCode;
 }
 

@@ -106,23 +106,23 @@ glsShaderMergeS ShaderMergeS;
 //-----------------------------------------------------------------------------
 //glsShaderMerge
 string glsShaderMerge::FragmentShaderCode(void){
-	const char fragmentShaderCode[] = 
-"#version 330 core\n"
-"precision highp float;\n"
-"uniform sampler2D	texSrc0;\n"
-"uniform sampler2D	texSrc1;\n"
-"uniform sampler2D	texSrc2;\n"
-"uniform sampler2D	texSrc3;\n"
-"layout (location = 0) out vec4 dst;\n"
-"void main(void)\n"
-"{\n"
-"	dst.r = texelFetch(texSrc0, ivec2(gl_FragCoord.xy),0).r;\n"
-"	dst.g = texelFetch(texSrc1, ivec2(gl_FragCoord.xy),0).r;\n"
-"	dst.b = texelFetch(texSrc2, ivec2(gl_FragCoord.xy),0).r;\n"
-"	dst.a = texelFetch(texSrc3, ivec2(gl_FragCoord.xy),0).r;\n"
-"\n"
-"}\n"
-;
+	const char fragmentShaderCode[] = TO_STR(
+#version 330 core\n
+precision highp float;\n
+uniform sampler2D	texSrc0;\n
+uniform sampler2D	texSrc1;\n
+uniform sampler2D	texSrc2;\n
+uniform sampler2D	texSrc3;\n
+layout (location = 0) out vec4 dst;\n
+void main(void)\n
+{\n
+	dst.r = texelFetch(texSrc0, ivec2(gl_FragCoord.xy),0).r;\n
+	dst.g = texelFetch(texSrc1, ivec2(gl_FragCoord.xy),0).r;\n
+	dst.b = texelFetch(texSrc2, ivec2(gl_FragCoord.xy),0).r;\n
+	dst.a = texelFetch(texSrc3, ivec2(gl_FragCoord.xy),0).r;\n
+\n
+}\n
+);
 	return fragmentShaderCode;
 }
 
@@ -131,22 +131,22 @@ string glsShaderMerge::FragmentShaderCode(void){
 //-----------------------------------------------------------------------------
 //glsShaderMergeU
 string glsShaderMergeU::FragmentShaderCode(void){
-	const char fragmentShaderCode[] =
-"#version 330 core\n"
-"precision highp float;\n"
-"uniform usampler2D	texSrc0;\n"
-"uniform usampler2D	texSrc1;\n"
-"uniform usampler2D	texSrc2;\n"
-"uniform usampler2D	texSrc3;\n"
-"layout (location = 0) out uvec4 dst;\n"
-"void main(void)\n"
-"{\n"
-"	dst.r = texelFetch(texSrc0, ivec2(gl_FragCoord.xy),0).r;\n"
-"	dst.g = texelFetch(texSrc1, ivec2(gl_FragCoord.xy),0).r;\n"
-"	dst.b = texelFetch(texSrc2, ivec2(gl_FragCoord.xy),0).r;\n"
-"	dst.a = texelFetch(texSrc3, ivec2(gl_FragCoord.xy),0).r;\n"
-"}\n"
-;
+	const char fragmentShaderCode[] = TO_STR(
+#version 330 core\n
+precision highp float;\n
+uniform usampler2D	texSrc0;\n
+uniform usampler2D	texSrc1;\n
+uniform usampler2D	texSrc2;\n
+uniform usampler2D	texSrc3;\n
+layout (location = 0) out uvec4 dst;\n
+void main(void)\n
+{\n
+	dst.r = texelFetch(texSrc0, ivec2(gl_FragCoord.xy),0).r;\n
+	dst.g = texelFetch(texSrc1, ivec2(gl_FragCoord.xy),0).r;\n
+	dst.b = texelFetch(texSrc2, ivec2(gl_FragCoord.xy),0).r;\n
+	dst.a = texelFetch(texSrc3, ivec2(gl_FragCoord.xy),0).r;\n
+}\n
+);
 	return fragmentShaderCode;
 }
 
@@ -154,22 +154,22 @@ string glsShaderMergeU::FragmentShaderCode(void){
 //-----------------------------------------------------------------------------
 //glsShaderMergeS
 string glsShaderMergeS::FragmentShaderCode(void){
-	const char fragmentShaderCode[] =
-"#version 330 core\n"
-"precision highp float;\n"
-"uniform isampler2D	texSrc0;\n"
-"uniform isampler2D	texSrc1;\n"
-"uniform isampler2D	texSrc2;\n"
-"uniform isampler2D	texSrc3;\n"
-"layout (location = 0) out ivec4 dst;\n"
-"void main(void)\n"
-"{\n"
-"	dst.r = texelFetch(texSrc0, ivec2(gl_FragCoord.xy),0).r;\n"
-"	dst.g = texelFetch(texSrc1, ivec2(gl_FragCoord.xy),0).r;\n"
-"	dst.b = texelFetch(texSrc2, ivec2(gl_FragCoord.xy),0).r;\n"
-"	dst.a = texelFetch(texSrc3, ivec2(gl_FragCoord.xy),0).r;\n"
-"}\n"
-;
+	const char fragmentShaderCode[] = TO_STR(
+#version 330 core\n
+precision highp float;\n
+uniform isampler2D	texSrc0;\n
+uniform isampler2D	texSrc1;\n
+uniform isampler2D	texSrc2;\n
+uniform isampler2D	texSrc3;\n
+layout (location = 0) out ivec4 dst;\n
+void main(void)\n
+{\n
+	dst.r = texelFetch(texSrc0, ivec2(gl_FragCoord.xy),0).r;\n
+	dst.g = texelFetch(texSrc1, ivec2(gl_FragCoord.xy),0).r;\n
+	dst.b = texelFetch(texSrc2, ivec2(gl_FragCoord.xy),0).r;\n
+	dst.a = texelFetch(texSrc3, ivec2(gl_FragCoord.xy),0).r;\n
+}\n
+);
 	return fragmentShaderCode;
 }
 

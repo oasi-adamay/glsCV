@@ -77,92 +77,92 @@ list<string> glsShaderReduce::UniformNameList(void){
 //-----------------------------------------------------------------------------
 //glsShaderReduce
 string glsShaderReduce::FragmentShaderCode(void){
-	const char fragmentShaderCode[] =
-"#version 330 core\n"
-"precision highp float;\n"
-"uniform sampler2D	texSrc;\n"
-"uniform int dim;\n"
-"uniform int reduceOp;\n"
-"layout (location = 0) out vec4 dst;\n"
-"#define FLT_MAX  3.402823e+38\n"
-"void main(void)\n"
-"{\n"
-"	ivec2 texSize = textureSize(texSrc,0);\n"
-"	vec4 data;\n"
-"	if (dim == 1){\n"
-"		switch (reduceOp){\n"
-"		case(0) : {  //CV_REDUCE_SUM\n"
-"			vec4 sum = vec4(0.0);\n"
-"			for (int x = 0; x < texSize.x; x++){\n"
-"				data = texelFetch(texSrc, ivec2(x, gl_FragCoord.y), 0);\n"
-"				sum = sum + data;\n"
-"			}\n"
-"			dst = sum;\n"
-"		}break;\n"
-"		case(1) : { //CV_REDUCE_AVE\n"
-"			vec4 sum = vec4(0.0);\n"
-"			for (int x = 0; x < texSize.x; x++){\n"
-"				data = texelFetch(texSrc, ivec2(x, gl_FragCoord.y), 0);\n"
-"				sum = sum + data;\n"
-"			}\n"
-"			dst = sum / vec4(texSize.x);\n"
-"		}break;\n"
-"		case(2) : { //CV_REDUCE_MAX\n"
-"			vec4 maxv = vec4(-FLT_MAX);\n"
-"			for (int x = 0; x < texSize.x; x++){\n"
-"				data = texelFetch(texSrc, ivec2(x, gl_FragCoord.y), 0);\n"
-"				maxv = max(data,maxv);\n"
-"			}\n"
-"			dst = maxv;\n"
-"		}break;\n"
-"		case(3) : { //CV_REDUCE_MIN\n"
-"			vec4 minv = vec4(FLT_MAX);\n"
-"			for (int x = 0; x < texSize.x; x++){\n"
-"				data = texelFetch(texSrc, ivec2(x, gl_FragCoord.y), 0);\n"
-"				minv = min(data,minv);\n"
-"			}\n"
-"			dst = minv;\n"
-"		}break;\n"
-"		}\n"
-"	}\n"
-"	else {	//dim==0\n"
-"		switch (reduceOp){\n"
-"		case(0) : {  //CV_REDUCE_SUM\n"
-"			vec4 sum = vec4(0.0);\n"
-"			for (int y = 0; y < texSize.y; y++){\n"
-"				data = texelFetch(texSrc, ivec2(gl_FragCoord.x, y), 0);\n"
-"				sum = sum + data;\n"
-"			}\n"
-"			dst = sum;\n"
-"		}break;\n"
-"		case(1) : { //CV_REDUCE_AVE\n"
-"			vec4 sum = vec4(0.0);\n"
-"			for (int y = 0; y < texSize.y; y++){\n"
-"				data = texelFetch(texSrc, ivec2(gl_FragCoord.x, y), 0);\n"
-"				sum = sum + data;\n"
-"			}\n"
-"			dst = sum / vec4(texSize.y);\n"
-"		}break;\n"
-"		case(2) : { //CV_REDUCE_MAX\n"
-"			vec4 maxv = vec4(-FLT_MAX);\n"
-"			for (int y = 0; y < texSize.y; y++){\n"
-"				data = texelFetch(texSrc, ivec2(gl_FragCoord.x, y), 0);\n"
-"				maxv = max(data,maxv);\n"
-"			}\n"
-"			dst = maxv;\n"
-"		}break;\n"
-"		case(3) : { //CV_REDUCE_MIN\n"
-"			vec4 minv = vec4(FLT_MAX);\n"
-"			for (int y = 0; y < texSize.y; y++){\n"
-"				data = texelFetch(texSrc, ivec2(gl_FragCoord.x, y), 0);\n"
-"				minv = min(data,minv);\n"
-"			}\n"
-"			dst = minv;\n"
-"		}break;\n"
-"		}\n"
-"	}\n"
-"}\n"
-;
+	const char fragmentShaderCode[] = TO_STR(
+#version 330 core\n
+precision highp float;\n
+uniform sampler2D	texSrc;\n
+uniform int dim;\n
+uniform int reduceOp;\n
+layout (location = 0) out vec4 dst;\n
+#define FLT_MAX  3.402823e+38\n
+void main(void)\n
+{\n
+	ivec2 texSize = textureSize(texSrc,0);\n
+	vec4 data;\n
+	if (dim == 1){\n
+		switch (reduceOp){\n
+		case(0) : {  //CV_REDUCE_SUM\n
+			vec4 sum = vec4(0.0);\n
+			for (int x = 0; x < texSize.x; x++){\n
+				data = texelFetch(texSrc, ivec2(x, gl_FragCoord.y), 0);\n
+				sum = sum + data;\n
+			}\n
+			dst = sum;\n
+		}break;\n
+		case(1) : { //CV_REDUCE_AVE\n
+			vec4 sum = vec4(0.0);\n
+			for (int x = 0; x < texSize.x; x++){\n
+				data = texelFetch(texSrc, ivec2(x, gl_FragCoord.y), 0);\n
+				sum = sum + data;\n
+			}\n
+			dst = sum / vec4(texSize.x);\n
+		}break;\n
+		case(2) : { //CV_REDUCE_MAX\n
+			vec4 maxv = vec4(-FLT_MAX);\n
+			for (int x = 0; x < texSize.x; x++){\n
+				data = texelFetch(texSrc, ivec2(x, gl_FragCoord.y), 0);\n
+				maxv = max(data,maxv);\n
+			}\n
+			dst = maxv;\n
+		}break;\n
+		case(3) : { //CV_REDUCE_MIN\n
+			vec4 minv = vec4(FLT_MAX);\n
+			for (int x = 0; x < texSize.x; x++){\n
+				data = texelFetch(texSrc, ivec2(x, gl_FragCoord.y), 0);\n
+				minv = min(data,minv);\n
+			}\n
+			dst = minv;\n
+		}break;\n
+		}\n
+	}\n
+	else {	//dim==0\n
+		switch (reduceOp){\n
+		case(0) : {  //CV_REDUCE_SUM\n
+			vec4 sum = vec4(0.0);\n
+			for (int y = 0; y < texSize.y; y++){\n
+				data = texelFetch(texSrc, ivec2(gl_FragCoord.x, y), 0);\n
+				sum = sum + data;\n
+			}\n
+			dst = sum;\n
+		}break;\n
+		case(1) : { //CV_REDUCE_AVE\n
+			vec4 sum = vec4(0.0);\n
+			for (int y = 0; y < texSize.y; y++){\n
+				data = texelFetch(texSrc, ivec2(gl_FragCoord.x, y), 0);\n
+				sum = sum + data;\n
+			}\n
+			dst = sum / vec4(texSize.y);\n
+		}break;\n
+		case(2) : { //CV_REDUCE_MAX\n
+			vec4 maxv = vec4(-FLT_MAX);\n
+			for (int y = 0; y < texSize.y; y++){\n
+				data = texelFetch(texSrc, ivec2(gl_FragCoord.x, y), 0);\n
+				maxv = max(data,maxv);\n
+			}\n
+			dst = maxv;\n
+		}break;\n
+		case(3) : { //CV_REDUCE_MIN\n
+			vec4 minv = vec4(FLT_MAX);\n
+			for (int y = 0; y < texSize.y; y++){\n
+				data = texelFetch(texSrc, ivec2(gl_FragCoord.x, y), 0);\n
+				minv = min(data,minv);\n
+			}\n
+			dst = minv;\n
+		}break;\n
+		}\n
+	}\n
+}\n
+);
 	return fragmentShaderCode;
 }
 

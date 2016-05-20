@@ -137,44 +137,44 @@ glsShaderConvertS ShaderConvertS;
 //-----------------------------------------------------------------------------
 //glsShaderConvert
 string glsShaderConvert::FragmentShaderCode(void){
-	const char fragmentShaderCode[] = 
-"#version 330 core\n"
-"precision highp float;\n"
-"uniform sampler2D	texSrc;\n"
-"uniform float	scl;\n"
-"uniform int	flag;\n"
-"layout (location = 0) out vec4 dst;\n"
-"void main(void)\n"
-"{\n"
-"	vec4 data = texelFetch(texSrc, ivec2(gl_FragCoord.xy),0);\n"
-"	vec4 color = vec4(data.r*scl,data.g*scl,data.b*scl,data.a*scl);\n"
-"	float gray;\n"
-"	switch(flag){\n"
-"	case(0)://CV_BGR2BGRA\n"
-"	case(1)://CV_BGRA2BGR\n"
-"		color = vec4(color.r,color.g,color.b,1.0);break;\n"
-"	case(2)://CV_BGR2RGBA\n"
-"	case(3)://CV_RGBA2BGR\n"
-"	case(4)://CV_BGR2RGB\n"
-"	case(5)://CV_BGRA2RGBA\n"
-"		color = vec4(color.b,color.g,color.r,1.0);break;\n"
-"	case(6)://CV_BGR2GRAY\n"
-"		gray = color.b * 0.299 + color.g * 0.587 + color.r * 0.114;\n"
-"		color = vec4(gray,gray,gray,1.0);break;\n"
-"	case(7)://CV_RGB2GRAY\n"
-"		gray = color.r * 0.299 + color.g * 0.587 + color.b * 0.114;\n"
-"		color = vec4(gray,gray,gray,1.0);break;\n"
-"	case(8)://CV_GRAY2BGR\n"
-"	case(9)://CV_GRAY2BGRA\n"
-"	case(10)://CV_BGRA2GRAY\n"
-"	case(11)://CV_RGBA2GRAY\n"
-"		gray = color.r;\n"
-"		color = vec4(gray,gray,gray,1.0);break;\n"
-"	}\n"
-"	dst = color;\n"
-"\n"
-"}\n"
-;
+	const char fragmentShaderCode[] = TO_STR(
+#version 330 core\n
+precision highp float;\n
+uniform sampler2D	texSrc;\n
+uniform float	scl;\n
+uniform int	flag;\n
+layout (location = 0) out vec4 dst;\n
+void main(void)\n
+{\n
+	vec4 data = texelFetch(texSrc, ivec2(gl_FragCoord.xy),0);\n
+	vec4 color = vec4(data.r*scl,data.g*scl,data.b*scl,data.a*scl);\n
+	float gray;\n
+	switch(flag){\n
+	case(0)://CV_BGR2BGRA\n
+	case(1)://CV_BGRA2BGR\n
+		color = vec4(color.r,color.g,color.b,1.0);break;\n
+	case(2)://CV_BGR2RGBA\n
+	case(3)://CV_RGBA2BGR\n
+	case(4)://CV_BGR2RGB\n
+	case(5)://CV_BGRA2RGBA\n
+		color = vec4(color.b,color.g,color.r,1.0);break;\n
+	case(6)://CV_BGR2GRAY\n
+		gray = color.b * 0.299 + color.g * 0.587 + color.r * 0.114;\n
+		color = vec4(gray,gray,gray,1.0);break;\n
+	case(7)://CV_RGB2GRAY\n
+		gray = color.r * 0.299 + color.g * 0.587 + color.b * 0.114;\n
+		color = vec4(gray,gray,gray,1.0);break;\n
+	case(8)://CV_GRAY2BGR\n
+	case(9)://CV_GRAY2BGRA\n
+	case(10)://CV_BGRA2GRAY\n
+	case(11)://CV_RGBA2GRAY\n
+		gray = color.r;\n
+		color = vec4(gray,gray,gray,1.0);break;\n
+	}\n
+	dst = color;\n
+\n
+}\n
+);
 	return fragmentShaderCode;
 }
 
@@ -184,43 +184,43 @@ string glsShaderConvert::FragmentShaderCode(void){
 //-----------------------------------------------------------------------------
 //glsShaderConvertU
 string glsShaderConvertU::FragmentShaderCode(void){
-	const char fragmentShaderCode[] =
-"#version 330 core\n"
-"precision highp float;\n"
-"uniform usampler2D	texSrc;\n"
-"uniform float	scl;\n"
-"uniform int	flag;\n"
-"layout (location = 0) out vec4 dst;\n"
-"void main(void)\n"
-"{\n"
-"	vec4 data = vec4(texelFetch(texSrc, ivec2(gl_FragCoord.xy),0));\n"
-"	vec4 color = vec4(data.r*scl,data.g*scl,data.b*scl,data.a*scl);\n"
-"	float gray;\n"
-"	switch(flag){\n"
-"	case(0)://CV_BGR2BGRA\n"
-"	case(1)://CV_BGRA2BGR\n"
-"		color = vec4(color.r,color.g,color.b,1.0);break;\n"
-"	case(2)://CV_BGR2RGBA\n"
-"	case(3)://CV_RGBA2BGR\n"
-"	case(4)://CV_BGR2RGB\n"
-"	case(5)://CV_BGRA2RGBA\n"
-"		color = vec4(color.b,color.g,color.r,1.0);break;\n"
-"	case(6)://CV_BGR2GRAY\n"
-"		gray = color.b * 0.299 + color.g * 0.587 + color.r * 0.114;\n"
-"		color = vec4(gray,gray,gray,1.0);break;\n"
-"	case(7)://CV_RGB2GRAY\n"
-"		gray = color.r * 0.299 + color.g * 0.587 + color.b * 0.114;\n"
-"		color = vec4(gray,gray,gray,1.0);break;\n"
-"	case(8)://CV_GRAY2BGR\n"
-"	case(9)://CV_GRAY2BGRA\n"
-"	case(10)://CV_BGRA2GRAY\n"
-"	case(11)://CV_RGBA2GRAY\n"
-"		gray = color.r;\n"
-"		color = vec4(gray,gray,gray,1.0);break;\n"
-"	}\n"
-"	dst = color;\n"
-"}\n"
-;
+	const char fragmentShaderCode[] = TO_STR(
+#version 330 core\n
+precision highp float;\n
+uniform usampler2D	texSrc;\n
+uniform float	scl;\n
+uniform int	flag;\n
+layout (location = 0) out vec4 dst;\n
+void main(void)\n
+{\n
+	vec4 data = vec4(texelFetch(texSrc, ivec2(gl_FragCoord.xy),0));\n
+	vec4 color = vec4(data.r*scl,data.g*scl,data.b*scl,data.a*scl);\n
+	float gray;\n
+	switch(flag){\n
+	case(0)://CV_BGR2BGRA\n
+	case(1)://CV_BGRA2BGR\n
+		color = vec4(color.r,color.g,color.b,1.0);break;\n
+	case(2)://CV_BGR2RGBA\n
+	case(3)://CV_RGBA2BGR\n
+	case(4)://CV_BGR2RGB\n
+	case(5)://CV_BGRA2RGBA\n
+		color = vec4(color.b,color.g,color.r,1.0);break;\n
+	case(6)://CV_BGR2GRAY\n
+		gray = color.b * 0.299 + color.g * 0.587 + color.r * 0.114;\n
+		color = vec4(gray,gray,gray,1.0);break;\n
+	case(7)://CV_RGB2GRAY\n
+		gray = color.r * 0.299 + color.g * 0.587 + color.b * 0.114;\n
+		color = vec4(gray,gray,gray,1.0);break;\n
+	case(8)://CV_GRAY2BGR\n
+	case(9)://CV_GRAY2BGRA\n
+	case(10)://CV_BGRA2GRAY\n
+	case(11)://CV_RGBA2GRAY\n
+		gray = color.r;\n
+		color = vec4(gray,gray,gray,1.0);break;\n
+	}\n
+	dst = color;\n
+}\n
+);
 	return fragmentShaderCode;
 }
 
@@ -229,43 +229,43 @@ string glsShaderConvertU::FragmentShaderCode(void){
 //-----------------------------------------------------------------------------
 //glsShaderConvertS
 string glsShaderConvertS::FragmentShaderCode(void){
-	const char fragmentShaderCode[] =
-"#version 330 core\n"
-"precision highp float;\n"
-"uniform isampler2D	texSrc;\n"
-"uniform float	scl;\n"
-"uniform int	flag;\n"
-"layout (location = 0) out vec4 dst;\n"
-"void main(void)\n"
-"{\n"
-"	vec4 data = vec4(texelFetch(texSrc, ivec2(gl_FragCoord.xy),0));\n"
-"	vec4 color = vec4(data.r*scl,data.g*scl,data.b*scl,data.a*scl);\n"
-"	float gray;\n"
-"	switch(flag){\n"
-"	case(0)://CV_BGR2BGRA\n"
-"	case(1)://CV_BGRA2BGR\n"
-"		color = vec4(color.r,color.g,color.b,1.0);break;\n"
-"	case(2)://CV_BGR2RGBA\n"
-"	case(3)://CV_RGBA2BGR\n"
-"	case(4)://CV_BGR2RGB\n"
-"	case(5)://CV_BGRA2RGBA\n"
-"		color = vec4(color.b,color.g,color.r,1.0);break;\n"
-"	case(6)://CV_BGR2GRAY\n"
-"		gray = color.b * 0.299 + color.g * 0.587 + color.r * 0.114;\n"
-"		color = vec4(gray,gray,gray,1.0);break;\n"
-"	case(7)://CV_RGB2GRAY\n"
-"		gray = color.r * 0.299 + color.g * 0.587 + color.b * 0.114;\n"
-"		color = vec4(gray,gray,gray,1.0);break;\n"
-"	case(8)://CV_GRAY2BGR\n"
-"	case(9)://CV_GRAY2BGRA\n"
-"	case(10)://CV_BGRA2GRAY\n"
-"	case(11)://CV_RGBA2GRAY\n"
-"		gray = color.r;\n"
-"		color = vec4(gray,gray,gray,1.0);break;\n"
-"	}\n"
-"	dst = color;\n"
-"}\n"
-;
+	const char fragmentShaderCode[] = TO_STR(
+#version 330 core\n
+precision highp float;\n
+uniform isampler2D	texSrc;\n
+uniform float	scl;\n
+uniform int	flag;\n
+layout (location = 0) out vec4 dst;\n
+void main(void)\n
+{\n
+	vec4 data = vec4(texelFetch(texSrc, ivec2(gl_FragCoord.xy),0));\n
+	vec4 color = vec4(data.r*scl,data.g*scl,data.b*scl,data.a*scl);\n
+	float gray;\n
+	switch(flag){\n
+	case(0)://CV_BGR2BGRA\n
+	case(1)://CV_BGRA2BGR\n
+		color = vec4(color.r,color.g,color.b,1.0);break;\n
+	case(2)://CV_BGR2RGBA\n
+	case(3)://CV_RGBA2BGR\n
+	case(4)://CV_BGR2RGB\n
+	case(5)://CV_BGRA2RGBA\n
+		color = vec4(color.b,color.g,color.r,1.0);break;\n
+	case(6)://CV_BGR2GRAY\n
+		gray = color.b * 0.299 + color.g * 0.587 + color.r * 0.114;\n
+		color = vec4(gray,gray,gray,1.0);break;\n
+	case(7)://CV_RGB2GRAY\n
+		gray = color.r * 0.299 + color.g * 0.587 + color.b * 0.114;\n
+		color = vec4(gray,gray,gray,1.0);break;\n
+	case(8)://CV_GRAY2BGR\n
+	case(9)://CV_GRAY2BGRA\n
+	case(10)://CV_BGRA2GRAY\n
+	case(11)://CV_RGBA2GRAY\n
+		gray = color.r;\n
+		color = vec4(gray,gray,gray,1.0);break;\n
+	}\n
+	dst = color;\n
+}\n
+);
 	return fragmentShaderCode;
 }
 

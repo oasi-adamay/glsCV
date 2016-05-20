@@ -90,53 +90,53 @@ glsShaderBinaryOperation ShaderBinaryOperation;
 
 //-----------------------------------------------------------------------------
 string glsShaderScalarOperation::FragmentShaderCode(void){
-	const char fragmentShaderCode[] =
-"#version 330 core\n"
-"precision highp float;\n"
-"uniform sampler2D	texSrc;\n"
-"uniform int	flags;\n"
-"uniform vec4 scalar;\n"
-"layout (location = 0) out vec4 dst;\n"
-"\n"
-"void main(void)\n"
-"{\n"
-"	vec4 src = texelFetch(texSrc, ivec2(gl_FragCoord.xy),0);\n"
-"	switch(flags){\n"
-"   case(0): dst = scalar + src; break;\n"
-"	case(1): dst = scalar - src; break;\n"
-"	case(2): dst = scalar * src; break;\n"
-"	case(3): dst = scalar / src; break;\n"
-"	case(4)://OPCODE_MIN \n"
-"		dst.r = scalar.r < src.r? scalar.r : src.r;\n"
-"		dst.g = scalar.g < src.g? scalar.g : src.g;\n"
-"		dst.b = scalar.b < src.b? scalar.b : src.b;\n"
-"		dst.a = scalar.a < src.a? scalar.a : src.a;\n"
-"		break;\n"
-"	case(5)://OPCODE_MAX \n"
-"		dst.r = scalar.r > src.r? scalar.r : src.r;\n"
-"		dst.g = scalar.g > src.g? scalar.g : src.g;\n"
-"		dst.b = scalar.b > src.b? scalar.b : src.b;\n"
-"		dst.a = scalar.a > src.a? scalar.a : src.a;\n"
-"		break;\n"
-"	case(9)://OPCODE_MAG_SPCETRUM \n"
-"		dst.r = sqrt(src.r*src.r +  src.g*src.g);\n"
-"		break;\n"
-"	case(10)://OPCODE_LOG \n"
-"		dst = log(abs(src));\n"
-"		break;\n"
-"	case(11)://OPCODE_EXP \n"
-"		dst = exp(src);\n"
-"		break;\n"
-"	case(12)://OPCODE_POW \n"
-"		dst = pow(src,scalar);\n"
-"		break;\n"
-"	case(13)://OPCODE_LOG_MAG_SPCETRUM \n"
-"		dst.r = log(abs(sqrt(src.r*src.r +  src.g*src.g)+scalar.r));\n"
-"		break;\n"
-"	default: dst = src;\n"
-"   }\n"
-"}\n"
-;
+	const char fragmentShaderCode[] = TO_STR(
+#version 330 core\n
+precision highp float;\n
+uniform sampler2D	texSrc;\n
+uniform int	flags;\n
+uniform vec4 scalar;\n
+layout (location = 0) out vec4 dst;\n
+\n
+void main(void)\n
+{\n
+	vec4 src = texelFetch(texSrc, ivec2(gl_FragCoord.xy),0);\n
+	switch(flags){\n
+	case(0): dst = scalar + src; break;\n
+	case(1): dst = scalar - src; break;\n
+	case(2): dst = scalar * src; break;\n
+	case(3): dst = scalar / src; break;\n
+	case(4)://OPCODE_MIN \n
+		dst.r = scalar.r < src.r? scalar.r : src.r;\n
+		dst.g = scalar.g < src.g? scalar.g : src.g;\n
+		dst.b = scalar.b < src.b? scalar.b : src.b;\n
+		dst.a = scalar.a < src.a? scalar.a : src.a;\n
+		break;\n
+	case(5)://OPCODE_MAX \n
+		dst.r = scalar.r > src.r? scalar.r : src.r;\n
+		dst.g = scalar.g > src.g? scalar.g : src.g;\n
+		dst.b = scalar.b > src.b? scalar.b : src.b;\n
+		dst.a = scalar.a > src.a? scalar.a : src.a;\n
+		break;\n
+	case(9)://OPCODE_MAG_SPCETRUM \n
+		dst.r = sqrt(src.r*src.r +  src.g*src.g);\n
+		break;\n
+	case(10)://OPCODE_LOG \n
+		dst = log(abs(src));\n
+		break;\n
+	case(11)://OPCODE_EXP \n
+		dst = exp(src);\n
+		break;\n
+	case(12)://OPCODE_POW \n
+		dst = pow(src,scalar);\n
+		break;\n
+	case(13)://OPCODE_LOG_MAG_SPCETRUM \n
+		dst.r = log(abs(sqrt(src.r*src.r +  src.g*src.g)+scalar.r));\n
+		break;\n
+	default: dst = src;\n
+   }\n
+}\n
+);
 	return fragmentShaderCode;
 }
 
@@ -151,63 +151,63 @@ list<string> glsShaderScalarOperation::UniformNameList(void){
 
 //-----------------------------------------------------------------------------
 string glsShaderBinaryOperation::FragmentShaderCode(void){
-	const char fragmentShaderCode[] =
-"#version 330 core\n"
-"precision highp float;\n"
-"uniform sampler2D	texSrc0;\n"
-"uniform sampler2D	texSrc1;\n"
-"uniform int			flags;\n"
-"layout (location = 0) out vec4 dst;\n"
-"\n"
-"void main(void)\n"
-"{\n"
-"	vec4 src0 = texelFetch(texSrc0, ivec2(gl_FragCoord.xy),0);\n"
-"	vec4 src1 = texelFetch(texSrc1, ivec2(gl_FragCoord.xy),0);\n"
-"	switch(flags){\n"
-"   case(0): dst = src0 + src1; break;\n"
-"	case(1): dst = src0 - src1; break;\n"
-"	case(2): dst = src0 * src1; break;\n"
-"	case(3): dst = src0 / src1; break;\n"
-"	case(4)://OPCODE_MIN \n"
-"		dst.r = src0.r < src1.r? src0.r : src1.r;\n"
-"		dst.g = src0.g < src1.g? src0.g : src1.g;\n"
-"		dst.b = src0.b < src1.b? src0.b : src1.b;\n"
-"		dst.a = src0.a < src1.a? src0.a : src1.a;\n"
-"		break;\n"
-"	case(5)://OPCODE_MAX \n"
-"		dst.r = src0.r > src1.r? src0.r : src1.r;\n"
-"		dst.g = src0.g > src1.g? src0.g : src1.g;\n"
-"		dst.b = src0.b > src1.b? src0.b : src1.b;\n"
-"		dst.a = src0.a > src1.a? src0.a : src1.a;\n"
-"		break;\n"
-"	case(6)://OPCODE_MUL_SPCETRUM \n"
-"		dst.r = src0.r*src1.r - src0.g*src1.g;\n"
-"		dst.g = src0.r*src1.g + src0.g*src1.r;\n"
-"		dst.b = src0.b*src1.b - src0.a*src1.a;\n"
-"		dst.a = src0.b*src1.a + src0.a*src1.b;\n"
-"		break;\n"
-"	case(7)://OPCODE_MUL_SPCETRUM_CONJ \n"
-"		dst.r = src0.r*src1.r + src0.g*src1.g;\n"
-"		dst.g = -src0.r*src1.g + src0.g*src1.r;\n"
-"		dst.b = src0.b*src1.b + src0.a*src1.a;\n"
-"		dst.a = -src0.b*src1.a + src0.a*src1.b;\n"
-"		break;\n"
-"	case(8)://OPCODE_MUL_SPCETRUM_POC \n"
-"       vec2 tmp0;\n"
-"       vec2 tmp1;\n"
-"		tmp0.r = src0.r*src1.r + src0.g*src1.g;\n"
-"		tmp0.g = -src0.r*src1.g + src0.g*src1.r;\n"
-"		tmp1.r = src0.b*src1.b + src0.a*src1.a;\n"
-"		tmp1.g = -src0.b*src1.a + src0.a*src1.b;\n"
-"		dst.r = tmp0.r / sqrt(tmp0.r*tmp0.r+tmp0.g*tmp0.g);\n"
-"		dst.g = tmp0.g / sqrt(tmp0.r*tmp0.r+tmp0.g*tmp0.g);\n"
-"		dst.b = tmp1.r / sqrt(tmp1.r*tmp1.r+tmp1.g*tmp1.g);\n"
-"		dst.a = tmp1.g / sqrt(tmp1.r*tmp1.r+tmp1.g*tmp1.g);\n"
-"		break;\n"
-"	default: dst = src0;\n"
-"   }\n"
-"}\n"
-;
+	const char fragmentShaderCode[] = TO_STR(
+#version 330 core\n
+precision highp float;\n
+uniform sampler2D	texSrc0;\n
+uniform sampler2D	texSrc1;\n
+uniform int			flags;\n
+layout (location = 0) out vec4 dst;\n
+\n
+void main(void)\n
+{\n
+	vec4 src0 = texelFetch(texSrc0, ivec2(gl_FragCoord.xy),0);\n
+	vec4 src1 = texelFetch(texSrc1, ivec2(gl_FragCoord.xy),0);\n
+	switch(flags){\n
+	case(0): dst = src0 + src1; break;\n
+	case(1): dst = src0 - src1; break;\n
+	case(2): dst = src0 * src1; break;\n
+	case(3): dst = src0 / src1; break;\n
+	case(4)://OPCODE_MIN \n
+		dst.r = src0.r < src1.r? src0.r : src1.r;\n
+		dst.g = src0.g < src1.g? src0.g : src1.g;\n
+		dst.b = src0.b < src1.b? src0.b : src1.b;\n
+		dst.a = src0.a < src1.a? src0.a : src1.a;\n
+		break;\n
+	case(5)://OPCODE_MAX \n
+		dst.r = src0.r > src1.r? src0.r : src1.r;\n
+		dst.g = src0.g > src1.g? src0.g : src1.g;\n
+		dst.b = src0.b > src1.b? src0.b : src1.b;\n
+		dst.a = src0.a > src1.a? src0.a : src1.a;\n
+		break;\n
+	case(6)://OPCODE_MUL_SPCETRUM \n
+		dst.r = src0.r*src1.r - src0.g*src1.g;\n
+		dst.g = src0.r*src1.g + src0.g*src1.r;\n
+		dst.b = src0.b*src1.b - src0.a*src1.a;\n
+		dst.a = src0.b*src1.a + src0.a*src1.b;\n
+		break;\n
+	case(7)://OPCODE_MUL_SPCETRUM_CONJ \n
+		dst.r = src0.r*src1.r + src0.g*src1.g;\n
+		dst.g = -src0.r*src1.g + src0.g*src1.r;\n
+		dst.b = src0.b*src1.b + src0.a*src1.a;\n
+		dst.a = -src0.b*src1.a + src0.a*src1.b;\n
+		break;\n
+	case(8)://OPCODE_MUL_SPCETRUM_POC \n
+       vec2 tmp0;\n
+       vec2 tmp1;\n
+		tmp0.r = src0.r*src1.r + src0.g*src1.g;\n
+		tmp0.g = -src0.r*src1.g + src0.g*src1.r;\n
+		tmp1.r = src0.b*src1.b + src0.a*src1.a;\n
+		tmp1.g = -src0.b*src1.a + src0.a*src1.b;\n
+		dst.r = tmp0.r / sqrt(tmp0.r*tmp0.r+tmp0.g*tmp0.g);\n
+		dst.g = tmp0.g / sqrt(tmp0.r*tmp0.r+tmp0.g*tmp0.g);\n
+		dst.b = tmp1.r / sqrt(tmp1.r*tmp1.r+tmp1.g*tmp1.g);\n
+		dst.a = tmp1.g / sqrt(tmp1.r*tmp1.r+tmp1.g*tmp1.g);\n
+		break;\n
+	default: dst = src0;\n
+   }\n
+}\n
+);
 	return fragmentShaderCode;
 }
 

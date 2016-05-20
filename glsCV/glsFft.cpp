@@ -76,102 +76,102 @@ glsShaderFft ShaderFft;
 //-----------------------------------------------------------------------------
 //glsShaderFft
 string glsShaderFft::FragmentShaderCode(void){
-	const char fragmentShaderCode[] = 
-"#version 330 core\n"
-"precision highp float;\n"
-"uniform sampler2D	texSrc0;\n"
-"uniform sampler2D	texSrc1;\n"
-"uniform sampler2D	texW;\n"
-"uniform  int i_flag;	//bit0:(0:holizontal 1:vertical)\n"
-"uniform  int i_N;\n"
-"uniform  int i_p;\n"
-"uniform  int i_q;\n"
-"uniform  float f_xscl;\n"
-"uniform  float f_yscl;\n"
-"uniform  float f_xconj;\n"
-"uniform  float f_yconj;\n"
-"\n"
-"layout (location = 0) out vec2 dst0;\n"
-"layout (location = 1) out vec2 dst1;\n"
-"\n"
-"#define FLAG_DIR	 (1<<0)\n"
-"\n"
-"\n"
-"int insertZeroBits(\n"
-"	const int src,\n"
-"	const int idx,\n"
-"	const int num\n"
-"	)\n"
-"{\n"
-"	int ret = src << num;\n"
-"	ret &= ~((1 << (idx + num)) - 1);\n"
-"	ret |= src & ((1 << idx) - 1);\n"
-"	return ret;\n"
-"}\n"
-"\n"
-"void main(void)\n"
-"{\n"
-"	int p = i_p;\n"
-"	int q = i_q;\n"
-"	int N = i_N;\n"
-"	int dir = ((i_flag & FLAG_DIR)==0) ?0:1;\n"
-"	float xscl = f_xscl;\n"
-"	float yscl = f_yscl;\n"
-"	float xconj = f_xconj;\n"
-"	float yconj = f_yconj;\n"
-"\n"
-"	int n;\n"
-"	vec2 x0;\n"
-"	vec2 x1;\n"
-"	vec2 w;\n"
-"\n"
-"	n= int(gl_FragCoord[dir]);\n"
-"	int iw = (n >> q) << q;\n"
-"	int ix0 = insertZeroBits(n, q, 1);\n"
-"	int ix1 = ix0 + (1 << q);\n"
-"	w = texelFetch(texW,ivec2(iw,0),0).rg;\n"
-"\n"
-"\n"
-"	if(dir ==0){\n"
-"		if(ix0 < N/2) x0 = texelFetch(texSrc0,ivec2(ix0,gl_FragCoord.y),0).rg;\n"
-"		else x0 = texelFetch(texSrc1,ivec2(ix0-N/2,gl_FragCoord.y),0).rg;\n"
-"\n"
-"		if(ix1 < N/2) x1 = texelFetch(texSrc0,ivec2(ix1,gl_FragCoord.y),0).rg;\n"
-"		else x1 = texelFetch(texSrc1,ivec2(ix1-N/2,gl_FragCoord.y),0).rg;\n"
-"	}\n"
-"	else{\n"
-"		if(ix0 < N/2) x0 = texelFetch(texSrc0,ivec2(gl_FragCoord.x,ix0),0).rg;\n"
-"		else x0 = texelFetch(texSrc1,ivec2(gl_FragCoord.x,ix0-N/2),0).rg;\n"
-"\n"
-"		if(ix1 < N/2) x1 = texelFetch(texSrc0,ivec2(gl_FragCoord.x,ix1),0).rg;\n"
-"		else x1 = texelFetch(texSrc1,ivec2(gl_FragCoord.x,ix1-N/2),0).rg;\n"
-"	}\n"
-"\n"
-"//	x0 = x0*xscl;\n"
-"//	x1 = x1*xscl;\n"
-"	x0.g = x0.g*xconj;\n"
-"	x1.g = x1.g*xconj;\n"
-"\n"
-"	vec2 tmp;\n"
-"	tmp.r = x1.r * w.r - x1.g * w.g;\n"
-"	tmp.g = x1.r * w.g + x1.g * w.r;\n"
-"\n"
-"	vec2 y0;\n"
-"	vec2 y1;\n"
-"\n"
-"	y0 = x0 + tmp;\n"
-"	y1 = x0 - tmp;\n"
-"\n"
-"	y0 = y0*yscl;\n"
-"	y1 = y1*yscl;\n"
-"	y0.g = y0.g*yconj;\n"
-"	y1.g = y1.g*yconj;\n"
-"\n"
-"	dst0 = y0;\n"
-"	dst1 = y1;\n"
-"\n"
-"}\n"
-;
+	const char fragmentShaderCode[] = TO_STR(
+#version 330 core\n
+precision highp float;\n
+uniform sampler2D	texSrc0;\n
+uniform sampler2D	texSrc1;\n
+uniform sampler2D	texW;\n
+uniform  int i_flag;	//bit0:(0:holizontal 1:vertical)\n
+uniform  int i_N;\n
+uniform  int i_p;\n
+uniform  int i_q;\n
+uniform  float f_xscl;\n
+uniform  float f_yscl;\n
+uniform  float f_xconj;\n
+uniform  float f_yconj;\n
+\n
+layout (location = 0) out vec2 dst0;\n
+layout (location = 1) out vec2 dst1;\n
+\n
+#define FLAG_DIR	 (1<<0)\n
+\n
+\n
+int insertZeroBits(\n
+	const int src,\n
+	const int idx,\n
+	const int num\n
+	)\n
+{\n
+	int ret = src << num;\n
+	ret &= ~((1 << (idx + num)) - 1);\n
+	ret |= src & ((1 << idx) - 1);\n
+	return ret;\n
+}\n
+\n
+void main(void)\n
+{\n
+	int p = i_p;\n
+	int q = i_q;\n
+	int N = i_N;\n
+	int dir = ((i_flag & FLAG_DIR)==0) ?0:1;\n
+	float xscl = f_xscl;\n
+	float yscl = f_yscl;\n
+	float xconj = f_xconj;\n
+	float yconj = f_yconj;\n
+\n
+	int n;\n
+	vec2 x0;\n
+	vec2 x1;\n
+	vec2 w;\n
+\n
+	n= int(gl_FragCoord[dir]);\n
+	int iw = (n >> q) << q;\n
+	int ix0 = insertZeroBits(n, q, 1);\n
+	int ix1 = ix0 + (1 << q);\n
+	w = texelFetch(texW,ivec2(iw,0),0).rg;\n
+\n
+\n
+	if(dir ==0){\n
+		if(ix0 < N/2) x0 = texelFetch(texSrc0,ivec2(ix0,gl_FragCoord.y),0).rg;\n
+		else x0 = texelFetch(texSrc1,ivec2(ix0-N/2,gl_FragCoord.y),0).rg;\n
+\n
+		if(ix1 < N/2) x1 = texelFetch(texSrc0,ivec2(ix1,gl_FragCoord.y),0).rg;\n
+		else x1 = texelFetch(texSrc1,ivec2(ix1-N/2,gl_FragCoord.y),0).rg;\n
+	}\n
+	else{\n
+		if(ix0 < N/2) x0 = texelFetch(texSrc0,ivec2(gl_FragCoord.x,ix0),0).rg;\n
+		else x0 = texelFetch(texSrc1,ivec2(gl_FragCoord.x,ix0-N/2),0).rg;\n
+\n
+		if(ix1 < N/2) x1 = texelFetch(texSrc0,ivec2(gl_FragCoord.x,ix1),0).rg;\n
+		else x1 = texelFetch(texSrc1,ivec2(gl_FragCoord.x,ix1-N/2),0).rg;\n
+	}\n
+\n
+//	x0 = x0*xscl;\n
+//	x1 = x1*xscl;\n
+	x0.g = x0.g*xconj;\n
+	x1.g = x1.g*xconj;\n
+\n
+	vec2 tmp;\n
+	tmp.r = x1.r * w.r - x1.g * w.g;\n
+	tmp.g = x1.r * w.g + x1.g * w.r;\n
+\n
+	vec2 y0;\n
+	vec2 y1;\n
+\n
+	y0 = x0 + tmp;\n
+	y1 = x0 - tmp;\n
+\n
+	y0 = y0*yscl;\n
+	y1 = y1*yscl;\n
+	y0.g = y0.g*yconj;\n
+	y1.g = y1.g*yconj;\n
+\n
+	dst0 = y0;\n
+	dst1 = y1;\n
+\n
+}\n
+);
 	return fragmentShaderCode;
 }
 

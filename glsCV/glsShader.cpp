@@ -254,14 +254,14 @@ string glsShaderBase::shaderBinName(const std::string funcname){
 }
 
 string glsShaderBase::VertexShaderCode(void){
-	static const char vertexShaderCode[] =
-"#version 330 core\n"
-"layout (location = 0)in  vec2 position;\n"
-"void main(void)\n"
-"{\n"
-"   gl_Position  = vec4(position,0.0,1.0);\n"
-"}\n"
-;
+	static const char vertexShaderCode[] = TO_STR(
+#version 330 core\n
+layout (location = 0)in  vec2 position;\n
+void main(void)\n
+{\n
+   gl_Position  = vec4(position,0.0,1.0);\n
+}\n
+);
 
 	return vertexShaderCode;
 }

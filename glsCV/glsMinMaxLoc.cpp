@@ -63,58 +63,58 @@ glsShaderMinMaxLoc ShaderMinMaxLoc;
 //-----------------------------------------------------------------------------
 //glsShaderMinMaxLoc
 string glsShaderMinMaxLoc::FragmentShaderCode(void){
-	const char fragmentShaderCode[] =
-"#version 330 core\n"
-"precision highp float;\n"
-"uniform sampler2D	texSrc0;\n"
-"uniform sampler2D	texSrc1;\n"
-"uniform isampler2D	texSrc2;\n"
-"uniform isampler2D	texSrc3;\n"
-"uniform int		path;\n"
-"layout (location = 0) out float minval;\n"
-"layout (location = 1) out float maxval;\n"
-"layout (location = 2) out ivec2 minloc;\n"
-"layout (location = 3) out ivec2 maxloc;\n"
-"#define FLT_MAX  3.402823e+38\n"
-"void main(void)\n"
-"{\n"
-"	ivec2 texSize = textureSize(texSrc0,0);\n"
-"	if(path==0){\n"
-"		float minv = float (FLT_MAX);\n"
-"		float maxv = float(-FLT_MAX);\n"
-"		int minl = 0;\n"
-"		int maxl = 0;\n"
-"		float data;\n"
-"		for (int x = 0; x < texSize.x; x++){\n"
-"			data = texelFetch(texSrc0, ivec2(x, gl_FragCoord.y), 0).r;\n"
-"			if(data<minv) {minv = data; minl = x;}\n"
-"			if(data>maxv) {maxv = data; maxl = x;}\n"
-"		}\n"
-"		minval = minv;\n"
-"		maxval = maxv;\n"
-"		minloc = ivec2(minl,0);\n"
-"		maxloc = ivec2(maxl,0);\n"
-"	}\n"
-"	else{\n"
-"		float minv = float (FLT_MAX);\n"
-"		float maxv = float(-FLT_MAX);\n"
-"		int minl = 0;\n"
-"		int maxl = 0;\n"
-"		float dmin;\n"
-"		float dmax;\n"
-"		for (int y = 0; y < texSize.y; y++){\n"
-"			dmin = texelFetch(texSrc0, ivec2(0,y), 0).r;\n"
-"			dmax = texelFetch(texSrc1, ivec2(0,y), 0).r;\n"
-"			if(dmin<minv) {minv = dmin; minl = y;}\n"
-"			if(dmax>maxv) {maxv = dmax; maxl = y;}\n"
-"		}\n"
-"		minval = minv;\n"
-"		maxval = maxv;\n"
-"		minloc = ivec2(texelFetch(texSrc2, ivec2(0,minl), 0).r,minl);\n"
-"		maxloc = ivec2(texelFetch(texSrc3, ivec2(0,maxl), 0).r,maxl);\n"
-"	}\n"
-"}\n"
-;
+	const char fragmentShaderCode[] = TO_STR(
+#version 330 core\n
+precision highp float;\n
+uniform sampler2D	texSrc0;\n
+uniform sampler2D	texSrc1;\n
+uniform isampler2D	texSrc2;\n
+uniform isampler2D	texSrc3;\n
+uniform int		path;\n
+layout (location = 0) out float minval;\n
+layout (location = 1) out float maxval;\n
+layout (location = 2) out ivec2 minloc;\n
+layout (location = 3) out ivec2 maxloc;\n
+#define FLT_MAX  3.402823e+38\n
+void main(void)\n
+{\n
+	ivec2 texSize = textureSize(texSrc0,0);\n
+	if(path==0){\n
+		float minv = float (FLT_MAX);\n
+		float maxv = float(-FLT_MAX);\n
+		int minl = 0;\n
+		int maxl = 0;\n
+		float data;\n
+		for (int x = 0; x < texSize.x; x++){\n
+			data = texelFetch(texSrc0, ivec2(x, gl_FragCoord.y), 0).r;\n
+			if(data<minv) {minv = data; minl = x;}\n
+			if(data>maxv) {maxv = data; maxl = x;}\n
+		}\n
+		minval = minv;\n
+		maxval = maxv;\n
+		minloc = ivec2(minl,0);\n
+		maxloc = ivec2(maxl,0);\n
+	}\n
+	else{\n
+		float minv = float (FLT_MAX);\n
+		float maxv = float(-FLT_MAX);\n
+		int minl = 0;\n
+		int maxl = 0;\n
+		float dmin;\n
+		float dmax;\n
+		for (int y = 0; y < texSize.y; y++){\n
+			dmin = texelFetch(texSrc0, ivec2(0,y), 0).r;\n
+			dmax = texelFetch(texSrc1, ivec2(0,y), 0).r;\n
+			if(dmin<minv) {minv = dmin; minl = y;}\n
+			if(dmax>maxv) {maxv = dmax; maxl = y;}\n
+		}\n
+		minval = minv;\n
+		maxval = maxv;\n
+		minloc = ivec2(texelFetch(texSrc2, ivec2(0,minl), 0).r,minl);\n
+		maxloc = ivec2(texelFetch(texSrc3, ivec2(0,maxl), 0).r,maxl);\n
+	}\n
+}\n
+);
 	return fragmentShaderCode;
 }
 
