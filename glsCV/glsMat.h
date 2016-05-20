@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _GLS_MAT_H_
 #define _GLS_MAT_H_
 
-#include <memory>
+#include <memory>	//shared_ptr
 
 namespace gls
 {

@@ -29,15 +29,23 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "stdafx.h"
 
+/*-----------------------------------------------------------------------------
+include
+*/
+#include "glsMacro.h"
+#include "GlsMat.h"
+#include "glsShader.h"
 
 #include "glsFft.h"
-#include "Timer.h"
+#include "glsCopy.h"	//tiled / untiled
+
 
 #define _USE_MATH_DEFINES
 #include <math.h>
 
 #ifdef _DEBUG
 //#if 1
+#include "Timer.h"
 #define _TMR_(...)  Timer tmr(__VA_ARGS__)
 #else
 #define _TMR_(...)

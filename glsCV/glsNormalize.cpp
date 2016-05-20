@@ -30,8 +30,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "stdafx.h"
 
-
+/*-----------------------------------------------------------------------------
+include
+*/
+#include "glsMacro.h"
+#include "GlsMat.h"
+#include "glsShader.h"
 #include "glsNormalize.h"
+
+#include "glsMinMaxLoc.h"
+#include "glsBasicOperation.h"
+#include "glsNorm.h"
 
 namespace gls
 {

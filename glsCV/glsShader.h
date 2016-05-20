@@ -31,10 +31,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _GLS_SHADER_H_
 #define _GLS_SHADER_H_
 
-#include "GlsCV.h"
-#include "GlsMat.h"
-#include "glsFBO.h"
 #include "glsVAO.h"
+#include "glsFBO.h"
 
 #ifdef _DEBUG
 //#define _DEBUG_SHADER
@@ -283,6 +281,7 @@ public:
 
 
 };
+
 
 template<class First, class... Rest>
 void glsShaderBase::Execute(const First& first, const Rest&... rest)

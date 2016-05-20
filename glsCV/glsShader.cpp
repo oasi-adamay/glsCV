@@ -30,10 +30,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "stdafx.h"
 
-#include "glsCV.h"
-
+/*-----------------------------------------------------------------------------
+include
+*/
+#include "glsMacro.h"
+#include "GlsMat.h"
 #include "glsShader.h"
-#include "Timer.h"
+
+//#include "Timer.h"
 
 #define _ENABLE_SHADER_BIN
 

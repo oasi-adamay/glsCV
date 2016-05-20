@@ -31,10 +31,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _GLS_NORM_H_
 #define _GLS_NORM_H_
 
-#include "glsCV.h"
-#include "GlsMat.h"
-#include "glsShader.h"
-
 namespace gls
 {
 

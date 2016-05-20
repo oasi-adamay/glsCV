@@ -30,13 +30,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "stdafx.h"
 
-#include "glsCV.h"
+/*-----------------------------------------------------------------------------
+include
+*/
+#include "glsMacro.h"
+#include "GlsMat.h"
+#include "glsShader.h"
+
 #include "glsBasicOperation.h"
 
 namespace gls
 {
-
-
 
 class glsShaderScalarOperation : public glsShaderBase
 {
@@ -145,111 +149,6 @@ list<string> glsShaderScalarOperation::UniformNameList(void){
 }
 
 
-
-
-//-------------------------------------------------------------
-// Scalar operation
-static
-void glslScalarOperation(
-const glsShaderScalarOperation* shader,	//progmra ID
-const Scalar scalar,				//scalar
-const GLuint texSrc,			//src texture ID
-const GLuint texDst,			//dst texture ID
-const int flags					//flag (opcode)
-)
-{
-	int width;
-	int height;
-
-	glBindTexture(GL_TEXTURE_2D, texSrc);
-	glGetTexLevelParameteriv(
-		GL_TEXTURE_2D, 0,
-		GL_TEXTURE_WIDTH, &width
-		);
-
-	glGetTexLevelParameteriv(
-		GL_TEXTURE_2D, 0,
-		GL_TEXTURE_HEIGHT, &height
-		);
-
-	glBindTexture(GL_TEXTURE_2D, 0);
-
-	
-	glsFBO fbo;		//FBO 
-	glsVAO vao(glGetAttribLocation(shader->program(), "position"));	//VAO
-
-	//program
-	{
-		glUseProgram(shader->program());
-	}
-#if 1
-	//uniform
-	{
-		float _scalar[4];
-		_scalar[0] = (float)scalar[0];
-		_scalar[1] = (float)scalar[1];
-		_scalar[2] = (float)scalar[2];
-		_scalar[3] = (float)scalar[3];
-
-		// Attribute & Uniform location
-
-		glUniform1i(glGetUniformLocation(shader->program(),"flags"), flags);
-		glUniform4fv(glGetUniformLocation(shader->program(), "scalar"), 1, &_scalar[0]);
-
-	}
-#elif 1
-	{
-		shader->setUniform("flags", flags);
-		shader->setUniform("scalar", scalar);
-	}
-#else
-	{
-		setUniforms(shader->uniformLocArray,0, flags, scalar);
-	}
-#endif
-
-	//Bind Texture
-	{
-		int id = 0;
-		glActiveTexture(GL_TEXTURE0 + id);
-		glBindTexture(GL_TEXTURE_2D, texSrc);
-		glUniform1i(glGetUniformLocation(shader->program(),"texSrc"), id);
-//		shader->setUniform("texSrc", id);
-
-	}
-
-	//dst texture
-	{
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texDst, 0);
-		GLS_Assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
-	}
-
-	GLenum bufs[] =
-	{
-		GL_COLOR_ATTACHMENT0,
-	};
-	glDrawBuffers(1, bufs);
-
-	//Viewport
-	{
-		glViewport(0, 0, width, height);
-	}
-
-	//Render!!
-	{
-		glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
-		glFlush();
-	}
-
-	GL_CHECK_ERROR();
-
-}
-
-
-
-
-
-
 //-----------------------------------------------------------------------------
 string glsShaderBinaryOperation::FragmentShaderCode(void){
 	const char fragmentShaderCode[] =
@@ -321,89 +220,11 @@ list<string> glsShaderBinaryOperation::UniformNameList(void){
 }
 
 
-//-------------------------------------------------------------
-// Binary operation
-static 
-void glslBinaryOperation(
-	const glsShaderBinaryOperation* shader,	//progmra ID
-	const GLuint texSrc0,	//src texture ID
-	const GLuint texSrc1,	//src texture ID
-	const GLuint texDst,	//dst texture ID
-	const int flags					//flag (opcode)
-	)
-{
-	int width;
-	int height;
-
-	glBindTexture(GL_TEXTURE_2D, texSrc0);
-	glGetTexLevelParameteriv(
-		GL_TEXTURE_2D, 0,
-		GL_TEXTURE_WIDTH, &width
-		);
-
-	glGetTexLevelParameteriv(
-		GL_TEXTURE_2D, 0,
-		GL_TEXTURE_HEIGHT, &height
-		);
-
-	glBindTexture(GL_TEXTURE_2D, 0);
-
-	glsFBO fbo;		//FBO 
-	glsVAO vao(glGetAttribLocation(shader->program(), "position"));	//VAO
-
-	//program
-	{
-		glUseProgram(shader->program());
-	}
-
-	//uniform
-	{
-		glUniform1i(glGetUniformLocation(shader->program(), "flags"), flags);
-	}
-
-	//Bind Texture
-	{
-		int id = 0;
-		glActiveTexture(GL_TEXTURE0 + id);
-		glBindTexture(GL_TEXTURE_2D, texSrc0);
-		glUniform1i(glGetUniformLocation(shader->program(), "texSrc0"), id);
-		id++;
-		glActiveTexture(GL_TEXTURE0 + id);
-		glBindTexture(GL_TEXTURE_2D, texSrc1);
-		glUniform1i(glGetUniformLocation(shader->program(), "texSrc1"), id);
-	}
-	//dst texture
-	{
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texDst, 0);
-		GLS_Assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
-	}
-
-	GLenum bufs[] =
-	{
-		GL_COLOR_ATTACHMENT0,
-	};
-	glDrawBuffers(1, bufs);
-
-	//Viewport
-	{
-		glViewport(0, 0, width, height);
-	}
-
-	//Render!!
-	{
-		glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
-		glFlush();
-	}
-
-	GL_CHECK_ERROR();
-
-}
 
 void add(const Scalar& scalar, const GlsMat& src, GlsMat& dst){
 	GLS_Assert(src.glType() == GL_FLOAT);
 	GlsMat _dst = getDstMat(src,dst);
 	ShaderScalarOperation.Execute(src, OPCODE_ADD, scalar, _dst);
-//	glslScalarOperation(&ShaderScalarOperation, scalar, src.texid(), _dst.texid(), OPCODE_ADD);
 	dst = _dst;
 }
 
@@ -413,7 +234,6 @@ void add(const GlsMat& src0, const GlsMat& src1, GlsMat& dst)
 	GLS_Assert(src1.glType() == GL_FLOAT);
 	GlsMat _dst = getDstMat(src0 , src1, dst);
 	ShaderBinaryOperation.Execute(src0, src1, OPCODE_ADD ,_dst);
-//	glslBinaryOperation(&ShaderBinaryOperation, src0.texid(), src1.texid(), _dst.texid(), OPCODE_ADD);
 	dst = _dst;
 }
 
@@ -422,7 +242,6 @@ void subtract(const Scalar& scalar, const GlsMat& src, GlsMat& dst){
 	GLS_Assert(src.glType() == GL_FLOAT);
 	GlsMat _dst = getDstMat(src, dst);
 	ShaderScalarOperation.Execute(src, OPCODE_SUB, scalar, _dst);
-//	glslScalarOperation(&ShaderScalarOperation, scalar, src.texid(), _dst.texid(), OPCODE_SUB);
 	dst = _dst;
 }
 
@@ -432,7 +251,6 @@ void subtract(const GlsMat& src0, const GlsMat& src1, GlsMat& dst)
 	GLS_Assert(src1.glType() == GL_FLOAT);
 	GlsMat _dst = getDstMat(src0 , src1, dst);
 	ShaderBinaryOperation.Execute(src0, src1, OPCODE_SUB, _dst);
-//	glslBinaryOperation(&ShaderBinaryOperation, src0.texid(), src1.texid(), _dst.texid(), OPCODE_SUB);
 	dst = _dst;
 }
 
@@ -441,7 +259,6 @@ void multiply(const Scalar& scalar, const GlsMat& src, GlsMat& dst){
 	GLS_Assert(src.glType() == GL_FLOAT);
 	GlsMat _dst = getDstMat(src, dst);
 	ShaderScalarOperation.Execute(src, OPCODE_MUL, scalar, _dst);
-//	glslScalarOperation(&ShaderScalarOperation, scalar, src.texid(), _dst.texid(), OPCODE_MUL);
 	dst = _dst;
 }
 
@@ -451,7 +268,6 @@ void multiply(const GlsMat& src0, const GlsMat& src1, GlsMat& dst)
 	GLS_Assert(src1.glType() == GL_FLOAT);
 	GlsMat _dst = getDstMat(src0 , src1, dst);
 	ShaderBinaryOperation.Execute(src0, src1, OPCODE_MUL, _dst);
-//	glslBinaryOperation(&ShaderBinaryOperation, src0.texid(), src1.texid(), _dst.texid(), OPCODE_MUL);
 	dst = _dst;
 }
 
@@ -459,7 +275,6 @@ void divide(const Scalar& scalar, const GlsMat& src, GlsMat& dst){
 	GLS_Assert(src.glType() == GL_FLOAT);
 	GlsMat _dst = getDstMat(src, dst);
 	ShaderScalarOperation.Execute(src, OPCODE_DIV, scalar, _dst);
-//	glslScalarOperation(&ShaderScalarOperation, scalar, src.texid(), _dst.texid(), OPCODE_DIV);
 	dst = _dst;
 }
 
@@ -469,7 +284,6 @@ void divide(const GlsMat& src0, const GlsMat& src1, GlsMat& dst){
 	GLS_Assert(src1.glType() == GL_FLOAT);
 	GlsMat _dst = getDstMat(src0 , src1, dst);
 	ShaderBinaryOperation.Execute(src0, src1, OPCODE_DIV, _dst);
-//	glslBinaryOperation(&ShaderBinaryOperation, src0.texid(), src1.texid(), _dst.texid(), OPCODE_DIV);
 	dst = _dst;
 }
 
@@ -477,7 +291,6 @@ void min(const Scalar& scalar, const GlsMat& src, GlsMat& dst){
 	GLS_Assert(src.glType() == GL_FLOAT);
 	GlsMat _dst = getDstMat(src, dst);
 	ShaderScalarOperation.Execute(src, OPCODE_MIN, scalar, _dst);
-//	glslScalarOperation(&ShaderScalarOperation, scalar, src.texid(), _dst.texid(), OPCODE_MIN);
 	dst = _dst;
 }
 
@@ -486,7 +299,6 @@ void min(const GlsMat& src0, const GlsMat& src1, GlsMat& dst){
 	GLS_Assert(src1.glType() == GL_FLOAT);
 	GlsMat _dst = getDstMat(src0 , src1, dst);
 	ShaderBinaryOperation.Execute(src0, src1, OPCODE_MIN, _dst);
-//	glslBinaryOperation(&ShaderBinaryOperation, src0.texid(), src1.texid(), _dst.texid(), OPCODE_MIN);
 	dst = _dst;
 }
 
@@ -494,7 +306,6 @@ void max(const Scalar& scalar, const GlsMat& src, GlsMat& dst){
 	GLS_Assert(src.glType() == GL_FLOAT);
 	GlsMat _dst = getDstMat(src, dst);
 	ShaderScalarOperation.Execute(src, OPCODE_MAX, scalar, _dst);
-//	glslScalarOperation(&ShaderScalarOperation, scalar, src.texid(), _dst.texid(), OPCODE_MAX);
 	dst = _dst;
 }
 
@@ -503,7 +314,6 @@ void max(const GlsMat& src0, const GlsMat& src1, GlsMat& dst){
 	GLS_Assert(src1.glType() == GL_FLOAT);
 	GlsMat _dst = getDstMat(src0 , src1, dst);
 	ShaderBinaryOperation.Execute(src0, src1, OPCODE_MAX, _dst);
-//	glslBinaryOperation(&ShaderBinaryOperation, src0.texid(), src1.texid(), _dst.texid(), OPCODE_MAX);
 	dst = _dst;
 }
 
@@ -513,8 +323,6 @@ void mulSpectrums(const GlsMat& src0, const GlsMat& src1, GlsMat& dst, bool conj
 	GlsMat _dst = getDstMat(src0 , src1, dst);
 	if (conj)ShaderBinaryOperation.Execute(src0, src1, OPCODE_MUL_SPCETRUM_CONJ, _dst);
 	else ShaderBinaryOperation.Execute(src0, src1, OPCODE_MUL_SPCETRUM, _dst);
-//	if (conj)glslBinaryOperation(&ShaderBinaryOperation, src0.texid(), src1.texid(), _dst.texid(), OPCODE_MUL_SPCETRUM_CONJ);
-//	else glslBinaryOperation(&ShaderBinaryOperation, src0.texid(), src1.texid(), _dst.texid(), OPCODE_MUL_SPCETRUM);
 	dst = _dst;
 }
 
@@ -523,7 +331,6 @@ void mulSpectrumsPhaseOnly(const GlsMat& src0, const GlsMat& src1, GlsMat& dst){
 	GLS_Assert(src1.glSizedFormat() == GL_RG32F);
 	GlsMat _dst = getDstMat(src0 , src1, dst);
 	ShaderBinaryOperation.Execute(src0, src1, OPCODE_MUL_SPCETRUM_POC, _dst);
-//	glslBinaryOperation(&ShaderBinaryOperation, src0.texid(), src1.texid(), _dst.texid(), OPCODE_MUL_SPCETRUM_POC);
 	dst = _dst;
 }
 
@@ -532,7 +339,6 @@ void magSpectrums(const GlsMat& src, GlsMat& dst){
 	Scalar scalar(1.0, 1.0, 1.0, 1.0);
 	GlsMat _dst = getDstMat(src.size(), CV_MAKE_TYPE(src.depth(), 1),dst);
 	ShaderScalarOperation.Execute(src, OPCODE_MAG_SPCETRUM, scalar, _dst);
-//	glslScalarOperation(&ShaderScalarOperation, scalar, src.texid(), _dst.texid(), OPCODE_MAG_SPCETRUM);
 	dst = _dst;
 }
 
@@ -541,7 +347,6 @@ void logMagSpectrums(const GlsMat& src, GlsMat& dst, float offset){
 	Scalar scalar(offset);
 	GlsMat _dst = getDstMat(src.size(), CV_MAKE_TYPE(src.depth(), 1),dst);
 	ShaderScalarOperation.Execute(src, OPCODE_LOG_MAG_SPCETRUM, scalar, _dst);
-//	glslScalarOperation(&ShaderScalarOperation, scalar, src.texid(), _dst.texid(), OPCODE_LOG_MAG_SPCETRUM);
 	dst = _dst;
 }
 
@@ -551,7 +356,6 @@ void log(const GlsMat& src, GlsMat& dst){
 	Scalar scalar(1.0, 1.0, 1.0, 1.0);
 	GlsMat _dst = getDstMat(src, dst);
 	ShaderScalarOperation.Execute(src, OPCODE_LOG, scalar, _dst);
-//	glslScalarOperation(&ShaderScalarOperation, scalar, src.texid(), _dst.texid(), OPCODE_LOG);
 	dst = _dst;
 }
 
@@ -560,7 +364,6 @@ void exp(const GlsMat& src, GlsMat& dst){
 	Scalar scalar(1.0, 1.0, 1.0, 1.0);
 	GlsMat _dst = getDstMat(src, dst);
 	ShaderScalarOperation.Execute(src, OPCODE_EXP, scalar, _dst);
-//	glslScalarOperation(&ShaderScalarOperation, scalar, src.texid(), _dst.texid(), OPCODE_EXP);
 	dst = _dst;
 }
 
@@ -569,7 +372,6 @@ void pow(const GlsMat& src, const float& power, GlsMat& dst){
 	Scalar scalar(power, power, power, power);
 	GlsMat _dst = getDstMat(src, dst);
 	ShaderScalarOperation.Execute(src, OPCODE_POW, scalar, _dst);
-//	glslScalarOperation(&ShaderScalarOperation, scalar, src.texid(), _dst.texid(), OPCODE_POW);
 	dst = _dst;
 }
 
