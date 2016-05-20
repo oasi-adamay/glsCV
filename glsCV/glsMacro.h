@@ -41,8 +41,8 @@ Assert macro
 //#define GLS_Assert(exp)	 assert(exp)  
 
 #ifdef _DEBUG
-const char* glsErrorString(int err);
-#define GL_CHECK_ERROR()  { int err = glGetError(); if(err!= GL_NO_ERROR){cerr << "[ERR]" << glsErrorString(err) <<" at " <<__FILE__ <<":" << __LINE__ << endl;}; GLS_Assert(err == GL_NO_ERROR); }
+const char* glsErrorString(GLenum err);
+#define GL_CHECK_ERROR()  { GLenum err = glGetError(); if(err!= GL_NO_ERROR){cerr << "[ERR]" << glsErrorString(err) <<" at " <<__FILE__ <<":" << __LINE__ << endl;}; GLS_Assert(err == GL_NO_ERROR); }
 #else
 /*
 opengl API error check

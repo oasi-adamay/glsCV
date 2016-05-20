@@ -50,6 +50,7 @@ namespace UnitTest_glsCV
 		cout << "ksize:" << ksize << endl;
 		Mat imgSrc(size, cvtype);
 		FillRandU<T>(imgSrc);
+		double delta = 0.5;
 
 		Mat imgRef;
 		Mat imgDst;
@@ -66,7 +67,7 @@ namespace UnitTest_glsCV
 
 
 		{
-			cv::sepFilter2D(imgSrc, imgRef, imgSrc.depth(), kernelX, kernelY);
+			cv::sepFilter2D(imgSrc, imgRef, imgSrc.depth(), kernelX, kernelY,Point(-1,-1),delta);
 		}
 
 		GlsMat glsSrc(imgSrc);
@@ -74,7 +75,7 @@ namespace UnitTest_glsCV
 
 
 		{
-			gls::sepFilter2D(glsSrc, glsDst, imgSrc.depth(), kernelX, kernelY);
+			gls::sepFilter2D(glsSrc, glsDst, imgSrc.depth(), kernelX, kernelY,Point(-1, -1), delta);
 		}
 
 		glsDst.download(imgDst);		// download
@@ -308,6 +309,8 @@ namespace UnitTest_glsCV
 
 	template <typename T>
 	int test_glsSobel(int cvtype, int xorder, int yorder ,int ksize = 3, int ulps = 0, Size size = Size(32, 24)){
+		double scale = 1.25;
+		double delta = 0.5;
 
 		cout << "Size:" << size << endl;
 		cout << "ksize:" << ksize << endl;
@@ -321,7 +324,7 @@ namespace UnitTest_glsCV
 
 		for (int i = 0; i < loop; i++){
 			_TMR_("cv::Sobel:\t");
-			cv::Sobel(imgSrc, imgRef, imgSrc.depth(), xorder, yorder,ksize);
+			cv::Sobel(imgSrc, imgRef, imgSrc.depth(), xorder, yorder, ksize, scale, delta);
 		}
 
 		GlsMat glsSrc(imgSrc);
@@ -330,7 +333,7 @@ namespace UnitTest_glsCV
 
 		for (int i = 0; i < loop; i++){
 			_TMR_("gls::Sobel:\t");
-			gls::Sobel(glsSrc, glsDst, glsSrc.depth(), xorder, yorder, ksize);
+			gls::Sobel(glsSrc, glsDst, glsSrc.depth(), xorder, yorder, ksize, scale, delta);
 		}
 
 		glsDst.download(imgDst);		// download
@@ -369,10 +372,78 @@ namespace UnitTest_glsCV
 
 
 
+	template <typename T>
+	int test_glsLaplacian(int cvtype, int ksize = 1, int ulps = 0, Size size = Size(32, 24)){
+		double scale = 1.25;
+		double delta = 0.5;
+
+		cout << "Size:" << size << endl;
+		cout << "ksize:" << ksize << endl;
+		Mat imgSrc(size, cvtype);
+		FillRandU<T>(imgSrc);
+
+		Mat imgRef;
+		Mat imgDst;
+
+		int loop = (size.width >= 256) ? 10 : 1;
+
+		for (int i = 0; i < loop; i++){
+			_TMR_("cv::Laplacian:\t");
+			cv::Laplacian(imgSrc, imgRef, imgSrc.depth(), ksize, scale, delta);
+		}
+
+		GlsMat glsSrc(imgSrc);
+		GlsMat glsDst;
+
+
+		for (int i = 0; i < loop; i++){
+			_TMR_("gls::Laplacian:\t");
+			gls::Laplacian(glsSrc, glsDst, glsSrc.depth(), ksize, scale, delta);
+		}
+
+		glsDst.download(imgDst);		// download
+
+		int errNum = 0;
+		if (!AreEqual<T>(imgRef, imgDst, ulps)) errNum = -1;
+
+		//cout << imgRef << endl;
+		//cout << imgDst << endl;
+		//cout << imgDst - imgRef << endl;
+
+
+		return errNum;
+	}
+
+
+
+	TEST_CLASS(UnitTest_glsLaplacian)
+	{
+	public:
+		TEST_METHOD(glsLaplacian_CV_32FC1_1)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_glsLaplacian<float>(CV_32FC1, 1);
+			Assert::AreEqual(0, errNum);
+		}
+		//TODO
+		//TEST_METHOD(glsLaplacian_CV_32FC1_3)
+		//{
+		//	cout << __FUNCTION__ << endl;
+		//	int errNum = test_glsLaplacian<float>(CV_32FC1, 3);
+		//	Assert::AreEqual(0, errNum);
+		//}
+
+
+	};
+
+
 
 	template <typename T>
 	int test_glsFilter2D(int cvtype, Size ksize = Size(5, 5), Size size = Size(32, 24)){
 		int ulps = 16;
+		double delta = 0.5;
+		Point anchor = Point(-1, -1);
+
 		cout << "Size:" << size << endl;
 		cout << "ksize:" << ksize << endl;
 		Mat imgSrc(size, cvtype);
@@ -388,7 +459,7 @@ namespace UnitTest_glsCV
 
 		for (int i = 0; i < loop; i++){
 			_TMR_("cv::filter2D:\t");
-			cv::filter2D(imgSrc, imgRef, -1, kernel);
+			cv::filter2D(imgSrc, imgRef, -1, kernel, anchor, delta);
 		}
 
 		GlsMat glsSrc(imgSrc);
@@ -397,7 +468,7 @@ namespace UnitTest_glsCV
 
 		for (int i = 0; i < loop; i++){
 			_TMR_("gls::filter2D:\t");
-			gls::filter2D(glsSrc, glsDst, -1, kernel);
+			gls::filter2D(glsSrc, glsDst, -1, kernel, anchor, delta);
 		}
 
 		glsDst.download(imgDst);		// download
