@@ -37,7 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "glsVAO.h"
 
 #ifdef _DEBUG
-#define _DEBUG_SHADER
+//#define _DEBUG_SHADER
 #endif
 
 namespace gls
@@ -65,16 +65,17 @@ private:
 
 	setup関数内で更新される。
 	*/
-	struct  {
+	struct  SetupInfo{
 		int argnum;			//Execute()の引数の数
 		int texSrcNum;		//src texture数
 		int texDstNum;		//dst texture数
 		Size texDstSize;	//dst textureのsize
-	}setupInfo;
+	};
 
 	// param が1個のために必要
-	void setup(int i) //const
+	void setup(SetupInfo* info) //const
 	{
+		const int i = info->argnum++;
 #ifdef _DEBUG_SHADER
 		std::cout << "i:" << i << "\t";
 		std::cout << "end!!" << std::endl;
@@ -82,7 +83,7 @@ private:
 	}
 
 	template<class T>
-	void setup(int i, const T& t)
+	void setup(SetupInfo* info, const T& t)
 	{
 #ifdef _DEBUG_SHADER
 		std::cout << "i:" << i << "\t";
@@ -91,9 +92,9 @@ private:
 	}
 
 	template<>
-	void setup<int>(int i, const int& t)
+	void setup<int>(SetupInfo* info, const int& t)
 	{
-		setupInfo.argnum++;
+		const int i = info->argnum++;
 		GLuint loc = uniformLocArray[i];
 		glUniform1i(loc, t);
 #ifdef _DEBUG_SHADER
@@ -104,9 +105,9 @@ private:
 	}
 
 	template<>
-	void setup<float>(int i, const float& t)
+	void setup<float>(SetupInfo* info, const float& t)
 	{
-		setupInfo.argnum++;
+		const int i = info->argnum++;
 		GLuint loc = uniformLocArray[i];
 		glUniform1f(loc, t);
 #ifdef _DEBUG_SHADER
@@ -117,9 +118,9 @@ private:
 	}
 
 	template<>
-	void setup<double>(int i, const double& t)
+	void setup<double>(SetupInfo* info, const double& t)
 	{
-		setupInfo.argnum++;
+		const int i = info->argnum++;
 		GLuint loc = uniformLocArray[i];
 		float val = (float)t;
 		glUniform1f(loc, val);
@@ -131,9 +132,9 @@ private:
 	}
 
 	template<>
-	void setup<Scalar>(int i, const Scalar& t)
+	void setup<Scalar>(SetupInfo* info, const Scalar& t)
 	{
-		setupInfo.argnum++;
+		const int i = info->argnum++;
 		GLuint loc = uniformLocArray[i];
 		float val[4] = { (float)t[0], (float)t[1], (float)t[2], (float)t[3] };
 		glUniform4fv(loc, 1, val);
@@ -146,17 +147,17 @@ private:
 
 
 	template<>
-	void setup<GlsMat>(int i, const GlsMat& t)
+	void setup<GlsMat>(SetupInfo* info, const GlsMat& t)
 	{
-		setupInfo.argnum++;
+		const int i = info->argnum++;
 		if (i<uniformLocArray.size()){	//src texture
 			if (!t.empty()){
 				GLuint loc = uniformLocArray[i];
-				int id = setupInfo.texSrcNum;
+				int id = info->texSrcNum++;
 				glActiveTexture(GL_TEXTURE0 + id);
 				glBindTexture(GL_TEXTURE_2D, t.texid());
 				glUniform1i(loc, id);
-				setupInfo.texSrcNum++;
+				
 #ifdef _DEBUG_SHADER
 				std::cout << "i:" << i << "\t";
 				std::cout << "loc:" << loc << "\t";
@@ -168,12 +169,10 @@ private:
 		}
 		else{	//dst texture
 			if (!t.empty()){
-				int id = setupInfo.texDstNum;
+				int id = info->texDstNum++;
+				info->texDstSize = t.size();
 				glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + id, GL_TEXTURE_2D, t.texid(), 0);
 				//GLS_Assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
-
-				setupInfo.texDstNum++;
-				setupInfo.texDstSize = t.size();
 #ifdef _DEBUG_SHADER
 				std::cout << "i:" << i << "\t";
 				std::cout << "attach:" << id << "\t";
@@ -185,10 +184,10 @@ private:
 	}
 
 	template<class First, class... Rest>
-	void setup(int i, const First& first, const Rest&... rest)
+	void setup(SetupInfo* info, const First& first, const Rest&... rest)
 	{
-		setup(i++, first);
-		setup(i++, rest...);
+		setup(info, first);
+		setup(info, rest...);
 	}
 
 	void DrawBuffers(const int attachment_num);
@@ -297,28 +296,24 @@ void glsShaderBase::Execute(const First& first, const Rest&... rest)
 	}
 
 	//setup
-	{
-		setupInfo.argnum =  0 ;
-		setupInfo.texSrcNum = 0;
-		setupInfo.texDstNum = 0;
-		setupInfo.texDstSize = Size(0,0);
+	SetupInfo info = { 0 };
 
-		int i = 0;
-		setup(i++, first);
-		setup(i++, rest...);
+	{
+		setup(&info, first);
+		setup(&info, rest...);
 	}
 #ifdef _DEBUG_SHADER
-	cout << "argnum:" << setupInfo.argnum << endl;
-	cout << "texSrcNum:" << setupInfo.texSrcNum << endl;
-	cout << "texDstNum:" << setupInfo.texDstNum << endl;
-	cout << "texDstSize:" << setupInfo.texDstSize << endl;
+	cout << "argnum:" << info.argnum << endl;
+	cout << "texSrcNum:" << info.texSrcNum << endl;
+	cout << "texDstNum:" << info.texDstNum << endl;
+	cout << "texDstSize:" << info.texDstSize << endl;
 
 #endif
 
-	DrawBuffers(setupInfo.texDstNum);
+	DrawBuffers(info.texDstNum);
 
 	//Viewport
-	glViewport(0, 0, setupInfo.texDstSize.width, setupInfo.texDstSize.height);
+	glViewport(0, 0, info.texDstSize.width, info.texDstSize.height);
 
 	//Render!!
 	{

@@ -190,16 +190,16 @@ void merge(const vector<GlsMat>& plnSrc, GlsMat& dst){
 	GLS_Assert(cn <= 4);
 
 	GlsMat _dst = getDstMat(plnSrc[0].size(), CV_MAKE_TYPE(plnSrc[0].depth(), cn),dst);
-	GlsMat _stub;
 
 	glsShaderBase* shader = selectShader(plnSrc[0].type());
 
 	switch (cn){
-	case (1) : shader->Execute(plnSrc[0], _stub, _stub, _stub,_dst); break;
-	case (2) : shader->Execute(plnSrc[0], plnSrc[1], _stub, _stub,_dst); break;
-	case (3) : shader->Execute(plnSrc[0], plnSrc[1], plnSrc[2], _stub,_dst); break;
+	case (1) : shader->Execute(plnSrc[0], 0, 0, 0,_dst); break;
+	case (2) : shader->Execute(plnSrc[0], plnSrc[1], 0, 0,_dst); break;
+	case (3) : shader->Execute(plnSrc[0], plnSrc[1], plnSrc[2], 0,_dst); break;
 	case (4) : shader->Execute(plnSrc[0], plnSrc[1], plnSrc[2], plnSrc[3], _dst); break;
 	}
+
 
 	dst = _dst;
 }

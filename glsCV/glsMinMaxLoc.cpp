@@ -157,8 +157,7 @@ void minMaxLoc(const GlsMat& src, double* minVal, double* maxVal, Point* minLoc,
 	glsShaderBase* shader = selectShader(src.type());
 
 	{		//path:0
-		GlsMat _stub;
-		shader->Execute(0, src, _stub, _stub, _stub, _minvec, _maxvec, _minloc, _maxloc);
+		shader->Execute(0, src, 0, 0, 0, _minvec, _maxvec, _minloc, _maxloc);
 	}
 	{		//path:1
 		GlsMat _minvec1;
