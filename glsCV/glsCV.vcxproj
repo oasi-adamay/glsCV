@@ -156,6 +156,7 @@
     <ClInclude Include="glsNormalize.h" />
     <ClInclude Include="glsReduce.h" />
     <ClInclude Include="glsShader.h" />
+    <ClInclude Include="glsShader_impl.h" />
     <ClInclude Include="glsSplit.h" />
     <ClInclude Include="glsThreshold.h" />
     <ClInclude Include="glsVAO.h" />
