@@ -13,14 +13,14 @@ BSD-3clause license
 
 ## 機能
 - 配列操作
- - split, merge, tiled, untiled, copy, 
+ - split, merge, tiled, untiled, copy, flip 
 - 要素毎の演算
  - add, subtract, multiply, divide, min, max, mulSpectrums, log, exp, pow
  - convert, cvtColor
 - 行列の縮約
- - reduce, norm
+ - reduce, norm, mean, meanStdDev, minMaxLoc
 - 演算
- - FFT, normalize, minMaxLoc
+ - FFT, normalize
 - フィルタ
  - sepFilter2D, filter2D, gaussianFilter, boxFilter, Sobel, Laplacian
  - threshold, adaptiveThreshold
