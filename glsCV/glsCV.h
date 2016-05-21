@@ -51,6 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "glsThreshold.h"
 #include "glsAdaptiveThreshold.h"
 #include "glsFlip.h"
+#include "glsResize.h"
 
 
 GLFWwindow* glsCvInit(const int _width = 0, const int _height = 0);

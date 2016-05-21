@@ -58,7 +58,17 @@ enum E_CAM_MODE {
 	FFT_RECT,
 };
 
-void controls(GLFWwindow* window, int& mode ,int& ocvwin){
+enum E_CAM_ZOOM {
+	ZOOMxMIN,
+	ZOOMx0500,
+	ZOOMx0707,
+	ZOOMx1000,
+	ZOOMx1414,
+	ZOOMx2000,
+	ZOOMxMAX,
+};
+
+void controls(GLFWwindow* window, int& mode ,int& zoom, int& ocvwin){
 	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) ocvwin = 1- ocvwin;
 	if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS) mode = E_CAM_MODE::NORMAL;
 	if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS) mode = E_CAM_MODE::GRAY;
@@ -70,16 +80,26 @@ void controls(GLFWwindow* window, int& mode ,int& ocvwin){
 	if (glfwGetKey(window, GLFW_KEY_8) == GLFW_PRESS) mode = E_CAM_MODE::ADAPTIVE_THRESH;
 	if (glfwGetKey(window, GLFW_KEY_9) == GLFW_PRESS) mode = E_CAM_MODE::FFT;
 	if (glfwGetKey(window, GLFW_KEY_0) == GLFW_PRESS) mode = E_CAM_MODE::FFT_RECT;
+
+	if (glfwGetKey(window, GLFW_KEY_PAGE_UP) == GLFW_PRESS){
+		zoom++;
+		if (zoom >= E_CAM_ZOOM::ZOOMxMAX) zoom--;
+	}
+	if (glfwGetKey(window, GLFW_KEY_PAGE_DOWN) == GLFW_PRESS){
+		zoom--;
+		if (zoom <= E_CAM_ZOOM::ZOOMxMIN) zoom++;
+	}
+
 }
 
 
 
 int _tmain(int argc, _TCHAR* argv[])
 {
-//	const GLsizei captureWidth(640);
-//	const GLsizei captureHeight(480);
-	const GLsizei captureWidth(1280);
-	const GLsizei captureHeight(720);
+	const GLsizei captureWidth(640);
+	const GLsizei captureHeight(480);
+//	const GLsizei captureWidth(1280);
+//	const GLsizei captureHeight(720);
 
 
 	GLFWwindow* window = glsCvInit(captureWidth, captureHeight);
@@ -98,8 +118,8 @@ int _tmain(int argc, _TCHAR* argv[])
 	camera.set(CV_CAP_PROP_FRAME_WIDTH, double(captureWidth));
 	camera.set(CV_CAP_PROP_FRAME_HEIGHT, double(captureHeight));
 
-//	Size sizeFft(256, 256);
-	Size sizeFft(512, 512);
+	Size sizeFft(256, 256);
+//	Size sizeFft(512, 512);
 	Mat fftwin;
 	cv::createHanningWindow(fftwin, sizeFft, CV_32F);
 	GlsMat glsFftWin(fftwin);
@@ -108,6 +128,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	Rect rectFft((captureWidth - sizeFft.width) / 2, (captureHeight - sizeFft.height) / 2 , sizeFft.width, sizeFft.height);
 
 	int camMode = E_CAM_MODE::FFT;
+	int camZoom = E_CAM_ZOOM::ZOOMx1000;
 	int ocvwin = 0;
 
 	do{
@@ -205,12 +226,30 @@ int _tmain(int argc, _TCHAR* argv[])
 		}break;
 		}
 
+		switch (camZoom){
+		case(E_CAM_ZOOM::ZOOMx1000) : {
+		}break;
+		case(E_CAM_ZOOM::ZOOMx1414) : {
+			gls::resize(glsFrame, glsFrame, Size(0, 0), sqrt(2.0), sqrt(2.0));
+		}break;
+		case(E_CAM_ZOOM::ZOOMx2000) : {
+			gls::resize(glsFrame, glsFrame, Size(0, 0), 2.0, 2.0);
+		}break;
+		case(E_CAM_ZOOM::ZOOMx0707) : {
+			gls::resize(glsFrame, glsFrame, Size(0, 0), 1.0 / sqrt(2.0), 1.0 / sqrt(2.0));
+		}break;
+		case(E_CAM_ZOOM::ZOOMx0500) : {
+			gls::resize(glsFrame, glsFrame, Size(0, 0), 0.5, 0.5);
+		}break;
+		}
+
+
 		glfwSetWindowSize(window, glsFrame.size().width, glsFrame.size().height);
 		gls::draw(glsFrame);
 
 		glfwSwapBuffers(window);  // Swap buffers
 		glfwPollEvents();
-		controls(window, camMode,ocvwin); // key check
+		controls(window, camMode, camZoom, ocvwin); // key check
 	}
 	while (glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS &&
 		glfwWindowShouldClose(window) == 0);
