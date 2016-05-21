@@ -1,4 +1,4 @@
-/*
+﻿/*
 Copyright (c) 2016, oasi-adamay
 All rights reserved.
 
@@ -27,34 +27,60 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+#include "stdafx.h"
 
-
-#ifndef _GLS_CV_H_
-#define _GLS_CV_H_
-
-
+/*-----------------------------------------------------------------------------
+include
+*/
+#include "glsMacro.h"
 #include "GlsMat.h"
 #include "glsShader.h"
-#include "glsCopy.h"
-#include "glsConvert.h"
-#include "glsDraw.h"
-#include "glsMerge.h"
-#include "glsSplit.h"
-#include "glsFft.h"
-#include "glsBasicOperation.h"
-#include "glsReduce.h"
-#include "glsMinMaxLoc.h"
+
 #include "glsMean.h"
-#include "glsNorm.h"
-#include "glsNormalize.h"
-#include "glsFilter.h"
-#include "glsThreshold.h"
-#include "glsAdaptiveThreshold.h"
-#include "glsFlip.h"
+#include "glsReduce.h"	//reduce
+#include "glsBasicOperation.h"	//add, mul
+
+namespace gls
+{
 
 
-GLFWwindow* glsCvInit(const int _width = 0, const int _height = 0);
-void glsCvTerminate(void);
+Scalar mean(const GlsMat& mtx){
+	GLS_Assert(mtx.depth() == CV_32F);
 
 
-#endif
+	GlsMat _tmp;
+	gls::reduce(mtx, _tmp, 1, CV_REDUCE_AVG);
+	GlsMat _val;
+	gls::reduce(_tmp, _val, 0, CV_REDUCE_AVG);
+
+	Mat val = (Mat)_val;
+	Scalar ret;
+	float* ptr = (float*)val.data;
+	for (int cn = 0; cn < val.channels(); cn++){
+		ret[cn] = (float)(*ptr++);
+	}
+
+	return ret;
+}
+
+void meanStdDev(const GlsMat& mtx, Scalar& mean, Scalar& stddev){
+	GLS_Assert(mtx.depth() == CV_32F);
+
+	//TODO 専用shaderを作る
+	mean = gls::mean(mtx);
+	GlsMat _tmp;
+	gls::add(-1.0*mean, mtx,_tmp);
+	gls::pow(_tmp ,2.0, _tmp);
+	Scalar var = gls::mean(_tmp);
+	for (int i = 0; i < 4; i++){
+		stddev[i] = sqrt(var[i]);
+	}
+}
+
+
+}//namespace gls
+
+
+
+
+

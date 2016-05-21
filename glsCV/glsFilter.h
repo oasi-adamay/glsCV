@@ -42,8 +42,10 @@ namespace gls
 @param ddepth 出力画像のビット深度(無視されます)
 @param kernelX　row方向フィルタ係数(1ch)　奇数TAPのみサポートします。
 @param kernelY　col方向フィルタ係数(1ch)　奇数TAPのみサポートします。
+@param anchor  カーネル内のアンカー位置．デフォルト値の  (-1, -1) のみサポートします。
+@param delta　フィルタ結果に足される値．
 */
-void sepFilter2D(const GlsMat& src, GlsMat& dst, int ddepth, const Mat& kernelX, const Mat& kernelY);
+void sepFilter2D(const GlsMat& src, GlsMat& dst, int ddepth, const Mat& kernelX, const Mat& kernelY, Point anchor = Point(-1, -1), double delta = 0);
 
 /*!
 カーネルを用いて画像の畳み込みを行います．
@@ -52,8 +54,10 @@ void sepFilter2D(const GlsMat& src, GlsMat& dst, int ddepth, const Mat& kernelX,
 @param dst 出力画像． src と同じサイズ，同じチャンネル数になります．
 @param ddepth 出力画像のビット深度(無視されます)
 @param シングルチャンネルの浮動小数点型行列である畳み込みカーネル
+@param anchor  カーネル内のアンカー位置．デフォルト値の  (-1, -1) のみサポートします。
+@param delta　フィルタ結果に足される値．
 */
-void filter2D(const GlsMat& src, GlsMat& dst, int ddepth, const Mat& kernel);
+void filter2D(const GlsMat& src, GlsMat& dst, int ddepth, const Mat& kernel, Point anchor = Point(-1, -1), double delta = 0);
 
 /*!
 Gaussian フィルタを用いて，画像を平滑化します．
@@ -84,8 +88,24 @@ void boxFilter(const GlsMat& src, GlsMat& dst, int ddepth, Size ksize);
 @param xorder xに関する微分の次数．
 @param yorder yに関する微分の次数．
 @param ksize – 拡張Sobelカーネルのサイズ． 1, 3, 5 あるいは 7 のいずれか
+@param scale オプション．求められた微分値に対するスケールファクタ
+@param delta dst に格納する前に，結果に足されるオプション値
 */
-void Sobel(const GlsMat& src, GlsMat& dst, int ddepth, int xorder, int yorder, int ksize = 3);
+void Sobel(const GlsMat& src, GlsMat& dst, int ddepth, int xorder, int yorder, int ksize = 3, double scale = 1, double delta = 0);
+
+
+/*!
+画像のラプラシアンを求めます．
+
+@param src 入力画像．CV_32FC1,CV_32FC2,CV_32FC3,CV_32FC4型の画像がサポートされます．
+@param dst 出力画像． src と同じサイズ，同じチャンネル数になります．
+@param ddepth 出力画像のビット深度(無視されます)
+@param ksize – 2次微分フィルタを求めるために利用されるアパーチャのサイズ． 1, 3, 5 あるいは 7 のいずれか
+@param scale オプション．求められた微分値に対するスケールファクタ
+@param delta dst に格納する前に，結果に足されるオプション値
+*/
+void Laplacian(const GlsMat& src, GlsMat& dst, int ddepth, int ksize = 1, double scale = 1, double delta = 0);
+
 
 }//namespace gls
 

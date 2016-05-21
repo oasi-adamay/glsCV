@@ -85,6 +85,14 @@ namespace UnitTest_glsCV
 		return AlmostEqualUlpsAbsEps(val0, val1, maxUlps, FLT_MIN);
 	}
 
+	template<> static
+		bool AreEqual<Scalar>(Scalar val0, Scalar val1, int maxUlps){
+		return AlmostEqualUlpsAbsEps((float)val0[0], (float)val1[0], maxUlps, FLT_MIN)
+			&& AlmostEqualUlpsAbsEps((float)val0[1], (float)val1[1], maxUlps, FLT_MIN)
+			&& AlmostEqualUlpsAbsEps((float)val0[2], (float)val1[2], maxUlps, FLT_MIN)
+			&& AlmostEqualUlpsAbsEps((float)val0[3], (float)val1[3], maxUlps, FLT_MIN);
+	}
+
 	template <typename T> static
 	bool AreEqual(Mat& mat0, Mat& mat1, int maxUlpsSpec = 0, float maxDiffSpec = 1e-6){
 		if (mat0.size() != mat1.size()){

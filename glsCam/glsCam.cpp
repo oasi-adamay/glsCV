@@ -51,6 +51,7 @@ enum E_CAM_MODE {
 	GAUSS,
 	SOBEL_H,
 	SOBEL_V,
+	LAPLACIAN,
 	THRESH,
 	ADAPTIVE_THRESH,
 	FFT,
@@ -64,8 +65,9 @@ void controls(GLFWwindow* window, int& mode ,int& ocvwin){
 	if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS) mode = E_CAM_MODE::GAUSS;
 	if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS) mode = E_CAM_MODE::SOBEL_H;
 	if (glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS) mode = E_CAM_MODE::SOBEL_V;
-	if (glfwGetKey(window, GLFW_KEY_6) == GLFW_PRESS) mode = E_CAM_MODE::THRESH;
-	if (glfwGetKey(window, GLFW_KEY_7) == GLFW_PRESS) mode = E_CAM_MODE::ADAPTIVE_THRESH;
+	if (glfwGetKey(window, GLFW_KEY_6) == GLFW_PRESS) mode = E_CAM_MODE::LAPLACIAN;
+	if (glfwGetKey(window, GLFW_KEY_7) == GLFW_PRESS) mode = E_CAM_MODE::THRESH;
+	if (glfwGetKey(window, GLFW_KEY_8) == GLFW_PRESS) mode = E_CAM_MODE::ADAPTIVE_THRESH;
 	if (glfwGetKey(window, GLFW_KEY_9) == GLFW_PRESS) mode = E_CAM_MODE::FFT;
 	if (glfwGetKey(window, GLFW_KEY_0) == GLFW_PRESS) mode = E_CAM_MODE::FFT_RECT;
 }
@@ -114,32 +116,15 @@ int _tmain(int argc, _TCHAR* argv[])
 		if (ocvwin)	cv::imshow("[OCV]", frame.clone());
 		else cv::destroyWindow("[OCV]");
 
-		cv::flip(frame, frame, 0);				// è„â∫îΩì]
+//		cv::flip(frame, frame, 0);				// è„â∫îΩì]
 
 		GlsMat glsFrame;
 
 		switch (camMode){
 		case(E_CAM_MODE::FFT) :	{
-#if 0
-			Mat roi = Mat(frame, rect).clone();
-			cv::cvtColor(roi,roi,CV_BGR2GRAY);
-			roi.convertTo(roi, CV_32FC1,1.0/256.0);
-			Mat zero = Mat::zeros(roi.size(),roi.type());
-			vector<Mat> pln(2);
-			pln[0] = roi;
-			pln[1] = zero;
-			Mat img;
-			cv::merge(pln, img);
-			cv::dft(img, img);
-			cv::split(img, pln);
-			Mat mag;
-			cv::magnitude(pln[0], pln[1], mag);
-			cv::log(mag+1,mag);
-			cv::normalize(mag, mag, 0, 1, CV_MINMAX);
-			cv::imshow("[CV MAG]",mag);
-#else
 			Mat roi = Mat(frame, rectFft);
 			glsFrame = (GlsMat)roi;
+			gls::flip(glsFrame, glsFrame, 0);				// è„â∫îΩì]
 			gls::convert(glsFrame, glsFrame, 1.0f / 256.0f);
 			gls::cvtColor(glsFrame, glsFrame, CV_BGR2GRAY);
 			gls::multiply(glsFftWin, glsFrame, glsFrame);
@@ -151,55 +136,70 @@ int _tmain(int argc, _TCHAR* argv[])
 			gls::fft(glsComplx, glsComplx, GLS_FFT_SHIFT);
 			gls::logMagSpectrums(glsComplx, glsFrame, 1.0);
 			gls::normalize(glsFrame, glsFrame, 0, 1, NORM_MINMAX);
-#endif
 		}break;
 		case(E_CAM_MODE::ADAPTIVE_THRESH) : {
 			glsFrame = (GlsMat)frame;
+			gls::flip(glsFrame, glsFrame, 0);				// è„â∫îΩì]
 			gls::convert(glsFrame, glsFrame, 1.0f / 256.0f);
 			gls::cvtColor(glsFrame, glsFrame, CV_BGR2GRAY);
 			gls::adaptiveThreshold(glsFrame, glsFrame, 1.0, ADAPTIVE_THRESH_MEAN_C, THRESH_BINARY,15,0.01);
 		}break;
 		case(E_CAM_MODE::THRESH) : {
 			glsFrame = (GlsMat)frame;
+			gls::flip(glsFrame, glsFrame, 0);				// è„â∫îΩì]
 			gls::convert(glsFrame, glsFrame, 1.0f / 256.0f);
 			gls::cvtColor(glsFrame, glsFrame, CV_BGR2GRAY);
-			gls::threshold(glsFrame, glsFrame, 0.5, 1.0, THRESH_BINARY);
+			Scalar mean = gls::mean(glsFrame);
+			gls::threshold(glsFrame, glsFrame, mean[0], 1.0, THRESH_BINARY);
 		}break;
 		case(E_CAM_MODE::FFT_RECT) : {
 			Mat roi = Mat(frame, rectFft);
 			glsFrame = (GlsMat)roi;
+			gls::flip(glsFrame, glsFrame, 0);				// è„â∫îΩì]
 			gls::convert(glsFrame, glsFrame, 1.0f / 256.0f);
 			gls::cvtColor(glsFrame, glsFrame, CV_BGR2GRAY);
 			gls::multiply(glsFftWin, glsFrame, glsFrame);
 		} break;
 		case(E_CAM_MODE::SOBEL_V) : {
 			glsFrame = (GlsMat)frame;
+			gls::flip(glsFrame, glsFrame, 0);				// è„â∫îΩì]
 			gls::convert(glsFrame, glsFrame, 1.0f / 256.0f);
 			gls::cvtColor(glsFrame, glsFrame, CV_BGR2GRAY);
-			gls::Sobel(glsFrame, glsFrame, -1, 0,1);
-			gls::add(Scalar(0.5), glsFrame, glsFrame);
+			gls::Sobel(glsFrame, glsFrame, -1, 0, 1, 3, 1.0, 0.5);
+//			gls::add(Scalar(0.5), glsFrame, glsFrame);
 		}break;
 		case(E_CAM_MODE::SOBEL_H) : {
 			glsFrame = (GlsMat)frame;
+			gls::flip(glsFrame, glsFrame, 0);				// è„â∫îΩì]
 			gls::convert(glsFrame, glsFrame, 1.0f / 256.0f);
 			gls::cvtColor(glsFrame, glsFrame, CV_BGR2GRAY);
-			gls::Sobel(glsFrame, glsFrame, -1, 1, 0);
-			gls::add(Scalar(0.5), glsFrame, glsFrame);
+			gls::Sobel(glsFrame, glsFrame, -1, 1, 0, 3, 1.0, 0.5);
+//			gls::add(Scalar(0.5), glsFrame, glsFrame);
+		}break;
+		case(E_CAM_MODE::LAPLACIAN) : {
+			glsFrame = (GlsMat)frame;
+			gls::flip(glsFrame, glsFrame, 0);				// è„â∫îΩì]
+			gls::convert(glsFrame, glsFrame, 1.0f / 256.0f);
+			gls::cvtColor(glsFrame, glsFrame, CV_BGR2GRAY);
+			gls::Laplacian(glsFrame, glsFrame, -1, 1, 1.0, 0.5);
 		}break;
 		case(E_CAM_MODE::GAUSS) : {
 			glsFrame = (GlsMat)frame;
+			gls::flip(glsFrame, glsFrame, 0);				// è„â∫îΩì]
 			gls::convert(glsFrame, glsFrame, 1.0f / 256.0f);
 			gls::cvtColor(glsFrame, glsFrame, CV_BGR2RGB);
 			gls::GaussianBlur(glsFrame, glsFrame, Size(9, 9), 0, 0);
 		}break;
 		case(E_CAM_MODE::GRAY) : {
 			glsFrame = (GlsMat)frame;
+			gls::flip(glsFrame, glsFrame, 0);				// è„â∫îΩì]
 			gls::convert(glsFrame, glsFrame, 1.0f / 256.0f);
 			gls::cvtColor(glsFrame, glsFrame, CV_BGR2GRAY);
 		}break;
 		case(E_CAM_MODE::NORMAL):
 		default:{
 			glsFrame = (GlsMat)frame;
+			gls::flip(glsFrame, glsFrame, 0);				// è„â∫îΩì]
 			gls::convert(glsFrame, glsFrame, 1.0f / 256.0f);
 			gls::cvtColor(glsFrame, glsFrame, CV_BGR2RGB);
 		}break;

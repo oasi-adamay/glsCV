@@ -11,21 +11,19 @@ BSD-3clause license
 - OpenGL　3.3 core profileを使用
 - Frament shader　のみで頑張ってみる。　
 
-## 実装済み
-- 要素毎の操作
- - add,sub,mul,div,....
+## 機能
+- 配列操作
+ - split, merge, tiled, untiled, copy, flip 
+- 要素毎の演算
+ - add, subtract, multiply, divide, min, max, mulSpectrums, log, exp, pow
+ - convert, cvtColor
 - 行列の縮約
- - reduce
- - minMaxLoc
- - normalize
+ - reduce, norm, mean, meanStdDev, minMaxLoc
 - 演算
- - FFT
-- 画像処理
- - sepFilter2D
- - boxFilter
- - gaussianFilter
- - sobel
- - adaptiveThreshold / threshold
+ - FFT, normalize
+- フィルタ
+ - sepFilter2D, filter2D, gaussianFilter, boxFilter, Sobel, Laplacian
+ - threshold, adaptiveThreshold
 
 ## 開発環境
  * Windows8
@@ -44,7 +42,9 @@ BSD-3clause license
  3. ソリューションのbuild  
 
 ## glsCam
- サンプルアプリケーション  
+サンプルアプリケーション  
+カメラからキャプチャーした画像をリアルタイム画像処理  
+- Gray,　Edge(Sobel,Laplacian), 2値化(threshold,adaptiveThreshold) , FFT
 
  
  
