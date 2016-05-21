@@ -38,6 +38,7 @@ include
 
 #include "glsMean.h"
 #include "glsReduce.h"	//reduce
+#include "glsBasicOperation.h"	//add, mul
 
 namespace gls
 {
@@ -61,6 +62,21 @@ Scalar mean(const GlsMat& mtx){
 
 	return ret;
 }
+
+void meanStdDev(const GlsMat& mtx, Scalar& mean, Scalar& stddev){
+	GLS_Assert(mtx.depth() == CV_32F);
+
+	//TODO 専用shaderを作る
+	mean = gls::mean(mtx);
+	GlsMat _tmp;
+	gls::add(-1.0*mean, mtx,_tmp);
+	gls::pow(_tmp ,2.0, _tmp);
+	Scalar var = gls::mean(_tmp);
+	for (int i = 0; i < 4; i++){
+		stddev[i] = sqrt(var[i]);
+	}
+}
+
 
 }//namespace gls
 

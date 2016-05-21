@@ -107,4 +107,72 @@ namespace UnitTest_glsCV
 
 	};
 
+	template <typename T>
+	int test_glsMeanStdDev(int cvtype, Size size = Size(32, 24)){
+		int ulps = 4;
+		Mat imgSrc(size, cvtype);
+		FillRandU<T>(imgSrc);
+
+		cout << "Size:" << imgSrc.size() << endl;
+
+		Scalar meanRef;
+		Scalar mean;
+		Scalar stddevRef;
+		Scalar stddev;
+
+		GlsMat glsSrc(imgSrc);
+
+		{
+			_TMR_("cv::meanStdDev:\t");
+			cv::meanStdDev(imgSrc, meanRef, stddevRef);
+		}
+		{
+			_TMR_("gls::meanStdDev:\t");
+			gls::meanStdDev(glsSrc,mean,stddev);
+		}
+
+		cout << meanRef << "," << mean << endl;
+		cout << stddevRef << "," << stddev << endl;
+
+
+		int errNum = 0;
+		if (!AreEqual<Scalar>(meanRef, mean, ulps))errNum++;
+		if (!AreEqual<Scalar>(stddevRef, stddev, ulps))errNum++;
+
+		cout << "errNum:" << errNum << endl;
+
+		return errNum;
+	}
+
+	TEST_CLASS(UnitTest_glsMeanStdDev)
+	{
+	public:
+		TEST_METHOD(glsMeanStdDev_CV_32FC1)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_glsMeanStdDev<float>(CV_32FC1);
+			Assert::AreEqual(0, errNum);
+		}
+		TEST_METHOD(glsMeanStdDev_CV_32FC2)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_glsMeanStdDev<float>(CV_32FC2);
+			Assert::AreEqual(0, errNum);
+		}
+		TEST_METHOD(glsMeanStdDev_CV_32FC3)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_glsMeanStdDev<float>(CV_32FC3);
+			Assert::AreEqual(0, errNum);
+		}
+		TEST_METHOD(glsMeanStdDev_CV_32FC4)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_glsMeanStdDev<float>(CV_32FC4);
+			Assert::AreEqual(0, errNum);
+		}
+
+	};
+
+
 }

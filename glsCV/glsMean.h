@@ -41,6 +41,16 @@ namespace gls
 */
 Scalar mean(const GlsMat& mtx);
 
+
+/*!
+配列要素の平均と標準偏差を求めます．
+
+@param mtx – 入力配列．（結果を Scalar() に格納出来るように）1 から 4 までのチャンネルを持ちます．
+@param mean – 出力パラメータ．求められた平均値．
+@param stddev – 出力パラメータ．求められた標準偏差．
+*/
+void meanStdDev(const GlsMat& mtx, Scalar& mean, Scalar& stddev);
+
 }//namespace gls
 
 #endif
