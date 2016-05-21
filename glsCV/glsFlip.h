@@ -1,4 +1,4 @@
-/*
+﻿/*
 Copyright (c) 2016, oasi-adamay
 All rights reserved.
 
@@ -28,33 +28,23 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#ifndef _GLS_FLIP_H_
+#define _GLS_FLIP_H_
 
-#ifndef _GLS_CV_H_
-#define _GLS_CV_H_
-
-
-#include "GlsMat.h"
-#include "glsShader.h"
-#include "glsCopy.h"
-#include "glsConvert.h"
-#include "glsDraw.h"
-#include "glsMerge.h"
-#include "glsSplit.h"
-#include "glsFft.h"
-#include "glsBasicOperation.h"
-#include "glsReduce.h"
-#include "glsMinMaxLoc.h"
-#include "glsMean.h"
-#include "glsNorm.h"
-#include "glsNormalize.h"
-#include "glsFilter.h"
-#include "glsThreshold.h"
-#include "glsAdaptiveThreshold.h"
-#include "glsFlip.h"
+namespace gls
+{
 
 
-GLFWwindow* glsCvInit(const int _width = 0, const int _height = 0);
-void glsCvTerminate(void);
+/*!
+2次元配列を，垂直軸，水平軸，あるいはその両方の軸で反転します．
 
+@param src – 入力配列
+@param dst – src と同じサイズ，同じ型の出力配列．
+@param flipCode – 配列の反転方法の指定： 0 は x軸周りでの反転，正値（例えば，1）は y軸周りでの反転，負値（例えば，-1）は 両軸周りでの反転を表します．
+*/
+void flip(const GlsMat& src, GlsMat& dst, int flipCode);
+
+
+}//namespace gls
 
 #endif

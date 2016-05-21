@@ -93,6 +93,9 @@
     <ClInclude Include="glsMean.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
+    <ClInclude Include="glsFlip.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -156,6 +159,9 @@
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="glsMean.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="glsFlip.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
