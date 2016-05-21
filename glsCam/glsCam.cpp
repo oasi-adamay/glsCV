@@ -165,7 +165,8 @@ int _tmain(int argc, _TCHAR* argv[])
 			glsFrame = (GlsMat)frame;
 			gls::convert(glsFrame, glsFrame, 1.0f / 256.0f);
 			gls::cvtColor(glsFrame, glsFrame, CV_BGR2GRAY);
-			gls::threshold(glsFrame, glsFrame, 0.5, 1.0, THRESH_BINARY);
+			Scalar mean = gls::mean(glsFrame);
+			gls::threshold(glsFrame, glsFrame, mean[0], 1.0, THRESH_BINARY);
 		}break;
 		case(E_CAM_MODE::FFT_RECT) : {
 			Mat roi = Mat(frame, rectFft);

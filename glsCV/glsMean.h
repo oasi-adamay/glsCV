@@ -1,4 +1,4 @@
-/*
+﻿/*
 Copyright (c) 2016, oasi-adamay
 All rights reserved.
 
@@ -28,33 +28,19 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#ifndef _GLS_MEAN_H_
+#define _GLS_MEAN_H_
 
-#ifndef _GLS_CV_H_
-#define _GLS_CV_H_
+namespace gls
+{
 
+/*!
+配列要素の平均値を求めます．
 
-#include "GlsMat.h"
-#include "glsShader.h"
-#include "glsCopy.h"
-#include "glsConvert.h"
-#include "glsDraw.h"
-#include "glsMerge.h"
-#include "glsSplit.h"
-#include "glsFft.h"
-#include "glsBasicOperation.h"
-#include "glsReduce.h"
-#include "glsMinMaxLoc.h"
-#include "glsMean.h"
-#include "glsNorm.h"
-#include "glsNormalize.h"
-#include "glsFilter.h"
-#include "glsThreshold.h"
-#include "glsAdaptiveThreshold.h"
+@param mtx – 入力配列．（結果を Scalar() に格納出来るように）1 から 4 までのチャンネルを持ちます．
+*/
+Scalar mean(const GlsMat& mtx);
 
-
-
-GLFWwindow* glsCvInit(const int _width = 0, const int _height = 0);
-void glsCvTerminate(void);
-
+}//namespace gls
 
 #endif

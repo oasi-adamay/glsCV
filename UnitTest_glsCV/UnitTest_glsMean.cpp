@@ -28,33 +28,83 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include "stdafx.h"
+#include "CppUnitTest.h"
 
-#ifndef _GLS_CV_H_
-#define _GLS_CV_H_
+using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 
-#include "GlsMat.h"
-#include "glsShader.h"
-#include "glsCopy.h"
-#include "glsConvert.h"
-#include "glsDraw.h"
-#include "glsMerge.h"
-#include "glsSplit.h"
-#include "glsFft.h"
-#include "glsBasicOperation.h"
-#include "glsReduce.h"
-#include "glsMinMaxLoc.h"
-#include "glsMean.h"
-#include "glsNorm.h"
-#include "glsNormalize.h"
-#include "glsFilter.h"
-#include "glsThreshold.h"
-#include "glsAdaptiveThreshold.h"
+#include "glsCV.h"
+#include "UnitTest_Common.h"
 
 
 
-GLFWwindow* glsCvInit(const int _width = 0, const int _height = 0);
-void glsCvTerminate(void);
+
+namespace UnitTest_glsCV
+{
 
 
-#endif
+	template <typename T>
+	int test_glsMean(int cvtype,Size size = Size(32, 24)){
+		int ulps = 4;
+		Mat imgSrc(size, cvtype);
+		FillRandU<T>(imgSrc);
+
+		cout << "Size:" << imgSrc.size() << endl;
+
+		Scalar meanRef;
+		Scalar mean;
+
+		GlsMat glsSrc(imgSrc);
+
+		{
+			_TMR_("cv::mean:\t");
+			meanRef = cv::mean(imgSrc);
+		}
+		{
+			_TMR_("gls::mean:\t");
+			mean = gls::mean(glsSrc);
+		}
+
+		cout << meanRef << "," << mean << endl;
+
+
+		int errNum = 0;
+		if (!AreEqual<Scalar>(meanRef, mean, ulps))errNum++;
+
+		cout << "errNum:" << errNum << endl;
+
+		return errNum;
+	}
+
+	TEST_CLASS(UnitTest_glsMean)
+	{
+	public:
+		TEST_METHOD(glsMean_CV_32FC1)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_glsMean<float>(CV_32FC1);
+			Assert::AreEqual(0, errNum);
+		}
+		TEST_METHOD(glsMean_CV_32FC2)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_glsMean<float>(CV_32FC2);
+			Assert::AreEqual(0, errNum);
+		}
+		TEST_METHOD(glsMean_CV_32FC3)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_glsMean<float>(CV_32FC3);
+			Assert::AreEqual(0, errNum);
+		}
+		TEST_METHOD(glsMean_CV_32FC4)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_glsMean<float>(CV_32FC4);
+			Assert::AreEqual(0, errNum);
+		}
+
+	};
+
+}
