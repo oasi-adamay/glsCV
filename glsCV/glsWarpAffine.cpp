@@ -117,7 +117,7 @@ glsShaderBase* selectShader(int type){
 void warpAffine(const GlsMat& src, GlsMat& dst, const Mat& M, Size dsize, int flags){
 	GLS_Assert(src.depth() == CV_32F);
 	int interpolation = flags & INTER_MAX;
-	bool inverseMap = (flags & WARP_INVERSE_MAP);
+	bool inverseMap = (flags & WARP_INVERSE_MAP)?true:false;
 	GLS_Assert(interpolation == INTER_NEAREST || interpolation == INTER_LINEAR);
 	GLS_Assert(M.rows == 2 && M.cols == 3);
 	GlsMat _dst = getDstMat(dsize, src.type(), dst);
