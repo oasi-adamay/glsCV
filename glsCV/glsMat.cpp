@@ -392,14 +392,19 @@ GlsMat::operator Mat() const{
 
 void GlsMat::setInterpolation(GLint interpolation) const{
 	glBindTexture(GL_TEXTURE_2D, texid());
-	// (set texture parameters here)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, interpolation);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, interpolation);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
 }
+
+void GlsMat::setWrapMode(GLint mode) const{
+	glBindTexture(GL_TEXTURE_2D, texid());
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, mode);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, mode);
+	glBindTexture(GL_TEXTURE_2D, 0);
+}
+
 
 
 

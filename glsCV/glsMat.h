@@ -109,6 +109,8 @@ public:
 	//! texture filter (GL_NEAREST/GL_LINEAR)
 	void setInterpolation(GLint interpolation) const;
 
+	//! texture filter (GL_CLAMP_TO_EDGE/GL_CLAMP_TO_BORDER/GL_MIRRORED_REPEAT/GL_REPEAT/GL_MIRROR_CLAMP_TO_EDGE)
+	void setWrapMode(GLint mode) const;
 
 };
 
