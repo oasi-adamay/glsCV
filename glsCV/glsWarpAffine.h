@@ -1,4 +1,4 @@
-/*
+﻿/*
 Copyright (c) 2016, oasi-adamay
 All rights reserved.
 
@@ -28,35 +28,32 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#ifndef _GLS_WARP_AFFINE_H_
+#define _GLS_WARP_AFFINE_H_
 
-#ifndef _GLS_CV_H_
-#define _GLS_CV_H_
+namespace gls
+{
 
+/*!
+画像のアフィン変換を行います．
 
-#include "GlsMat.h"
-#include "glsShader.h"
-#include "glsCopy.h"
-#include "glsConvert.h"
-#include "glsDraw.h"
-#include "glsMerge.h"
-#include "glsSplit.h"
-#include "glsFft.h"
-#include "glsBasicOperation.h"
-#include "glsReduce.h"
-#include "glsMinMaxLoc.h"
-#include "glsMean.h"
-#include "glsNorm.h"
-#include "glsNormalize.h"
-#include "glsFilter.h"
-#include "glsThreshold.h"
-#include "glsAdaptiveThreshold.h"
-#include "glsFlip.h"
-#include "glsResize.h"
-#include "glsWarpAffine.h"
+@param src – 入力画像 (CV_32FC1,CV_32FC2,CV_32FC3,CV_32FC4)
+@param dst – 出力画像．サイズが dsizeで srcと同じタイプの出力画像
+@param M – 2x3 の変換行列．
+@param dsize – 出力画像サイズ．
+@param flag 補間手法：
+- INTER_NEAREST 最近傍補間
+- INTER_LINEAR バイリニア補間（デフォルト）
+(- INTER_AREA ピクセル領域の関係を利用したリサンプリング)
+(- INTER_CUBIC 4x4 の近傍領域を利用するバイキュービック補間)
+
+関数 warpAffine は，指定された行列を用いて入力画像を変換します：
+dst(x,y) = src(M11x+M12y+M13,M21y+M21y+M22)
+*/
+void warpAffine(const GlsMat& src, GlsMat& dst, const Mat& M, Size dsize, int flags = INTER_LINEAR);
 
 
-GLFWwindow* glsCvInit(const int _width = 0, const int _height = 0);
-void glsCvTerminate(void);
 
+}//namespace gls
 
 #endif

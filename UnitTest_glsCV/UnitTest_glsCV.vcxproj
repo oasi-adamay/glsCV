@@ -190,6 +190,7 @@
     <ClCompile Include="UnitTest_glsResize.cpp" />
     <ClCompile Include="UnitTest_glsSplit.cpp" />
     <ClCompile Include="UnitTest_glsThreshold.cpp" />
+    <ClCompile Include="UnitTest_glsWrapAffine.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

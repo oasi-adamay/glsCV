@@ -163,6 +163,7 @@
     <ClInclude Include="glsSplit.h" />
     <ClInclude Include="glsThreshold.h" />
     <ClInclude Include="glsVAO.h" />
+    <ClInclude Include="glsWarpAffine.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="Timer.h" />
@@ -190,6 +191,7 @@
     <ClCompile Include="glsSplit.cpp" />
     <ClCompile Include="glsThreshold.cpp" />
     <ClCompile Include="glsVAO.cpp" />
+    <ClCompile Include="glsWarpAffine.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
