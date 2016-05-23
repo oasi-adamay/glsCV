@@ -177,6 +177,7 @@
     <ClCompile Include="UnitTest_Common.cpp" />
     <ClCompile Include="UnitTest_glsAdaptiveThreshold.cpp" />
     <ClCompile Include="UnitTest_glsBasicOperation.cpp" />
+    <ClCompile Include="UnitTest_glsBilateralFilter.cpp" />
     <ClCompile Include="UnitTest_glsConvert.cpp" />
     <ClCompile Include="UnitTest_glsCopy.cpp" />
     <ClCompile Include="unittest_glsFft.cpp" />

@@ -143,6 +143,7 @@
   <ItemGroup>
     <ClInclude Include="glsAdaptiveThreshold.h" />
     <ClInclude Include="glsBasicOperation.h" />
+    <ClInclude Include="glsBilateralFilter.h" />
     <ClInclude Include="glsConvert.h" />
     <ClInclude Include="glsCopy.h" />
     <ClInclude Include="glsCV.h" />
@@ -173,6 +174,7 @@
   <ItemGroup>
     <ClCompile Include="glsAdaptiveThreshold.cpp" />
     <ClCompile Include="glsBasicOperation.cpp" />
+    <ClCompile Include="glsBilateralFilter.cpp" />
     <ClCompile Include="glsConvert.cpp" />
     <ClCompile Include="glsCopy.cpp" />
     <ClCompile Include="glsCV.cpp" />

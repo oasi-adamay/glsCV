@@ -49,6 +49,7 @@ enum E_CAM_MODE {
 	NORMAL,
 	GRAY,
 	GAUSS,
+	BILATERAL,
 	SOBEL_H,
 	SOBEL_V,
 	LAPLACIAN,
@@ -72,7 +73,8 @@ void controls(GLFWwindow* window, int& mode ,int& zoom, int& ocvwin){
 	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) ocvwin = 1- ocvwin;
 	if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS) mode = E_CAM_MODE::NORMAL;
 	if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS) mode = E_CAM_MODE::GRAY;
-	if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS) mode = E_CAM_MODE::GAUSS;
+//	if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS) mode = E_CAM_MODE::GAUSS;
+	if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS) mode = E_CAM_MODE::BILATERAL;
 	if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS) mode = E_CAM_MODE::SOBEL_H;
 	if (glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS) mode = E_CAM_MODE::SOBEL_V;
 	if (glfwGetKey(window, GLFW_KEY_6) == GLFW_PRESS) mode = E_CAM_MODE::LAPLACIAN;
@@ -202,7 +204,8 @@ int _tmain(int argc, _TCHAR* argv[])
 			gls::flip(glsFrame, glsFrame, 0);				// è„â∫îΩì]
 			gls::convert(glsFrame, glsFrame, 1.0f / 256.0f);
 			gls::cvtColor(glsFrame, glsFrame, CV_BGR2GRAY);
-			gls::Laplacian(glsFrame, glsFrame, -1, 1, 1.0, 0.5);
+//			gls::Laplacian(glsFrame, glsFrame, -1, 1, 1.0, 0.5);
+			gls::Laplacian(glsFrame, glsFrame, -1, 3, 1.0, 0.5);
 		}break;
 		case(E_CAM_MODE::GAUSS) : {
 			glsFrame = (GlsMat)frame;
@@ -210,6 +213,13 @@ int _tmain(int argc, _TCHAR* argv[])
 			gls::convert(glsFrame, glsFrame, 1.0f / 256.0f);
 			gls::cvtColor(glsFrame, glsFrame, CV_BGR2RGB);
 			gls::GaussianBlur(glsFrame, glsFrame, Size(9, 9), 0, 0);
+		}break;
+		case(E_CAM_MODE::BILATERAL) : {
+			glsFrame = (GlsMat)frame;
+			gls::flip(glsFrame, glsFrame, 0);				// è„â∫îΩì]
+			gls::convert(glsFrame, glsFrame, 1.0f / 256.0f);
+			gls::cvtColor(glsFrame, glsFrame, CV_BGR2GRAY);
+			gls::bilateralFilter(glsFrame, glsFrame, 9, 0.05, 1.85);
 		}break;
 		case(E_CAM_MODE::GRAY) : {
 			glsFrame = (GlsMat)frame;
