@@ -94,6 +94,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -127,6 +128,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <OpenMPSupport>true</OpenMPSupport>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -141,6 +143,7 @@
   <ItemGroup>
     <ClInclude Include="glsAdaptiveThreshold.h" />
     <ClInclude Include="glsBasicOperation.h" />
+    <ClInclude Include="glsBilateralFilter.h" />
     <ClInclude Include="glsConvert.h" />
     <ClInclude Include="glsCopy.h" />
     <ClInclude Include="glsCV.h" />
@@ -157,11 +160,13 @@
     <ClInclude Include="glsNorm.h" />
     <ClInclude Include="glsNormalize.h" />
     <ClInclude Include="glsReduce.h" />
+    <ClInclude Include="glsResize.h" />
     <ClInclude Include="glsShader.h" />
     <ClInclude Include="glsShader_impl.h" />
     <ClInclude Include="glsSplit.h" />
     <ClInclude Include="glsThreshold.h" />
     <ClInclude Include="glsVAO.h" />
+    <ClInclude Include="glsWarpAffine.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="Timer.h" />
@@ -169,6 +174,7 @@
   <ItemGroup>
     <ClCompile Include="glsAdaptiveThreshold.cpp" />
     <ClCompile Include="glsBasicOperation.cpp" />
+    <ClCompile Include="glsBilateralFilter.cpp" />
     <ClCompile Include="glsConvert.cpp" />
     <ClCompile Include="glsCopy.cpp" />
     <ClCompile Include="glsCV.cpp" />
@@ -184,10 +190,12 @@
     <ClCompile Include="glsNorm.cpp" />
     <ClCompile Include="glsNormalize.cpp" />
     <ClCompile Include="glsReduce.cpp" />
+    <ClCompile Include="glsResize.cpp" />
     <ClCompile Include="glsShader.cpp" />
     <ClCompile Include="glsSplit.cpp" />
     <ClCompile Include="glsThreshold.cpp" />
     <ClCompile Include="glsVAO.cpp" />
+    <ClCompile Include="glsWarpAffine.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

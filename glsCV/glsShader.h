@@ -63,11 +63,24 @@ private:
 
 	//! setup (uniform / bind / ...)
 	template<class T>	void setup(SetupInfo* info, const T& t);
-	template<>	void setup<int>(SetupInfo* info, const int& t);
-	template<>	void setup<float>(SetupInfo* info, const float& t);
-	template<>	void setup<double>(SetupInfo* info, const double& t);
-	template<>	void setup<Scalar>(SetupInfo* info, const Scalar& t);
-	template<>	void setup<GlsMat>(SetupInfo* info, const GlsMat& t);
+	template<>	void setup<int>(SetupInfo* info, const int& t);			//!< uniform int
+	template<>	void setup<float>(SetupInfo* info, const float& t);		//!< uniform float
+	template<>	void setup<double>(SetupInfo* info, const double& t);	//!< uniform float
+	template<>	void setup<Scalar>(SetupInfo* info, const Scalar& t);	//!< uniform vec4
+	template<>	void setup<Vec2f>(SetupInfo* info, const Vec2f& t);		//!< uniform vec2
+	template<>	void setup<Vec3f>(SetupInfo* info, const Vec3f& t);		//!< uniform vec3
+	template<>	void setup<Vec4f>(SetupInfo* info, const Vec4f& t);		//!< uniform vec
+	template<>	void setup<Vec2i>(SetupInfo* info, const Vec2i& t);		//!< uniform ivec2
+	template<>	void setup<Vec3i>(SetupInfo* info, const Vec3i& t);		//!< uniform ivec3
+	template<>	void setup<Vec4i>(SetupInfo* info, const Vec4i& t);		//!< uniform ivec4
+	template<>	void setup<Matx22f>(SetupInfo* info, const Matx22f& t);	//!< uniform mat2(transpose)
+	template<>	void setup<Matx33f>(SetupInfo* info, const Matx33f& t);	//!< uniform mat3(transpose)
+	template<>	void setup<Matx44f>(SetupInfo* info, const Matx44f& t);	//!< uniform mat4(transpose)
+	template<>	void setup<Matx23f>(SetupInfo* info, const Matx23f& t);	//!< uniform mat3x2(transpose)
+	template<>	void setup<Matx32f>(SetupInfo* info, const Matx32f& t);	//!< uniform mat2x3(transpose)
+	template<>	void setup<Matx34f>(SetupInfo* info, const Matx34f& t);	//!< uniform mat4x3(transpose)
+	template<>	void setup<Matx43f>(SetupInfo* info, const Matx43f& t);	//!< uniform mat3x4(transpose)
+	template<>	void setup<GlsMat>(SetupInfo* info, const GlsMat& t);	//!<
 	template<class First, class... Rest>
 	void setup(SetupInfo* info, const First& first, const Rest&... rest);
 

@@ -1,4 +1,4 @@
-/*
+﻿/*
 Copyright (c) 2016, oasi-adamay
 All rights reserved.
 
@@ -28,36 +28,33 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#ifndef _GLS_RESIZE_H_
+#define _GLS_RESIZE_H_
 
-#ifndef _GLS_CV_H_
-#define _GLS_CV_H_
+namespace gls
+{
+
+/*!
+画像のサイズを変更します．
+
+@param src – 入力画像 (CV_32FC1,CV_32FC2,CV_32FC3,CV_32FC4)
+@param dst – 出力画像．サイズは dsize （0でない場合）か，または src.size() , fx , fy から計算される値になります． dst の型は， src と同じになります
+@param dsize – 出力画像サイズ．これが0の場合，次のように計算されます：
+dsize = Size(round(fx*src.cols),round(fy*src.rows))
+必ず dsize が非0，あるいは fx と fy の両方が非0，でなければいけません
+@param fx – 水平軸方向のスケールファクタ．これが0の場合，次のように計算されます
+(double) dsize.width / src.cols;
+@param fy – 垂直軸方向のスケールファクタ．これが0の場合，次のように計算されます：
+(double) dsize.height / src.rows;
+@param 補間手法：
+- INTER_NEAREST 最近傍補間
+- INTER_LINEAR バイリニア補間（デフォルト）
+(- INTER_AREA ピクセル領域の関係を利用したリサンプリング)
+(- INTER_CUBIC 4x4 の近傍領域を利用するバイキュービック補間)
+*/
+void resize(const GlsMat& src, GlsMat& dst, Size dsize, double fx = 0, double fy = 0, int interpolation = INTER_LINEAR);
 
 
-#include "GlsMat.h"
-#include "glsShader.h"
-#include "glsCopy.h"
-#include "glsConvert.h"
-#include "glsDraw.h"
-#include "glsMerge.h"
-#include "glsSplit.h"
-#include "glsFft.h"
-#include "glsBasicOperation.h"
-#include "glsReduce.h"
-#include "glsMinMaxLoc.h"
-#include "glsMean.h"
-#include "glsNorm.h"
-#include "glsNormalize.h"
-#include "glsFilter.h"
-#include "glsBilateralFilter.h"
-#include "glsThreshold.h"
-#include "glsAdaptiveThreshold.h"
-#include "glsFlip.h"
-#include "glsResize.h"
-#include "glsWarpAffine.h"
-
-
-GLFWwindow* glsCvInit(const int _width = 0, const int _height = 0);
-void glsCvTerminate(void);
-
+}//namespace gls
 
 #endif

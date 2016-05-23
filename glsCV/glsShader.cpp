@@ -39,7 +39,9 @@ include
 
 //#include "Timer.h"
 
+#ifndef _DEBUG
 #define _ENABLE_SHADER_BIN
+#endif
 
 namespace gls
 {

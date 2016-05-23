@@ -105,6 +105,177 @@ void glsShaderBase::setup<Scalar>(SetupInfo* info, const Scalar& t)
 #endif
 }
 
+template<>
+void glsShaderBase::setup<Vec2f>(SetupInfo* info, const Vec2f& t)
+{
+	const int i = info->argnum++;
+	GLuint loc = uniformLocArray[i];
+	glUniform2fv(loc, 1, &t.val[0]);
+#ifdef _DEBUG_SHADER
+	std::cout << "i:" << i << "\t";
+	std::cout << "loc:" << loc << "\t";
+	std::cout << "val:" << t << endl;
+#endif
+}
+
+template<>
+void glsShaderBase::setup<Vec3f>(SetupInfo* info, const Vec3f& t)
+{
+	const int i = info->argnum++;
+	GLuint loc = uniformLocArray[i];
+	glUniform3fv(loc, 1, &t.val[0]);
+#ifdef _DEBUG_SHADER
+	std::cout << "i:" << i << "\t";
+	std::cout << "loc:" << loc << "\t";
+	std::cout << "val:" << t << endl;
+#endif
+}
+
+template<>
+void glsShaderBase::setup<Vec4f>(SetupInfo* info, const Vec4f& t)
+{
+	const int i = info->argnum++;
+	GLuint loc = uniformLocArray[i];
+	glUniform4fv(loc, 1, &t.val[0]);
+#ifdef _DEBUG_SHADER
+	std::cout << "i:" << i << "\t";
+	std::cout << "loc:" << loc << "\t";
+	std::cout << "val:" << t << endl;
+#endif
+}
+
+template<>
+void glsShaderBase::setup<Vec2i>(SetupInfo* info, const Vec2i& t)
+{
+	const int i = info->argnum++;
+	GLuint loc = uniformLocArray[i];
+	glUniform2iv(loc, 1, &t.val[0]);
+#ifdef _DEBUG_SHADER
+	std::cout << "i:" << i << "\t";
+	std::cout << "loc:" << loc << "\t";
+	std::cout << "val:" << t << endl;
+#endif
+}
+
+template<>
+void glsShaderBase::setup<Vec3i>(SetupInfo* info, const Vec3i& t)
+{
+	const int i = info->argnum++;
+	GLuint loc = uniformLocArray[i];
+	glUniform3iv(loc, 1, &t.val[0]);
+#ifdef _DEBUG_SHADER
+	std::cout << "i:" << i << "\t";
+	std::cout << "loc:" << loc << "\t";
+	std::cout << "val:" << t << endl;
+#endif
+}
+
+template<>
+void glsShaderBase::setup<Vec4i>(SetupInfo* info, const Vec4i& t)
+{
+	const int i = info->argnum++;
+	GLuint loc = uniformLocArray[i];
+	glUniform4iv(loc, 1, &t.val[0]);
+#ifdef _DEBUG_SHADER
+	std::cout << "i:" << i << "\t";
+	std::cout << "loc:" << loc << "\t";
+	std::cout << "val:" << t << endl;
+#endif
+}
+
+
+template<>
+void glsShaderBase::setup<Matx22f>(SetupInfo* info, const Matx22f& t)
+{
+	const int i = info->argnum++;
+	GLuint loc = uniformLocArray[i];
+	glUniformMatrix2fv(loc, 1, GL_TRUE, &t.val[0]);
+#ifdef _DEBUG_SHADER
+	std::cout << "i:" << i << "\t";
+	std::cout << "loc:" << loc << "\t";
+	std::cout << "val:" << t << endl;
+#endif
+}
+
+template<>
+void glsShaderBase::setup<Matx33f>(SetupInfo* info, const Matx33f& t)
+{
+	const int i = info->argnum++;
+	GLuint loc = uniformLocArray[i];
+	glUniformMatrix3fv(loc, 1, GL_TRUE, &t.val[0]);
+#ifdef _DEBUG_SHADER
+	std::cout << "i:" << i << "\t";
+	std::cout << "loc:" << loc << "\t";
+	std::cout << "val:" << t << endl;
+#endif
+}
+
+template<>
+void glsShaderBase::setup<Matx44f>(SetupInfo* info, const Matx44f& t)
+{
+	const int i = info->argnum++;
+	GLuint loc = uniformLocArray[i];
+	glUniformMatrix4fv(loc, 1, GL_TRUE, &t.val[0]);
+#ifdef _DEBUG_SHADER
+	std::cout << "i:" << i << "\t";
+	std::cout << "loc:" << loc << "\t";
+	std::cout << "val:" << t << endl;
+#endif
+}
+
+template<>
+void glsShaderBase::setup<Matx23f>(SetupInfo* info, const Matx23f& t)
+{
+	const int i = info->argnum++;
+	GLuint loc = uniformLocArray[i];
+	glUniformMatrix3x2fv(loc, 1, GL_TRUE, &t.val[0]);
+#ifdef _DEBUG_SHADER
+	std::cout << "i:" << i << "\t";
+	std::cout << "loc:" << loc << "\t";
+	std::cout << "val:" << t << endl;
+#endif
+}
+
+
+template<>
+void glsShaderBase::setup<Matx32f>(SetupInfo* info, const Matx32f& t)
+{
+	const int i = info->argnum++;
+	GLuint loc = uniformLocArray[i];
+	glUniformMatrix2x3fv(loc, 1, GL_TRUE, &t.val[0]);
+#ifdef _DEBUG_SHADER
+	std::cout << "i:" << i << "\t";
+	std::cout << "loc:" << loc << "\t";
+	std::cout << "val:" << t << endl;
+#endif
+}
+
+template<>
+void glsShaderBase::setup<Matx34f>(SetupInfo* info, const Matx34f& t)
+{
+	const int i = info->argnum++;
+	GLuint loc = uniformLocArray[i];
+	glUniformMatrix4x3fv(loc, 1, GL_TRUE, &t.val[0]);
+#ifdef _DEBUG_SHADER
+	std::cout << "i:" << i << "\t";
+	std::cout << "loc:" << loc << "\t";
+	std::cout << "val:" << t << endl;
+#endif
+}
+
+template<>
+void glsShaderBase::setup<Matx43f>(SetupInfo* info, const Matx43f& t)
+{
+	const int i = info->argnum++;
+	GLuint loc = uniformLocArray[i];
+	glUniformMatrix3x4fv(loc, 1, GL_TRUE, &t.val[0]);
+#ifdef _DEBUG_SHADER
+	std::cout << "i:" << i << "\t";
+	std::cout << "loc:" << loc << "\t";
+	std::cout << "val:" << t << endl;
+#endif
+}
+
 
 template<>
 void glsShaderBase::setup<GlsMat>(SetupInfo* info, const GlsMat& t)
@@ -142,6 +313,7 @@ void glsShaderBase::setup<GlsMat>(SetupInfo* info, const GlsMat& t)
 
 	}
 }
+
 
 
 template<class First, class... Rest>

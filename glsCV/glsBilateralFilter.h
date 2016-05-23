@@ -1,4 +1,4 @@
-/*
+﻿/*
 Copyright (c) 2016, oasi-adamay
 All rights reserved.
 
@@ -28,36 +28,25 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#ifndef _GLS_BILATERAL_FILTER_H_
+#define _GLS_BILATERAL_FILTER_H_
 
-#ifndef _GLS_CV_H_
-#define _GLS_CV_H_
+namespace gls
+{
 
+/*!
+画像にバイラテラルフィルタを適用します．
 
-#include "GlsMat.h"
-#include "glsShader.h"
-#include "glsCopy.h"
-#include "glsConvert.h"
-#include "glsDraw.h"
-#include "glsMerge.h"
-#include "glsSplit.h"
-#include "glsFft.h"
-#include "glsBasicOperation.h"
-#include "glsReduce.h"
-#include "glsMinMaxLoc.h"
-#include "glsMean.h"
-#include "glsNorm.h"
-#include "glsNormalize.h"
-#include "glsFilter.h"
-#include "glsBilateralFilter.h"
-#include "glsThreshold.h"
-#include "glsAdaptiveThreshold.h"
-#include "glsFlip.h"
-#include "glsResize.h"
-#include "glsWarpAffine.h"
+@param src 入力画像．CV_32FC1型の画像がサポートされます．
+@param dst 出力画像． src と同じサイズ，同じチャンネル数になります．
+@param d – フィルタリングで利用される，各ピクセル近傍領域の直径．これが正値でない場合， sigmaSpace から求められます．
+@param sigmaColor – 色空間におけるフィルタシグマ．
+@param sigmaSpace – 座標空間におけるフィルタシグマ． d>0 ならば sigmaSpace に関係なく近傍領域のサイズが決まります。
+*/
+void bilateralFilter(const GlsMat& src, GlsMat& dst, int d, double sigmaColor, double sigmaSpace);
 
 
-GLFWwindow* glsCvInit(const int _width = 0, const int _height = 0);
-void glsCvTerminate(void);
 
+}//namespace gls
 
 #endif

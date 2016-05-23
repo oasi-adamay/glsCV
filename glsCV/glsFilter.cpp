@@ -403,50 +403,35 @@ void Sobel(const GlsMat& src, GlsMat& dst, int ddepth, int xorder, int yorder, i
 }
 
 void Laplacian(const GlsMat& src, GlsMat& dst, int ddepth, int ksize, double scale, double delta){
+	GLS_Assert(src.depth() == CV_32F);
+	GLS_Assert(ksize %2 == 1);
 
-	GLS_Assert(ksize == 1);
-
-	if (ksize == 1){
-		Mat kernel;
-		kernel = (cv::Mat_<float>(3, 3) << 0.0f, 1.0f, 0.0f, 1.0f, -4.0f, 1.0f, 0.0f, 1.0f, 0.0f);
-		kernel *= scale;
-//		cout << kernel << endl;
-		const Point anchor(-1, -1);
-		gls::filter2D(src, dst, ddepth, kernel, anchor, delta);
-
+	if (ksize == 1 || ksize == 3)
+	{
+		float K[2][9] =
+		{ { 0, 1, 0, 1, -4, 1, 0, 1, 0 },
+		{ 2, 0, 2, 0, -8, 0, 2, 0, 2 } };
+		Mat kernel(3, 3, CV_32F, K[ksize == 3]);
+		if (scale != 1)
+			kernel *= scale;
+		gls::filter2D(src, dst, ddepth, kernel, Point(-1, -1), delta);
 	}
 	else{
-		/* TODO
-		cvと結果が一致しない。
-		*/
+		Mat kd,ks;
 
-		Mat kernelX;
-		Mat kernelY;
+		cv::getDerivKernels(kd, ks, 2, 0, ksize, false, CV_32F);
+//		cout << kd << endl;
+//		cout << ks << endl;
+		GlsMat _d2x;
+		GlsMat _d2y;
+		gls::sepFilter2D(src, _d2x, ddepth, kd, ks);
+		gls::sepFilter2D(src, _d2y, ddepth, ks, kd);
+		// TODO:optimize
+		// scale*(src0+src1) + delta
+		gls::add(_d2x, _d2y, dst);
+		if (scale != 1) gls::multiply(Scalar(scale), dst, dst);
+		if (delta != 0) gls::add(Scalar(delta), dst, dst);
 
-		cv::getDerivKernels(kernelX, kernelY, 2, 2, ksize, false, CV_32F);
-//		cout << kernelX << endl;
-//		cout << kernelY << endl;
-#if 0
-		gls::sepFilter2D(src, dst, ddepth, kernelX, kernelY);
-#elif 1
-		Mat kernel = kernelY*(kernelX.t());
-//		cout << kernel << endl;
-		gls::filter2D(src, dst, ddepth, kernel);
-#else
-		GlsMat _kernelX = (GlsMat)kernelX.t();
-		GlsMat _kernelY = (GlsMat)kernelY;
-
-		GlsMat _tmpX = GlsMat(src.size(), src.type());
-		GlsMat _tmpY = GlsMat(src.size(), src.type());
-
-		glsShaderBase* shader = selectShader1D(src.type());
-		shader->Execute(src, _kernelX, _tmpX);	//row filter
-		shader->Execute(src, _kernelY, _tmpY);	//col filter
-
-		gls::add(_tmpX, _tmpY,dst);
-
-
-#endif
 	}
 }
 

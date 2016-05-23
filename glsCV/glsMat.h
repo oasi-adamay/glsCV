@@ -72,9 +72,6 @@ public:
 	//! 代入　ヘッダー情報のみのコピーで、データ自体のコピーは発生しません。
 	GlsMat& operator=(const GlsMat& rhs);
 
-	//! テクスチャーのIDの取得
-	GLuint texid(void)const { return _texid.use_count() == 0 ? 0 :* _texid; }
-
 	//! 行列サイズ(width,height)
 	Size size(void) const { return Size(cols, rows); }
 	//! 行列要素の型を返します．OpenCVのMat.type()と同じです。
@@ -84,17 +81,23 @@ public:
 	//! 行列要素のビット深度を返します．OpenCVのMat.depth()と同じです。
 	int depth(void) const { return CV_MAT_DEPTH(flag); }
 
+	//! 配列が要素を持たない（テクスチャーが生成されていない）場合に true を返します．
+	bool empty(void) const { return _texid.use_count() == 0; }
+	bool isContinuous(void) const { return true; }
+
+	/*!
+	OpenGL　wrapper
+	*/
+
+	//! テクスチャーのIDの取得
+	GLuint texid(void)const { return _texid.use_count() == 0 ? 0 : *_texid; }
+
 	//! OpenGL internal format (SizedFormatを使用します。GL_RGB32Fなど)
 	GLenum glSizedFormat(void) const{ return convCVtype2GLsizedFormat(CV_MAT_TYPE(flag)); }
 	//! OpenGL format (GL_RED,GL_RG,GL_RGB,GL_RED_INTEGER等)
 	GLenum glFormat(void) const{ return convCVtype2GLformat(CV_MAT_TYPE(flag)); }
 	//! OpenGL type (GL_FLOAT,GL_UNSIGED_BYTET等)
 	GLenum glType(void) const{ return convCVtype2GLtype(CV_MAT_TYPE(flag)); }
-
-	//! 配列が要素を持たない（テクスチャーが生成されていない）場合に true を返します．
-	bool empty(void) const { return _texid.use_count() == 0; }
-	bool isContinuous(void) const { return true; }
-
 
 	//! CPU->GPUへのupload
 	void upload(const Mat&src);
@@ -103,6 +106,11 @@ public:
 	void download(Mat&dst) const;
 	operator Mat() const;
 
+	//! texture filter (GL_NEAREST/GL_LINEAR)
+	void setInterpolation(GLint interpolation) const;
+
+	//! texture filter (GL_CLAMP_TO_EDGE/GL_CLAMP_TO_BORDER/GL_MIRRORED_REPEAT/GL_REPEAT/GL_MIRROR_CLAMP_TO_EDGE)
+	void setWrapMode(GLint mode) const;
 
 };
 
