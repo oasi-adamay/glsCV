@@ -373,7 +373,9 @@ namespace UnitTest_glsCV
 
 
 	template <typename T>
-	int test_glsLaplacian(int cvtype, int ksize = 1, int ulps = 0, Size size = Size(32, 24)){
+	int test_glsLaplacian(int cvtype, int ksize = 1, Size size = Size(32, 24)){
+		int ulps = 16;
+
 		double scale = 1.25;
 		double delta = 0.5;
 
@@ -425,11 +427,18 @@ namespace UnitTest_glsCV
 			int errNum = test_glsLaplacian<float>(CV_32FC1, 1);
 			Assert::AreEqual(0, errNum);
 		}
-		//TODO
-		//TEST_METHOD(glsLaplacian_CV_32FC1_3)
+
+		TEST_METHOD(glsLaplacian_CV_32FC1_3)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_glsLaplacian<float>(CV_32FC1, 3);
+			Assert::AreEqual(0, errNum);
+		}
+
+		//TEST_METHOD(glsLaplacian_CV_32FC1_5)
 		//{
 		//	cout << __FUNCTION__ << endl;
-		//	int errNum = test_glsLaplacian<float>(CV_32FC1, 3);
+		//	int errNum = test_glsLaplacian<float>(CV_32FC1, 5);
 		//	Assert::AreEqual(0, errNum);
 		//}
 
