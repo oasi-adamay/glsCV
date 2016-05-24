@@ -190,6 +190,7 @@
     <ClCompile Include="UnitTest_glsNorm.cpp" />
     <ClCompile Include="UnitTest_glsNormalize.cpp" />
     <ClCompile Include="UnitTest_glsReduce.cpp" />
+    <ClCompile Include="UnitTest_glsRemap.cpp" />
     <ClCompile Include="UnitTest_glsResize.cpp" />
     <ClCompile Include="UnitTest_glsSplit.cpp" />
     <ClCompile Include="UnitTest_glsThreshold.cpp" />

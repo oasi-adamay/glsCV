@@ -160,6 +160,7 @@
     <ClInclude Include="glsNorm.h" />
     <ClInclude Include="glsNormalize.h" />
     <ClInclude Include="glsReduce.h" />
+    <ClInclude Include="glsRemap.h" />
     <ClInclude Include="glsResize.h" />
     <ClInclude Include="glsShader.h" />
     <ClInclude Include="glsShader_impl.h" />
@@ -190,6 +191,7 @@
     <ClCompile Include="glsNorm.cpp" />
     <ClCompile Include="glsNormalize.cpp" />
     <ClCompile Include="glsReduce.cpp" />
+    <ClCompile Include="glsRemap.cpp" />
     <ClCompile Include="glsResize.cpp" />
     <ClCompile Include="glsShader.cpp" />
     <ClCompile Include="glsSplit.cpp" />

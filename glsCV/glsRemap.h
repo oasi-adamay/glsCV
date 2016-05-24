@@ -1,4 +1,4 @@
-/*
+﻿/*
 Copyright (c) 2016, oasi-adamay
 All rights reserved.
 
@@ -28,37 +28,32 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#ifndef _GLS_REMAP_H_
+#define _GLS_REMAP_H_
 
-#ifndef _GLS_CV_H_
-#define _GLS_CV_H_
+namespace gls
+{
 
+/*!
+画像に対して，汎用的な幾何学変換を適用します．
 
-#include "GlsMat.h"
-#include "glsShader.h"
-#include "glsCopy.h"
-#include "glsConvert.h"
-#include "glsDraw.h"
-#include "glsMerge.h"
-#include "glsSplit.h"
-#include "glsFft.h"
-#include "glsBasicOperation.h"
-#include "glsReduce.h"
-#include "glsMinMaxLoc.h"
-#include "glsMean.h"
-#include "glsNorm.h"
-#include "glsNormalize.h"
-#include "glsFilter.h"
-#include "glsBilateralFilter.h"
-#include "glsThreshold.h"
-#include "glsAdaptiveThreshold.h"
-#include "glsFlip.h"
-#include "glsResize.h"
-#include "glsWarpAffine.h"
-#include "glsRemap.h"
+@param src – 入力画像 (CV_32FC1,CV_32FC2,CV_32FC3,CV_32FC4)
+@param dst – 出力画像． map1 と同じサイズ， src と同じタイプ
+@param map1 – CV_32FC2 である座標点 (x,y)．
+@param map2 – 空のマップ
+@param interpolation 補間手法：
+- INTER_NEAREST 最近傍補間
+- INTER_LINEAR バイリニア補間（デフォルト）
+(- INTER_AREA ピクセル領域の関係を利用したリサンプリング)
+(- INTER_CUBIC 4x4 の近傍領域を利用するバイキュービック補間)
+
+dst(x,y) = src(mapx(x,y),mapy(x,y))
+*/
+
+void remap(const GlsMat& src, GlsMat& dst, const GlsMat& map1, const GlsMat& map2, int interpolation);
 
 
-GLFWwindow* glsCvInit(const int _width = 0, const int _height = 0);
-void glsCvTerminate(void);
 
+}//namespace gls
 
 #endif
