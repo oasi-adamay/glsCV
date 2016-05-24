@@ -100,6 +100,13 @@ namespace UnitTest_glsCV
 			Assert::AreEqual(0, errNum);
 		}
 
+		TEST_METHOD(glsBilateralFilter_CV_32FC3)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_glsBilateralFilter<float>(CV_32FC3);
+			Assert::AreEqual(0, errNum);
+		}
+
 #if 1
 		//! benchmark
 		BEGIN_TEST_METHOD_ATTRIBUTE(glsBilateralFilter_CV_32FC1_5x5_1024x1024)

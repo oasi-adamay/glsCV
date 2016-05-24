@@ -40,24 +40,37 @@ include
 
 namespace gls
 {
+
 //-----------------------------------------------------------------------------
-// glsShaderBilateralFilter
-class glsShaderBilateralFilter : public glsShaderBase
+// glsShaderBilateralFilterBase
+class glsShaderBilateralFilterBase : public glsShaderBase
 {
 protected:
-	string FragmentShaderCode(void);
 	list<string> UniformNameList(void);
 
 public:
-	glsShaderBilateralFilter(void) : glsShaderBase(__FUNCTION__){}
-
+	glsShaderBilateralFilterBase(const string& _name) :glsShaderBase(_name){}
 };
+
+list<string> glsShaderBilateralFilterBase::UniformNameList(void){
+	list<string> lst;
+	lst.push_back("texSrc");
+	lst.push_back("texKernel");
+	lst.push_back("color_coeff");
+	return lst;
+}
 
 
 //-----------------------------------------------------------------------------
-//global 
-glsShaderBilateralFilter ShaderBilateralFilter;
+// glsShaderBilateralFilter
+class glsShaderBilateralFilter : public glsShaderBilateralFilterBase
+{
+protected:
+	string FragmentShaderCode(void);
 
+public:
+	glsShaderBilateralFilter(void) : glsShaderBilateralFilterBase(__FUNCTION__){}
+};
 
 //-----------------------------------------------------------------------------
 //glsShaderBilateralFilter
@@ -107,19 +120,83 @@ void main(void)\n
 	return fragmentShaderCode;
 }
 
-list<string> glsShaderBilateralFilter::UniformNameList(void){
-	list<string> lst;
-	lst.push_back("texSrc");
-	lst.push_back("texKernel");
-	lst.push_back("color_coeff");
-	return lst;
+//-----------------------------------------------------------------------------
+// glsShaderBilateralFilter
+class glsShaderBilateralFilter32FC3 : public glsShaderBilateralFilterBase
+{
+protected:
+	string FragmentShaderCode(void);
+
+public:
+	glsShaderBilateralFilter32FC3(void) : glsShaderBilateralFilterBase(__FUNCTION__){}
+};
+
+//-----------------------------------------------------------------------------
+//glsShaderBilateralFilter32FC3
+string glsShaderBilateralFilter32FC3::FragmentShaderCode(void){
+	const char fragmentShaderCode[] = TO_STR(
+#version 330 core\n
+precision highp float;\n
+uniform sampler2D	texSrc;\n
+uniform sampler2D	texKernel;\n
+uniform float color_coeff; \n
+layout (location = 0) out vec3 dst;\n
+#define BOUND_PVT(x,pl,pr) ((x)<(pl)?2*(pl)-(x) :(x)>(pr)? 2*(pr)-(x): (x))\n
+void main(void)\n
+{\n
+	ivec2 texSize = textureSize(texSrc,0);\n
+	ivec2 texKernelSize = textureSize(texKernel,0);\n
+	{\n
+		int kxsize = texKernelSize.x ;\n
+		int kysize = texKernelSize.y ;\n
+		int kxp = kxsize / 2 ;\n
+		int kxm = -kxp;\n
+		int kyp = kysize / 2 ;\n
+		int kym = -kyp;\n
+		vec3 data0 = texelFetch(texSrc, ivec2(gl_FragCoord.xy), 0).rgb; \n
+		vec3 sum = vec3(0.0,0.0,0.0); \n
+		float sumw = 0.0; \n
+		for (int ky = kym; ky <= kyp; ky++){\n
+			for (int kx = kxm; kx <= kxp; kx++){\n
+				vec3 data; \n
+				float coef; \n
+				int x = int(gl_FragCoord.x) + kx;\n
+				int y = int(gl_FragCoord.y) + ky;\n
+				x = BOUND_PVT(x,0,texSize.x-1);\n
+				y = BOUND_PVT(y,0,texSize.y-1);\n
+				data = texelFetch(texSrc, ivec2(x, y), 0).rgb;\n
+				coef = texelFetch(texKernel, ivec2(kx+kxp, ky+kyp), 0).r;\n
+//				vec3 diff2 = (data - data0)*(data - data0); \n
+//				float ssd = diff2.r + diff2.g + diff2.b; \n
+//				float w = coef * exp(ssd*color_coeff); \n
+				vec3  absdif = abs(data - data0); \n
+				float sad = absdif.r + absdif.g + absdif.b; \n
+				float w = coef * exp(sad*sad*color_coeff); \n
+				sum += data * vec3(w); \n
+				sumw += w; \n
+			}\n
+		}\n
+		dst = sum / vec3(sumw); \n
+	}\n
+}\n
+);
+	return fragmentShaderCode;
 }
+
+
+
+//-----------------------------------------------------------------------------
+//global 
+glsShaderBilateralFilter ShaderBilateralFilter;
+glsShaderBilateralFilter32FC3 ShaderBilateralFilter32FC3;
+
 
 static
 glsShaderBase* selectShader(int type){
 	glsShaderBase* shader = 0;
-	switch (CV_MAT_DEPTH(type)){
-	case(CV_32F) : shader = &ShaderBilateralFilter; break;
+	switch (type){
+	case(CV_32FC1) : shader = &ShaderBilateralFilter; break;
+	case(CV_32FC3) : shader = &ShaderBilateralFilter32FC3; break;
 		//case(CV_8U) :
 		//case(CV_16U) : shader = shaderFilterU; break;
 		//case(CV_8S) :
@@ -131,7 +208,7 @@ glsShaderBase* selectShader(int type){
 }
 
 void bilateralFilter(const GlsMat& src, GlsMat& dst, int d, double sigmaColor, double sigmaSpace){
-	GLS_Assert(src.depth() == CV_32FC1);
+	GLS_Assert(src.depth() == CV_32FC1 || src.depth() == CV_32FC3);
 
 	if (sigmaColor <= 0)	sigmaColor = 1;
 	if (sigmaSpace <= 0)	sigmaSpace = 1;

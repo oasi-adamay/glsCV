@@ -218,8 +218,12 @@ int _tmain(int argc, _TCHAR* argv[])
 			glsFrame = (GlsMat)frame;
 			gls::flip(glsFrame, glsFrame, 0);				// è„â∫îΩì]
 			gls::convert(glsFrame, glsFrame, 1.0f / 256.0f);
-			gls::cvtColor(glsFrame, glsFrame, CV_BGR2GRAY);
-			gls::bilateralFilter(glsFrame, glsFrame, 9, 0.05, 1.85);
+			gls::cvtColor(glsFrame, glsFrame, CV_BGR2RGB);
+			//! tuning param
+			const int ksize = 9;				//trade off IQ vs process time
+			const double sigmaColor = 0.07;		//measurement noise sigma / trade off image detail vs noise
+			const double sigmaSpace = 0.3*(ksize / 2 - 1) + 0.8;
+			gls::bilateralFilter(glsFrame, glsFrame, ksize, sigmaColor, sigmaSpace);
 		}break;
 		case(E_CAM_MODE::GRAY) : {
 			glsFrame = (GlsMat)frame;
