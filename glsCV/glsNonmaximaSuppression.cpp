@@ -50,7 +50,8 @@ protected:
 		list<string> lst;
 		lst.push_back("texMag");
 		lst.push_back("texAngle");
-		lst.push_back("threshold");
+		lst.push_back("highThreshold");
+		lst.push_back("lowThreshold");
 		return lst;
 	}
 public:
@@ -89,9 +90,13 @@ string glsShaderNonmaximaSuppression::FragmentShaderCode(void){
 precision highp float;			\n
 uniform sampler2D	texMag;		\n
 uniform sampler2D	texAngle;	\n
-uniform float	threshold;		\n
-layout(location = 0) out float dst;	\n
+uniform float	highThreshold;		\n
+uniform float	lowThreshold;		\n
+layout(location = 0) out uint dst;	\n
 #define M_PI 3.1415926535897932384626433832795 \n
+#define can_not_belong_to_an_edge  0 \n
+#define might_belong_to_an_edge 128  \n
+#define does_belong_to_an_edge 255 \n
 void main(void)\n
 { \n
 	float rad_pi_8 = M_PI / 8.0; \n
@@ -111,8 +116,9 @@ void main(void)\n
 	int x2 = 0; \n
 	ivec2 texSize = textureSize(texMag, 0); \n
 	int width = texSize.x; \n
-	int height = texSize.x; \n
-	if (a <= threshold) {
+	int height = texSize.y; \n
+	uint val; \n
+	if (a < lowThreshold) {
 		\n
 	}\n
 	else{\n
@@ -147,8 +153,18 @@ void main(void)\n
 		else{\n
 			a = 0.0;\n
 		}\n
+
+		if (a > highThreshold){ \n
+			val = uint(does_belong_to_an_edge);  \n
+		}  \n
+		else if (a < lowThreshold){  \n
+			val = uint(can_not_belong_to_an_edge);  \n
+		}  \n
+		else{  \n
+			val = uint(might_belong_to_an_edge);  \n
+		}  \n
 	}\n
-	dst = a;\n
+	dst = val;\n
 }\n
 );
 	return fragmentShaderCode;
@@ -172,14 +188,16 @@ glsShaderBase* selectShader(int type){
 }
 
 
-void nonmaximaSuppression(const GlsMat&mag, const GlsMat&angle, GlsMat& dst, float threshold){
+void nonmaximaSuppression(const GlsMat&mag, const GlsMat&angle, GlsMat& dst, const float highThreshold, const float lowThreshold){
 	GLS_Assert(mag.type() == CV_32FC1);
 	GLS_Assert(angle.type() == CV_32FC1);
+	GLS_Assert(highThreshold >= lowThreshold);
 
-	GlsMat _dst = getDstMat(mag,dst);
+
+	GlsMat _dst = getDstMat(mag.size(),CV_8UC1,dst);
 
 	glsShaderBase* shader = selectShader(mag.type());
-	shader->Execute(mag, angle, threshold,_dst);
+	shader->Execute(mag, angle, highThreshold, lowThreshold, _dst);
 
 	dst = _dst;
 }

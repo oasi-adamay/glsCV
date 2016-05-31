@@ -40,32 +40,42 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 namespace UnitTest_glsCV
 {
 
+//map encording
+enum {
+	can_not_belong_to_an_edge = 0,
+	might_belong_to_an_edge = 128,
+	does_belong_to_an_edge = 255,
+};
+
 //do nonmaxima suppression
 //angle : radian [0-2PI]
-void nonmaximaSuppression(const Mat&mag, const Mat&angle, Mat& dst, float threshold){
+void nonmaximaSuppression(const Mat&mag, const Mat&angle, Mat& map, const float highThreshold, const float lowThreshold){
 	CV_Assert(mag.type() == CV_32FC1);
+	CV_Assert(angle.type() == CV_32FC1);
+	CV_Assert(highThreshold >= lowThreshold);
 
 	const double rad_pi_8 = (CV_PI / 8.);
 	const double rad_1pi_4 = (CV_PI * 1 / 4);
 	const double rad_2pi_4 = (CV_PI * 2 / 4);
 	const double rad_3pi_4 = (CV_PI * 3 / 4);
 
-	Mat _dst = Mat(mag.size(), mag.type());
+	map = Mat(mag.size(), CV_8UC1);
 
-	//do nonmaxima suppression
 	const int width = mag.cols;
 	const int height = mag.rows;
+
+
 
 	for (int y = 0; y < height; y++)
 	{
 		for (int x = 0; x < width; x++)
 		{
+			uchar val;
 
 			float a = mag.at<float>(y, x), b = 0, c = 0;
 			int y1 = 0, y2 = 0, x1 = 0, x2 = 0;
 
-			if (a <= threshold) {
-
+			if (a < lowThreshold) {
 			}
 			else{
 				double rad = angle.at<float>(y, x);
@@ -101,15 +111,21 @@ void nonmaximaSuppression(const Mat&mag, const Mat&angle, Mat& dst, float thresh
 				else{
 					a = 0;
 				}
-
 			}
 
-			_dst.at<float>(y, x) = a;
+			if (a > highThreshold){
+				val = does_belong_to_an_edge;
+			}
+			else if (a < lowThreshold){
+				val = can_not_belong_to_an_edge;
+			}
+			else{
+				val = might_belong_to_an_edge;
+			}
+
+			map.at<uchar>(y, x) = val;
 		}
 	}
-
-	dst = _dst;
-
 }
 
 
@@ -117,7 +133,8 @@ void nonmaximaSuppression(const Mat&mag, const Mat&angle, Mat& dst, float thresh
 
 	template <typename T>
 	int test_glsNonmaximaSuppression(int cvtype){
-		float threshold = 0.01f;
+		const float highThreshold = 0.5f;
+		const float lowThreshold = 0.3f;
 
 		Size size(32, 24);
 		cout << "Size:" << size << endl;
@@ -137,13 +154,13 @@ void nonmaximaSuppression(const Mat&mag, const Mat&angle, Mat& dst, float thresh
 		cv::cartToPolar(imgSrcX, imgSrcY, imgMag, imgAngle, false);
 
 		Mat imgDst;
-		nonmaximaSuppression(imgMag, imgAngle, imgDst, threshold);
+		nonmaximaSuppression(imgMag, imgAngle, imgDst, highThreshold, lowThreshold);
 
 		GlsMat glsMag(imgMag);
 		GlsMat glsAngle(imgAngle);
 		GlsMat glsDst;
 
-		gls::nonmaximaSuppression(glsMag, glsAngle, glsDst, threshold);
+		gls::nonmaximaSuppression(glsMag, glsAngle, glsDst, highThreshold, lowThreshold);
 
 		Mat imgDst_ = (Mat)glsDst;
 

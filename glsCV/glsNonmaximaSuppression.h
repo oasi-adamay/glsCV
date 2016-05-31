@@ -41,7 +41,7 @@ Non-maximum suppression
 @param angle - radian [0-2PI] (CV_32FC1)
 @param dat
 */
-void nonmaximaSuppression(const GlsMat&mag, const GlsMat&angle, GlsMat& dst, float threshold);
+void nonmaximaSuppression(const GlsMat&mag, const GlsMat&angle, GlsMat& dst, const float highThreshold, const float lowThreshold);
 
 
 
