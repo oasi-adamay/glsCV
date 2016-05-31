@@ -47,7 +47,8 @@ namespace UnitTest_glsCV
 	int test_glsRemap(int cvtype, int interpolation){
 		int ulps = 0;
 		Size size(32, 24);
-		Size dsize(32, 24);
+		//Size dsize(32, 24);
+		Size dsize(48, 32);
 		//Size dsize(64, 48);
 		Point2f center((float)size.width / 2, (float)size.height / 2);
 
@@ -70,6 +71,7 @@ namespace UnitTest_glsCV
 		Mat distCoeffs;
 		Mat R;
 		Mat newCameraMatrix = Mat::eye(3, 3, CV_32FC1);
+//		Mat newCameraMatrix = getOptimalNewCameraMatrix(cameraMatrix, distCoeffs, imgSrc.size(), 1, dsize);
 		vector<Mat> map(2);
 
 		cv::initUndistortRectifyMap(cameraMatrix, distCoeffs, R, newCameraMatrix, dsize, CV_32FC1,map[0],map[1]);

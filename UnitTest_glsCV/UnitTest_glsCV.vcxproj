@@ -178,6 +178,8 @@
     <ClCompile Include="UnitTest_glsAdaptiveThreshold.cpp" />
     <ClCompile Include="UnitTest_glsBasicOperation.cpp" />
     <ClCompile Include="UnitTest_glsBilateralFilter.cpp" />
+    <ClCompile Include="UnitTest_glsCanny.cpp" />
+    <ClCompile Include="UnitTest_glsCartToPolar.cpp" />
     <ClCompile Include="UnitTest_glsConvert.cpp" />
     <ClCompile Include="UnitTest_glsCopy.cpp" />
     <ClCompile Include="unittest_glsFft.cpp" />
@@ -187,6 +189,7 @@
     <ClCompile Include="UnitTest_glsMean.cpp" />
     <ClCompile Include="UnitTest_glsMerge.cpp" />
     <ClCompile Include="UnitTest_glsMinMaxLoc.cpp" />
+    <ClCompile Include="UnitTest_glsNonmaximaSuppression.cpp" />
     <ClCompile Include="UnitTest_glsNorm.cpp" />
     <ClCompile Include="UnitTest_glsNormalize.cpp" />
     <ClCompile Include="UnitTest_glsReduce.cpp" />

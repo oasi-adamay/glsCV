@@ -144,6 +144,8 @@
     <ClInclude Include="glsAdaptiveThreshold.h" />
     <ClInclude Include="glsBasicOperation.h" />
     <ClInclude Include="glsBilateralFilter.h" />
+    <ClInclude Include="glsCanny.h" />
+    <ClInclude Include="glsCartToPolar.h" />
     <ClInclude Include="glsConvert.h" />
     <ClInclude Include="glsCopy.h" />
     <ClInclude Include="glsCV.h" />
@@ -157,6 +159,7 @@
     <ClInclude Include="glsMean.h" />
     <ClInclude Include="glsMerge.h" />
     <ClInclude Include="glsMinMaxLoc.h" />
+    <ClInclude Include="glsNonmaximaSuppression.h" />
     <ClInclude Include="glsNorm.h" />
     <ClInclude Include="glsNormalize.h" />
     <ClInclude Include="glsReduce.h" />
@@ -176,6 +179,8 @@
     <ClCompile Include="glsAdaptiveThreshold.cpp" />
     <ClCompile Include="glsBasicOperation.cpp" />
     <ClCompile Include="glsBilateralFilter.cpp" />
+    <ClCompile Include="glsCanny.cpp" />
+    <ClCompile Include="glsCartToPolar.cpp" />
     <ClCompile Include="glsConvert.cpp" />
     <ClCompile Include="glsCopy.cpp" />
     <ClCompile Include="glsCV.cpp" />
@@ -188,6 +193,7 @@
     <ClCompile Include="glsMean.cpp" />
     <ClCompile Include="glsMerge.cpp" />
     <ClCompile Include="glsMinMaxLoc.cpp" />
+    <ClCompile Include="glsNonmaximaSuppression.cpp" />
     <ClCompile Include="glsNorm.cpp" />
     <ClCompile Include="glsNormalize.cpp" />
     <ClCompile Include="glsReduce.cpp" />

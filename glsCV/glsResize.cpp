@@ -79,8 +79,9 @@ uniform float fx; \n
 uniform float fy; \n
 uniform int flag; \n
 layout(location = 0) out vec4 dst; \n
-vec4 cubic(float v){ \n
-    vec4 n = vec4(1.0, 2.0, 3.0, 4.0) - v; \n
+vec4 cubic(float v){
+\n
+	vec4 n = vec4(1.0, 2.0, 3.0, 4.0) - v; \n
 	vec4 s = n * n * n; \n
 	float x = s.x; \n
 	float y = s.y - 4.0 * s.x; \n
@@ -88,10 +89,10 @@ vec4 cubic(float v){ \n
 	float w = 6.0 - x - y - z; \n
 	return vec4(x, y, z, w) * (1.0 / 6.0); \n
 } \n
-vec4 textureBicubic(sampler2D sampler, vec2 texCoords){ \n
+vec4 textureBicubic(sampler2D sampler, vec2 texCoords){	\n
 	vec2 texSize = textureSize(texSrc, 0); \n
-    vec2 invTexSize = 1.0 / texSize; \n
-    texCoords = texCoords * texSize - 0.5;  \n
+	vec2 invTexSize = 1.0 / texSize; \n
+	texCoords = texCoords * texSize - 0.5;  \n
 	vec2 fxy = fract(texCoords);  \n
 	texCoords -= fxy; \n
 	vec4 xcubic = cubic(fxy.x);  \n
@@ -111,9 +112,15 @@ vec4 textureBicubic(sampler2D sampler, vec2 texCoords){ \n
 void main(void)\n
 { \n
 	ivec2 texSize = textureSize(texSrc, 0); \n
-	vec2 coord = vec2(gl_FragCoord.x / (float(texSize.x)*fx), gl_FragCoord.y / (float(texSize.y)*fy)); \n
-	if (flag == 0){ \n
+//	vec2 coord = gl_FragCoord.xy - vec2(0.5, 0.5);  \n
+//	coord = coord / vec2(fx, fy);\n
+//	coord = (coord + vec2(0.5, 0.5)) / vec2(texSize);  \n
+	vec2 coord = gl_FragCoord.xy;  \n
+	coord = coord / (vec2(texSize)*vec2(fx, fy));  \n
+	if (flag == 0){
+	\n
 		dst = texture(texSrc, coord); \n
+//		dst = vec4(gl_FragCoord.xy,0.0,1.0); \n
 	}\n
 	else{ \n
 		dst = textureBicubic(texSrc, coord); \n

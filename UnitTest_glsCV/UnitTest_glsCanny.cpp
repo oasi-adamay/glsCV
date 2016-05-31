@@ -49,7 +49,7 @@ enum {
 
 //do nonmaxima suppression
 //angle : radian [0-2PI]
-static
+static 
 void nonmaximaSuppression(const Mat&mag, const Mat&angle, Mat& map, const float highThreshold, const float lowThreshold){
 	CV_Assert(mag.type() == CV_32FC1);
 	CV_Assert(angle.type() == CV_32FC1);
@@ -129,13 +129,62 @@ void nonmaximaSuppression(const Mat&mag, const Mat&angle, Mat& map, const float 
 	}
 }
 
+static void
+map_follow(int x, int y, const Mat& src, Mat& dst)
+{
+	CV_Assert(src.type() == CV_8UC1);
+	CV_Assert(dst.type() == CV_8UC1);
+	CV_Assert(dst.size() == src.size());
+
+	static const int ofs[][2] = { { 1, 0 }, { 1, -1 }, { 0, -1 }, { -1, -1 }, { -1, 0 }, { -1, 1 }, { 0, 1 }, { 1, 1 } };
+	int i;
+
+	dst.at<uchar>(y, x) = (uchar)does_belong_to_an_edge;
+
+	for (i = 0; i < 8; i++)
+	{
+		int x1 = x + ofs[i][0];
+		int y1 = y + ofs[i][1];
+		if ((unsigned)x1 < (unsigned)src.cols &&
+			(unsigned)y1 < (unsigned)src.rows &&
+			src.at<uchar>(y1, x1) == might_belong_to_an_edge &&
+			dst.at<uchar>(y1, x1) == can_not_belong_to_an_edge){
+			//			!dst.at<uchar>(y1, x1)){
+			map_follow(x1, y1, src, dst);
+		}
+
+	}
+}
+
+static void map_optimize(Mat& map)
+{
+	Mat src = map.clone();
+	Mat dst = Mat::zeros(map.size(), map.type());
+	const int width = map.cols;
+	const int height = map.rows;
+
+	// hysteresis threshold
+	for (int y = 0; y < height; y++)
+	{
+		for (int x = 0; x < width; x++){
+			if (src.at<uchar>(y, x) == does_belong_to_an_edge &&
+				dst.at<uchar>(y, x) == can_not_belong_to_an_edge){
+				//				!dst.at<uchar>(y, x)){
+				map_follow(x, y, src, dst);
+			}
+		}
+	}
+
+	map = dst;
+}
 
 
 
 	template <typename T>
-	int test_glsNonmaximaSuppression(int cvtype){
-		const float highThreshold = 0.5f;
+	int test_glsCanny(int cvtype){
+		const float highThreshold = 1.0f;
 		const float lowThreshold = 0.3f;
+		int aperture_size = 3;
 
 		Size size(32, 24);
 		cout << "Size:" << size << endl;
@@ -143,30 +192,57 @@ void nonmaximaSuppression(const Mat&mag, const Mat&angle, Mat& map, const float 
 
 		int ulps = 4;
 
-		Mat imgSrcX(size, cvtype);
-		Mat imgSrcY(size, cvtype);
-		FillRandU<T>(imgSrcX);
-		FillRandU<T>(imgSrcY);
-		imgSrcX -= 0.5;
-		imgSrcY -= 0.5;
+		Mat src(size, cvtype);
+		FillRandU<T>(src);
 
-		Mat imgMag;
-		Mat imgAngle;
-		cv::cartToPolar(imgSrcX, imgSrcY, imgMag, imgAngle, false);
+		Mat map;
+		Mat map_before;
+#if 0
+		{
+			int cn = 1;
+			Mat dx(src.size(), CV_32FC(cn));
+			Mat dy(src.size(), CV_32FC(cn));
+			cv::Sobel(src, dx, CV_32F, 1, 0, aperture_size, 1, 0 /*, cv::BORDER_REPLICATE*/);
+			cv::Sobel(src, dy, CV_32F, 0, 1, aperture_size, 1, 0 /*, cv::BORDER_REPLICATE*/);
 
-		Mat imgDst;
-		nonmaximaSuppression(imgMag, imgAngle, imgDst, highThreshold, lowThreshold);
+			Mat mag;
+			Mat angle;
 
-		GlsMat glsMag(imgMag);
-		GlsMat glsAngle(imgAngle);
-		GlsMat glsDst;
+			cv::cartToPolar(dx, dy, mag, angle, false);
+			nonmaximaSuppression(mag, angle, map, highThreshold, lowThreshold);
+			map_before = map.clone();
+			map_optimize(map);
+		}
+#else
+		{
+			int cn = 1;
+			GlsMat dx;
+			GlsMat dy;
+			GlsMat _src = (GlsMat)src;
+			gls::Sobel(_src, dx, CV_32F, 1, 0, aperture_size, 1, 0 /*, cv::BORDER_REPLICATE*/);
+			gls::Sobel(_src, dy, CV_32F, 0, 1, aperture_size, 1, 0 /*, cv::BORDER_REPLICATE*/);
 
-		gls::nonmaximaSuppression(glsMag, glsAngle, glsDst, highThreshold, lowThreshold);
+			GlsMat mag;
+			GlsMat angle;
+			GlsMat _map;
+			gls::cartToPolar(dx, dy, mag, angle, false);
+			gls::nonmaximaSuppression(mag, angle, _map, highThreshold, lowThreshold);
+			map = (Mat)_map;
+			map_before = map.clone();
+			map_optimize(map);
+		}
+#endif
 
-		Mat imgDst_ = (Mat)glsDst;
+
+		GlsMat glsSrc_(src);
+		GlsMat glsMap_;
+
+		gls::Canny(glsSrc_, glsMap_, highThreshold, lowThreshold, aperture_size , true);
+
+		Mat map_ = (Mat)glsMap_;
 
 		int errNum = 0;
-		if (!AreEqual<T>(imgDst, imgDst_, ulps)) errNum -= 1;
+		if (!AreEqual<T>(map, map_, ulps)) errNum -= 1;
 
 		//cout << imgRef << endl;
 		//cout << imgDst << endl;
@@ -178,14 +254,14 @@ void nonmaximaSuppression(const Mat&mag, const Mat&angle, Mat& map, const float 
 
 
 
-	TEST_CLASS(UnitTest_glsNonmaximaSuppression)
+	TEST_CLASS(UnitTest_glsCanny)
 	{
 	public:
-		//glsNonmaximaSuppression
-		TEST_METHOD(glsNonmaximaSuppression_CV_32FC1)
+		//glsCanny
+		TEST_METHOD(glsCanny_CV_32FC1)
 		{
 			cout << __FUNCTION__ << endl;
-			int errNum = test_glsNonmaximaSuppression<float>(CV_32FC1);
+			int errNum = test_glsCanny<float>(CV_32FC1);
 			Assert::AreEqual(0, errNum);
 		}
 
