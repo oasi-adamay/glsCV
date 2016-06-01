@@ -36,95 +36,53 @@ include
 #include "GlsMat.h"
 #include "glsShader.h"
 
-#include "glsResize.h"
+#include "glsRemap.h"
 
 namespace gls
 {
 
 //-----------------------------------------------------------------------------
-// glsShaderResize
-class glsShaderResizeBase : public glsShaderBase
+// glsShaderRemap
+class glsShaderRemapBase : public glsShaderBase
 {
 protected:
 	list<string> UniformNameList(void){
 		list<string> lst;
 		lst.push_back("texSrc");
-		lst.push_back("fx");
-		lst.push_back("fy");
+		lst.push_back("texMap");
 		lst.push_back("flag");
 		return lst;
 	}
 public:
-	glsShaderResizeBase(const string& _name) :glsShaderBase(_name){}
+	glsShaderRemapBase(const string& _name) :glsShaderBase(_name){}
 };
 
 //-----------------------------------------------------------------------------
-// glsShaderResize
-class glsShaderResize : public glsShaderResizeBase
+// glsShaderRemap
+class glsShaderRemap : public glsShaderRemapBase
 {
 protected:
 	string FragmentShaderCode(void);
 public:
-	glsShaderResize(void) :glsShaderResizeBase(__FUNCTION__){}
+	glsShaderRemap(void) :glsShaderRemapBase(__FUNCTION__){}
 };
 
 //-----------------------------------------------------------------------------
-//glsShaderResize
-string glsShaderResize::FragmentShaderCode(void){
+//glsShaderRemap
+string glsShaderRemap::FragmentShaderCode(void){
 	const char fragmentShaderCode[] = TO_STR(
 #version 330 core\n
 precision highp float; \n
 uniform sampler2D	texSrc; \n
-uniform float fx; \n
-uniform float fy; \n
+uniform sampler2D	texMap; \n
 uniform int flag; \n
 layout(location = 0) out vec4 dst; \n
-vec4 cubic(float v){
-\n
-	vec4 n = vec4(1.0, 2.0, 3.0, 4.0) - v; \n
-	vec4 s = n * n * n; \n
-	float x = s.x; \n
-	float y = s.y - 4.0 * s.x; \n
-	float z = s.z - 4.0 * s.y + 6.0 * s.x; \n
-	float w = 6.0 - x - y - z; \n
-	return vec4(x, y, z, w) * (1.0 / 6.0); \n
-} \n
-vec4 textureBicubic(sampler2D sampler, vec2 texCoords){	\n
-	vec2 texSize = textureSize(texSrc, 0); \n
-	vec2 invTexSize = 1.0 / texSize; \n
-	texCoords = texCoords * texSize - 0.5;  \n
-	vec2 fxy = fract(texCoords);  \n
-	texCoords -= fxy; \n
-	vec4 xcubic = cubic(fxy.x);  \n
-	vec4 ycubic = cubic(fxy.y); \n
-	vec4 c = texCoords.xxyy + vec2(-0.5, +1.5).xyxy;  \n
-	vec4 s = vec4(xcubic.xz + xcubic.yw, ycubic.xz + ycubic.yw);  \n
-	vec4 offset = c + vec4(xcubic.yw, ycubic.yw) / s; \n
-	offset *= invTexSize.xxyy; \n
-	vec4 sample0 = texture(sampler, offset.xz); \n
-	vec4 sample1 = texture(sampler, offset.yz); \n
-	vec4 sample2 = texture(sampler, offset.xw); \n
-	vec4 sample3 = texture(sampler, offset.yw); \n
-	float sx = s.x / (s.x + s.y); \n
-	float sy = s.z / (s.z + s.w); \n
-	return mix(mix(sample3, sample2, sx), mix(sample1, sample0, sx), sy); \n
-} \n
 void main(void)\n
 { \n
 	ivec2 texSize = textureSize(texSrc, 0); \n
-//	vec2 coord = gl_FragCoord.xy - vec2(0.5, 0.5);  \n
-//	coord = coord / vec2(fx, fy);\n
-//	coord = (coord + vec2(0.5, 0.5)) / vec2(texSize);  \n
-	vec2 coord = gl_FragCoord.xy;  \n
-	coord = coord / (vec2(texSize)*vec2(fx, fy));  \n
-	if (flag == 0){
-	\n
-		dst = texture(texSrc, coord); \n
-//		dst = vec4(gl_FragCoord.xy,0.0,1.0); \n
-	}\n
-	else{ \n
-		dst = textureBicubic(texSrc, coord); \n
-	} \n
+	vec2 coord = texelFetch(texMap, ivec2(gl_FragCoord.xy), 0).rg; \n
+    coord = vec2((coord.x+0.5) / float(texSize.x), (coord.y+0.5) / float(texSize.y)); \n
+	dst = texture(texSrc, coord); \n
 }\n
 );
 	return fragmentShaderCode;
@@ -133,7 +91,7 @@ void main(void)\n
 
 //-----------------------------------------------------------------------------
 //global 
-glsShaderResize ShaderResize;
+glsShaderRemap ShaderRemap;
 
 
 
@@ -141,54 +99,48 @@ static
 glsShaderBase* selectShader(int type){
 	glsShaderBase* shader = 0;
 	switch (CV_MAT_DEPTH(type)){
-	case(CV_32F) : shader = &ShaderResize; break;
+	case(CV_32F) : shader = &ShaderRemap; break;
 	//case(CV_8U) :
-	//case(CV_16U) : shader = &ShaderResizeU; break;
+	//case(CV_16U) : shader = &ShaderRemapU; break;
 	//case(CV_8S) :
 	//case(CV_16S) :
-	//case(CV_32S) : shader = &ShaderResizeI; break;
+	//case(CV_32S) : shader = &ShaderRemapI; break;
 	default: GLS_Assert(0);		//not implement
 	}
 	return shader;
 }
 
-void resize(const GlsMat& src, GlsMat& dst, Size dsize, double fx, double fy, int interpolation){
-	GLS_Assert(src.depth()==CV_32F);
+
+void remap(const GlsMat& src, GlsMat& dst, const GlsMat& map1, const GlsMat& map2, int interpolation){
+	GLS_Assert(src.depth() == CV_32F);
 	GLS_Assert(interpolation == INTER_NEAREST || interpolation == INTER_LINEAR);
-	GLS_Assert((fx == 0 && fy == 0 && dsize != Size(0, 0))
-		|| (fx > 0 && fy > 0 && dsize == Size(0, 0)));
-
-	if (fx == 0 && fy == 0){
-		fx = dsize.width / (double)src.cols;
-		fy = dsize.height / (double)src.rows;
-	}
-	else{
-		dsize = Size((int)round(fx*src.cols), (int)round(fy*src.rows));
-	}
-
-	int flag;
-		
-	GlsMat _dst = getDstMat(dsize, src.type(), dst);
-	glsShaderBase* shader = selectShader(src.type());
+	GlsMat _dst = GlsMat(map1.size(), src.type());
+	int _flag;	// internal flag 
 	switch (interpolation){
 	case(INTER_NEAREST) : {
 		src.setInterpolation(GL_NEAREST);
-		flag = 0;
+		_flag = 0;
 	}break;
 	case(INTER_LINEAR) : {
 		src.setInterpolation(GL_LINEAR);
-		flag = 0;
+		_flag = 0;
 	}break;
 	case(INTER_CUBIC) : {
 		src.setInterpolation(GL_LINEAR);
-		flag = 1;
+		_flag = 1;
 	}break;
 	default: GLS_Assert(0);
 	}
 
-	shader->Execute(src, fx, fy, flag, _dst);
+	src.setWrapMode(GL_CLAMP_TO_BORDER);
+
+	glsShaderBase* shader = selectShader(src.type());
+	shader->Execute(src, map1, _flag, _dst);
 	dst = _dst;
+
+
 }
+
 
 
 }//namespace gls

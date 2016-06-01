@@ -47,7 +47,9 @@ namespace UnitTest_glsCV
 	int test_glsResize(int cvtype, int interpolation){
 		int ulps = 0;
 		Size size(32, 24);
+//		Size dsize(32, 24);
 		Size dsize(64, 48);
+//		Size dsize(48, 32);
 		double fx = 0;
 		double fy = 0;
 

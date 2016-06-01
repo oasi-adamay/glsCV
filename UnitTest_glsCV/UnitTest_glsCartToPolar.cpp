@@ -27,7 +27,6 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-
 #include "stdafx.h"
 #include "CppUnitTest.h"
 
@@ -38,47 +37,43 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 #include "UnitTest_Common.h"
 
 
-
-
 namespace UnitTest_glsCV
 {
 
-
-
 	template <typename T>
-	int test_glsBilateralFilter(int cvtype, int ksize = 5, Size size = Size(32, 24)){
-		int ulps = 0;
-		double sigmaSpace = 0.3*(ksize / 2.0 - 1) + 0.8;
-		double sigmaColor = 0.1;
-
+	int test_glsCartToPolar(int cvtype, bool angleInDegrees){
+		Size size(32, 24);
 		cout << "Size:" << size << endl;
-		cout << "ksize:" << ksize << endl;
-		Mat imgSrc(size, cvtype);
-		FillRandU<T>(imgSrc);
+		int ulps_mag = 4;
+		int ulps_angle = 4096;
 
-		Mat imgRef;
-		Mat imgDst;
+		Mat imgSrcX(size, cvtype);
+		Mat imgSrcY(size, cvtype);
+		FillRandU<T>(imgSrcX);
+		FillRandU<T>(imgSrcY);
+		imgSrcX -= 0.5;
+		imgSrcY -= 0.5;
 
-		int loop = (size.width >= 256)? 10 : 1;
-
-		for (int i = 0; i < loop;i++){
-			_TMR_("cv::bilateralFilter:\t");
-			cv::bilateralFilter(imgSrc, imgRef, ksize, sigmaColor, sigmaSpace);
-		}
-
-		GlsMat glsSrc(imgSrc);
-		GlsMat glsDst;
+		Mat imgMag;
+		Mat imgAngle;
 
 
-		for (int i = 0; i < loop; i++){
-			_TMR_("gls::bilateralFilter:\t");
-			gls::bilateralFilter(glsSrc, glsDst, ksize, sigmaColor, sigmaSpace);
-		}
+		cv::cartToPolar(imgSrcX, imgSrcY, imgMag, imgAngle, angleInDegrees);
 
-		glsDst.download(imgDst);		// download
+		GlsMat glsSrcX(imgSrcX);
+		GlsMat glsSrcY(imgSrcY);
+		GlsMat glsMag;
+		GlsMat glsAngle;
+
+		gls::cartToPolar(glsSrcX, glsSrcY, glsMag, glsAngle, angleInDegrees);
+
+		Mat imgMag_ = (Mat)glsMag;
+		Mat imgAngle_ = (Mat)glsAngle;
+
 
 		int errNum = 0;
-		if (!AreEqual<T>(imgRef, imgDst, ulps)) errNum = -1;
+		if (!AreEqual<T>(imgMag, imgMag_, ulps_mag)) errNum -= 1;
+		if (!AreEqual<T>(imgAngle, imgAngle_, ulps_angle)) errNum -= 1;
 
 		//cout << imgRef << endl;
 		//cout << imgDst << endl;
@@ -90,41 +85,24 @@ namespace UnitTest_glsCV
 
 
 
-	TEST_CLASS(UnitTest_glsBilateralFilter)
+	TEST_CLASS(UnitTest_glsCartToPolar)
 	{
 	public:
-		TEST_METHOD(glsBilateralFilter_CV_32FC1)
+		//glsCartToPolar
+		TEST_METHOD(glsCartToPolar_CV_32FC1)
 		{
 			cout << __FUNCTION__ << endl;
-			int errNum = test_glsBilateralFilter<float>(CV_32FC1);
+			int errNum = test_glsCartToPolar<float>(CV_32FC1, false);
 			Assert::AreEqual(0, errNum);
 		}
 
-		TEST_METHOD(glsBilateralFilter_CV_32FC3)
+		//glsCartToPolar
+		TEST_METHOD(glsCartToPolar_CV_32FC1_degree)
 		{
 			cout << __FUNCTION__ << endl;
-			int errNum = test_glsBilateralFilter<float>(CV_32FC3);
+			int errNum = test_glsCartToPolar<float>(CV_32FC1, true);
 			Assert::AreEqual(0, errNum);
 		}
-
-#if 1
-		//! benchmark
-		BEGIN_TEST_METHOD_ATTRIBUTE(glsBilateralFilter_CV_32FC1_5x5_1024x1024)
-			//TEST_OWNER(L"OwnerName")
-			//TEST_PRIORITY(1)
-			TEST_MY_TRAIT(L"benchmark")
-			END_TEST_METHOD_ATTRIBUTE()
-
-		TEST_METHOD(glsBilateralFilter_CV_32FC1_5x5_1024x1024)
-		{
-			cout << __FUNCTION__ << endl;
-			int errNum = test_glsBilateralFilter<float>(CV_32FC1, 5,  Size(1024, 1024));
-			Assert::AreEqual(0, errNum);
-		}
-#endif
 
 	};
-
-
-
 }

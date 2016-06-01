@@ -1,4 +1,4 @@
-/*
+﻿/*
 Copyright (c) 2016, oasi-adamay
 All rights reserved.
 
@@ -28,40 +28,26 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#ifndef _GLS_CART_TO_POLAR_H_
+#define _GLS_CART_TO_POLAR_H_
 
-#ifndef _GLS_CV_H_
-#define _GLS_CV_H_
+namespace gls
+{
 
+/*!
+配列の要素に対して，ある定数での閾値処理を行います．
 
-#include "GlsMat.h"
-#include "glsShader.h"
-#include "glsCopy.h"
-#include "glsConvert.h"
-#include "glsDraw.h"
-#include "glsMerge.h"
-#include "glsSplit.h"
-#include "glsFft.h"
-#include "glsBasicOperation.h"
-#include "glsReduce.h"
-#include "glsMinMaxLoc.h"
-#include "glsMean.h"
-#include "glsNorm.h"
-#include "glsNormalize.h"
-#include "glsFilter.h"
-#include "glsBilateralFilter.h"
-#include "glsThreshold.h"
-#include "glsAdaptiveThreshold.h"
-#include "glsFlip.h"
-#include "glsResize.h"
-#include "glsWarpAffine.h"
-#include "glsRemap.h"
-#include "glsCartToPolar.h"
-#include "glsNonmaximaSuppression.h"
-#include "glsCanny.h"
+@param x – x 座標の配列．(CV_32FC1)
+@param x と同じサイズ，同じ型の y 座標の配列．
+@param magnitude – 大きさの出力配列． x と同じサイズ，同じ型です．
+@param angle – 角度の出力配列． x と同じサイズ，同じ型．角度はラジアン ( 0 から  2 \pi ) あるいは度 (0 から 360) で表されます．
+@param angleInDegrees – 角度の表記にラジアン（デフォルト），または度のどちらを用いるかを指定するフラグ．
+*/
+void cartToPolar(const GlsMat& x, const GlsMat& y, GlsMat& magnitude, GlsMat& angle, bool angleInDegrees = false);
 
 
-GLFWwindow* glsCvInit(const int _width = 0, const int _height = 0);
-void glsCvTerminate(void);
 
+
+}//namespace gls
 
 #endif

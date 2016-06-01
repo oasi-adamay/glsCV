@@ -1,4 +1,4 @@
-/*
+﻿/*
 Copyright (c) 2016, oasi-adamay
 All rights reserved.
 
@@ -28,40 +28,24 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#ifndef _GLS_CANNY_H_
+#define _GLS_CANNY_H_
 
-#ifndef _GLS_CV_H_
-#define _GLS_CV_H_
+namespace gls
+{
 
+/*!
+Cannyアルゴリズムを用いて，画像のエッジを検出します．
 
-#include "GlsMat.h"
-#include "glsShader.h"
-#include "glsCopy.h"
-#include "glsConvert.h"
-#include "glsDraw.h"
-#include "glsMerge.h"
-#include "glsSplit.h"
-#include "glsFft.h"
-#include "glsBasicOperation.h"
-#include "glsReduce.h"
-#include "glsMinMaxLoc.h"
-#include "glsMean.h"
-#include "glsNorm.h"
-#include "glsNormalize.h"
-#include "glsFilter.h"
-#include "glsBilateralFilter.h"
-#include "glsThreshold.h"
-#include "glsAdaptiveThreshold.h"
-#include "glsFlip.h"
-#include "glsResize.h"
-#include "glsWarpAffine.h"
-#include "glsRemap.h"
-#include "glsCartToPolar.h"
-#include "glsNonmaximaSuppression.h"
-#include "glsCanny.h"
+@param image – 8ビット，シングルチャンネルの入力画像．
+@param edges – 出力されるエッジのマップ． image と同じサイズ，同じ型です．
+@param threshold1 – ヒステリシスが存在する処理の，1番目の閾値．
+@param threshold2 – ヒステリシスが存在する処理の，2番目の閾値．
+@param apertureSize – Sobel() オペレータのアパーチャサイズ．
+@param L2gradient – 画像勾配の強度を求めるために，より精度の高い  L_2 ノルムを使用します。
+*/
+void Canny(const GlsMat& image, GlsMat& edges, double threshold1, double threshold2, int apertureSize = 3, bool L2gradient = false);
 
-
-GLFWwindow* glsCvInit(const int _width = 0, const int _height = 0);
-void glsCvTerminate(void);
-
+}//namespace gls
 
 #endif

@@ -55,6 +55,7 @@ enum E_CAM_MODE {
 	LAPLACIAN,
 	THRESH,
 	ADAPTIVE_THRESH,
+	CANNY,
 	FFT,
 	FFT_RECT,
 };
@@ -71,17 +72,19 @@ enum E_CAM_ZOOM {
 
 void controls(GLFWwindow* window, int& mode ,int& zoom, int& ocvwin){
 	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) ocvwin = 1- ocvwin;
-	if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS) mode = E_CAM_MODE::NORMAL;
-	if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS) mode = E_CAM_MODE::GRAY;
+	if (glfwGetKey(window, GLFW_KEY_N) == GLFW_PRESS) mode = E_CAM_MODE::NORMAL;
+	if (glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS) mode = E_CAM_MODE::GRAY;
 //	if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS) mode = E_CAM_MODE::GAUSS;
-	if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS) mode = E_CAM_MODE::BILATERAL;
-	if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS) mode = E_CAM_MODE::SOBEL_H;
-	if (glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS) mode = E_CAM_MODE::SOBEL_V;
-	if (glfwGetKey(window, GLFW_KEY_6) == GLFW_PRESS) mode = E_CAM_MODE::LAPLACIAN;
-	if (glfwGetKey(window, GLFW_KEY_7) == GLFW_PRESS) mode = E_CAM_MODE::THRESH;
-	if (glfwGetKey(window, GLFW_KEY_8) == GLFW_PRESS) mode = E_CAM_MODE::ADAPTIVE_THRESH;
-	if (glfwGetKey(window, GLFW_KEY_9) == GLFW_PRESS) mode = E_CAM_MODE::FFT;
+	if (glfwGetKey(window, GLFW_KEY_B) == GLFW_PRESS) mode = E_CAM_MODE::BILATERAL;
+	if (glfwGetKey(window, GLFW_KEY_H) == GLFW_PRESS) mode = E_CAM_MODE::SOBEL_H;
+	if (glfwGetKey(window, GLFW_KEY_V) == GLFW_PRESS) mode = E_CAM_MODE::SOBEL_V;
+	if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS) mode = E_CAM_MODE::LAPLACIAN;
+	if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS) mode = E_CAM_MODE::THRESH;
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) mode = E_CAM_MODE::ADAPTIVE_THRESH;
+	if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS) mode = E_CAM_MODE::FFT;
 	if (glfwGetKey(window, GLFW_KEY_0) == GLFW_PRESS) mode = E_CAM_MODE::FFT_RECT;
+	if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS) mode = E_CAM_MODE::CANNY;
+	
 
 	if (glfwGetKey(window, GLFW_KEY_PAGE_UP) == GLFW_PRESS){
 		zoom++;
@@ -129,7 +132,7 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	Rect rectFft((captureWidth - sizeFft.width) / 2, (captureHeight - sizeFft.height) / 2 , sizeFft.width, sizeFft.height);
 
-	int camMode = E_CAM_MODE::FFT;
+	int camMode = E_CAM_MODE::CANNY;
 	int camZoom = E_CAM_ZOOM::ZOOMx1000;
 	int ocvwin = 0;
 
@@ -218,8 +221,21 @@ int _tmain(int argc, _TCHAR* argv[])
 			glsFrame = (GlsMat)frame;
 			gls::flip(glsFrame, glsFrame, 0);				// è„â∫îΩì]
 			gls::convert(glsFrame, glsFrame, 1.0f / 256.0f);
+			gls::cvtColor(glsFrame, glsFrame, CV_BGR2RGB);
+			//! tuning param
+			const int ksize = 9;				//trade off IQ vs process time
+			const double sigmaColor = 0.07;		//measurement noise sigma / trade off image detail vs noise
+			const double sigmaSpace = 0.3*(ksize / 2 - 1) + 0.8;
+			gls::bilateralFilter(glsFrame, glsFrame, ksize, sigmaColor, sigmaSpace);
+		}break;
+		case(E_CAM_MODE::CANNY) : {
+			glsFrame = (GlsMat)frame;
+			gls::flip(glsFrame, glsFrame, 0);				// è„â∫îΩì]
+			gls::convert(glsFrame, glsFrame, 1.0f / 256.0f);
 			gls::cvtColor(glsFrame, glsFrame, CV_BGR2GRAY);
-			gls::bilateralFilter(glsFrame, glsFrame, 9, 0.05, 1.85);
+			const double high = 0.20;
+			const double low = high /2.0;
+			gls::Canny(glsFrame, glsFrame, high,low,3,true);
 		}break;
 		case(E_CAM_MODE::GRAY) : {
 			glsFrame = (GlsMat)frame;

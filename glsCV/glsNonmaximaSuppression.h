@@ -1,4 +1,4 @@
-/*
+﻿/*
 Copyright (c) 2016, oasi-adamay
 All rights reserved.
 
@@ -28,40 +28,25 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#ifndef _GLS_NonmaximaSuppression_H_
+#define _GLS_NonmaximaSuppression_H_
 
-#ifndef _GLS_CV_H_
-#define _GLS_CV_H_
+namespace gls
+{
 
+/*!
+Non-maximum suppression
 
-#include "GlsMat.h"
-#include "glsShader.h"
-#include "glsCopy.h"
-#include "glsConvert.h"
-#include "glsDraw.h"
-#include "glsMerge.h"
-#include "glsSplit.h"
-#include "glsFft.h"
-#include "glsBasicOperation.h"
-#include "glsReduce.h"
-#include "glsMinMaxLoc.h"
-#include "glsMean.h"
-#include "glsNorm.h"
-#include "glsNormalize.h"
-#include "glsFilter.h"
-#include "glsBilateralFilter.h"
-#include "glsThreshold.h"
-#include "glsAdaptiveThreshold.h"
-#include "glsFlip.h"
-#include "glsResize.h"
-#include "glsWarpAffine.h"
-#include "glsRemap.h"
-#include "glsCartToPolar.h"
-#include "glsNonmaximaSuppression.h"
-#include "glsCanny.h"
+@param mag  - magnitude (CV_32FC1)
+@param angle - radian [0-2PI] (CV_32FC1)
+@param dat
+*/
+void nonmaximaSuppression(const GlsMat&mag, const GlsMat&angle, GlsMat& dst, const float highThreshold, const float lowThreshold);
 
 
-GLFWwindow* glsCvInit(const int _width = 0, const int _height = 0);
-void glsCvTerminate(void);
 
+
+
+}//namespace gls
 
 #endif

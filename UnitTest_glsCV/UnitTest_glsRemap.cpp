@@ -43,39 +43,48 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 namespace UnitTest_glsCV
 {
 
-
-
 	template <typename T>
-	int test_glsBilateralFilter(int cvtype, int ksize = 5, Size size = Size(32, 24)){
+	int test_glsRemap(int cvtype, int interpolation){
 		int ulps = 0;
-		double sigmaSpace = 0.3*(ksize / 2.0 - 1) + 0.8;
-		double sigmaColor = 0.1;
+		Size size(32, 24);
+		//Size dsize(32, 24);
+		Size dsize(48, 32);
+		//Size dsize(64, 48);
+		Point2f center((float)size.width / 2, (float)size.height / 2);
 
 		cout << "Size:" << size << endl;
-		cout << "ksize:" << ksize << endl;
+
+#if 0
 		Mat imgSrc(size, cvtype);
 		FillRandU<T>(imgSrc);
+#else
+		Mat imgSrc = Mat::zeros(size, cvtype);
+		Mat roi = Mat(imgSrc, Rect(size.width / 4, size.height / 4, size.width / 2, size.height / 2));
+		FillRandU<T>(roi);
+#endif
 
 		Mat imgRef;
 		Mat imgDst;
+		Mat imgMap;
 
-		int loop = (size.width >= 256)? 10 : 1;
+		Mat cameraMatrix = Mat::eye(3,3,CV_32FC1);
+		Mat distCoeffs;
+		Mat R;
+		Mat newCameraMatrix = Mat::eye(3, 3, CV_32FC1);
+//		Mat newCameraMatrix = getOptimalNewCameraMatrix(cameraMatrix, distCoeffs, imgSrc.size(), 1, dsize);
+		vector<Mat> map(2);
 
-		for (int i = 0; i < loop;i++){
-			_TMR_("cv::bilateralFilter:\t");
-			cv::bilateralFilter(imgSrc, imgRef, ksize, sigmaColor, sigmaSpace);
-		}
+		cv::initUndistortRectifyMap(cameraMatrix, distCoeffs, R, newCameraMatrix, dsize, CV_32FC1,map[0],map[1]);
+		cv::merge(map, imgMap);
 
 		GlsMat glsSrc(imgSrc);
+		GlsMat glsMap(imgMap);
 		GlsMat glsDst;
 
+		cv::remap(imgSrc, imgRef, imgMap, Mat(), interpolation);
+		gls::remap(glsSrc, glsDst, glsMap, GlsMat(), interpolation);
 
-		for (int i = 0; i < loop; i++){
-			_TMR_("gls::bilateralFilter:\t");
-			gls::bilateralFilter(glsSrc, glsDst, ksize, sigmaColor, sigmaSpace);
-		}
-
-		glsDst.download(imgDst);		// download
+		imgDst = (Mat)glsDst;
 
 		int errNum = 0;
 		if (!AreEqual<T>(imgRef, imgDst, ulps)) errNum = -1;
@@ -90,41 +99,31 @@ namespace UnitTest_glsCV
 
 
 
-	TEST_CLASS(UnitTest_glsBilateralFilter)
+	TEST_CLASS(UnitTest_glsRemap)
 	{
 	public:
-		TEST_METHOD(glsBilateralFilter_CV_32FC1)
+		TEST_METHOD(glsRemap_CV_32FC1_INTER_NEAREST)
 		{
 			cout << __FUNCTION__ << endl;
-			int errNum = test_glsBilateralFilter<float>(CV_32FC1);
+			int errNum = test_glsRemap<float>(CV_32FC1, INTER_NEAREST);
 			Assert::AreEqual(0, errNum);
 		}
 
-		TEST_METHOD(glsBilateralFilter_CV_32FC3)
+		TEST_METHOD(glsRemap_CV_32FC1_INTER_LINEAR)
 		{
 			cout << __FUNCTION__ << endl;
-			int errNum = test_glsBilateralFilter<float>(CV_32FC3);
+			int errNum = test_glsRemap<float>(CV_32FC1, INTER_LINEAR);
 			Assert::AreEqual(0, errNum);
 		}
 
-#if 1
-		//! benchmark
-		BEGIN_TEST_METHOD_ATTRIBUTE(glsBilateralFilter_CV_32FC1_5x5_1024x1024)
-			//TEST_OWNER(L"OwnerName")
-			//TEST_PRIORITY(1)
-			TEST_MY_TRAIT(L"benchmark")
-			END_TEST_METHOD_ATTRIBUTE()
+		//TEST_METHOD(glsRemap_CV_32FC1_INTER_CUBIC)
+		//{
+		//	cout << __FUNCTION__ << endl;
+		//	int errNum = test_glsRemap<float>(CV_32FC1, INTER_CUBIC);
+		//	Assert::AreEqual(0, errNum);
+		//}
 
-		TEST_METHOD(glsBilateralFilter_CV_32FC1_5x5_1024x1024)
-		{
-			cout << __FUNCTION__ << endl;
-			int errNum = test_glsBilateralFilter<float>(CV_32FC1, 5,  Size(1024, 1024));
-			Assert::AreEqual(0, errNum);
-		}
-#endif
 
 	};
-
-
 
 }
