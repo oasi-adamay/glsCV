@@ -150,6 +150,7 @@
     <ClInclude Include="glsCopy.h" />
     <ClInclude Include="glsCV.h" />
     <ClInclude Include="glsDraw.h" />
+    <ClInclude Include="glsEdgeTracer.h" />
     <ClInclude Include="glsFBO.h" />
     <ClInclude Include="glsFft.h" />
     <ClInclude Include="glsFilter.h" />
@@ -185,6 +186,7 @@
     <ClCompile Include="glsCopy.cpp" />
     <ClCompile Include="glsCV.cpp" />
     <ClCompile Include="glsDraw.cpp" />
+    <ClCompile Include="glsEdgeTracer.cpp" />
     <ClCompile Include="glsFBO.cpp" />
     <ClCompile Include="glsFft.cpp" />
     <ClCompile Include="glsFilter.cpp" />

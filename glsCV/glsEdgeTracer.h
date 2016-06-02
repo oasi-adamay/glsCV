@@ -28,24 +28,19 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef _GLS_NonmaximaSuppression_H_
-#define _GLS_NonmaximaSuppression_H_
+#ifndef _GLS_EDGE_TRACER_H_
+#define _GLS_EDGE_TRACER_H_
 
 namespace gls
 {
 
 /*!
-Non-maximum suppression
+3値化エッジ画像をトレースして、2値化エッジ画像を生成します。
 
-@param mag  - magnitude (CV_32FC1)
-@param angle - radian [0-2PI] (CV_32FC1)
-@param edge 細線化された、３値エッジ出力画(CV_8UC1)像　0:エッジではない。　128:エッジかもしれない、255：エッジ
+@param src – 8ビット，シングルチャンネルの入力画像．
+@param dst – 出力されるエッジのマップ． src と同じサイズ，同じ型です．
 */
-void nonmaximaSuppression(const GlsMat&mag, const GlsMat&angle, GlsMat& edge, const float highThreshold, const float lowThreshold);
-
-
-
-
+void edgeTracer(const GlsMat& src, GlsMat& dst);
 
 }//namespace gls
 

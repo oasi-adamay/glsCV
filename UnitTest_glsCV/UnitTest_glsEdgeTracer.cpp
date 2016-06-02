@@ -40,7 +40,7 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 namespace UnitTest_glsCV
 {
 
-//edge encording
+//map encording
 enum {
 	can_not_belong_to_an_edge = 0,
 	might_belong_to_an_edge = 128,
@@ -50,7 +50,7 @@ enum {
 //do nonmaxima suppression
 //angle : radian [0-2PI]
 static 
-void nonmaximaSuppression(const Mat&mag, const Mat&angle, Mat& edge, const float highThreshold, const float lowThreshold){
+void nonmaximaSuppression(const Mat&mag, const Mat&angle, Mat& map, const float highThreshold, const float lowThreshold){
 	CV_Assert(mag.type() == CV_32FC1);
 	CV_Assert(angle.type() == CV_32FC1);
 	CV_Assert(highThreshold >= lowThreshold);
@@ -60,7 +60,7 @@ void nonmaximaSuppression(const Mat&mag, const Mat&angle, Mat& edge, const float
 	const double rad_2pi_4 = (CV_PI * 2 / 4);
 	const double rad_3pi_4 = (CV_PI * 3 / 4);
 
-	edge = Mat(mag.size(), CV_8UC1);
+	map = Mat(mag.size(), CV_8UC1);
 
 	const int width = mag.cols;
 	const int height = mag.rows;
@@ -124,13 +124,13 @@ void nonmaximaSuppression(const Mat&mag, const Mat&angle, Mat& edge, const float
 				val = might_belong_to_an_edge;
 			}
 
-			edge.at<uchar>(y, x) = val;
+			map.at<uchar>(y, x) = val;
 		}
 	}
 }
 
 static void
-edge_follow(int x, int y, const Mat& src, Mat& dst)
+edgeTracer_recursive(int x, int y, const Mat& src, Mat& dst)
 {
 	CV_Assert(src.type() == CV_8UC1);
 	CV_Assert(dst.type() == CV_8UC1);
@@ -149,141 +149,70 @@ edge_follow(int x, int y, const Mat& src, Mat& dst)
 			(unsigned)y1 < (unsigned)src.rows &&
 			src.at<uchar>(y1, x1) == might_belong_to_an_edge &&
 			dst.at<uchar>(y1, x1) == can_not_belong_to_an_edge){
-			//			!dst.at<uchar>(y1, x1)){
-			edge_follow(x1, y1, src, dst);
+			edgeTracer_recursive(x1, y1, src, dst);
 		}
 
 	}
 }
 
-static void edge_optimize(Mat& edge)
+static void edgeTracer(const Mat& src, Mat& dst)
 {
-	Mat src = edge.clone();
-	Mat dst = Mat::zeros(edge.size(), edge.type());
-	const int width = edge.cols;
-	const int height = edge.rows;
+	dst = Mat::zeros(src.size(), src.type());
+	const int width = src.cols;
+	const int height = src.rows;
 
-	// hysteresis threshold
+	//edgeTracer top level
 	for (int y = 0; y < height; y++)
 	{
 		for (int x = 0; x < width; x++){
 			if (src.at<uchar>(y, x) == does_belong_to_an_edge &&
 				dst.at<uchar>(y, x) == can_not_belong_to_an_edge){
-				//				!dst.at<uchar>(y, x)){
-				edge_follow(x, y, src, dst);
+				edgeTracer_recursive(x, y, src, dst);
 			}
 		}
 	}
-
-	edge = dst;
 }
 
 
 
 	template <typename T>
-	int test_glsCanny(int cvtype){
-#if 0
-		const float highThreshold = 1.0f;
-		const float lowThreshold = 0.3f;
-		int aperture_size = 3;
+	int test_glsEdgeTracer(int cvtype){
 
-		Size size(32, 24);
-		cout << "Size:" << size << endl;
-
-		int ulps = 0;
-
-		Mat src(size, cvtype);
-		FillRandU<T>(src);
-#else
-
-//		float highThreshold = 1.2f;
-		float highThreshold = 1.0f;
-		float lowThreshold = 0.5f;
-		int aperture_size = 3;
 		Size size(256, 192);
 		cout << "Size:" << size << endl;
-
 		int ulps = 0;
 
 		Point center = Point(size.width / 2, size.height / 2);
 		int radius = size.height / 4;
+			 
+		Mat src = Mat::zeros(size, cvtype);
+		cv::circle(src, center, radius, Scalar(255));
+		cv::line(src, Point(0, size.height / 2), Point(size.width, size.height / 2), Scalar(255));
 
-//		Mat src = Mat::zeros(size, cvtype);
-		Mat src = Mat(size, cvtype,0.5);
-		cv::circle(src, center, radius, Scalar(0.5+0.25));
-		cv::line(src, Point(0, size.height / 2), Point(size.width, size.height / 2), Scalar(0.5-0.25));
-
-		Mat noise = Mat(size, cvtype);
-		cv::randn(noise, Scalar(0.0), Scalar(0.05));
-
-		src += noise;
-
-		//const float th = 0.3f;
-		//for (int y = 0; y < size.height; y++){
-		//	for (int x = 0; x < size.width; x++){
-		//		if (cv::randu<float>() < th){
-		//			src.at<T>(y, x) = 0.5;
-		//		}
-		//	}
-		//}
-#endif
-
-		src.convertTo(src, CV_8UC1, 256);
-		highThreshold *= 256;
-		lowThreshold *= 256;
-
-
-		Mat edge;
-		Mat edge_before;
-#if 1	
-		{
-			cv::Canny(src, edge, highThreshold, lowThreshold, aperture_size, true);
+		const float th = 0.3f;
+		for (int y = 0; y < size.height; y++){
+			for (int x = 0; x < size.width; x++){
+				if (cv::randu<float>() < th){
+					src.at<T>(y, x) = 128;
+				}
+			}
 		}
-#elif 1
+
+		Mat dst;
+
 		{
-			int cn = 1;
-			Mat dx(src.size(), CV_32FC(cn));
-			Mat dy(src.size(), CV_32FC(cn));
-			cv::Sobel(src, dx, CV_32F, 1, 0, aperture_size, 1, 0 /*, cv::BORDER_REPLICATE*/);
-			cv::Sobel(src, dy, CV_32F, 0, 1, aperture_size, 1, 0 /*, cv::BORDER_REPLICATE*/);
-
-			Mat mag;
-			Mat angle;
-			cv::cartToPolar(dx, dy, mag, angle, false);
-			nonmaximaSuppression(mag, angle, edge, highThreshold, lowThreshold);
-			edge_before = edge.clone();
-			edge_optimize(edge);
+			edgeTracer(src,dst);
 		}
-#else
-		{
-			int cn = 1;
-			GlsMat dx;
-			GlsMat dy;
-			GlsMat _src = (GlsMat)src;
-			gls::Sobel(_src, dx, CV_32F, 1, 0, aperture_size, 1, 0 /*, cv::BORDER_REPLICATE*/);
-			gls::Sobel(_src, dy, CV_32F, 0, 1, aperture_size, 1, 0 /*, cv::BORDER_REPLICATE*/);
 
-			GlsMat mag;
-			GlsMat angle;
-			GlsMat _edge;
-			gls::cartToPolar(dx, dy, mag, angle, false);
-			gls::nonmaximaSuppression(mag, angle, _edge, highThreshold, lowThreshold);
-			edge = (Mat)_edge;
-			edge_before = edge.clone();
-			edge_optimize(edge);
-		}
-#endif
+		GlsMat glsSrc(src);
+		GlsMat glsDst;
 
+		gls::edgeTracer(glsSrc, glsDst);
 
-		GlsMat glsSrc_(src);
-		GlsMat glsMap_;
-
-		gls::Canny(glsSrc_, glsMap_, highThreshold, lowThreshold, aperture_size , true);
-
-		Mat edge_ = (Mat)glsMap_;
+		Mat dst_ = (Mat)glsDst;
 
 		int errNum = 0;
-		if (!AreEqual<uchar>(edge, edge_, ulps)) errNum -= 1;
+		if (!AreEqual<T>(dst, dst_, ulps)) errNum -= 1;
 
 		//cout << imgRef << endl;
 		//cout << imgDst << endl;
@@ -295,14 +224,14 @@ static void edge_optimize(Mat& edge)
 
 
 
-	TEST_CLASS(UnitTest_glsCanny)
+	TEST_CLASS(UnitTest_glsEdgeTracer)
 	{
 	public:
-		//glsCanny
-		TEST_METHOD(glsCanny_CV_32FC1)
+		//glsEdgeTracer
+		TEST_METHOD(glsEdgeTracer_CV_8UC1)
 		{
 			cout << __FUNCTION__ << endl;
-			int errNum = test_glsCanny<float>(CV_32FC1);
+			int errNum = test_glsEdgeTracer<uchar>(CV_8UC1);
 			Assert::AreEqual(0, errNum);
 		}
 

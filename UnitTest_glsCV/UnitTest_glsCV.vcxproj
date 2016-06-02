@@ -182,6 +182,7 @@
     <ClCompile Include="UnitTest_glsCartToPolar.cpp" />
     <ClCompile Include="UnitTest_glsConvert.cpp" />
     <ClCompile Include="UnitTest_glsCopy.cpp" />
+    <ClCompile Include="UnitTest_glsEdgeTracer.cpp" />
     <ClCompile Include="unittest_glsFft.cpp" />
     <ClCompile Include="UnitTest_glsFilter.cpp" />
     <ClCompile Include="UnitTest_glsFlip.cpp" />

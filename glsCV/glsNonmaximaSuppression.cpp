@@ -142,13 +142,12 @@ void main(void)\n
 		\n
 		if (uint(y1) < uint(height) && uint(x1) < uint(width)){\n
 			b = texelFetch(texMag, ivec2(x1, y1), 0).r; \n
-			b = abs(b); \n
 		}\n
 		if (uint(y2) < uint(height) && uint(x2) < uint(width)){\n
 			c = texelFetch(texMag, ivec2(x2, y2), 0).r; \n
-			c = abs(c); \n
 		}\n
 		if ((a > b || (a == b && ((x1 == x + 1 && y1 == y) || (x1 == x && y1 == y + 1)))) && a > c){\n
+//		if ((a > b || (abs(a - b)<0.001 && ((x1 == x + 1 && y1 == y) || (x1 == x && y1 == y + 1)))) && a > c){\n
 		}\n
 		else{\n
 			a = 0.0;\n
@@ -188,18 +187,18 @@ glsShaderBase* selectShader(int type){
 }
 
 
-void nonmaximaSuppression(const GlsMat&mag, const GlsMat&angle, GlsMat& dst, const float highThreshold, const float lowThreshold){
+void nonmaximaSuppression(const GlsMat&mag, const GlsMat&angle, GlsMat& edge, const float highThreshold, const float lowThreshold){
 	GLS_Assert(mag.type() == CV_32FC1);
 	GLS_Assert(angle.type() == CV_32FC1);
 	GLS_Assert(highThreshold >= lowThreshold);
 
 
-	GlsMat _dst = getDstMat(mag.size(),CV_8UC1,dst);
+	GlsMat _dst = getDstMat(mag.size(), CV_8UC1, edge);
 
 	glsShaderBase* shader = selectShader(mag.type());
 	shader->Execute(mag, angle, highThreshold, lowThreshold, _dst);
 
-	dst = _dst;
+	edge = _dst;
 }
 
 
