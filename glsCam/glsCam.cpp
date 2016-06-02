@@ -52,6 +52,7 @@ enum E_CAM_MODE {
 	BILATERAL,
 	SOBEL_H,
 	SOBEL_V,
+	EDGE,
 	LAPLACIAN,
 	THRESH,
 	ADAPTIVE_THRESH,
@@ -84,7 +85,8 @@ void controls(GLFWwindow* window, int& mode ,int& zoom, int& ocvwin){
 	if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS) mode = E_CAM_MODE::FFT;
 	if (glfwGetKey(window, GLFW_KEY_0) == GLFW_PRESS) mode = E_CAM_MODE::FFT_RECT;
 	if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS) mode = E_CAM_MODE::CANNY;
-	
+	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) mode = E_CAM_MODE::EDGE;
+
 
 	if (glfwGetKey(window, GLFW_KEY_PAGE_UP) == GLFW_PRESS){
 		zoom++;
@@ -192,7 +194,6 @@ int _tmain(int argc, _TCHAR* argv[])
 			gls::convert(glsFrame, glsFrame, 1.0f / 256.0f);
 			gls::cvtColor(glsFrame, glsFrame, CV_BGR2GRAY);
 			gls::Sobel(glsFrame, glsFrame, -1, 0, 1, 3, 1.0, 0.5);
-//			gls::add(Scalar(0.5), glsFrame, glsFrame);
 		}break;
 		case(E_CAM_MODE::SOBEL_H) : {
 			glsFrame = (GlsMat)frame;
@@ -200,7 +201,19 @@ int _tmain(int argc, _TCHAR* argv[])
 			gls::convert(glsFrame, glsFrame, 1.0f / 256.0f);
 			gls::cvtColor(glsFrame, glsFrame, CV_BGR2GRAY);
 			gls::Sobel(glsFrame, glsFrame, -1, 1, 0, 3, 1.0, 0.5);
-//			gls::add(Scalar(0.5), glsFrame, glsFrame);
+		}break;
+		case(E_CAM_MODE::EDGE) : {
+			glsFrame = (GlsMat)frame;
+			gls::flip(glsFrame, glsFrame, 0);				// è„â∫îΩì]
+			gls::convert(glsFrame, glsFrame, 1.0f / 256.0f);
+			gls::cvtColor(glsFrame, glsFrame, CV_BGR2GRAY);
+			GlsMat dx;
+			GlsMat dy;
+			gls::Sobel(glsFrame, dx, -1, 1, 0, 3, 1.0, 0.0);
+			gls::Sobel(glsFrame, dy, -1, 0, 1, 3, 1.0, 0.0);
+			vector<GlsMat> mag_rad(2);
+			gls::cartToPolar(dx, dy, mag_rad[0], mag_rad[1], false);
+			gls::merge(mag_rad, glsFrame);
 		}break;
 		case(E_CAM_MODE::LAPLACIAN) : {
 			glsFrame = (GlsMat)frame;

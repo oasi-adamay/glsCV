@@ -31,6 +31,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _GLS_SHADER_IMPL_H_
 #define _GLS_SHADER_IMPL_H_
 
+#include "glsMacro.h"
+
 #include "glsVAO.h"
 #include "glsFBO.h"
 
@@ -285,6 +287,7 @@ void glsShaderBase::setup<GlsMat>(SetupInfo* info, const GlsMat& t)
 		if (!t.empty()){
 			GLuint loc = uniformLocArray[i];
 			int id = info->texSrcNum++;
+			info->texSrcSize = t.size();
 			glActiveTexture(GL_TEXTURE0 + id);
 			glBindTexture(GL_TEXTURE_2D, t.texid());
 			glUniform1i(loc, id);
@@ -300,10 +303,16 @@ void glsShaderBase::setup<GlsMat>(SetupInfo* info, const GlsMat& t)
 	}
 	else{	//dst texture
 		if (!t.empty()){
+			if (info->texDstNum == 0){
+				// create FBO (off-screen framebuffer)
+				glGenFramebuffers(1,&(info->fbo));
+				// bind offscreen framebuffer (that is, skip the window-specific render target)
+				glBindFramebuffer(GL_FRAMEBUFFER, info->fbo);
+			}
 			int id = info->texDstNum++;
 			info->texDstSize = t.size();
 			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + id, GL_TEXTURE_2D, t.texid(), 0);
-			//GLS_Assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
+			GLS_Assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
 #ifdef _DEBUG_SHADER
 			std::cout << "i:" << i << "\t";
 			std::cout << "attach:" << id << "\t";
@@ -328,7 +337,7 @@ template<class First, class... Rest>
 void glsShaderBase::Execute(const First& first, const Rest&... rest)
 {
 	glsVAO vao(glGetAttribLocation(program(), "position"));
-	glsFBO fbo(1);
+//	glsFBO fbo(1);
 
 	//program
 	{
@@ -350,10 +359,16 @@ void glsShaderBase::Execute(const First& first, const Rest&... rest)
 
 #endif
 
-	DrawBuffers(info.texDstNum);
+	if (info.texDstNum){
+		DrawBuffers(info.texDstNum);
 
-	//Viewport
-	glViewport(0, 0, info.texDstSize.width, info.texDstSize.height);
+		//Viewport
+		glViewport(0, 0, info.texDstSize.width, info.texDstSize.height);
+	}
+	else{
+		//Viewport
+		glViewport(0, 0, info.texSrcSize.width, info.texSrcSize.height);
+	}
 
 	//Render!!
 	{
@@ -361,7 +376,12 @@ void glsShaderBase::Execute(const First& first, const Rest&... rest)
 		glFlush();
 	}
 
-//	GL_CHECK_ERROR();
+	if (info.fbo){
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glDeleteFramebuffers(1, &(info.fbo));
+	}
+
+	GL_CHECK_ERROR();
 
 }
 

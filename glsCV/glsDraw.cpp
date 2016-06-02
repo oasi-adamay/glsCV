@@ -45,6 +45,15 @@ namespace gls
 // glsDraw shader
 class glsShaderDrawBase : public glsShaderBase
 {
+protected:
+	list<string> UniformNameList(void){
+		list<string> lst;
+		lst.push_back("texSrc");
+		lst.push_back("scl");
+		lst.push_back("flag");
+		return lst;
+	}
+
 
 public:
 	glsShaderDrawBase(const string& _name) :glsShaderBase(_name){}
@@ -96,6 +105,32 @@ uniform int 	flag;\n
 \n
 layout (location = 0) out vec4 dst;\n
 \n
+// h [0-1] s [0-1] v [0-1]  a[0-1]\n
+vec4 hsv_to_rgb(float h, float s, float v, float a) \n
+{ \n
+	float c = v * s; \n
+	h = mod((h * 6.0), 6.0); \n
+	float x = c * (1.0 - abs(mod(h, 2.0) - 1.0)); \n
+	vec4 color; \n
+	if (0.0 <= h && h < 1.0) {			\n
+		color = vec4(c, x, 0.0, a);		\n
+	} else if (1.0 <= h && h < 2.0) {	\n
+		color = vec4(x, c, 0.0, a);		\n
+	} else if (2.0 <= h && h < 3.0) {	\n
+		color = vec4(0.0, c, x, a);		\n
+	} else if (3.0 <= h && h < 4.0) {	\n
+		color = vec4(0.0, x, c, a);		\n
+	} else if (4.0 <= h && h < 5.0) {	\n
+		color = vec4(x, 0.0, c, a);		\n
+	} else if (5.0 <= h && h < 6.0) {	\n
+		color = vec4(c, 0.0, x, a);		\n
+	} else {							\n
+		color = vec4(0.0, 0.0, 0.0, a); \n
+	} \n
+	color.rgb += v - c;	\n
+	return color; \n
+} \n
+#define M_PI 3.1415926535897932384626433832795 \n
 void main(void)\n
 {\n
 	ivec2 texSize = textureSize(texSrc,0);\n
@@ -105,7 +140,7 @@ void main(void)\n
 	switch(flag&3){\n
 	case(0):color = vec4(data.r*scl,data.g*scl,data.b*scl,data.g*scl);break;\n
 	case(1):color = vec4(data.r*scl,data.r*scl,data.r*scl,1.0);break;\n
-	case(2):color = vec4(data.r*scl,data.r*scl,data.r*scl,1.0);break;\n
+	case(2):color = hsv_to_rgb(data.g / (2.0 * M_PI),data.r,1.0,1.0);break;\n
 	case(3):color = vec4(data.r*scl,data.g*scl,data.b*scl,1.0);break;\n
 	}\n
 	dst = color;\n
@@ -145,60 +180,6 @@ void main(void)\n
 }\n
 );
 	return fragmentShaderCode;
-}
-
-
-//---------------------------------------------------------------------------
-//
-static void glsDrawProcess(
-	const glsShaderDrawBase* shader,	//progmra ID
-	const GLuint& texSrc,				//src texture IDs
-	const Rect  rect,					//src rect
-	const Size  sizeDst,				//dst size
-	const float scl,					// scaling 
-	const int   flag					// flag [1:0] channnel 
-	)
-{
-	int width = sizeDst.width;
-	int height = sizeDst.height;
-
-	//program
-	{
-		glUseProgram(shader->program());
-	}
-
-	//uniform
-	{
-		glUniform1f(glGetUniformLocation(shader->program(), "scl"), scl);
-		glUniform1i(glGetUniformLocation(shader->program(), "flag"), flag);
-	}
-
-
-	//Bind Texture
-	{
-		int id = 0;
-		glActiveTexture(GL_TEXTURE0 + id);
-		glBindTexture(GL_TEXTURE_2D, texSrc);
-		glUniform1i(glGetUniformLocation(shader->program(),"texSrc"), id);
-	}
-
-	glsVAO vao(glGetAttribLocation(shader->program(), "position"));
-	
-
-	//Viewport
-	{
-//		glViewport(0, 0, width, height);
-		glViewport(rect.x, rect.y, rect.width, rect.height);
-	}
-
-	//Render!!
-	{
-		glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
-		glFlush();
-	}
-
-	//	glFinish();
-
 }
 
 //-----------------------------------------------------------------------------
@@ -254,12 +235,7 @@ void draw(GlsMat& src){
 	default: GLS_Assert(0);		//not implement
 	}
 
-	Size sizeDst(src.size());
-
-	Rect rect(0, 0, src.cols, src.rows);
-	glsDrawProcess(shader, src.texid(), rect, sizeDst, scl, flag);
-
-
+	shader->Execute(src, scl, flag);
 }
 
 }//namespace gls
