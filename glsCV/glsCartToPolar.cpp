@@ -98,9 +98,9 @@ void main(void)\n
 	float x = texelFetch(texSrcX, ivec2(gl_FragCoord.xy), 0).r; \n
 	float y = texelFetch(texSrcY, ivec2(gl_FragCoord.xy), 0).r; \n
 	magnitude = sqrt(x*x + y*y); \n
-	if (x == 0.0) angle = 0.0;\n
-	else angle = atan(y, x);\n
-	if (angle<0)angle = angle + 2.0 * M_PI;\n
+	if (y < x) angle = atan(y, x); \n
+	else angle = 0.5* M_PI - atan(x, y); \n
+	angle = mod(angle + 2.0 * M_PI, 2.0 * M_PI);
 	if (angleInDegrees!=0) angle = 360.0 * angle / (2.0*M_PI);\n
 }\n
 );
