@@ -41,6 +41,7 @@ include
 #include "glsConvert.h"
 #include "glsCartToPolar.h"
 #include "glsNonmaximaSuppression.h"
+#include "glsEdgeTracer.h"
 
 namespace gls
 {
@@ -53,85 +54,6 @@ enum {
 	does_belong_to_an_edge = 255,
 };
 
-
-#if 1
-//-----------------------------------------------------------------------------
-// glsShaderMapFollow
-//3値マップから2値化マップへ
-
-class glsShaderMapFollowU : public glsShaderBase
-{
-protected:
-	list<string> UniformNameList(void){
-		list<string> lst;
-		lst.push_back("texSrc");
-		lst.push_back("last");
-		return lst;
-	}
-	string FragmentShaderCode(void);
-
-public:
-	glsShaderMapFollowU(void) : glsShaderBase(__FUNCTION__){}
-};
-
-
-
-//-----------------------------------------------------------------------------
-//global 
-glsShaderMapFollowU ShaderMapFollowU;
-
-
-//-----------------------------------------------------------------------------
-//glsShaderMapFollow
-
-//-----------------------------------------------------------------------------
-//glsShaderMapFollowU
-string glsShaderMapFollowU::FragmentShaderCode(void){
-	const char fragmentShaderCode[] = TO_STR(
-#version 330 core\n
-precision highp float;\n
-uniform usampler2D	texSrc;\n
-uniform int last;\n
-layout (location = 0) out uint dst;\n
-void main(void)\n
-{\n
-	ivec2 xy = ivec2(gl_FragCoord.xy); \n
-	uint src = texelFetch(texSrc, xy, 0).r;\n
-	uint val = src;\n
-	if (src == 128u){\
-		val |= texelFetchOffset(texSrc, xy, 0, ivec2(-1, -1)).r; \n
-		val |= texelFetchOffset(texSrc, xy, 0, ivec2(+0, -1)).r; \n
-		val |= texelFetchOffset(texSrc, xy, 0, ivec2(+1, -1)).r; \n
-		val |= texelFetchOffset(texSrc, xy, 0, ivec2(-1, +0)).r; \n
-		val |= texelFetchOffset(texSrc, xy, 0, ivec2(+1, +0)).r; \n
-		val |= texelFetchOffset(texSrc, xy, 0, ivec2(-1, +1)).r; \n
-		val |= texelFetchOffset(texSrc, xy, 0, ivec2(+0, +1)).r; \n
-		val |= texelFetchOffset(texSrc, xy, 0, ivec2(+1, +1)).r; \n
-	}\n
-	if (last != 0 && src == 128u) val =0u;\n
-	dst = val;
-}\n
-);
-	return fragmentShaderCode;
-}
-
-
-static 
-glsShaderBase* selectShader(int type){
-	glsShaderBase* shader = 0;
-	switch (CV_MAT_DEPTH(type)){
-//	case(CV_32F) : shader = &ShaderMapFollow; break;
-	case(CV_8U) :
-	case(CV_16U) : shader = &ShaderMapFollowU; break;
-	//case(CV_8S) :
-	//case(CV_16S) :
-	//case(CV_32S) : shader = &ShaderMapFollowS; break;
-	default: GLS_Assert(0);		//not implement
-	}
-	return shader;
-}
-
-#endif
 
 void Canny(const GlsMat& src, GlsMat& dst, double threshold1, double threshold2, int apertureSize, bool L2gradient)
 {
@@ -158,30 +80,12 @@ void Canny(const GlsMat& src, GlsMat& dst, double threshold1, double threshold2,
 
 	GlsMat mag;
 	GlsMat angle;
-	GlsMat map;
+	GlsMat edge;
 
 	gls::cartToPolar(dx, dy, mag, angle);
-	gls::nonmaximaSuppression(mag, angle, map, highThreshold, lowThreshold);
-
-#if 1
-	glsShaderBase* shader = selectShader(map.type());
-
-	GlsMat buf[2];
-	int bank = 0;
-	buf[bank] = map;
-	buf[bank ^ 1] = GlsMat(map.size(), map.type());
-	int loop_count = 256;
-	while (loop_count--){
-		shader->Execute(buf[bank], 0, buf[bank ^ 1]);
-		bank = bank ^ 1;
-	}
-	shader->Execute(buf[bank], 1, buf[bank ^ 1]);
-	bank = bank ^ 1;
-
-	dst = buf[bank];
-#else
-	dst = map;
-#endif
+	gls::nonmaximaSuppression(mag, angle, edge, highThreshold, lowThreshold);
+	gls::edgeTracer(edge, edge);
+	dst = edge;
 }
 
 

@@ -36,38 +36,50 @@ include
 #include "GlsMat.h"
 #include "glsShader.h"
 
-#include "glsCartToPolar.h"
+#include "glsAccumulateWeighted.h"
 
 namespace gls
 {
 
 //-----------------------------------------------------------------------------
-// glsShaderCartToPolar
-class glsShaderCartToPolarBase : public glsShaderBase
+// glsShaderAccumulateWeighted
+class glsShaderAccumulateWeightedBase : public glsShaderBase
 {
 protected:
 	list<string> UniformNameList(void){
 		list<string> lst;
-		lst.push_back("texSrcX");
-		lst.push_back("texSrcY");
-		lst.push_back("angleInDegrees");
+		lst.push_back("texSrc");
+		lst.push_back("texDst");
+		lst.push_back("alpha");
 		return lst;
 	}
 public:
-	glsShaderCartToPolarBase(const string& _name) :glsShaderBase(_name){}
+	glsShaderAccumulateWeightedBase(const string& _name) :glsShaderBase(_name){}
 
 
 };
 
 //-----------------------------------------------------------------------------
-// glsShaderCartToPolar
-class glsShaderCartToPolar : public glsShaderCartToPolarBase
+// glsShaderAccumulateWeighted
+class glsShaderAccumulateWeighted : public glsShaderAccumulateWeightedBase
 {
 protected:
 	string FragmentShaderCode(void);
 
 public:
-	glsShaderCartToPolar(void) : glsShaderCartToPolarBase(__FUNCTION__){}
+	glsShaderAccumulateWeighted(void) : glsShaderAccumulateWeightedBase(__FUNCTION__){}
+
+};
+
+//-----------------------------------------------------------------------------
+// glsShaderAccumulateWeighted
+class glsShaderAccumulateWeightedU : public glsShaderAccumulateWeightedBase
+{
+protected:
+	string FragmentShaderCode(void);
+
+public:
+	glsShaderAccumulateWeightedU(void) : glsShaderAccumulateWeightedBase(__FUNCTION__){}
 
 };
 
@@ -75,34 +87,45 @@ public:
 
 //-----------------------------------------------------------------------------
 //global 
-glsShaderCartToPolar ShaderCartToPolar;
-
-
-
-
+glsShaderAccumulateWeighted ShaderAccumulateWeighted;
+glsShaderAccumulateWeightedU ShaderAccumulateWeightedU;
 
 //-----------------------------------------------------------------------------
-//glsShaderCartToPolar
-string glsShaderCartToPolar::FragmentShaderCode(void){
+//glsShaderAccumulateWeighted
+string glsShaderAccumulateWeighted::FragmentShaderCode(void){
 	const char fragmentShaderCode[] = TO_STR(
 #version 330 core\n
 precision highp float; \n
-uniform sampler2D	texSrcX; \n
-uniform sampler2D	texSrcY; \n
-uniform int	angleInDegrees; \n
-layout(location = 0) out float magnitude; \n
-layout(location = 1) out float angle; \n
-#define M_PI 3.1415926535897932384626433832795 \n
+uniform sampler2D	texSrc; \n
+uniform sampler2D	texDst; \n
+uniform float	alpha; \n
+layout(location = 0) out vec4 dst; \n
 void main(void)\n
 { \n
-	float x = texelFetch(texSrcX, ivec2(gl_FragCoord.xy), 0).r; \n
-	float y = texelFetch(texSrcY, ivec2(gl_FragCoord.xy), 0).r; \n
-	magnitude = sqrt(x*x + y*y); \n
-	if (y < x) angle = atan(y, x); \n
-	else angle = 0.5* M_PI - atan(x, y); \n
-	angle = mod(angle + 2.0 * M_PI, 2.0 * M_PI);
-	if (angleInDegrees!=0) angle = 360.0 * angle / (2.0*M_PI);\n
+	vec4 src = texelFetch(texSrc, ivec2(gl_FragCoord.xy), 0); \n
+	vec4 _dst = texelFetch(texDst, ivec2(gl_FragCoord.xy), 0); \n
+	dst = vec4(1.0 - alpha)*_dst + vec4(alpha)*src; \n
 }\n
+);
+	return fragmentShaderCode;
+}
+
+//-----------------------------------------------------------------------------
+//glsShaderAccumulateWeightedU
+string glsShaderAccumulateWeightedU::FragmentShaderCode(void){
+	const char fragmentShaderCode[] = TO_STR(
+#version 330 core\n
+precision highp float; \n
+uniform usampler2D	texSrc; \n
+uniform sampler2D	texDst; \n
+uniform float	alpha; \n
+layout(location = 0) out vec4 dst; \n
+void main(void)\n
+	{ \n
+	vec4 src = vec4(texelFetch(texSrc, ivec2(gl_FragCoord.xy), 0)); \n
+	vec4 _dst = texelFetch(texDst, ivec2(gl_FragCoord.xy), 0); \n
+	dst = vec4(1.0 - alpha)*_dst + vec4(alpha)*src; \n
+	}\n
 );
 	return fragmentShaderCode;
 }
@@ -113,28 +136,28 @@ static
 glsShaderBase* selectShader(int type){
 	glsShaderBase* shader = 0;
 	switch (CV_MAT_DEPTH(type)){
-	case(CV_32F) : shader = &ShaderCartToPolar; break;
-	//case(CV_8U) :
-	//case(CV_16U) : shader = &ShaderCartToPolarU; break;
+	case(CV_32F) : shader = &ShaderAccumulateWeighted; break;
+	case(CV_8U) :
+	case(CV_16U) : shader = &ShaderAccumulateWeightedU; break;
 	//case(CV_8S) :
 	//case(CV_16S) :
-	//case(CV_32S) : shader = &ShaderCartToPolarS; break;
+	//case(CV_32S) : shader = &ShaderAccumulateWeightedS; break;
 	default: GLS_Assert(0);		//not implement
 	}
 	return shader;
 }
 
+void accumulateWeighted(const GlsMat& src, GlsMat& dst, double alpha){
+	GLS_Assert(src.depth() == CV_32F);
+	GLS_Assert(dst.size() == src.size());
 
-void cartToPolar(const GlsMat& x, const GlsMat& y, GlsMat& magnitude, GlsMat& angle, bool angleInDegrees){
-	GLS_Assert(x.type() == CV_32FC1);
-	GLS_Assert(y.type() == CV_32FC1);
+	GlsMat _dst = GlsMat(dst.size(), dst.type());
+	glsShaderBase* shader = selectShader(src.type());
+	shader->Execute(src, dst,(float)alpha, _dst);
 
-	magnitude = GlsMat(x.size(), x.type());
-	angle = GlsMat(x.size(), x.type());
-
-	glsShaderBase* shader = selectShader(x.type());
-	shader->Execute(x, y, (int)angleInDegrees, magnitude, angle);
+	dst = _dst;
 }
+
 
 
 

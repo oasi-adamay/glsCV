@@ -52,6 +52,7 @@ enum E_CAM_MODE {
 	BILATERAL,
 	SOBEL_H,
 	SOBEL_V,
+	EDGE,
 	LAPLACIAN,
 	THRESH,
 	ADAPTIVE_THRESH,
@@ -70,8 +71,9 @@ enum E_CAM_ZOOM {
 	ZOOMxMAX,
 };
 
-void controls(GLFWwindow* window, int& mode ,int& zoom, int& ocvwin){
+void controls(GLFWwindow* window, int& mode, int& zoom, int& ocvwin, int& enable_accm_filter){
 	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) ocvwin = 1- ocvwin;
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) enable_accm_filter = enable_accm_filter^1;
 	if (glfwGetKey(window, GLFW_KEY_N) == GLFW_PRESS) mode = E_CAM_MODE::NORMAL;
 	if (glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS) mode = E_CAM_MODE::GRAY;
 //	if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS) mode = E_CAM_MODE::GAUSS;
@@ -84,7 +86,8 @@ void controls(GLFWwindow* window, int& mode ,int& zoom, int& ocvwin){
 	if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS) mode = E_CAM_MODE::FFT;
 	if (glfwGetKey(window, GLFW_KEY_0) == GLFW_PRESS) mode = E_CAM_MODE::FFT_RECT;
 	if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS) mode = E_CAM_MODE::CANNY;
-	
+	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) mode = E_CAM_MODE::EDGE;
+
 
 	if (glfwGetKey(window, GLFW_KEY_PAGE_UP) == GLFW_PRESS){
 		zoom++;
@@ -135,6 +138,9 @@ int _tmain(int argc, _TCHAR* argv[])
 	int camMode = E_CAM_MODE::CANNY;
 	int camZoom = E_CAM_ZOOM::ZOOMx1000;
 	int ocvwin = 0;
+	int enable_accm_filter = 0;
+
+	GlsMat glsFrameAcc;
 
 	do{
 		cv::Mat frame;
@@ -192,7 +198,6 @@ int _tmain(int argc, _TCHAR* argv[])
 			gls::convert(glsFrame, glsFrame, 1.0f / 256.0f);
 			gls::cvtColor(glsFrame, glsFrame, CV_BGR2GRAY);
 			gls::Sobel(glsFrame, glsFrame, -1, 0, 1, 3, 1.0, 0.5);
-//			gls::add(Scalar(0.5), glsFrame, glsFrame);
 		}break;
 		case(E_CAM_MODE::SOBEL_H) : {
 			glsFrame = (GlsMat)frame;
@@ -200,14 +205,31 @@ int _tmain(int argc, _TCHAR* argv[])
 			gls::convert(glsFrame, glsFrame, 1.0f / 256.0f);
 			gls::cvtColor(glsFrame, glsFrame, CV_BGR2GRAY);
 			gls::Sobel(glsFrame, glsFrame, -1, 1, 0, 3, 1.0, 0.5);
-//			gls::add(Scalar(0.5), glsFrame, glsFrame);
+		}break;
+		case(E_CAM_MODE::EDGE) : {
+			glsFrame = (GlsMat)frame;
+			gls::flip(glsFrame, glsFrame, 0);				// è„â∫îΩì]
+			gls::convert(glsFrame, glsFrame, 1.0f / 256.0f);
+			gls::cvtColor(glsFrame, glsFrame, CV_BGR2GRAY);
+			GlsMat dx;
+			GlsMat dy;
+			gls::Sobel(glsFrame, dx, -1, 1, 0, 3, 1.0, 0.0);
+			gls::Sobel(glsFrame, dy, -1, 0, 1, 3, 1.0, 0.0);
+			vector<GlsMat> mag_rad(2);
+			gls::cartToPolar(dx, dy, mag_rad[0], mag_rad[1], false);
+			gls::merge(mag_rad, glsFrame);
 		}break;
 		case(E_CAM_MODE::LAPLACIAN) : {
 			glsFrame = (GlsMat)frame;
 			gls::flip(glsFrame, glsFrame, 0);				// è„â∫îΩì]
 			gls::convert(glsFrame, glsFrame, 1.0f / 256.0f);
 			gls::cvtColor(glsFrame, glsFrame, CV_BGR2GRAY);
-//			gls::Laplacian(glsFrame, glsFrame, -1, 1, 1.0, 0.5);
+			if (enable_accm_filter){
+				if (glsFrameAcc.size() != glsFrame.size() ||
+					glsFrameAcc.type() != glsFrame.type()) gls::copy(glsFrame, glsFrameAcc);
+				gls::accumulateWeighted(glsFrame, glsFrameAcc, 0.25);
+				glsFrame = glsFrameAcc;
+			}
 			gls::Laplacian(glsFrame, glsFrame, -1, 3, 1.0, 0.5);
 		}break;
 		case(E_CAM_MODE::GAUSS) : {
@@ -233,6 +255,12 @@ int _tmain(int argc, _TCHAR* argv[])
 			gls::flip(glsFrame, glsFrame, 0);				// è„â∫îΩì]
 			gls::convert(glsFrame, glsFrame, 1.0f / 256.0f);
 			gls::cvtColor(glsFrame, glsFrame, CV_BGR2GRAY);
+			if (enable_accm_filter){
+				if (glsFrameAcc.size() != glsFrame.size() ||
+					glsFrameAcc.type() != glsFrame.type()) gls::copy(glsFrame, glsFrameAcc);
+				gls::accumulateWeighted(glsFrame, glsFrameAcc, 0.25);
+				glsFrame = glsFrameAcc;
+			}
 			const double high = 0.20;
 			const double low = high /2.0;
 			gls::Canny(glsFrame, glsFrame, high,low,3,true);
@@ -248,6 +276,12 @@ int _tmain(int argc, _TCHAR* argv[])
 			glsFrame = (GlsMat)frame;
 			gls::flip(glsFrame, glsFrame, 0);				// è„â∫îΩì]
 			gls::convert(glsFrame, glsFrame, 1.0f / 256.0f);
+			if (enable_accm_filter){
+				if (glsFrameAcc.size() != glsFrame.size() ||
+					glsFrameAcc.type() != glsFrame.type()) gls::copy(glsFrame, glsFrameAcc);
+				gls::accumulateWeighted(glsFrame, glsFrameAcc, 0.25);
+				glsFrame = glsFrameAcc;
+			}
 			gls::cvtColor(glsFrame, glsFrame, CV_BGR2RGB);
 		}break;
 		}
@@ -275,7 +309,7 @@ int _tmain(int argc, _TCHAR* argv[])
 
 		glfwSwapBuffers(window);  // Swap buffers
 		glfwPollEvents();
-		controls(window, camMode, camZoom, ocvwin); // key check
+		controls(window, camMode, camZoom, ocvwin, enable_accm_filter); // key check
 	}
 	while (glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS &&
 		glfwWindowShouldClose(window) == 0);

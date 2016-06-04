@@ -57,7 +57,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "glsRemap.h"
 #include "glsCartToPolar.h"
 #include "glsNonmaximaSuppression.h"
+#include "glsEdgeTracer.h"
 #include "glsCanny.h"
+#include "glsAccumulateWeighted.h"
 
 
 GLFWwindow* glsCvInit(const int _width = 0, const int _height = 0);

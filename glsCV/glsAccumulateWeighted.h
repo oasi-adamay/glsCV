@@ -28,20 +28,21 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef _GLS_NonmaximaSuppression_H_
-#define _GLS_NonmaximaSuppression_H_
+#ifndef _GLS_ACCUMLATE_WEIGHTED_H_
+#define _GLS_ACCUMLATE_WEIGHTED_H_
 
 namespace gls
 {
 
 /*!
-Non-maximum suppression
+移動平均値を更新します．
 
-@param mag  - magnitude (CV_32FC1)
-@param angle - radian [0-2PI] (CV_32FC1)
-@param edge 細線化された、３値エッジ出力画(CV_8UC1)像　0:エッジではない。　128:エッジかもしれない、255：エッジ
+@param src – 1- または 3-チャンネル，または 32ビット浮動小数点型の入力画像．
+@param dst - 入力画像と同じチャンネル数，32ビット浮動小数点型の累算器画像．
+@param alpha – 入力画像の重み．
 */
-void nonmaximaSuppression(const GlsMat&mag, const GlsMat&angle, GlsMat& edge, const float highThreshold, const float lowThreshold);
+
+void accumulateWeighted(const GlsMat& src, GlsMat& dst, double alpha);
 
 
 

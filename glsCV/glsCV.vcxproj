@@ -141,6 +141,7 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="glsAccumulateWeighted.h" />
     <ClInclude Include="glsAdaptiveThreshold.h" />
     <ClInclude Include="glsBasicOperation.h" />
     <ClInclude Include="glsBilateralFilter.h" />
@@ -150,6 +151,7 @@
     <ClInclude Include="glsCopy.h" />
     <ClInclude Include="glsCV.h" />
     <ClInclude Include="glsDraw.h" />
+    <ClInclude Include="glsEdgeTracer.h" />
     <ClInclude Include="glsFBO.h" />
     <ClInclude Include="glsFft.h" />
     <ClInclude Include="glsFilter.h" />
@@ -176,6 +178,7 @@
     <ClInclude Include="Timer.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="glsAccumulateWeighted.cpp" />
     <ClCompile Include="glsAdaptiveThreshold.cpp" />
     <ClCompile Include="glsBasicOperation.cpp" />
     <ClCompile Include="glsBilateralFilter.cpp" />
@@ -185,6 +188,7 @@
     <ClCompile Include="glsCopy.cpp" />
     <ClCompile Include="glsCV.cpp" />
     <ClCompile Include="glsDraw.cpp" />
+    <ClCompile Include="glsEdgeTracer.cpp" />
     <ClCompile Include="glsFBO.cpp" />
     <ClCompile Include="glsFft.cpp" />
     <ClCompile Include="glsFilter.cpp" />

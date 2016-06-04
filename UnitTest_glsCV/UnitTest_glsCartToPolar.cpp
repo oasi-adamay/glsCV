@@ -45,7 +45,7 @@ namespace UnitTest_glsCV
 		Size size(32, 24);
 		cout << "Size:" << size << endl;
 		int ulps_mag = 4;
-		int ulps_angle = 4096;
+		int ulps_angle = 3000;
 
 		Mat imgSrcX(size, cvtype);
 		Mat imgSrcY(size, cvtype);

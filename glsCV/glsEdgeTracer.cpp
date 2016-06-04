@@ -36,104 +36,119 @@ include
 #include "GlsMat.h"
 #include "glsShader.h"
 
-#include "glsCartToPolar.h"
+#include "glsEdgeTracer.h"
 
 namespace gls
 {
 
+
+//map encording
+enum {
+	can_not_belong_to_an_edge = 0,
+	might_belong_to_an_edge = 128,
+	does_belong_to_an_edge = 255,
+};
+
 //-----------------------------------------------------------------------------
-// glsShaderCartToPolar
-class glsShaderCartToPolarBase : public glsShaderBase
+// glsShaderEdgeTracer
+//3値マップから2値化マップへ
+
+class glsShaderEdgeTracerU : public glsShaderBase
 {
 protected:
 	list<string> UniformNameList(void){
 		list<string> lst;
-		lst.push_back("texSrcX");
-		lst.push_back("texSrcY");
-		lst.push_back("angleInDegrees");
+		lst.push_back("texSrc");
+		lst.push_back("last");
 		return lst;
 	}
-public:
-	glsShaderCartToPolarBase(const string& _name) :glsShaderBase(_name){}
-
-
-};
-
-//-----------------------------------------------------------------------------
-// glsShaderCartToPolar
-class glsShaderCartToPolar : public glsShaderCartToPolarBase
-{
-protected:
 	string FragmentShaderCode(void);
 
 public:
-	glsShaderCartToPolar(void) : glsShaderCartToPolarBase(__FUNCTION__){}
-
+	glsShaderEdgeTracerU(void) : glsShaderBase(__FUNCTION__){}
 };
 
 
 
 //-----------------------------------------------------------------------------
 //global 
-glsShaderCartToPolar ShaderCartToPolar;
-
-
-
+glsShaderEdgeTracerU ShaderEdgeTracerU;
 
 
 //-----------------------------------------------------------------------------
-//glsShaderCartToPolar
-string glsShaderCartToPolar::FragmentShaderCode(void){
+//glsShaderEdgeTracer
+
+//-----------------------------------------------------------------------------
+//glsShaderEdgeTracerU
+string glsShaderEdgeTracerU::FragmentShaderCode(void){
 	const char fragmentShaderCode[] = TO_STR(
 #version 330 core\n
-precision highp float; \n
-uniform sampler2D	texSrcX; \n
-uniform sampler2D	texSrcY; \n
-uniform int	angleInDegrees; \n
-layout(location = 0) out float magnitude; \n
-layout(location = 1) out float angle; \n
-#define M_PI 3.1415926535897932384626433832795 \n
+precision highp float;\n
+uniform usampler2D	texSrc;\n
+uniform int last;\n
+layout (location = 0) out uint dst;\n
 void main(void)\n
-{ \n
-	float x = texelFetch(texSrcX, ivec2(gl_FragCoord.xy), 0).r; \n
-	float y = texelFetch(texSrcY, ivec2(gl_FragCoord.xy), 0).r; \n
-	magnitude = sqrt(x*x + y*y); \n
-	if (y < x) angle = atan(y, x); \n
-	else angle = 0.5* M_PI - atan(x, y); \n
-	angle = mod(angle + 2.0 * M_PI, 2.0 * M_PI);
-	if (angleInDegrees!=0) angle = 360.0 * angle / (2.0*M_PI);\n
+{\n
+	ivec2 xy = ivec2(gl_FragCoord.xy); \n
+	uint src = texelFetch(texSrc, xy, 0).r;\n
+	uint val = src;\n
+	if (src == 128u){\
+		val |= texelFetchOffset(texSrc, xy, 0, ivec2(-1, -1)).r; \n
+		val |= texelFetchOffset(texSrc, xy, 0, ivec2(+0, -1)).r; \n
+		val |= texelFetchOffset(texSrc, xy, 0, ivec2(+1, -1)).r; \n
+		val |= texelFetchOffset(texSrc, xy, 0, ivec2(-1, +0)).r; \n
+		val |= texelFetchOffset(texSrc, xy, 0, ivec2(+1, +0)).r; \n
+		val |= texelFetchOffset(texSrc, xy, 0, ivec2(-1, +1)).r; \n
+		val |= texelFetchOffset(texSrc, xy, 0, ivec2(+0, +1)).r; \n
+		val |= texelFetchOffset(texSrc, xy, 0, ivec2(+1, +1)).r; \n
+	}\n
+	if (last != 0 && src == 128u) val =0u;\n
+	dst = val;
 }\n
 );
 	return fragmentShaderCode;
 }
 
 
-
 static 
 glsShaderBase* selectShader(int type){
 	glsShaderBase* shader = 0;
 	switch (CV_MAT_DEPTH(type)){
-	case(CV_32F) : shader = &ShaderCartToPolar; break;
-	//case(CV_8U) :
-	//case(CV_16U) : shader = &ShaderCartToPolarU; break;
+//	case(CV_32F) : shader = &ShaderEdgeTracer; break;
+	case(CV_8U) :
+	case(CV_16U) : shader = &ShaderEdgeTracerU; break;
 	//case(CV_8S) :
 	//case(CV_16S) :
-	//case(CV_32S) : shader = &ShaderCartToPolarS; break;
+	//case(CV_32S) : shader = &ShaderEdgeTracerS; break;
 	default: GLS_Assert(0);		//not implement
 	}
 	return shader;
 }
 
 
-void cartToPolar(const GlsMat& x, const GlsMat& y, GlsMat& magnitude, GlsMat& angle, bool angleInDegrees){
-	GLS_Assert(x.type() == CV_32FC1);
-	GLS_Assert(y.type() == CV_32FC1);
+void edgeTracer(const GlsMat& src, GlsMat& dst)
+{
+	GLS_Assert(src.channels() == 1);
+	GLS_Assert(src.depth() == CV_8UC1);
 
-	magnitude = GlsMat(x.size(), x.type());
-	angle = GlsMat(x.size(), x.type());
+	glsShaderBase* shader = selectShader(src.type());
 
-	glsShaderBase* shader = selectShader(x.type());
-	shader->Execute(x, y, (int)angleInDegrees, magnitude, angle);
+	GlsMat buf[2];
+	int bank = 0;
+	buf[bank] = src;
+	buf[bank ^ 1] = GlsMat(src.size(), src.type());
+
+	//TODO 探索終了条件が固定ループ長
+	// atomic カウンタ化
+	int loop_count = 256;
+	while (loop_count--){
+		shader->Execute(buf[bank], 0, buf[bank ^ 1]);
+		bank = bank ^ 1;
+	}
+	shader->Execute(buf[bank], 1, buf[bank ^ 1]);
+	bank = bank ^ 1;
+
+	dst = buf[bank];
 }
 
 

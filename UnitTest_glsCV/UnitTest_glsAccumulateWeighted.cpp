@@ -1,4 +1,4 @@
-﻿/*
+/*
 Copyright (c) 2016, oasi-adamay
 All rights reserved.
 
@@ -27,26 +27,62 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+#include "stdafx.h"
+#include "CppUnitTest.h"
 
-#ifndef _GLS_NonmaximaSuppression_H_
-#define _GLS_NonmaximaSuppression_H_
+using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
-namespace gls
+
+#include "glsCV.h"
+#include "UnitTest_Common.h"
+
+
+namespace UnitTest_glsCV
 {
 
-/*!
-Non-maximum suppression
+	template <typename T>
+	int test_glsAccumulateWeighted(int cvtype, double alpha){
+		Size size(32, 24);
+		cout << "Size:" << size << endl;
+		int ulps = 0;
 
-@param mag  - magnitude (CV_32FC1)
-@param angle - radian [0-2PI] (CV_32FC1)
-@param edge 細線化された、３値エッジ出力画(CV_8UC1)像　0:エッジではない。　128:エッジかもしれない、255：エッジ
-*/
-void nonmaximaSuppression(const GlsMat&mag, const GlsMat&angle, GlsMat& edge, const float highThreshold, const float lowThreshold);
+		Mat imgSrc(size, cvtype);
+		Mat imgDst(size, cvtype);
+		FillRandU<T>(imgSrc);
+		FillRandU<T>(imgDst);
+		GlsMat glsSrc(imgSrc);
+		GlsMat glsDst(imgDst);
+
+
+		cv::accumulateWeighted(imgSrc, imgDst, alpha);
+		gls::accumulateWeighted(glsSrc, glsDst, alpha);
+
+		Mat imgDst_ = (Mat)glsDst;
+
+		int errNum = 0;
+		if (!AreEqual<T>(imgDst, imgDst_, ulps)) errNum -= 1;
+
+		//cout << imgRef << endl;
+		//cout << imgDst << endl;
+		//cout << imgDst - imgRef << endl;
+
+
+		return errNum;
+	}
 
 
 
+	TEST_CLASS(UnitTest_glsAccumulateWeighted)
+	{
+	public:
+		//glsAccumulateWeighted
+		TEST_METHOD(glsAccumulateWeighted_CV_32FC1)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_glsAccumulateWeighted<float>(CV_32FC1, 0.25);
+			Assert::AreEqual(0, errNum);
+		}
 
 
-}//namespace gls
-
-#endif
+	};
+}

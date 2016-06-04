@@ -117,6 +117,12 @@
     <ClInclude Include="glsNonmaximaSuppression.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
+    <ClInclude Include="glsEdgeTracer.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="glsAccumulateWeighted.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="glsFft.cpp">
@@ -204,6 +210,12 @@
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="glsNonmaximaSuppression.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="glsEdgeTracer.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="glsAccumulateWeighted.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>

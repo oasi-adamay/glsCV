@@ -57,8 +57,10 @@ private:
 	struct  SetupInfo{
 		int argnum;			//Execute()の引数の数
 		int texSrcNum;		//src texture数
+		Size texSrcSize;	//src textureのsize
 		int texDstNum;		//dst texture数
 		Size texDstSize;	//dst textureのsize
+		GLuint fbo;			//fbo
 	};
 
 	//! setup (uniform / bind / ...)
