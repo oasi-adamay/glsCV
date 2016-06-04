@@ -141,6 +141,7 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="glsAccumulateWeighted.h" />
     <ClInclude Include="glsAdaptiveThreshold.h" />
     <ClInclude Include="glsBasicOperation.h" />
     <ClInclude Include="glsBilateralFilter.h" />
@@ -177,6 +178,7 @@
     <ClInclude Include="Timer.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="glsAccumulateWeighted.cpp" />
     <ClCompile Include="glsAdaptiveThreshold.cpp" />
     <ClCompile Include="glsBasicOperation.cpp" />
     <ClCompile Include="glsBilateralFilter.cpp" />

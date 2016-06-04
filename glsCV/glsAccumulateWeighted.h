@@ -1,4 +1,4 @@
-/*
+﻿/*
 Copyright (c) 2016, oasi-adamay
 All rights reserved.
 
@@ -28,42 +28,26 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#ifndef _GLS_ACCUMLATE_WEIGHTED_H_
+#define _GLS_ACCUMLATE_WEIGHTED_H_
 
-#ifndef _GLS_CV_H_
-#define _GLS_CV_H_
+namespace gls
+{
 
+/*!
+移動平均値を更新します．
 
-#include "GlsMat.h"
-#include "glsShader.h"
-#include "glsCopy.h"
-#include "glsConvert.h"
-#include "glsDraw.h"
-#include "glsMerge.h"
-#include "glsSplit.h"
-#include "glsFft.h"
-#include "glsBasicOperation.h"
-#include "glsReduce.h"
-#include "glsMinMaxLoc.h"
-#include "glsMean.h"
-#include "glsNorm.h"
-#include "glsNormalize.h"
-#include "glsFilter.h"
-#include "glsBilateralFilter.h"
-#include "glsThreshold.h"
-#include "glsAdaptiveThreshold.h"
-#include "glsFlip.h"
-#include "glsResize.h"
-#include "glsWarpAffine.h"
-#include "glsRemap.h"
-#include "glsCartToPolar.h"
-#include "glsNonmaximaSuppression.h"
-#include "glsEdgeTracer.h"
-#include "glsCanny.h"
-#include "glsAccumulateWeighted.h"
+@param src – 1- または 3-チャンネル，または 32ビット浮動小数点型の入力画像．
+@param dst - 入力画像と同じチャンネル数，32ビット浮動小数点型の累算器画像．
+@param alpha – 入力画像の重み．
+*/
+
+void accumulateWeighted(const GlsMat& src, GlsMat& dst, double alpha);
 
 
-GLFWwindow* glsCvInit(const int _width = 0, const int _height = 0);
-void glsCvTerminate(void);
 
+
+
+}//namespace gls
 
 #endif

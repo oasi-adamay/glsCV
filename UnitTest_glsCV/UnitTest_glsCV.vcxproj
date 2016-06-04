@@ -175,6 +175,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="UnitTest_Common.cpp" />
+    <ClCompile Include="UnitTest_glsAccumulateWeighted.cpp" />
     <ClCompile Include="UnitTest_glsAdaptiveThreshold.cpp" />
     <ClCompile Include="UnitTest_glsBasicOperation.cpp" />
     <ClCompile Include="UnitTest_glsBilateralFilter.cpp" />

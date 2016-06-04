@@ -27,43 +27,62 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+#include "stdafx.h"
+#include "CppUnitTest.h"
+
+using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 
-#ifndef _GLS_CV_H_
-#define _GLS_CV_H_
+#include "glsCV.h"
+#include "UnitTest_Common.h"
 
 
-#include "GlsMat.h"
-#include "glsShader.h"
-#include "glsCopy.h"
-#include "glsConvert.h"
-#include "glsDraw.h"
-#include "glsMerge.h"
-#include "glsSplit.h"
-#include "glsFft.h"
-#include "glsBasicOperation.h"
-#include "glsReduce.h"
-#include "glsMinMaxLoc.h"
-#include "glsMean.h"
-#include "glsNorm.h"
-#include "glsNormalize.h"
-#include "glsFilter.h"
-#include "glsBilateralFilter.h"
-#include "glsThreshold.h"
-#include "glsAdaptiveThreshold.h"
-#include "glsFlip.h"
-#include "glsResize.h"
-#include "glsWarpAffine.h"
-#include "glsRemap.h"
-#include "glsCartToPolar.h"
-#include "glsNonmaximaSuppression.h"
-#include "glsEdgeTracer.h"
-#include "glsCanny.h"
-#include "glsAccumulateWeighted.h"
+namespace UnitTest_glsCV
+{
+
+	template <typename T>
+	int test_glsAccumulateWeighted(int cvtype, double alpha){
+		Size size(32, 24);
+		cout << "Size:" << size << endl;
+		int ulps = 0;
+
+		Mat imgSrc(size, cvtype);
+		Mat imgDst(size, cvtype);
+		FillRandU<T>(imgSrc);
+		FillRandU<T>(imgDst);
+		GlsMat glsSrc(imgSrc);
+		GlsMat glsDst(imgDst);
 
 
-GLFWwindow* glsCvInit(const int _width = 0, const int _height = 0);
-void glsCvTerminate(void);
+		cv::accumulateWeighted(imgSrc, imgDst, alpha);
+		gls::accumulateWeighted(glsSrc, glsDst, alpha);
+
+		Mat imgDst_ = (Mat)glsDst;
+
+		int errNum = 0;
+		if (!AreEqual<T>(imgDst, imgDst_, ulps)) errNum -= 1;
+
+		//cout << imgRef << endl;
+		//cout << imgDst << endl;
+		//cout << imgDst - imgRef << endl;
 
 
-#endif
+		return errNum;
+	}
+
+
+
+	TEST_CLASS(UnitTest_glsAccumulateWeighted)
+	{
+	public:
+		//glsAccumulateWeighted
+		TEST_METHOD(glsAccumulateWeighted_CV_32FC1)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_glsAccumulateWeighted<float>(CV_32FC1, 0.25);
+			Assert::AreEqual(0, errNum);
+		}
+
+
+	};
+}
