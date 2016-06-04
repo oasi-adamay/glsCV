@@ -13,7 +13,7 @@ BSD-3clause license
 
 ## 機能
 - 配列操作
- - split, merge, tiled, untiled, copy, flip 
+ - split, merge, tiled, untiled, copy, flip, cartToPolar 
 - 要素毎の演算
  - add, subtract, multiply, divide, min, max, mulSpectrums, log, exp, pow
  - convert, cvtColor
@@ -22,8 +22,10 @@ BSD-3clause license
 - 演算
  - FFT, normalize
 - フィルタ
- - sepFilter2D, filter2D, gaussianFilter, boxFilter, Sobel, Laplacian
+ - sepFilter2D, filter2D, gaussianFilter, boxFilter, Sobel, Laplacian, bilateralFilter, Canny, accumulateWeighted
  - threshold, adaptiveThreshold
+- 幾何変換
+ - remap ,resize, warpAffine 
 
 ## 開発環境
  * Windows8
