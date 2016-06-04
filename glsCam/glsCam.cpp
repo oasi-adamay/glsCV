@@ -59,6 +59,10 @@ enum E_CAM_MODE {
 	CANNY,
 	FFT,
 	FFT_RECT,
+	MODE_MASK = 0x0000FFFF,
+	CTRL_MASK = 0xFFFF0000,
+	ENABLE_PRE_FILTER = 1 << 16,
+	RESET_ACC = 1 << 17,
 };
 
 enum E_CAM_ZOOM {
@@ -71,31 +75,53 @@ enum E_CAM_ZOOM {
 	ZOOMxMAX,
 };
 
-void controls(GLFWwindow* window, int& mode, int& zoom, int& ocvwin, int& enable_pre_filter){
-	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) ocvwin = 1- ocvwin;
-	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) enable_pre_filter = enable_pre_filter^1;
-	if (glfwGetKey(window, GLFW_KEY_N) == GLFW_PRESS) mode = E_CAM_MODE::NORMAL;
-	if (glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS) mode = E_CAM_MODE::GRAY;
-//	if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS) mode = E_CAM_MODE::GAUSS;
-	if (glfwGetKey(window, GLFW_KEY_B) == GLFW_PRESS) mode = E_CAM_MODE::BILATERAL;
-	if (glfwGetKey(window, GLFW_KEY_H) == GLFW_PRESS) mode = E_CAM_MODE::SOBEL_H;
-	if (glfwGetKey(window, GLFW_KEY_V) == GLFW_PRESS) mode = E_CAM_MODE::SOBEL_V;
-	if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS) mode = E_CAM_MODE::LAPLACIAN;
-	if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS) mode = E_CAM_MODE::THRESH;
-	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) mode = E_CAM_MODE::ADAPTIVE_THRESH;
-	if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS) mode = E_CAM_MODE::FFT;
-	if (glfwGetKey(window, GLFW_KEY_0) == GLFW_PRESS) mode = E_CAM_MODE::FFT_RECT;
-	if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS) mode = E_CAM_MODE::CANNY;
-	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) mode = E_CAM_MODE::EDGE;
+static void set_mode(int& mode, const int new_mode){
+	mode = (mode & E_CAM_MODE::CTRL_MASK) | new_mode;
+}
 
+static void controls(GLFWwindow* window, int& mode, int& zoom){
 
-	if (glfwGetKey(window, GLFW_KEY_PAGE_UP) == GLFW_PRESS){
-		zoom++;
-		if (zoom >= E_CAM_ZOOM::ZOOMxMAX) zoom--;
+	if (glfwGetKey(window, GLFW_KEY_N) == GLFW_PRESS) set_mode(mode, E_CAM_MODE::NORMAL);
+	if (glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS) set_mode(mode, E_CAM_MODE::GRAY);
+	if (glfwGetKey(window, GLFW_KEY_B) == GLFW_PRESS) set_mode(mode, E_CAM_MODE::BILATERAL);
+	if (glfwGetKey(window, GLFW_KEY_H) == GLFW_PRESS) set_mode(mode, E_CAM_MODE::SOBEL_H);
+	if (glfwGetKey(window, GLFW_KEY_V) == GLFW_PRESS) set_mode(mode, E_CAM_MODE::SOBEL_V);
+	if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS) set_mode(mode, E_CAM_MODE::LAPLACIAN);
+	if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS) set_mode(mode, E_CAM_MODE::THRESH);
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) set_mode(mode, E_CAM_MODE::ADAPTIVE_THRESH);
+	if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS) set_mode(mode, E_CAM_MODE::FFT);
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) set_mode(mode, E_CAM_MODE::FFT_RECT);
+	if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS) set_mode(mode, E_CAM_MODE::CANNY);
+	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) set_mode(mode, E_CAM_MODE::EDGE);
+
+	static bool key_p_invalid = false;
+	if (glfwGetKey(window, GLFW_KEY_P) == GLFW_RELEASE) key_p_invalid = false;
+	if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS) {
+		if (!key_p_invalid) {
+			key_p_invalid = true;
+			mode ^= ENABLE_PRE_FILTER;
+			if (mode & ENABLE_PRE_FILTER) mode |= RESET_ACC;
+		}
 	}
+
+	static bool key_page_up_invalid = false;
+	if (glfwGetKey(window, GLFW_KEY_PAGE_UP) == GLFW_RELEASE) key_page_up_invalid = false;
+	if (glfwGetKey(window, GLFW_KEY_PAGE_UP) == GLFW_PRESS){
+		if (!key_page_up_invalid) {
+			key_page_up_invalid = true;
+			zoom++;
+			if (zoom >= E_CAM_ZOOM::ZOOMxMAX) zoom--;
+		}
+	}
+
+	static bool key_page_down_invalid = false;
+	if (glfwGetKey(window, GLFW_KEY_PAGE_DOWN) == GLFW_RELEASE)key_page_down_invalid = false;
 	if (glfwGetKey(window, GLFW_KEY_PAGE_DOWN) == GLFW_PRESS){
-		zoom--;
-		if (zoom <= E_CAM_ZOOM::ZOOMxMIN) zoom++;
+		if (!key_page_down_invalid) {
+			key_page_down_invalid = true;
+			zoom--;
+			if (zoom <= E_CAM_ZOOM::ZOOMxMIN) zoom++;
+		}
 	}
 
 }
@@ -135,18 +161,14 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	Rect rectFft((captureWidth - sizeFft.width) / 2, (captureHeight - sizeFft.height) / 2 , sizeFft.width, sizeFft.height);
 
-	int camMode = E_CAM_MODE::CANNY;
+	int camMode = E_CAM_MODE::NORMAL;
 	int camZoom = E_CAM_ZOOM::ZOOMx1000;
-	int ocvwin = 0;
-	int enable_pre_filter = 0;
 
 	GlsMat glsFrameAcc;
 
 	do{
 		cv::Mat frame;
 		camera >> frame;						// キャプチャ映像から画像を切り出す
-		if (ocvwin)	cv::imshow("[OCV]", frame.clone());
-		else cv::destroyWindow("[OCV]");
 
 		GlsMat glsFrame;
 
@@ -154,14 +176,17 @@ int _tmain(int argc, _TCHAR* argv[])
 			glsFrame = (GlsMat)frame;							//upload 
 			gls::flip(glsFrame, glsFrame, 0);					//flip up to down
 			gls::convert(glsFrame, glsFrame, 1.0f / 256.0f);	//convert to float
-			if (enable_pre_filter){								//pre-filter
-				if (glsFrameAcc.empty()) gls::copy(glsFrame, glsFrameAcc);
+			if (camMode & ENABLE_PRE_FILTER){					//pre-filter
+				if (glsFrameAcc.empty() || (camMode & RESET_ACC)){
+					gls::copy(glsFrame, glsFrameAcc);
+					camMode &= ~RESET_ACC;	//clear bit
+				}
 				gls::accumulateWeighted(glsFrame, glsFrameAcc, 0.25);
 				glsFrame = glsFrameAcc;
 			}
 		}
 
-		switch (camMode){
+		switch (camMode&E_CAM_MODE::MODE_MASK){
 		case(E_CAM_MODE::FFT) :	{
 			gls::cvtColor(glsFrame, glsFrame, CV_BGR2GRAY);
 			gls::copyRect(glsFrame, glsFrame, rectFft);
@@ -226,12 +251,6 @@ int _tmain(int argc, _TCHAR* argv[])
 		}break;
 		case(E_CAM_MODE::CANNY) : {
 			gls::cvtColor(glsFrame, glsFrame, CV_BGR2GRAY);
-			if (enable_pre_filter){
-				if (glsFrameAcc.size() != glsFrame.size() ||
-					glsFrameAcc.type() != glsFrame.type()) gls::copy(glsFrame, glsFrameAcc);
-				gls::accumulateWeighted(glsFrame, glsFrameAcc, 0.25);
-				glsFrame = glsFrameAcc;
-			}
 			const double high = 0.20;
 			const double low = high /2.0;
 			gls::Canny(glsFrame, glsFrame, high,low,3,true);
@@ -268,7 +287,7 @@ int _tmain(int argc, _TCHAR* argv[])
 
 		glfwSwapBuffers(window);  // Swap buffers
 		glfwPollEvents();
-		controls(window, camMode, camZoom, ocvwin, enable_pre_filter); // key check
+		controls(window, camMode, camZoom); // key check
 	}
 	while (glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS &&
 		glfwWindowShouldClose(window) == 0);
