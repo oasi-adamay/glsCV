@@ -80,10 +80,11 @@ layout(location = 0) out vec4 dst; \n
 void main(void)\n
 { \n
 	ivec2 texSize = textureSize(texSrc, 0); \n
-	vec2 coord = gl_FragCoord.xy; \n
-//	vec2 coord = gl_FragCoord.xy + vec2(+0.25,0); \n
+//	vec2 coord = gl_FragCoord.xy; \n
+	vec2 coord = gl_FragCoord.xy - vec2(0.5, 0.5); \n
 	coord = vec2(coord.x*M[0][0] + coord.y*M[1][0] + M[2][0], \n
 	             coord.x*M[0][1] + coord.y*M[1][1] + M[2][1]); \n
+	coord = coord + vec2(0.5, 0.5); \n
     coord = vec2(coord.x / float(texSize.x), coord.y / float(texSize.y)); \n
 	dst = texture(texSrc, coord); \n
 }\n

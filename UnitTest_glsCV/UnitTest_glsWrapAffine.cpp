@@ -45,15 +45,16 @@ namespace UnitTest_glsCV
 
 	template <typename T>
 	int test_glsWarpAffine(int cvtype, int interpolation){
-		int ulps = 0;
+		int ulps = 4;
+		float eps = 0.01f;
 		Size size(32, 24);
 		//Size dsize(32, 24);
 		Size dsize(64, 48);
 		Point2f center((float)size.width / 2, (float)size.height / 2);
 		double angle = 13.0;
 		double scale = 1.2;
-		Mat M = cv::getRotationMatrix2D(center,angle,scale);
-//		M.convertTo(M,CV_32F);
+		Mat M = cv::getRotationMatrix2D(center, angle, scale);
+//		M.convertTo(M, CV_32F);
 
 		cout << "Size:" << size << endl;
 
@@ -71,13 +72,33 @@ namespace UnitTest_glsCV
 		GlsMat glsSrc(imgSrc);
 		GlsMat glsDst;
 
+#if 1
 		cv::warpAffine(imgSrc, imgRef, M, dsize, interpolation);
+#else
+		Mat _M;
+		cv::invertAffineTransform(M, _M);
+		_M.convertTo(_M, CV_32F);
+
+		Mat mapx(dsize, CV_32F);
+		Mat mapy(dsize, CV_32F);
+		float *m = (float *)_M.data;
+
+		for (int y = 0; y < dsize.height; y++){
+			for (int x = 0; x < dsize.width; x++){
+				mapx.at<float>(y, x) = (float)(x*m[0] + y*m[1] + m[2]);
+				mapy.at<float>(y, x) = (float)(x*m[3] + y*m[4] + m[5]);
+			}
+		}
+		cv::remap(imgSrc, imgRef, mapx, mapy, interpolation);
+
+
+#endif
 		gls::warpAffine(glsSrc, glsDst, M, dsize, interpolation);
 
 		imgDst = (Mat)glsDst;
 
 		int errNum = 0;
-		if (!AreEqual<T>(imgRef, imgDst, ulps)) errNum = -1;
+		if (!AreEqual<T>(imgRef, imgDst, ulps, eps)) errNum = -1;
 
 		//cout << imgRef << endl;
 		//cout << imgDst << endl;
