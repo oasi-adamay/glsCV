@@ -59,6 +59,10 @@ enum E_CAM_MODE {
 	CANNY,
 	FFT,
 	FFT_RECT,
+	MODE_MASK = 0x0000FFFF,
+	CTRL_MASK = 0xFFFF0000,
+	ENABLE_PRE_FILTER = 1 << 16,
+	RESET_ACC = 1 << 17,
 };
 
 enum E_CAM_ZOOM {
@@ -71,31 +75,53 @@ enum E_CAM_ZOOM {
 	ZOOMxMAX,
 };
 
-void controls(GLFWwindow* window, int& mode, int& zoom, int& ocvwin, int& enable_accm_filter){
-	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) ocvwin = 1- ocvwin;
-	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) enable_accm_filter = enable_accm_filter^1;
-	if (glfwGetKey(window, GLFW_KEY_N) == GLFW_PRESS) mode = E_CAM_MODE::NORMAL;
-	if (glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS) mode = E_CAM_MODE::GRAY;
-//	if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS) mode = E_CAM_MODE::GAUSS;
-	if (glfwGetKey(window, GLFW_KEY_B) == GLFW_PRESS) mode = E_CAM_MODE::BILATERAL;
-	if (glfwGetKey(window, GLFW_KEY_H) == GLFW_PRESS) mode = E_CAM_MODE::SOBEL_H;
-	if (glfwGetKey(window, GLFW_KEY_V) == GLFW_PRESS) mode = E_CAM_MODE::SOBEL_V;
-	if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS) mode = E_CAM_MODE::LAPLACIAN;
-	if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS) mode = E_CAM_MODE::THRESH;
-	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) mode = E_CAM_MODE::ADAPTIVE_THRESH;
-	if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS) mode = E_CAM_MODE::FFT;
-	if (glfwGetKey(window, GLFW_KEY_0) == GLFW_PRESS) mode = E_CAM_MODE::FFT_RECT;
-	if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS) mode = E_CAM_MODE::CANNY;
-	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) mode = E_CAM_MODE::EDGE;
+static void set_mode(int& mode, const int new_mode){
+	mode = (mode & E_CAM_MODE::CTRL_MASK) | new_mode;
+}
 
+static void controls(GLFWwindow* window, int& mode, int& zoom){
 
-	if (glfwGetKey(window, GLFW_KEY_PAGE_UP) == GLFW_PRESS){
-		zoom++;
-		if (zoom >= E_CAM_ZOOM::ZOOMxMAX) zoom--;
+	if (glfwGetKey(window, GLFW_KEY_N) == GLFW_PRESS) set_mode(mode, E_CAM_MODE::NORMAL);
+	if (glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS) set_mode(mode, E_CAM_MODE::GRAY);
+	if (glfwGetKey(window, GLFW_KEY_B) == GLFW_PRESS) set_mode(mode, E_CAM_MODE::BILATERAL);
+	if (glfwGetKey(window, GLFW_KEY_H) == GLFW_PRESS) set_mode(mode, E_CAM_MODE::SOBEL_H);
+	if (glfwGetKey(window, GLFW_KEY_V) == GLFW_PRESS) set_mode(mode, E_CAM_MODE::SOBEL_V);
+	if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS) set_mode(mode, E_CAM_MODE::LAPLACIAN);
+	if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS) set_mode(mode, E_CAM_MODE::THRESH);
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) set_mode(mode, E_CAM_MODE::ADAPTIVE_THRESH);
+	if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS) set_mode(mode, E_CAM_MODE::FFT);
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) set_mode(mode, E_CAM_MODE::FFT_RECT);
+	if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS) set_mode(mode, E_CAM_MODE::CANNY);
+	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) set_mode(mode, E_CAM_MODE::EDGE);
+
+	static bool key_p_invalid = false;
+	if (glfwGetKey(window, GLFW_KEY_P) == GLFW_RELEASE) key_p_invalid = false;
+	if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS) {
+		if (!key_p_invalid) {
+			key_p_invalid = true;
+			mode ^= ENABLE_PRE_FILTER;
+			if (mode & ENABLE_PRE_FILTER) mode |= RESET_ACC;
+		}
 	}
+
+	static bool key_page_up_invalid = false;
+	if (glfwGetKey(window, GLFW_KEY_PAGE_UP) == GLFW_RELEASE) key_page_up_invalid = false;
+	if (glfwGetKey(window, GLFW_KEY_PAGE_UP) == GLFW_PRESS){
+		if (!key_page_up_invalid) {
+			key_page_up_invalid = true;
+			zoom++;
+			if (zoom >= E_CAM_ZOOM::ZOOMxMAX) zoom--;
+		}
+	}
+
+	static bool key_page_down_invalid = false;
+	if (glfwGetKey(window, GLFW_KEY_PAGE_DOWN) == GLFW_RELEASE)key_page_down_invalid = false;
 	if (glfwGetKey(window, GLFW_KEY_PAGE_DOWN) == GLFW_PRESS){
-		zoom--;
-		if (zoom <= E_CAM_ZOOM::ZOOMxMIN) zoom++;
+		if (!key_page_down_invalid) {
+			key_page_down_invalid = true;
+			zoom--;
+			if (zoom <= E_CAM_ZOOM::ZOOMxMIN) zoom++;
+		}
 	}
 
 }
@@ -135,30 +161,41 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	Rect rectFft((captureWidth - sizeFft.width) / 2, (captureHeight - sizeFft.height) / 2 , sizeFft.width, sizeFft.height);
 
-	int camMode = E_CAM_MODE::CANNY;
+	int camMode = E_CAM_MODE::NORMAL;
 	int camZoom = E_CAM_ZOOM::ZOOMx1000;
-	int ocvwin = 0;
-	int enable_accm_filter = 0;
 
 	GlsMat glsFrameAcc;
 
+	cv::TickMeter timer;
+	timer.reset();
+
 	do{
+		timer.reset();
+		timer.start();
+
 		cv::Mat frame;
 		camera >> frame;						// ÉLÉÉÉvÉ`ÉÉâfëúÇ©ÇÁâÊëúÇêÿÇËèoÇ∑
-		if (ocvwin)	cv::imshow("[OCV]", frame.clone());
-		else cv::destroyWindow("[OCV]");
-
-//		cv::flip(frame, frame, 0);				// è„â∫îΩì]
 
 		GlsMat glsFrame;
 
-		switch (camMode){
+		{	// common pre-process
+			glsFrame = (GlsMat)frame;							//upload 
+			gls::flip(glsFrame, glsFrame, 0);					//flip up to down
+			gls::convert(glsFrame, glsFrame, 1.0f / 256.0f);	//convert to float
+			if (camMode & ENABLE_PRE_FILTER){					//pre-filter
+				if (glsFrameAcc.empty() || (camMode & RESET_ACC)){
+					gls::copy(glsFrame, glsFrameAcc);
+					camMode &= ~RESET_ACC;	//clear bit
+				}
+				gls::accumulateWeighted(glsFrame, glsFrameAcc, 0.25);
+				glsFrame = glsFrameAcc;
+			}
+		}
+
+		switch (camMode&E_CAM_MODE::MODE_MASK){
 		case(E_CAM_MODE::FFT) :	{
-			Mat roi = Mat(frame, rectFft);
-			glsFrame = (GlsMat)roi;
-			gls::flip(glsFrame, glsFrame, 0);				// è„â∫îΩì]
-			gls::convert(glsFrame, glsFrame, 1.0f / 256.0f);
 			gls::cvtColor(glsFrame, glsFrame, CV_BGR2GRAY);
+			gls::copyRect(glsFrame, glsFrame, rectFft);
 			gls::multiply(glsFftWin, glsFrame, glsFrame);
 			vector<GlsMat> plnGls(2);
 			plnGls[0] = glsFrame;
@@ -169,47 +206,30 @@ int _tmain(int argc, _TCHAR* argv[])
 			gls::logMagSpectrums(glsComplx, glsFrame, 1.0);
 			gls::normalize(glsFrame, glsFrame, 0, 1, NORM_MINMAX);
 		}break;
+		case(E_CAM_MODE::FFT_RECT) : {
+			gls::cvtColor(glsFrame, glsFrame, CV_BGR2GRAY);
+			gls::copyRect(glsFrame, glsFrame, rectFft);
+			gls::multiply(glsFftWin, glsFrame, glsFrame);
+		} break;
+
 		case(E_CAM_MODE::ADAPTIVE_THRESH) : {
-			glsFrame = (GlsMat)frame;
-			gls::flip(glsFrame, glsFrame, 0);				// è„â∫îΩì]
-			gls::convert(glsFrame, glsFrame, 1.0f / 256.0f);
 			gls::cvtColor(glsFrame, glsFrame, CV_BGR2GRAY);
 			gls::adaptiveThreshold(glsFrame, glsFrame, 1.0, ADAPTIVE_THRESH_MEAN_C, THRESH_BINARY,15,0.01);
 		}break;
 		case(E_CAM_MODE::THRESH) : {
-			glsFrame = (GlsMat)frame;
-			gls::flip(glsFrame, glsFrame, 0);				// è„â∫îΩì]
-			gls::convert(glsFrame, glsFrame, 1.0f / 256.0f);
 			gls::cvtColor(glsFrame, glsFrame, CV_BGR2GRAY);
 			Scalar mean = gls::mean(glsFrame);
 			gls::threshold(glsFrame, glsFrame, mean[0], 1.0, THRESH_BINARY);
 		}break;
-		case(E_CAM_MODE::FFT_RECT) : {
-			Mat roi = Mat(frame, rectFft);
-			glsFrame = (GlsMat)roi;
-			gls::flip(glsFrame, glsFrame, 0);				// è„â∫îΩì]
-			gls::convert(glsFrame, glsFrame, 1.0f / 256.0f);
-			gls::cvtColor(glsFrame, glsFrame, CV_BGR2GRAY);
-			gls::multiply(glsFftWin, glsFrame, glsFrame);
-		} break;
 		case(E_CAM_MODE::SOBEL_V) : {
-			glsFrame = (GlsMat)frame;
-			gls::flip(glsFrame, glsFrame, 0);				// è„â∫îΩì]
-			gls::convert(glsFrame, glsFrame, 1.0f / 256.0f);
 			gls::cvtColor(glsFrame, glsFrame, CV_BGR2GRAY);
 			gls::Sobel(glsFrame, glsFrame, -1, 0, 1, 3, 1.0, 0.5);
 		}break;
 		case(E_CAM_MODE::SOBEL_H) : {
-			glsFrame = (GlsMat)frame;
-			gls::flip(glsFrame, glsFrame, 0);				// è„â∫îΩì]
-			gls::convert(glsFrame, glsFrame, 1.0f / 256.0f);
 			gls::cvtColor(glsFrame, glsFrame, CV_BGR2GRAY);
 			gls::Sobel(glsFrame, glsFrame, -1, 1, 0, 3, 1.0, 0.5);
 		}break;
 		case(E_CAM_MODE::EDGE) : {
-			glsFrame = (GlsMat)frame;
-			gls::flip(glsFrame, glsFrame, 0);				// è„â∫îΩì]
-			gls::convert(glsFrame, glsFrame, 1.0f / 256.0f);
 			gls::cvtColor(glsFrame, glsFrame, CV_BGR2GRAY);
 			GlsMat dx;
 			GlsMat dy;
@@ -220,29 +240,14 @@ int _tmain(int argc, _TCHAR* argv[])
 			gls::merge(mag_rad, glsFrame);
 		}break;
 		case(E_CAM_MODE::LAPLACIAN) : {
-			glsFrame = (GlsMat)frame;
-			gls::flip(glsFrame, glsFrame, 0);				// è„â∫îΩì]
-			gls::convert(glsFrame, glsFrame, 1.0f / 256.0f);
 			gls::cvtColor(glsFrame, glsFrame, CV_BGR2GRAY);
-			if (enable_accm_filter){
-				if (glsFrameAcc.size() != glsFrame.size() ||
-					glsFrameAcc.type() != glsFrame.type()) gls::copy(glsFrame, glsFrameAcc);
-				gls::accumulateWeighted(glsFrame, glsFrameAcc, 0.25);
-				glsFrame = glsFrameAcc;
-			}
 			gls::Laplacian(glsFrame, glsFrame, -1, 3, 1.0, 0.5);
 		}break;
 		case(E_CAM_MODE::GAUSS) : {
-			glsFrame = (GlsMat)frame;
-			gls::flip(glsFrame, glsFrame, 0);				// è„â∫îΩì]
-			gls::convert(glsFrame, glsFrame, 1.0f / 256.0f);
 			gls::cvtColor(glsFrame, glsFrame, CV_BGR2RGB);
 			gls::GaussianBlur(glsFrame, glsFrame, Size(9, 9), 0, 0);
 		}break;
 		case(E_CAM_MODE::BILATERAL) : {
-			glsFrame = (GlsMat)frame;
-			gls::flip(glsFrame, glsFrame, 0);				// è„â∫îΩì]
-			gls::convert(glsFrame, glsFrame, 1.0f / 256.0f);
 			gls::cvtColor(glsFrame, glsFrame, CV_BGR2RGB);
 			//! tuning param
 			const int ksize = 9;				//trade off IQ vs process time
@@ -251,37 +256,16 @@ int _tmain(int argc, _TCHAR* argv[])
 			gls::bilateralFilter(glsFrame, glsFrame, ksize, sigmaColor, sigmaSpace);
 		}break;
 		case(E_CAM_MODE::CANNY) : {
-			glsFrame = (GlsMat)frame;
-			gls::flip(glsFrame, glsFrame, 0);				// è„â∫îΩì]
-			gls::convert(glsFrame, glsFrame, 1.0f / 256.0f);
 			gls::cvtColor(glsFrame, glsFrame, CV_BGR2GRAY);
-			if (enable_accm_filter){
-				if (glsFrameAcc.size() != glsFrame.size() ||
-					glsFrameAcc.type() != glsFrame.type()) gls::copy(glsFrame, glsFrameAcc);
-				gls::accumulateWeighted(glsFrame, glsFrameAcc, 0.25);
-				glsFrame = glsFrameAcc;
-			}
 			const double high = 0.20;
 			const double low = high /2.0;
 			gls::Canny(glsFrame, glsFrame, high,low,3,true);
 		}break;
 		case(E_CAM_MODE::GRAY) : {
-			glsFrame = (GlsMat)frame;
-			gls::flip(glsFrame, glsFrame, 0);				// è„â∫îΩì]
-			gls::convert(glsFrame, glsFrame, 1.0f / 256.0f);
 			gls::cvtColor(glsFrame, glsFrame, CV_BGR2GRAY);
 		}break;
 		case(E_CAM_MODE::NORMAL):
 		default:{
-			glsFrame = (GlsMat)frame;
-			gls::flip(glsFrame, glsFrame, 0);				// è„â∫îΩì]
-			gls::convert(glsFrame, glsFrame, 1.0f / 256.0f);
-			if (enable_accm_filter){
-				if (glsFrameAcc.size() != glsFrame.size() ||
-					glsFrameAcc.type() != glsFrame.type()) gls::copy(glsFrame, glsFrameAcc);
-				gls::accumulateWeighted(glsFrame, glsFrameAcc, 0.25);
-				glsFrame = glsFrameAcc;
-			}
 			gls::cvtColor(glsFrame, glsFrame, CV_BGR2RGB);
 		}break;
 		}
@@ -309,7 +293,12 @@ int _tmain(int argc, _TCHAR* argv[])
 
 		glfwSwapBuffers(window);  // Swap buffers
 		glfwPollEvents();
-		controls(window, camMode, camZoom, ocvwin, enable_accm_filter); // key check
+		controls(window, camMode, camZoom); // key check
+
+		timer.stop();
+		double fps = 1.0 / timer.getTimeSec();
+		glfwSetWindowTitle(window, ("glsCam [" + to_string(fps) + "]").c_str());
+
 	}
 	while (glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS &&
 		glfwWindowShouldClose(window) == 0);
