@@ -35,6 +35,9 @@ namespace gls
 {
 
 
+class GlsMat;
+class AtomicCounter;
+
 /*!
 glsShader Base Class
 
@@ -83,6 +86,8 @@ private:
 	template<>	void setup<Matx34f>(SetupInfo* info, const Matx34f& t);	//!< uniform mat4x3(transpose)
 	template<>	void setup<Matx43f>(SetupInfo* info, const Matx43f& t);	//!< uniform mat3x4(transpose)
 	template<>	void setup<GlsMat>(SetupInfo* info, const GlsMat& t);	//!<
+	template<>	void setup<AtomicCounter>(SetupInfo* info, const AtomicCounter& t);	//!<
+
 	template<class First, class... Rest>
 	void setup(SetupInfo* info, const First& first, const Rest&... rest);
 

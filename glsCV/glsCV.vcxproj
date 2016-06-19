@@ -143,6 +143,7 @@
   <ItemGroup>
     <ClInclude Include="glsAccumulateWeighted.h" />
     <ClInclude Include="glsAdaptiveThreshold.h" />
+    <ClInclude Include="glsAtomicCounter.h" />
     <ClInclude Include="glsBasicOperation.h" />
     <ClInclude Include="glsBilateralFilter.h" />
     <ClInclude Include="glsCanny.h" />
@@ -180,6 +181,7 @@
   <ItemGroup>
     <ClCompile Include="glsAccumulateWeighted.cpp" />
     <ClCompile Include="glsAdaptiveThreshold.cpp" />
+    <ClCompile Include="glsAtomicCounter.cpp" />
     <ClCompile Include="glsBasicOperation.cpp" />
     <ClCompile Include="glsBilateralFilter.cpp" />
     <ClCompile Include="glsCanny.cpp" />
