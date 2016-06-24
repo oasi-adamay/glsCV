@@ -35,6 +35,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "glsVAO.h"
 #include "glsFBO.h"
+#include "glsAtomicCounter.h"
+
 
 #ifdef _DEBUG
 //#define _DEBUG_SHADER
@@ -322,6 +324,14 @@ void glsShaderBase::setup<GlsMat>(SetupInfo* info, const GlsMat& t)
 
 	}
 }
+
+template<>
+void glsShaderBase::setup<AtomicCounter>(SetupInfo* info, const AtomicCounter& t)
+{
+	const int i = info->argnum++;
+	t.Bind();
+}
+
 
 
 

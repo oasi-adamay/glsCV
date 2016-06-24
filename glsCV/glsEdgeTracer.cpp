@@ -35,6 +35,8 @@ include
 #include "glsMacro.h"
 #include "GlsMat.h"
 #include "glsShader.h"
+#include "glsAtomicCounter.h"
+
 
 #include "glsEdgeTracer.h"
 
@@ -60,6 +62,7 @@ protected:
 		list<string> lst;
 		lst.push_back("texSrc");
 		lst.push_back("last");
+		lst.push_back("ac");
 		return lst;
 	}
 	string FragmentShaderCode(void);
@@ -82,10 +85,11 @@ glsShaderEdgeTracerU ShaderEdgeTracerU;
 //glsShaderEdgeTracerU
 string glsShaderEdgeTracerU::FragmentShaderCode(void){
 	const char fragmentShaderCode[] = TO_STR(
-#version 330 core\n
+#version 420 compatibility \n
 precision highp float;\n
 uniform usampler2D	texSrc;\n
 uniform int last;\n
+layout(binding = 0, offset = 0) uniform atomic_uint ac;
 layout (location = 0) out uint dst;\n
 void main(void)\n
 {\n
@@ -103,6 +107,7 @@ void main(void)\n
 		val |= texelFetchOffset(texSrc, xy, 0, ivec2(+1, +1)).r; \n
 	}\n
 	if (last != 0 && src == 128u) val =0u;\n
+	if (val != src) atomicCounterIncrement(ac); \n
 	dst = val;
 }\n
 );
@@ -138,17 +143,23 @@ void edgeTracer(const GlsMat& src, GlsMat& dst)
 	buf[bank] = src;
 	buf[bank ^ 1] = GlsMat(src.size(), src.type());
 
-	//TODO 探索終了条件が固定ループ長
-	// atomic カウンタ化
-	int loop_count = 256;
-	while (loop_count--){
-		shader->Execute(buf[bank], 0, buf[bank ^ 1]);
+	AtomicCounter ac;
+	const int loop_count_max = 256;
+	int loop_count = 0;
+	while (loop_count++< loop_count_max){
+		ac.Set(0);
+		shader->Execute(buf[bank], 0, ac, buf[bank ^ 1]);
 		bank = bank ^ 1;
+		unsigned int atomic_count = ac.Get();
+//		cout << "atomic_count:" << atomic_count << endl;
+		if (atomic_count == 0) break;
 	}
-	shader->Execute(buf[bank], 1, buf[bank ^ 1]);
+	shader->Execute(buf[bank], 1, ac, buf[bank ^ 1]);
 	bank = bank ^ 1;
 
 	dst = buf[bank];
+
+//	cout << "loop_count:" << loop_count << endl;
 }
 
 
