@@ -113,7 +113,6 @@ namespace UnitTest_glsCV
 	TEST_CLASS(UnitTest_glsWarpAffine)
 	{
 	public:
-		//TODO ”÷–­‚É‚¸‚ê‚Ä‚¢‚é
 		TEST_METHOD(glsWarpAffine_CV_32FC1_INTER_NEAREST)
 		{
 			cout << __FUNCTION__ << endl;
@@ -121,7 +120,6 @@ namespace UnitTest_glsCV
 			Assert::AreEqual(0, errNum);
 		}
 
-		//TODO ”÷–­‚É‚¸‚ê‚Ä‚¢‚é
 		TEST_METHOD(glsWarpAffine_CV_32FC1_INTER_LINEAR)
 		{
 			cout << __FUNCTION__ << endl;

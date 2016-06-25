@@ -44,15 +44,18 @@ namespace UnitTest_glsCV
 {
 
 	template <typename T>
-	int test_glsResize(int cvtype, int interpolation){
-		int ulps = 0;
+	int test_glsResize(int cvtype, int interpolation, double fx = 1.0, double fy = 1.0){
+		int ulps = 4;
+		float eps = 0.01f;
 		Size size(32, 24);
-//		Size dsize(32, 24);
-		Size dsize(64, 48);
-//		Size dsize(48, 32);
-		double fx = 0;
-		double fy = 0;
+		Size dsize(0,0);
 
+//		Size dsize(32, 24);
+//		Size dsize(64, 48);
+//		Size dsize(48, 32);
+//		double fx = 0;
+//		double fy = 0;
+		
 		cout << "Size:" << size << endl;
 
 		Mat imgSrc(size, cvtype);
@@ -69,7 +72,7 @@ namespace UnitTest_glsCV
 		imgDst = (Mat)glsDst;
 
 		int errNum = 0;
-		if (!AreEqual<T>(imgRef, imgDst, ulps)) errNum = -1;
+		if (!AreEqual<T>(imgRef, imgDst, ulps, eps)) errNum = -1;
 
 		//cout << imgRef << endl;
 		//cout << imgDst << endl;
@@ -84,26 +87,71 @@ namespace UnitTest_glsCV
 	TEST_CLASS(UnitTest_glsResize)
 	{
 	public:
-		TEST_METHOD(glsResize_CV_32FC1_INTER_NEAREST)
+		TEST_METHOD(glsResize_CV_32FC1_INTER_NEAREST_x1)
 		{
 			cout << __FUNCTION__ << endl;
-			int errNum = test_glsResize<float>(CV_32FC1, INTER_NEAREST);
+			int errNum = test_glsResize<float>(CV_32FC1, INTER_NEAREST, 1.0, 1.0);
 			Assert::AreEqual(0, errNum);
 		}
 
-		TEST_METHOD(glsResize_CV_32FC1_INTER_LINEAR)
-		{
-			cout << __FUNCTION__ << endl;
-			int errNum = test_glsResize<float>(CV_32FC1, INTER_LINEAR);
-			Assert::AreEqual(0, errNum);
-		}
-
-		//TEST_METHOD(glsResize_CV_32FC1_INTER_CUBIC)
+		//TEST_METHOD(glsResize_CV_32FC1_INTER_NEAREST_x1p5)
 		//{
 		//	cout << __FUNCTION__ << endl;
-		//	int errNum = test_glsResize<float>(CV_32FC1, INTER_CUBIC);
+		//	int errNum = test_glsResize<float>(CV_32FC1, INTER_NEAREST, 1.5, 1.5);
 		//	Assert::AreEqual(0, errNum);
 		//}
+
+
+		TEST_METHOD(glsResize_CV_32FC1_INTER_NEAREST_x2)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_glsResize<float>(CV_32FC1, INTER_NEAREST,2.0,2.0);
+			Assert::AreEqual(0, errNum);
+		}
+
+		TEST_METHOD(glsResize_CV_32FC1_INTER_LINEAR_x1)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_glsResize<float>(CV_32FC1, INTER_LINEAR, 1.0, 1.0);
+			Assert::AreEqual(0, errNum);
+		}
+
+		TEST_METHOD(glsResize_CV_32FC1_INTER_LINEAR_x1p5)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_glsResize<float>(CV_32FC1, INTER_LINEAR, 1.5, 1.5);
+			Assert::AreEqual(0, errNum);
+		}
+
+
+		TEST_METHOD(glsResize_CV_32FC1_INTER_LINEAR_x2)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_glsResize<float>(CV_32FC1, INTER_LINEAR, 2.0, 2.0);
+			Assert::AreEqual(0, errNum);
+		}
+
+		TEST_METHOD(glsResize_CV_32FC1_INTER_CUBIC_x1)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_glsResize<float>(CV_32FC1, INTER_CUBIC, 1.0, 1.0);
+			Assert::AreEqual(0, errNum);
+		}
+
+		TEST_METHOD(glsResize_CV_32FC1_INTER_CUBIC_x1p5)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_glsResize<float>(CV_32FC1, INTER_CUBIC, 1.5, 1.5);
+			Assert::AreEqual(0, errNum);
+		}
+
+		TEST_METHOD(glsResize_CV_32FC1_INTER_CUBIC_x2)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_glsResize<float>(CV_32FC1, INTER_CUBIC, 2.0, 2.0);
+			Assert::AreEqual(0, errNum);
+		}
+
 
 
 	};
