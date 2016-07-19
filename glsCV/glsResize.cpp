@@ -79,48 +79,46 @@ uniform float fx; \n
 uniform float fy; \n
 uniform int flag; \n
 layout(location = 0) out vec4 dst; \n
-vec4 cubic(float v){
-\n
-	vec4 n = vec4(1.0, 2.0, 3.0, 4.0) - v; \n
-	vec4 s = n * n * n; \n
-	float x = s.x; \n
-	float y = s.y - 4.0 * s.x; \n
-	float z = s.z - 4.0 * s.y + 6.0 * s.x; \n
-	float w = 6.0 - x - y - z; \n
-	return vec4(x, y, z, w) * (1.0 / 6.0); \n
+vec4 cubic(float x){
+	float A = -0.75;
+	vec4 coeffs;
+	coeffs[0] = ((A*(x + 1) - 5 * A)*(x + 1) + 8 * A)*(x + 1) - 4 * A;
+	coeffs[1] = ((A + 2)*x - (A + 3))*x*x + 1;
+	coeffs[2] = ((A + 2)*(1 - x) - (A + 3))*(1 - x)*(1 - x) + 1;
+	coeffs[3] = 1.0 - coeffs[0] - coeffs[1] - coeffs[2];
+	return coeffs; \n
 } \n
 vec4 textureBicubic(sampler2D sampler, vec2 texCoords){	\n
-	vec2 texSize = textureSize(texSrc, 0); \n
-	vec2 invTexSize = 1.0 / texSize; \n
-	texCoords = texCoords * texSize - 0.5;  \n
+	ivec2 texSize = textureSize(sampler, 0); \n
+	texCoords = texCoords * vec2(texSize) - vec2(0.5);  \n
 	vec2 fxy = fract(texCoords);  \n
-	texCoords -= fxy; \n
 	vec4 xcubic = cubic(fxy.x);  \n
 	vec4 ycubic = cubic(fxy.y); \n
-	vec4 c = texCoords.xxyy + vec2(-0.5, +1.5).xyxy;  \n
-	vec4 s = vec4(xcubic.xz + xcubic.yw, ycubic.xz + ycubic.yw);  \n
-	vec4 offset = c + vec4(xcubic.yw, ycubic.yw) / s; \n
-	offset *= invTexSize.xxyy; \n
-	vec4 sample0 = texture(sampler, offset.xz); \n
-	vec4 sample1 = texture(sampler, offset.yz); \n
-	vec4 sample2 = texture(sampler, offset.xw); \n
-	vec4 sample3 = texture(sampler, offset.yw); \n
-	float sx = s.x / (s.x + s.y); \n
-	float sy = s.z / (s.z + s.w); \n
-	return mix(mix(sample3, sample2, sx), mix(sample1, sample0, sx), sy); \n
+	texCoords -= fxy; \n
+	vec4 sum = vec4(0.0);
+	for (int i = -1; i < 3; i++){
+		vec4 xsum = vec4(0.0);
+		for (int j = -1; j < 3; j++){
+			ivec2 coord = ivec2(texCoords.x + j, texCoords.y + i);
+			if (coord.x < 0) coord.x = 0;
+			if (coord.x > texSize.x - 1) coord.x = texSize.x - 1;
+			if (coord.y < 0) coord.y = 0;
+			if (coord.y > texSize.y - 1) coord.y = texSize.y - 1;
+			vec4  sample = texelFetch(sampler, coord, 0); 
+			xsum += sample * vec4(xcubic[j + 1]);
+		}
+		sum += xsum * vec4(ycubic[i + 1]);
+	}
+	return sum; \n
 } \n
 void main(void)\n
 { \n
 	ivec2 texSize = textureSize(texSrc, 0); \n
-//	vec2 coord = gl_FragCoord.xy - vec2(0.5, 0.5);  \n
-//	coord = coord / vec2(fx, fy);\n
-//	coord = (coord + vec2(0.5, 0.5)) / vec2(texSize);  \n
-	vec2 coord = gl_FragCoord.xy;  \n
-	coord = coord / (vec2(texSize)*vec2(fx, fy));  \n
+	vec2 coord = gl_FragCoord.xy; \n
+	coord = vec2(coord.x / (float(texSize.x)*fx), coord.y / (float(texSize.y)*fy)); \n
 	if (flag == 0){
 	\n
 		dst = texture(texSrc, coord); \n
-//		dst = vec4(gl_FragCoord.xy,0.0,1.0); \n
 	}\n
 	else{ \n
 		dst = textureBicubic(texSrc, coord); \n
@@ -154,7 +152,9 @@ glsShaderBase* selectShader(int type){
 
 void resize(const GlsMat& src, GlsMat& dst, Size dsize, double fx, double fy, int interpolation){
 	GLS_Assert(src.depth()==CV_32F);
-	GLS_Assert(interpolation == INTER_NEAREST || interpolation == INTER_LINEAR);
+	GLS_Assert(interpolation == INTER_NEAREST 
+			|| interpolation == INTER_LINEAR
+			|| interpolation == INTER_CUBIC);
 	GLS_Assert((fx == 0 && fy == 0 && dsize != Size(0, 0))
 		|| (fx > 0 && fy > 0 && dsize == Size(0, 0)));
 

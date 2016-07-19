@@ -274,10 +274,10 @@ int _tmain(int argc, _TCHAR* argv[])
 		case(E_CAM_ZOOM::ZOOMx1000) : {
 		}break;
 		case(E_CAM_ZOOM::ZOOMx1414) : {
-			gls::resize(glsFrame, glsFrame, Size(0, 0), sqrt(2.0), sqrt(2.0));
+			gls::resize(glsFrame, glsFrame, Size(0, 0), sqrt(2.0), sqrt(2.0), INTER_CUBIC);
 		}break;
 		case(E_CAM_ZOOM::ZOOMx2000) : {
-			gls::resize(glsFrame, glsFrame, Size(0, 0), 2.0, 2.0);
+			gls::resize(glsFrame, glsFrame, Size(0, 0), 2.0, 2.0, INTER_CUBIC);
 		}break;
 		case(E_CAM_ZOOM::ZOOMx0707) : {
 			gls::resize(glsFrame, glsFrame, Size(0, 0), 1.0 / sqrt(2.0), 1.0 / sqrt(2.0));
