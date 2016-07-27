@@ -128,10 +128,82 @@ void main(void)\n
 	return fragmentShaderCode;
 }
 
+//-----------------------------------------------------------------------------
+// glsShaderResizeU
+class glsShaderResizeU : public glsShaderResizeBase
+{
+protected:
+	string FragmentShaderCode(void);
+public:
+	glsShaderResizeU(void) :glsShaderResizeBase(__FUNCTION__){}
+};
+
+//-----------------------------------------------------------------------------
+//glsShaderResizeU
+string glsShaderResizeU::FragmentShaderCode(void){
+	const char fragmentShaderCode[] = TO_STR(
+#version 330 core\n
+precision highp float; \n
+uniform usampler2D	texSrc; \n
+uniform float fx; \n
+uniform float fy; \n
+uniform int flag; \n
+layout(location = 0) out uvec4 dst; \n
+vec4 cubic(float x){
+	float A = -0.75;
+	vec4 coeffs;
+	coeffs[0] = ((A*(x + 1) - 5 * A)*(x + 1) + 8 * A)*(x + 1) - 4 * A;
+	coeffs[1] = ((A + 2)*x - (A + 3))*x*x + 1;
+	coeffs[2] = ((A + 2)*(1 - x) - (A + 3))*(1 - x)*(1 - x) + 1;
+	coeffs[3] = 1.0 - coeffs[0] - coeffs[1] - coeffs[2];
+	return coeffs; \n
+} \n
+uvec4 textureBicubic(usampler2D sampler, vec2 texCoords){	\n
+	ivec2 texSize = textureSize(sampler, 0); \n
+	texCoords = texCoords * vec2(texSize) - vec2(0.5);  \n
+	vec2 fxy = fract(texCoords);  \n
+	vec4 xcubic = cubic(fxy.x);  \n
+	vec4 ycubic = cubic(fxy.y); \n
+	texCoords -= fxy; \n
+	vec4 sum = vec4(0.0);
+	for (int i = -1; i < 3; i++){
+		vec4 xsum = vec4(0.0);
+		for (int j = -1; j < 3; j++){
+			ivec2 coord = ivec2(texCoords.x + j, texCoords.y + i);
+			if (coord.x < 0) coord.x = 0;
+			if (coord.x > texSize.x - 1) coord.x = texSize.x - 1;
+			if (coord.y < 0) coord.y = 0;
+			if (coord.y > texSize.y - 1) coord.y = texSize.y - 1;
+			vec4  sample = vec4(texelFetch(sampler, coord, 0)); 
+			xsum += sample * vec4(xcubic[j + 1]);
+		}
+		sum += xsum * vec4(ycubic[i + 1]);
+	}
+	return uvec4(sum); \n
+} \n
+void main(void)\n
+{ \n
+	ivec2 texSize = textureSize(texSrc, 0); \n
+	vec2 coord = gl_FragCoord.xy; \n
+	coord = vec2(coord.x / (float(texSize.x)*fx), coord.y / (float(texSize.y)*fy)); \n
+	if (flag == 0){	\n
+		dst = uvec4(texture(texSrc, coord)); \n
+//		dst = uvec4(128); \n
+	}\n
+	else{ \n
+	dst = textureBicubic(texSrc, coord); \n
+	} \n
+}\n
+);
+	return fragmentShaderCode;
+}
+
+
 
 //-----------------------------------------------------------------------------
 //global 
 glsShaderResize ShaderResize;
+glsShaderResizeU ShaderResizeU;
 
 
 
@@ -140,8 +212,8 @@ glsShaderBase* selectShader(int type){
 	glsShaderBase* shader = 0;
 	switch (CV_MAT_DEPTH(type)){
 	case(CV_32F) : shader = &ShaderResize; break;
-	//case(CV_8U) :
-	//case(CV_16U) : shader = &ShaderResizeU; break;
+	case(CV_8U) :
+	case(CV_16U) : shader = &ShaderResizeU; break;
 	//case(CV_8S) :
 	//case(CV_16S) :
 	//case(CV_32S) : shader = &ShaderResizeI; break;
@@ -151,7 +223,9 @@ glsShaderBase* selectShader(int type){
 }
 
 void resize(const GlsMat& src, GlsMat& dst, Size dsize, double fx, double fy, int interpolation){
-	GLS_Assert(src.depth()==CV_32F);
+	GLS_Assert(src.depth() == CV_32F 
+			|| src.depth() == CV_8U
+			|| src.depth() == CV_16U);
 	GLS_Assert(interpolation == INTER_NEAREST 
 			|| interpolation == INTER_LINEAR
 			|| interpolation == INTER_CUBIC);
@@ -180,7 +254,8 @@ void resize(const GlsMat& src, GlsMat& dst, Size dsize, double fx, double fy, in
 		flag = 0;
 	}break;
 	case(INTER_CUBIC) : {
-		src.setInterpolation(GL_LINEAR);
+//		src.setInterpolation(GL_LINEAR);
+		src.setInterpolation(GL_NEAREST);
 		flag = 1;
 	}break;
 	default: GLS_Assert(0);
