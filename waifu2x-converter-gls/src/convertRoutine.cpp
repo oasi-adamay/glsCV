@@ -9,6 +9,8 @@
  */
 
 #include "convertRoutine.hpp"
+#include "glsCV.h"
+
 
 namespace w2xc {
 
@@ -55,31 +57,32 @@ static bool convertWithModelsBasic(cv::Mat &inputPlane, cv::Mat &outputPlane,
 
 	// padding is require before calling this function
 
-	std::unique_ptr<std::vector<cv::Mat> > inputPlanes = std::unique_ptr<
-			std::vector<cv::Mat> >(new std::vector<cv::Mat>());
-	std::unique_ptr<std::vector<cv::Mat> > outputPlanes = std::unique_ptr<
-			std::vector<cv::Mat> >(new std::vector<cv::Mat>());
+	//std::unique_ptr<std::vector<cv::Mat> > inputPlanes = std::unique_ptr<
+	//		std::vector<cv::Mat> >(new std::vector<cv::Mat>());
+	//std::unique_ptr<std::vector<cv::Mat> > outputPlanes = std::unique_ptr<
+	//		std::vector<cv::Mat> >(new std::vector<cv::Mat>());
 
-	inputPlanes->clear();
-	inputPlanes->push_back(inputPlane);
+	std::vector<gls::GlsMat> inputPlanes;
+	std::vector<gls::GlsMat> outputPlanes;
+
+
+	inputPlanes.clear();
+	inputPlanes.push_back((GlsMat)inputPlane);
 
 	for (int index = 0; index < models.size(); index++) {
-//		std::cout << "Iteration #" << (index + 1) << "..." << std::endl;
 		std::cout << "Layer#" << (index) << 
 			" : " << models[index]->getNInputPlanes() <<
 			" > " << models[index]->getNOutputPlanes() <<
 			std::endl;
-		if (!models[index]->filter(*inputPlanes, *outputPlanes)) {
+		if (!models[index]->filter(inputPlanes, outputPlanes)) {
 			std::exit(-1);
 		}
 		if (index != models.size() - 1) {
-			inputPlanes = std::move(outputPlanes);
-			outputPlanes = std::unique_ptr<std::vector<cv::Mat> >(
-					new std::vector<cv::Mat>());
+			inputPlanes = outputPlanes;
 		}
 	}
 
-	outputPlanes->at(0).copyTo(outputPlane);
+	outputPlane = (Mat)outputPlanes[0];
 
 	return true;
 

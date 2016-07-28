@@ -11,7 +11,6 @@
 #include "modelHandler.hpp"
 // #include <iostream> in modelHandler.hpp
 #include <fstream>
-#include <thread>
 
 #include "glsCV.h"
 
@@ -26,8 +25,11 @@ int Model::getNOutputPlanes() {
 	return nOutputPlanes;
 }
 
-bool Model::filter(std::vector<cv::Mat> &inputPlanes,
-		std::vector<cv::Mat> &outputPlanes) {
+bool Model::filter(
+	std::vector<gls::GlsMat> &inputPlanes,
+	std::vector<gls::GlsMat> &outputPlanes
+)
+{
 
 	if (inputPlanes.size() != nInputPlanes) {
 		std::cerr << "Error : Model-filter : \n"
@@ -37,42 +39,43 @@ bool Model::filter(std::vector<cv::Mat> &inputPlanes,
 		return false;
 	}
 
-	outputPlanes.clear();
-	for (int i = 0; i < nOutputPlanes; i++) {
-		outputPlanes.push_back(cv::Mat::zeros(inputPlanes[0].size(), CV_32FC1));
-	}
-#if 0
-	int nJob = modelUtility::getInstance().getNumberOfJobs();
+	outputPlanes.resize(nOutputPlanes);
 
-	// filter job issuing
-	std::vector<std::thread> workerThreads;
-	int worksPerThread = nOutputPlanes / nJob;
-	for (int idx = 0; idx < nJob; idx++) {
-		if (!(idx == (nJob - 1) && worksPerThread * nJob != nOutputPlanes)) {
-			workerThreads.push_back(
-					std::thread(&Model::filterWorker, this,
-							std::ref(inputPlanes), std::ref(weights),
-							std::ref(outputPlanes),
-							static_cast<unsigned int>(worksPerThread * idx),
-							static_cast<unsigned int>(worksPerThread)));
-		} else {
-			// worksPerThread * nJob != nOutputPlanes
-			workerThreads.push_back(
-					std::thread(&Model::filterWorker, this,
-							std::ref(inputPlanes), std::ref(weights),
-							std::ref(outputPlanes),
-							static_cast<unsigned int>(worksPerThread * idx),
-							static_cast<unsigned int>(nOutputPlanes
-									- worksPerThread * idx)));
+	cv::Size ipSize = inputPlanes[0].size();
+
+	// filter processing
+	// input : inputPlanes
+	// kernel : weightMatrices
+	for (int opIndex = 0; opIndex < nOutputPlanes ; opIndex++) {
+
+		int wMatIndex = nInputPlanes * opIndex;
+		cv::Mat outputPlane = cv::Mat::zeros(ipSize, CV_32FC1);
+		gls::GlsMat uIntermediatePlane = (GlsMat)outputPlane; // all zero matrix
+
+		for (int ipIndex = 0; ipIndex < nInputPlanes; ipIndex++) {
+
+			gls::GlsMat filterOutput;
+			gls::filter2D(inputPlanes[ipIndex], filterOutput, -1, weights[wMatIndex + ipIndex],
+				cv::Point(-1, -1), 0.0 /*, cv::BORDER_REPLICATE*/);
+			gls::add(uIntermediatePlane, filterOutput, uIntermediatePlane);
+
 		}
-	}
-	// wait for finishing jobs
-	for (auto& th : workerThreads) {
-		th.join();
-	}
-#else
-	filterWorker(inputPlanes, weights, outputPlanes, 0, nOutputPlanes);
-#endif
+		gls::add(biases[opIndex], uIntermediatePlane, uIntermediatePlane);
+		gls::GlsMat moreThanZero;
+		gls::GlsMat lessThanZero;
+		gls::max(0.0, uIntermediatePlane, moreThanZero);
+		gls::min(0.0, uIntermediatePlane, lessThanZero);
+		gls::multiply(0.1, lessThanZero, lessThanZero);
+		gls::add(lessThanZero, moreThanZero, uIntermediatePlane);
+		outputPlanes[opIndex] = uIntermediatePlane;
+
+	} // for index
+
+	return true;
+
+
+
+//	filterWorker(inputPlanes, weights, outputPlanes, 0, nOutputPlanes);
 
 	return true;
 }
@@ -197,72 +200,6 @@ bool Model::saveModelToBin(std::ostream& binFile)
 	return true;
 }
 
-
-
-
-
-#define USE_GLS
-
-bool Model::filterWorker(std::vector<cv::Mat> &inputPlanes,
-		std::vector<cv::Mat> &weightMatrices,
-		std::vector<cv::Mat> &outputPlanes, unsigned int beginningIndex,
-		unsigned int nWorks) {
-
-	cv::Size ipSize = inputPlanes[0].size();
-	// filter processing
-	// input : inputPlanes
-	// kernel : weightMatrices
-	for (int opIndex = beginningIndex; opIndex < (int)(beginningIndex + nWorks);
-			opIndex++) {
-
-		int wMatIndex = nInputPlanes * opIndex;
-		cv::Mat outputPlane = cv::Mat::zeros(ipSize, CV_32FC1);
-#if !defined(USE_GLS)
-		cv::Mat uIntermediatePlane = outputPlane; // all zero matrix
-#else
-		gls::GlsMat uIntermediatePlane = (GlsMat)outputPlane; // all zero matrix
-#endif
-
-		for (int ipIndex = 0; ipIndex < nInputPlanes; ipIndex++) {
-#if !defined(USE_GLS)
-			cv::Mat filterOutput = cv::Mat(ipSize, CV_32FC1);
-			cv::filter2D(inputPlanes[ipIndex], filterOutput, -1, weightMatrices[wMatIndex + ipIndex],
-				cv::Point(-1, -1), 0.0, cv::BORDER_REPLICATE);
-			cv::add(uIntermediatePlane, filterOutput, uIntermediatePlane);
-#else
-
-			gls::GlsMat filterOutput(ipSize, CV_32FC1);
-			gls::filter2D((GlsMat)inputPlanes[ipIndex], filterOutput, -1, weightMatrices[wMatIndex + ipIndex],
-				cv::Point(-1, -1), 0.0 /*, cv::BORDER_REPLICATE*/);
-			gls::add(uIntermediatePlane, filterOutput, uIntermediatePlane);
-#endif
-
-		}
-#if !defined(USE_GLS)
-		cv::add(uIntermediatePlane, biases[opIndex], uIntermediatePlane);
-		cv::Mat moreThanZero = cv::Mat(ipSize,CV_32FC1,0.0);
-		cv::Mat lessThanZero = cv::Mat(ipSize,CV_32FC1,0.0);
-		cv::max(uIntermediatePlane, 0.0, moreThanZero);
-		cv::min(uIntermediatePlane, 0.0, lessThanZero);
-		cv::scaleAdd(lessThanZero, 0.1, moreThanZero, uIntermediatePlane);
-		outputPlane = uIntermediatePlane;
-		outputPlane.copyTo(outputPlanes[opIndex]);
-#else
-		gls::add(biases[opIndex], uIntermediatePlane, uIntermediatePlane);
-		gls::GlsMat moreThanZero;
-		gls::GlsMat lessThanZero;
-		gls::max(0.0,uIntermediatePlane, moreThanZero);
-		gls::min(0.0,uIntermediatePlane, lessThanZero);
-		//		cv::scaleAdd(lessThanZero, 0.1, moreThanZero, uIntermediatePlane);
-		gls::multiply(0.1, lessThanZero, lessThanZero);
-		gls::add(lessThanZero, moreThanZero, uIntermediatePlane);
-		outputPlanes[opIndex] = (Mat)uIntermediatePlane;
-#endif
-
-	} // for index
-
-	return true;
-}
 
 modelUtility * modelUtility::instance = nullptr;
 

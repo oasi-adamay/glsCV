@@ -19,6 +19,8 @@
 #include <cstdint>
 #include <cstdlib>
 
+#include "glsCV.h"
+
 namespace w2xc {
 
 class Model {
@@ -38,11 +40,7 @@ private:
 	bool loadModelFromJSONObject(picojson::object& jsonObj);
 	bool loadModelFromBin(std::istream& binFile);
 
-	// thread worker function
-	bool filterWorker(std::vector<cv::Mat> &inputPlanes,
-			std::vector<cv::Mat> &weightMatrices,
-			std::vector<cv::Mat> &outputPlanes, unsigned int beginningIndex,
-			unsigned int nWorks);
+
 
 public:
 	// ctor and dtor
@@ -87,8 +85,10 @@ public:
 	// setter function
 
 	// public operation function
-	bool filter(std::vector<cv::Mat> &inputPlanes,
-			std::vector<cv::Mat> &outputPlanes);
+	bool Model::filter(
+		std::vector<gls::GlsMat> &inputPlanes,
+		std::vector<gls::GlsMat> &outputPlanes
+		);
 
 	bool saveModelToBin(std::ostream& binFile);
 

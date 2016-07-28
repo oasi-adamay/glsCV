@@ -28,6 +28,15 @@
 #pragma comment (lib, "glfw3dll.lib")
 #pragma comment (lib, "glsCV.lib")
 
+//#ifdef _DEBUG
+#if 1
+#include "Timer.h"
+#define _TMR_(...)  Timer tmr(__VA_ARGS__)
+#else
+#define _TMR_(...)
+#endif
+
+
 #define MODEL_BIN
 
 int main(int argc, char** argv) {
@@ -108,6 +117,7 @@ int main(int argc, char** argv) {
 	 
 	// ===== Noise Reduction Phase =====
 	if (cmdMode.getValue() == "noise" || cmdMode.getValue() == "noise_scale") {
+		_TMR_("[TMR]Noise Reduction:");
 		std::cout << "Noise Reduction Phase." << std::endl;
 
 		std::string modelFileName(cmdModelPath.getValue());
@@ -137,6 +147,7 @@ int main(int argc, char** argv) {
 	// ===== scaling phase =====
 
 	if (cmdMode.getValue() == "scale" || cmdMode.getValue() == "noise_scale") {
+		_TMR_("[TMR]scaling:");
 		std::cout << "scaling phase." << std::endl;
 
 		// calculate iteration times of 2x scaling and shrink ratio which will use at last
