@@ -36,6 +36,7 @@ private:
 
 	// class inside operation function
 	bool loadModelFromJSONObject(picojson::object& jsonObj);
+	bool loadModelFromBin(std::istream& binFile);
 
 	// thread worker function
 	bool filterWorker(std::vector<cv::Mat> &inputPlanes,
@@ -69,6 +70,8 @@ public:
 			std::exit(-1);
 		}
 	}
+	Model(std::istream& binFile);
+
 	;
 	~Model() {
 	}
@@ -87,6 +90,9 @@ public:
 	bool filter(std::vector<cv::Mat> &inputPlanes,
 			std::vector<cv::Mat> &outputPlanes);
 
+	bool saveModelToBin(std::ostream& binFile);
+
+
 };
 
 class modelUtility {
@@ -103,6 +109,11 @@ private:
 public:
 	static bool generateModelFromJSON(const std::string &fileName,
 			std::vector<std::unique_ptr<Model> > &models);
+	static bool generateModelFromBin(const std::string &fileName,
+		std::vector<std::unique_ptr<Model> > &models);
+	static bool saveModelToBin(const std::string &fileName,
+		std::vector<std::unique_ptr<Model> > &models);
+
 	static modelUtility& getInstance();
 	bool setNumberOfJobs(int setNJob);
 	int getNumberOfJobs();

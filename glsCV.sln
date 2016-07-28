@@ -16,6 +16,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "glsCam", "glsCam\glsCam.vcx
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "waifu2x-converter-gls", "waifu2x-converter-gls\waifu2x-converter-gls.vcxproj", "{4E007452-262A-458A-9C45-24FE3C5DCDE7}"
+	ProjectSection(ProjectDependencies) = postProject
+		{52C59688-DAF7-4AC3-BE6C-D6906409AA72} = {52C59688-DAF7-4AC3-BE6C-D6906409AA72}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

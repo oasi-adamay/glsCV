@@ -21,7 +21,19 @@
 #include "modelHandler.hpp"
 #include "convertRoutine.hpp"
 
+#include "glsCV.h"
+//Lib 
+#pragma comment (lib, "opengl32.lib")
+#pragma comment (lib, "glew32.lib")
+#pragma comment (lib, "glfw3dll.lib")
+#pragma comment (lib, "glsCV.lib")
+
+#define MODEL_BIN
+
 int main(int argc, char** argv) {
+
+	glsCvInit();
+
 
 	// definition of command line arguments
 	TCLAP::CmdLine cmd("waifu2x reimplementation using OpenCV", ' ', "1.0.0");
@@ -57,7 +69,7 @@ int main(int argc, char** argv) {
 			"models", "string", cmd);
 
 	TCLAP::ValueArg<int> cmdNumberOfJobs("j", "jobs",
-			"number of threads launching at the same time", false, 4, "integer",
+			"number of threads launching at the same time", false, 1, "integer",
 			cmd);
 
 	// definition of command line argument : end
@@ -72,21 +84,43 @@ int main(int argc, char** argv) {
 	}
 
 	// load image file
+	std::cout << "Load image file:" << cmdInputFile.getValue() << std::endl;
 	cv::Mat image = cv::imread(cmdInputFile.getValue(), cv::IMREAD_COLOR);
+	if (image.empty()){
+		std::cerr << "Error : cannot open image " << cmdInputFile.getValue() << std::endl;
+		std::exit(-1);
+	}
+
+	cv::Mat srcImg = image.clone();
+
 	image.convertTo(image, CV_32F, 1.0 / 255.0);
 	cv::cvtColor(image, image, cv::COLOR_RGB2YUV);
 
 	// set number of jobs for processing models
 	w2xc::modelUtility::getInstance().setNumberOfJobs(cmdNumberOfJobs.getValue());
 
+	string strModelExt;
+#if !defined(MODEL_BIN)
+	strModelExt = ".json";
+#else
+	strModelExt = ".bin";
+#endif
+	 
 	// ===== Noise Reduction Phase =====
 	if (cmdMode.getValue() == "noise" || cmdMode.getValue() == "noise_scale") {
+		std::cout << "Noise Reduction Phase." << std::endl;
+
 		std::string modelFileName(cmdModelPath.getValue());
 		modelFileName = modelFileName + "/noise"
-				+ std::to_string(cmdNRLevel.getValue()) + "_model.json";
+			+ std::to_string(cmdNRLevel.getValue()) + "_model" + strModelExt;
 		std::vector<std::unique_ptr<w2xc::Model> > models;
 
+		std::cout << "Load model file:" << modelFileName << std::endl;
+#if !defined(MODEL_BIN)
 		if (!w2xc::modelUtility::generateModelFromJSON(modelFileName, models))
+#else
+		if (!w2xc::modelUtility::generateModelFromBin(modelFileName, models))
+#endif
 			std::exit(-1);
 
 		std::vector<cv::Mat> imageSplit;
@@ -103,6 +137,7 @@ int main(int argc, char** argv) {
 	// ===== scaling phase =====
 
 	if (cmdMode.getValue() == "scale" || cmdMode.getValue() == "noise_scale") {
+		std::cout << "scaling phase." << std::endl;
 
 		// calculate iteration times of 2x scaling and shrink ratio which will use at last
 		int iterTimesTwiceScaling = static_cast<int>(std::ceil(
@@ -115,11 +150,16 @@ int main(int argc, char** argv) {
 		}
 
 		std::string modelFileName(cmdModelPath.getValue());
-		modelFileName = modelFileName + "/scale2.0x_model.json";
+		modelFileName = modelFileName + "/scale2.0x_model" +strModelExt;
 
 		std::vector<std::unique_ptr<w2xc::Model> > models;
 
+		std::cout << "Load model file:" << modelFileName << std::endl;
+#if !defined(MODEL_BIN)
 		if (!w2xc::modelUtility::generateModelFromJSON(modelFileName, models))
+#else
+		if (!w2xc::modelUtility::generateModelFromBin(modelFileName, models))
+#endif
 			std::exit(-1);
 
 		std::cout << "start scaling" << std::endl;
@@ -175,7 +215,7 @@ int main(int argc, char** argv) {
 	std::string outputFileName = cmdOutputFile.getValue();
 	if (outputFileName == "(auto)") {
 		outputFileName = cmdInputFile.getValue();
-		int tailDot = outputFileName.find_last_of('.');
+		int tailDot = (int)outputFileName.find_last_of('.');
 		outputFileName.erase(tailDot, outputFileName.length());
 		outputFileName = outputFileName + "(" + cmdMode.getValue() + ")";
 		std::string &mode = cmdMode.getValue();
@@ -189,9 +229,17 @@ int main(int argc, char** argv) {
 		}
 		outputFileName += ".png";
 	}
+	std::cout << "Save image file:" << outputFileName << std::endl;
 	cv::imwrite(outputFileName, image);
 
 	std::cout << "process successfully done!" << std::endl;
+
+	cv::Mat dstImg = image.clone();
+	cv::imshow("src",srcImg);
+	cv::imshow("dst", dstImg);
+	cv::waitKey();
+
+	glsCvTerminate();
 
 	return 0;
 }

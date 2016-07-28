@@ -13,6 +13,9 @@
 #include <fstream>
 #include <thread>
 
+#include "glsCV.h"
+
+
 namespace w2xc {
 
 int Model::getNInputPlanes() {
@@ -38,7 +41,7 @@ bool Model::filter(std::vector<cv::Mat> &inputPlanes,
 	for (int i = 0; i < nOutputPlanes; i++) {
 		outputPlanes.push_back(cv::Mat::zeros(inputPlanes[0].size(), CV_32FC1));
 	}
-
+#if 0
 	int nJob = modelUtility::getInstance().getNumberOfJobs();
 
 	// filter job issuing
@@ -67,6 +70,9 @@ bool Model::filter(std::vector<cv::Mat> &inputPlanes,
 	for (auto& th : workerThreads) {
 		th.join();
 	}
+#else
+	filterWorker(inputPlanes, weights, outputPlanes, 0, nOutputPlanes);
+#endif
 
 	return true;
 }
@@ -94,7 +100,7 @@ bool Model::loadModelFromJSONObject(picojson::object &jsonObj) {
 
 				for (int index = 0; index < kernelSize; index++) {
 					writeMatrix.at<float>(writingRow, index) =
-							weightMatRow[index].get<double>();
+							(float)weightMatRow[index].get<double>();
 				} // for(weightMatRow) (writing 1 row finished)
 
 			} // for(weightMat) (writing 1 matrix finished)
@@ -114,43 +120,125 @@ bool Model::loadModelFromJSONObject(picojson::object &jsonObj) {
 	return true;
 }
 
+
+Model::Model(std::istream& binFile) {
+	// preload nInputPlanes,nOutputPlanes, and preserve required size vector
+
+	binFile.read((char*)&nInputPlanes, sizeof(int));
+	binFile.read((char*)&nOutputPlanes, sizeof(int));
+	binFile.read((char*)&kernelSize, sizeof(int));
+
+	weights = std::vector<cv::Mat>(nInputPlanes * nOutputPlanes, cv::Mat(kernelSize, kernelSize, CV_32FC1));
+	biases = std::vector<double>(nOutputPlanes, 0.0);
+
+	if (!loadModelFromBin(binFile)) {
+		std::cerr << "Error : Model-Constructor : \n"
+			"something error has been occured in loading model from Binary File.\n"
+			"stop."
+			<< std::endl;
+		std::exit(-1);
+	}
+
+}
+
+
+bool Model::loadModelFromBin(std::istream& binFile)
+{
+	// nInputPlanes,nOutputPlanes,kernelSize have already set.
+	int matProgress = 0;
+	for (int i = 0; i < nOutputPlanes; i++) {
+		for (int j = 0; j < nInputPlanes; j++) {
+			cv::Mat writeMatrix = cv::Mat::zeros(kernelSize, kernelSize, CV_32FC1);
+
+			for (int writingRow = 0; writingRow < kernelSize; writingRow++) {
+				for (int index = 0; index < kernelSize; index++) {
+					float data;
+					binFile.read((char*)&data, sizeof(float));
+					writeMatrix.at<float>(writingRow, index) = data;
+				}
+			}
+			weights.at(matProgress) = std::move(writeMatrix);
+			matProgress++;
+		}
+	}
+
+	// setting biases
+	biases.resize(nOutputPlanes);
+	binFile.read((char*)&biases[0], biases.size() * sizeof(double));
+
+	return true;
+}
+
+bool Model::saveModelToBin(std::ostream& binFile)
+{
+	binFile.write((char*)&nInputPlanes, sizeof(int));
+	binFile.write((char*)&nOutputPlanes, sizeof(int));
+	binFile.write((char*)&kernelSize, sizeof(int));
+
+	int matProgress = 0;
+	for (int i = 0; i < nOutputPlanes; i++) {
+		for (int j = 0; j < nInputPlanes; j++) {
+			const cv::Mat& writeMatrix = weights.at(matProgress);
+
+			for (int writingRow = 0; writingRow < kernelSize; writingRow++) {
+				for (int index = 0; index < kernelSize; index++) {
+					float data = writeMatrix.at<float>(writingRow, index);
+					binFile.write((char*)&data, sizeof(float));
+				}
+			}
+
+			matProgress++;
+		}
+	}
+
+	// setting biases
+	binFile.write((char*)&biases[0], biases.size() * sizeof(double));
+
+	return true;
+}
+
+
+
+
+
+#define USE_GLS
+
 bool Model::filterWorker(std::vector<cv::Mat> &inputPlanes,
 		std::vector<cv::Mat> &weightMatrices,
 		std::vector<cv::Mat> &outputPlanes, unsigned int beginningIndex,
 		unsigned int nWorks) {
-//	cv::ocl::setUseOpenCL(false); // disable OpenCL Support(temporary)
 
 	cv::Size ipSize = inputPlanes[0].size();
 	// filter processing
 	// input : inputPlanes
 	// kernel : weightMatrices
-	for (int opIndex = beginningIndex; opIndex < (beginningIndex + nWorks);
+	for (int opIndex = beginningIndex; opIndex < (int)(beginningIndex + nWorks);
 			opIndex++) {
 
 		int wMatIndex = nInputPlanes * opIndex;
 		cv::Mat outputPlane = cv::Mat::zeros(ipSize, CV_32FC1);
-//		cv::UMat uIntermediatePlane = outputPlane.getUMat(cv::ACCESS_WRITE); // all zero matrix
+#if !defined(USE_GLS)
 		cv::Mat uIntermediatePlane = outputPlane; // all zero matrix
+#else
+		gls::GlsMat uIntermediatePlane = (GlsMat)outputPlane; // all zero matrix
+#endif
 
 		for (int ipIndex = 0; ipIndex < nInputPlanes; ipIndex++) {
-#if 0
-			cv::UMat uInputPlane = inputPlanes[ipIndex].getUMat(
-					cv::ACCESS_READ);
-			cv::UMat weightMatrix = weightMatrices[wMatIndex + ipIndex].getUMat(
-					cv::ACCESS_READ);
-			cv::UMat filterOutput = cv::UMat(ipSize, CV_32FC1);
-
-			cv::filter2D(uInputPlane, filterOutput, -1, weightMatrix,
-					cv::Point(-1, -1), 0.0, cv::BORDER_REPLICATE);
-#else
+#if !defined(USE_GLS)
 			cv::Mat filterOutput = cv::Mat(ipSize, CV_32FC1);
 			cv::filter2D(inputPlanes[ipIndex], filterOutput, -1, weightMatrices[wMatIndex + ipIndex],
 				cv::Point(-1, -1), 0.0, cv::BORDER_REPLICATE);
+			cv::add(uIntermediatePlane, filterOutput, uIntermediatePlane);
+#else
+
+			gls::GlsMat filterOutput(ipSize, CV_32FC1);
+			gls::filter2D((GlsMat)inputPlanes[ipIndex], filterOutput, -1, weightMatrices[wMatIndex + ipIndex],
+				cv::Point(-1, -1), 0.0 /*, cv::BORDER_REPLICATE*/);
+			gls::add(uIntermediatePlane, filterOutput, uIntermediatePlane);
 #endif
 
-			cv::add(uIntermediatePlane, filterOutput, uIntermediatePlane);
 		}
-
+#if !defined(USE_GLS)
 		cv::add(uIntermediatePlane, biases[opIndex], uIntermediatePlane);
 		cv::Mat moreThanZero = cv::Mat(ipSize,CV_32FC1,0.0);
 		cv::Mat lessThanZero = cv::Mat(ipSize,CV_32FC1,0.0);
@@ -159,6 +247,17 @@ bool Model::filterWorker(std::vector<cv::Mat> &inputPlanes,
 		cv::scaleAdd(lessThanZero, 0.1, moreThanZero, uIntermediatePlane);
 		outputPlane = uIntermediatePlane;
 		outputPlane.copyTo(outputPlanes[opIndex]);
+#else
+		gls::add(biases[opIndex], uIntermediatePlane, uIntermediatePlane);
+		gls::GlsMat moreThanZero;
+		gls::GlsMat lessThanZero;
+		gls::max(0.0,uIntermediatePlane, moreThanZero);
+		gls::min(0.0,uIntermediatePlane, lessThanZero);
+		//		cv::scaleAdd(lessThanZero, 0.1, moreThanZero, uIntermediatePlane);
+		gls::multiply(0.1, lessThanZero, lessThanZero);
+		gls::add(lessThanZero, moreThanZero, uIntermediatePlane);
+		outputPlanes[opIndex] = (Mat)uIntermediatePlane;
+#endif
 
 	} // for index
 
@@ -203,6 +302,47 @@ bool modelUtility::generateModelFromJSON(const std::string &fileName,
 	return true;
 }
 
+bool modelUtility::generateModelFromBin(const std::string &fileName,
+	std::vector<std::unique_ptr<Model> > &models) {
+
+	std::ifstream binFile;
+
+	binFile.open(fileName, std::ios::binary);
+	if (!binFile.is_open()) {
+		std::cerr << "Error : couldn't open " << fileName << std::endl;
+		return false;
+	}
+
+	int32_t modelCount;
+	binFile.read((char*)&modelCount, sizeof(modelCount));
+	for (int i = 0; i < modelCount; i++) {
+		models.emplace_back(new Model(binFile));
+	}
+
+	return true;
+}
+
+bool modelUtility::saveModelToBin(const std::string &fileName,
+	std::vector<std::unique_ptr<Model> > &models) {
+
+	std::ofstream binFile;
+
+	binFile.open(fileName, std::ios::binary);
+	if (!binFile.is_open()) {
+		std::cerr << "Error : couldn't open " << fileName << std::endl;
+		return false;
+	}
+
+	int32_t modelCount = (int32_t)models.size();
+	binFile.write((char*)&modelCount, sizeof(modelCount));
+	for (auto& model : models) {
+		model->saveModelToBin(binFile);
+	}
+
+	return true;
+}
+
+
 bool modelUtility::setNumberOfJobs(int setNJob){
 	if(setNJob < 1)return false;
 	nJob = setNJob;
@@ -221,7 +361,7 @@ bool modelUtility::setBlockSize(cv::Size size){
 
 bool modelUtility::setBlockSizeExp2Square(int exp){
 	if(exp < 0)return false;
-	int length = std::pow(2, exp);
+	int length = (int)std::pow(2, exp);
 	blockSplittingSize = cv::Size(length, length);
 	return true;
 }

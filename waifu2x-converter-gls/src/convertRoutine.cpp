@@ -30,7 +30,7 @@ bool convertWithModels(cv::Mat &inputPlane, cv::Mat &outputPlane,
 	} else {
 		//insert padding to inputPlane
 		cv::Mat tempMat;
-		int nModel = models.size();
+		int nModel = (int)models.size();
 		cv::Size outputSize = inputPlane.size();
 		cv::copyMakeBorder(inputPlane, tempMat, nModel, nModel, nModel, nModel,
 				cv::BORDER_REPLICATE);
@@ -64,7 +64,11 @@ static bool convertWithModelsBasic(cv::Mat &inputPlane, cv::Mat &outputPlane,
 	inputPlanes->push_back(inputPlane);
 
 	for (int index = 0; index < models.size(); index++) {
-		std::cout << "Iteration #" << (index + 1) << "..." << std::endl;
+//		std::cout << "Iteration #" << (index + 1) << "..." << std::endl;
+		std::cout << "Layer#" << (index) << 
+			" : " << models[index]->getNInputPlanes() <<
+			" > " << models[index]->getNOutputPlanes() <<
+			std::endl;
 		if (!models[index]->filter(*inputPlanes, *outputPlanes)) {
 			std::exit(-1);
 		}
@@ -88,7 +92,7 @@ static bool convertWithModelsBlockSplit(cv::Mat &inputPlane,
 
 	// initialize local variables
 	cv::Size blockSize = modelUtility::getInstance().getBlockSize();
-	unsigned int nModel = models.size();
+	unsigned int nModel = (int)models.size();
 
 	//insert padding to inputPlane
 	cv::Mat tempMat;

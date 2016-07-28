@@ -123,9 +123,10 @@ void GlsMat::createTexture(
 	cols = _width;
 	rows = _height;
 
-	GLuint tex;
+	GLuint tex = 0;
 
 	glGenTextures(1, &tex); // create (reference to) a new texture
+	GLS_Assert(tex != 0);
 
 	glBindTexture(GL_TEXTURE_2D, tex);
 	// (set texture parameters here)

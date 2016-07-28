@@ -7,9 +7,28 @@
 
 #include "targetver.h"
 
+// TODO: プログラムに必要な追加ヘッダーをここで参照してください。
+
 #include <stdio.h>
 #include <tchar.h>
+#include <string>
+#include <vector>
+#include <iostream>
+#include <fstream>
+#include <algorithm>
+#include <memory>
+using namespace std;
 
+//---------------------
+// OpenCV
+#include <opencv2/opencv.hpp>
+using namespace cv;
 
+//---------------------
+// GL
+// Include GLEW
+#include <GL/glew.h>
 
-// TODO: プログラムに必要な追加ヘッダーをここで参照してください。
+// Include GLFW
+#define GLFW_INCLUDE_GLU
+#include <GLFW/glfw3.h>
