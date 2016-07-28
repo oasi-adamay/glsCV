@@ -151,6 +151,50 @@ namespace UnitTest_glsCV
 			int errNum = test_glsResize<float>(CV_32FC1, INTER_CUBIC, 2.0, 2.0);
 			Assert::AreEqual(0, errNum);
 		}
+		
+		TEST_METHOD(glsResize_CV_8UC1_INTER_NEAREST_x1)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_glsResize<uchar>(CV_8UC1, INTER_NEAREST, 1.0, 1.0);
+			Assert::AreEqual(0, errNum);
+		}
+
+		TEST_METHOD(glsResize_CV_8UC1_INTER_NEAREST_x2)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_glsResize<uchar>(CV_8UC1, INTER_NEAREST, 2.0, 2.0);
+			Assert::AreEqual(0, errNum);
+		}
+
+		TEST_METHOD(glsResize_CV_8UC1_INTER_LINEAR_x1)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_glsResize<uchar>(CV_8UC1, INTER_LINEAR, 1.0, 1.0);
+			Assert::AreEqual(0, errNum);
+		}
+
+		TEST_METHOD(glsResize_CV_8UC1_INTER_LINEAR_x2)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_glsResize<uchar>(CV_8UC1, INTER_LINEAR, 2.0, 2.0);
+			Assert::AreEqual(0, errNum);
+		}
+
+		TEST_METHOD(glsResize_CV_8UC1_INTER_CUBIC_x1)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_glsResize<uchar>(CV_8UC1, INTER_CUBIC, 1.0, 1.0);
+			Assert::AreEqual(0, errNum);
+		}
+
+		TEST_METHOD(glsResize_CV_8UC1_INTER_CUBIC_x2)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_glsResize<uchar>(CV_8UC1, INTER_CUBIC, 2.0, 2.0);
+			Assert::AreEqual(0, errNum);
+		}
+
+
 
 
 
