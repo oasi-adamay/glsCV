@@ -100,11 +100,25 @@ public:
 };
 #endif
 
+// glsShaderFilter2D_3x3
+class glsShaderFilter2D_3x3 : public glsShaderBase
+{
+protected:
+	string FragmentShaderCode(void);
+	list<string> UniformNameList(void);
+
+public:
+	glsShaderFilter2D_3x3(void) : glsShaderBase(__FUNCTION__){}
+
+};
+
+
 //-----------------------------------------------------------------------------
 //global 
 glsShaderFilter1D ShaderFilter1D;
 glsShaderFilter1DU ShaderFilter1DU;
 glsShaderFilter2D ShaderFilter2D;
+glsShaderFilter2D_3x3 ShaderFilter2D_3x3;
 
 //-----------------------------------------------------------------------------
 //glsShaderFilter1D
@@ -280,6 +294,69 @@ list<string> glsShaderFilter2D::UniformNameList(void){
 }
 
 
+//-----------------------------------------------------------------------------
+//glsShaderFilter2D_3x3
+string glsShaderFilter2D_3x3::FragmentShaderCode(void){
+const char fragmentShaderCode[] = TO_STR(
+#version 330 core\n
+precision highp float; \n
+uniform sampler2D	texSrc; \n
+uniform sampler2D	texKernel; \n
+uniform float delta; \n
+layout(location = 0) out vec4 dst; \n
+#define BOUND_PVT(x,pl,pr) ((x)<(pl)?2*(pl)-(x) :(x)>(pr)? 2*(pr)-(x): (x))\n
+
+void main(void)\n
+{ \n
+	ivec2 texCoord = ivec2(gl_FragCoord.xy); \n
+
+	{ \n
+		vec4 sum = vec4(0.0, 0.0, 0.0, 0.0); \n
+		vec4 data; \n
+		vec4 coef; \n
+		data = texelFetchOffset(texSrc, texCoord, 0, ivec2(-1, -1)); \n
+		coef = vec4(texelFetch(texKernel, ivec2(0,0), 0).r); \n
+		sum += data * coef; \n
+		data = texelFetchOffset(texSrc, texCoord, 0, ivec2(0, -1)); \n
+		coef = vec4(texelFetch(texKernel, ivec2(1, 0), 0).r); \n
+		sum += data * coef; \n
+		data = texelFetchOffset(texSrc, texCoord, 0, ivec2(+1, -1)); \n
+		coef = vec4(texelFetch(texKernel, ivec2(2, 0), 0).r); \n
+		sum += data * coef; \n
+		data = texelFetchOffset(texSrc, texCoord, 0, ivec2(-1, 0)); \n
+		coef = vec4(texelFetch(texKernel, ivec2(0, 1), 0).r); \n
+		sum += data * coef; \n
+		data = texelFetchOffset(texSrc, texCoord, 0, ivec2(0, 0)); \n
+		coef = vec4(texelFetch(texKernel, ivec2(1, 1), 0).r); \n
+		sum += data * coef; \n
+		data = texelFetchOffset(texSrc, texCoord, 0, ivec2(+1, 0)); \n
+		coef = vec4(texelFetch(texKernel, ivec2(2, 1), 0).r); \n
+		sum += data * coef; \n
+		data = texelFetchOffset(texSrc, texCoord, 0, ivec2(-1, 1)); \n
+		coef = vec4(texelFetch(texKernel, ivec2(0, 2), 0).r); \n
+		sum += data * coef; \n
+		data = texelFetchOffset(texSrc, texCoord, 0, ivec2(0, 1)); \n
+		coef = vec4(texelFetch(texKernel, ivec2(1, 2), 0).r); \n
+		sum += data * coef; \n
+		data = texelFetchOffset(texSrc, texCoord, 0, ivec2(+1, 1)); \n
+		coef = vec4(texelFetch(texKernel, ivec2(2, 2), 0).r); \n
+		sum += data * coef; \n
+		dst = sum + delta; \n
+	}\n
+}\n
+);
+return fragmentShaderCode;
+}
+
+list<string> glsShaderFilter2D_3x3::UniformNameList(void){
+	list<string> lst;
+	lst.push_back("texSrc");
+	lst.push_back("texKernel");
+	lst.push_back("delta");
+	return lst;
+}
+
+
 
 
 
@@ -300,17 +377,34 @@ glsShaderBase* selectShader1D(int type){
 }
 
 static
-glsShaderBase* selectShader2D(int type){
+glsShaderBase* selectShader2D(int type,Size ksize){
 	glsShaderBase* shader = 0;
+
+//	if (ksize == Size(3, 3)){
+	if (0){
 	switch (CV_MAT_DEPTH(type)){
-	case(CV_32F) : shader = &ShaderFilter2D; break;
-		//case(CV_8U) :
-		//case(CV_16U) : shader = shaderFilterU; break;
-		//case(CV_8S) :
-		//case(CV_16S) :
-		//case(CV_32S) : shader = shaderFilterS; break;
-	default: GLS_Assert(0);		//not implement
+		case(CV_32F) : shader = &ShaderFilter2D_3x3; break;
+			//case(CV_8U) :
+			//case(CV_16U) : shader = shaderFilterU; break;
+			//case(CV_8S) :
+			//case(CV_16S) :
+			//case(CV_32S) : shader = shaderFilterS; break;
+		default: GLS_Assert(0);		//not implement
+		}
+
 	}
+	else{
+		switch (CV_MAT_DEPTH(type)){
+		case(CV_32F) : shader = &ShaderFilter2D; break;
+			//case(CV_8U) :
+			//case(CV_16U) : shader = shaderFilterU; break;
+			//case(CV_8S) :
+			//case(CV_16S) :
+			//case(CV_32S) : shader = shaderFilterS; break;
+		default: GLS_Assert(0);		//not implement
+		}
+	}
+
 	return shader;
 }
 
@@ -357,7 +451,7 @@ void filter2D(const GlsMat& src, GlsMat& dst, int ddepth, const Mat& kernel, Poi
 
 	GlsMat _dst = getDstMat(src, dst);
 
-	glsShaderBase* shader = selectShader2D(src.type());
+	glsShaderBase* shader = selectShader2D(src.type(), kernel.size());
 	shader->Execute(src, _kernel, delta, _dst);
 	dst = _dst;
 }

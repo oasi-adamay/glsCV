@@ -49,8 +49,7 @@ bool Model::filter(
 	for (int opIndex = 0; opIndex < nOutputPlanes ; opIndex++) {
 
 		int wMatIndex = nInputPlanes * opIndex;
-		cv::Mat outputPlane = cv::Mat::zeros(ipSize, CV_32FC1);
-		gls::GlsMat uIntermediatePlane = (GlsMat)outputPlane; // all zero matrix
+		gls::GlsMat uIntermediatePlane = (GlsMat)cv::Mat::zeros(ipSize, CV_32FC1); // all zero matrix;
 
 		for (int ipIndex = 0; ipIndex < nInputPlanes; ipIndex++) {
 
@@ -60,6 +59,7 @@ bool Model::filter(
 			gls::add(uIntermediatePlane, filterOutput, uIntermediatePlane);
 
 		}
+
 		gls::add(biases[opIndex], uIntermediatePlane, uIntermediatePlane);
 		gls::GlsMat moreThanZero;
 		gls::GlsMat lessThanZero;

@@ -174,7 +174,6 @@ int main(int argc, char** argv) {
 			std::exit(-1);
 
 		std::cout << "start scaling" << std::endl;
-
 		// 2x scaling
 		for (int nIteration = 0; nIteration < iterTimesTwiceScaling;
 				nIteration++) {
@@ -197,6 +196,7 @@ int main(int argc, char** argv) {
 			cv::Mat image2xBicubic;
 			cv::resize(image,image2xBicubic,imageSize,0,0,cv::INTER_CUBIC);
 			cv::split(image2xBicubic, imageSplit);
+
 
 			if(!w2xc::convertWithModels(imageY, imageSplit[0], models)){
 				std::cerr << "w2xc::convertWithModels : something error has occured.\n"
@@ -246,8 +246,15 @@ int main(int argc, char** argv) {
 	std::cout << "process successfully done!" << std::endl;
 
 	cv::Mat dstImg = image.clone();
+
+	cv::Mat cubicImg;
+	cv::resize(srcImg, cubicImg, Size(0,0), 2.0, 2.0, cv::INTER_CUBIC);
+
+
 	cv::imshow("src",srcImg);
 	cv::imshow("dst", dstImg);
+	cv::imshow("cubic", cubicImg);
+	
 	cv::waitKey();
 
 	glsCvTerminate();
