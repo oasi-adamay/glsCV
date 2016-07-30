@@ -79,6 +79,7 @@ uniform float fx; \n
 uniform float fy; \n
 uniform int flag; \n
 layout(location = 0) out vec4 dst; \n
+#define BOUND_PVT(x,pl,pr) ((x)<(pl)?2*(pl)-(x) :(x)>(pr)? 2*(pr)-(x): (x))\n
 vec4 cubic(float x){
 	float A = -0.75;
 	vec4 coeffs;
@@ -100,6 +101,9 @@ vec4 textureBicubic(sampler2D sampler, vec2 texCoords){	\n
 		vec4 xsum = vec4(0.0);
 		for (int j = -1; j < 3; j++){
 			ivec2 coord = ivec2(texCoords.x + j, texCoords.y + i);
+			//TODO: 画像外周部の扱いをCVと合わせる。
+//			coord.x = BOUND_PVT(coord.x, 0, texSize.x -1);
+//			coord.y = BOUND_PVT(coord.y, 0, texSize.y -1);
 			if (coord.x < 0) coord.x = 0;
 			if (coord.x > texSize.x - 1) coord.x = texSize.x - 1;
 			if (coord.y < 0) coord.y = 0;
