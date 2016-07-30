@@ -63,20 +63,26 @@ namespace gls
 static int gTextureNum = 0;
 #endif
 
-GlsMat::GlsMat(void){
+GlsMat::GlsMat(void) : size(&rows){
 	flag = 0;
 	rows = 0;
 	cols = 0;
+	dims = 0;
 }
 
-GlsMat::GlsMat(const Size size, const int ocvtype){
+GlsMat::GlsMat(const GlsMat &obj) : size(&rows){
+	*this = obj;
+}
+
+
+GlsMat::GlsMat(const Size size, const int ocvtype) : size(&rows){
 
 	createTexture(size.width, size.height, ocvtype);
 }
 
 
 
-GlsMat::GlsMat(const Mat & cvmat){
+GlsMat::GlsMat(const Mat & cvmat) : size(&rows){
 	createTexture(cvmat.cols, cvmat.rows, cvmat.type());
 	upload(cvmat);
 }
@@ -92,16 +98,10 @@ GlsMat& GlsMat::operator=(const GlsMat& rhs){
 	flag = rhs.flag;
 	cols = rhs.cols;
 	rows = rhs.rows;
+	dims = rhs.dims;
 
 	return *this;
 }
-
-
-//GlsMat::GlsMat(const GlsMat& src, bool copy){
-//	createTexture(src.width, src.height, src.internalFormat, src.blkX, src.blkY);
-//	GLS_Assert(copy == false);	///@TODO Copy tex
-//}
-
 
 
 
@@ -122,6 +122,8 @@ void GlsMat::createTexture(
 
 	cols = _width;
 	rows = _height;
+	dims = 2;
+
 
 	GLuint tex = 0;
 
@@ -166,6 +168,7 @@ void GlsMat::deleteTexture(void){
 	flag = 0;
 	rows = 0;
 	cols = 0;
+	dims = 0;
 
 }
 
@@ -406,6 +409,31 @@ void GlsMat::setWrapMode(GLint mode) const{
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
+
+inline GlsMat::MSize::MSize(int* _p) : p(_p) {}
+inline Size GlsMat::MSize::operator()(void) const { return Size(p[1], p[0]); }
+inline const int& GlsMat::MSize::operator[](int i) const { return p[i]; }
+inline int& GlsMat::MSize::operator[](int i) { return p[i]; }
+inline GlsMat::MSize::operator const int*() const { return p; }
+
+inline bool GlsMat::MSize::operator == (const MSize& sz) const
+{
+	int d = p[-1], dsz = sz.p[-1];
+	if (d != dsz)
+		return false;
+	if (d == 2)
+		return p[0] == sz.p[0] && p[1] == sz.p[1];
+
+	for (int i = 0; i < d; i++)
+		if (p[i] != sz.p[i])
+			return false;
+	return true;
+}
+
+inline bool GlsMat::MSize::operator != (const MSize& sz) const
+{
+	return !(*this == sz);
+}
 
 
 

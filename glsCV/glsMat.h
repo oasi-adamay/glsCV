@@ -55,8 +55,24 @@ private:
 
 public:
 	
+	int dims;	//! 配列の次元 >= 2
 	int rows;	//!< 行数(height)
 	int cols;	//!< 列数(width)
+
+	struct MSize
+	{
+		MSize(int* _p);
+		Size operator()(void) const;
+		const int& operator[](int i) const;
+		int& operator[](int i);
+		operator const int*() const;
+		bool operator == (const MSize& sz) const;
+		bool operator != (const MSize& sz) const;
+
+		int* p;
+	};
+	MSize size;
+
 
 
 	//! cv::matと同じサイズ、同じtypeのテクスチャーを生成し、データをuploadします。
@@ -66,6 +82,9 @@ public:
 	//! 空の行列です。テクスチャーは生成されません。
 	GlsMat(void);
 
+	//! コピーコンストラクタ
+	GlsMat(const GlsMat &);
+
 	//! デストラクタ　参照カウントが最後のエントリを示すときに、テクスチャーを削除します。
 	~GlsMat(void);
 
@@ -73,7 +92,7 @@ public:
 	GlsMat& operator=(const GlsMat& rhs);
 
 	//! 行列サイズ(width,height)
-	Size size(void) const { return Size(cols, rows); }
+	//Size size(void) const { return Size(cols, rows); }
 	//! 行列要素の型を返します．OpenCVのMat.type()と同じです。
 	int type(void) const { return CV_MAT_TYPE(flag); }
 	//! チャンネル数　(1-4)
