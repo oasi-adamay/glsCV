@@ -46,12 +46,13 @@ namespace UnitTest_glsCV
 	template <typename T>
 	int test_glsWarpAffine(int cvtype, int interpolation){
 		int ulps = 4;
-		float eps = 0.01f;
+		float eps = 0.02f;
 		Size size(32, 24);
 		//Size dsize(32, 24);
 		Size dsize(64, 48);
 		Point2f center((float)size.width / 2, (float)size.height / 2);
-		double angle = 13.0;
+//		double angle = 13.0;
+		double angle = 12.25;
 		double scale = 1.2;
 		Mat M = cv::getRotationMatrix2D(center, angle, scale);
 //		M.convertTo(M, CV_32F);
