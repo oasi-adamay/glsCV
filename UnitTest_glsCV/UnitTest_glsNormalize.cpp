@@ -85,6 +85,13 @@ namespace UnitTest_glsCV
 	{
 	public:
 		//glsNormalize
+		//! basic
+		BEGIN_TEST_METHOD_ATTRIBUTE(glsNormalize_CV_32FC1_NORM_MINMAX_0_1)
+			//TEST_OWNER(L"OwnerName")
+			TEST_PRIORITY(1)
+			TEST_MY_TRAIT(L"basic")
+		END_TEST_METHOD_ATTRIBUTE()
+
 		TEST_METHOD(glsNormalize_CV_32FC1_NORM_MINMAX_0_1)
 		{
 			cout << __FUNCTION__ << endl;

@@ -89,6 +89,13 @@ namespace UnitTest_glsCV
 	{
 	public:
 		//glsCartToPolar
+		//! basic
+		BEGIN_TEST_METHOD_ATTRIBUTE(glsCartToPolar_CV_32FC1)
+			//TEST_OWNER(L"OwnerName")
+			TEST_PRIORITY(1)
+			TEST_MY_TRAIT(L"basic")
+		END_TEST_METHOD_ATTRIBUTE()
+
 		TEST_METHOD(glsCartToPolar_CV_32FC1)
 		{
 			cout << __FUNCTION__ << endl;

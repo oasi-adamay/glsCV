@@ -96,6 +96,13 @@ namespace UnitTest_glsCV
 	TEST_CLASS(UnitTest_glsSepFilter2D)
 	{
 	public:
+		//! basic
+		BEGIN_TEST_METHOD_ATTRIBUTE(glsSepFilter2D_CV_32FC1)
+			//TEST_OWNER(L"OwnerName")
+			TEST_PRIORITY(1)
+			TEST_MY_TRAIT(L"basic")
+		END_TEST_METHOD_ATTRIBUTE()
+
 		TEST_METHOD(glsSepFilter2D_CV_32FC1)
 		{
 			cout << __FUNCTION__ << endl;
@@ -170,6 +177,13 @@ namespace UnitTest_glsCV
 	TEST_CLASS(UnitTest_glsGaussianBlur)
 	{
 	public:
+		//! basic
+		BEGIN_TEST_METHOD_ATTRIBUTE(glsGaussianBlur_CV_32FC1)
+			//TEST_OWNER(L"OwnerName")
+			TEST_PRIORITY(1)
+			TEST_MY_TRAIT(L"basic")
+		END_TEST_METHOD_ATTRIBUTE()
+
 		TEST_METHOD(glsGaussianBlur_CV_32FC1)
 		{
 			cout << __FUNCTION__ << endl;
@@ -255,6 +269,14 @@ namespace UnitTest_glsCV
 	TEST_CLASS(UnitTest_glsBoxFilter)
 	{
 	public:
+		//! basic
+		BEGIN_TEST_METHOD_ATTRIBUTE(glsBoxFilter_CV_32FC1)
+			//TEST_OWNER(L"OwnerName")
+			TEST_PRIORITY(1)
+			TEST_MY_TRAIT(L"basic")
+		END_TEST_METHOD_ATTRIBUTE()
+
+
 		TEST_METHOD(glsBoxFilter_CV_32FC1)
 		{
 			cout << __FUNCTION__ << endl;
@@ -354,6 +376,13 @@ namespace UnitTest_glsCV
 	TEST_CLASS(UnitTest_glsSobel)
 	{
 	public:
+		//! basic
+		BEGIN_TEST_METHOD_ATTRIBUTE(glsSobel_CV_32FC1_1_0)
+			//TEST_OWNER(L"OwnerName")
+			TEST_PRIORITY(1)
+			TEST_MY_TRAIT(L"basic")
+		END_TEST_METHOD_ATTRIBUTE()
+
 		TEST_METHOD(glsSobel_CV_32FC1_1_0)
 		{
 			cout << __FUNCTION__ << endl;
@@ -428,6 +457,14 @@ namespace UnitTest_glsCV
 	TEST_CLASS(UnitTest_glsLaplacian)
 	{
 	public:
+		//! basic
+		BEGIN_TEST_METHOD_ATTRIBUTE(glsLaplacian_CV_32FC1_1)
+			//TEST_OWNER(L"OwnerName")
+			TEST_PRIORITY(1)
+			TEST_MY_TRAIT(L"basic")
+		END_TEST_METHOD_ATTRIBUTE()
+
+
 		TEST_METHOD(glsLaplacian_CV_32FC1_1)
 		{
 			cout << __FUNCTION__ << endl;
@@ -503,6 +540,14 @@ namespace UnitTest_glsCV
 	TEST_CLASS(UnitTest_glsFilter2D)
 	{
 	public:
+		//! basic
+		BEGIN_TEST_METHOD_ATTRIBUTE(glsFilter2D_5x5_CV_32FC1)
+			//TEST_OWNER(L"OwnerName")
+			TEST_PRIORITY(1)
+			TEST_MY_TRAIT(L"basic")
+		END_TEST_METHOD_ATTRIBUTE()
+
+
 		TEST_METHOD(glsFilter2D_5x5_CV_32FC1)
 		{
 			cout << __FUNCTION__ << endl;
