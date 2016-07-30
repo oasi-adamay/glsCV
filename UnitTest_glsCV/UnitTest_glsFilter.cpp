@@ -503,12 +503,21 @@ namespace UnitTest_glsCV
 	TEST_CLASS(UnitTest_glsFilter2D)
 	{
 	public:
-		TEST_METHOD(glsFilter2D_CV_32FC1)
+		TEST_METHOD(glsFilter2D_5x5_CV_32FC1)
 		{
 			cout << __FUNCTION__ << endl;
-			int errNum = test_glsFilter2D<float>(CV_32FC1);
+			int errNum = test_glsFilter2D<float>(CV_32FC1, Size(5, 5));
 			Assert::AreEqual(0, errNum);
 		}
+
+		TEST_METHOD(glsFilter2D_3x3_CV_32FC1)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_glsFilter2D<float>(CV_32FC1, Size(3, 3));
+			Assert::AreEqual(0, errNum);
+		}
+
+
 	};
 
 

@@ -79,6 +79,7 @@ uniform float fx; \n
 uniform float fy; \n
 uniform int flag; \n
 layout(location = 0) out vec4 dst; \n
+#define BOUND_PVT(x,pl,pr) ((x)<(pl)?2*(pl)-(x) :(x)>(pr)? 2*(pr)-(x): (x))\n
 vec4 cubic(float x){
 	float A = -0.75;
 	vec4 coeffs;
@@ -100,6 +101,9 @@ vec4 textureBicubic(sampler2D sampler, vec2 texCoords){	\n
 		vec4 xsum = vec4(0.0);
 		for (int j = -1; j < 3; j++){
 			ivec2 coord = ivec2(texCoords.x + j, texCoords.y + i);
+			//TODO: 画像外周部の扱いをCVと合わせる。
+//			coord.x = BOUND_PVT(coord.x, 0, texSize.x -1);
+//			coord.y = BOUND_PVT(coord.y, 0, texSize.y -1);
 			if (coord.x < 0) coord.x = 0;
 			if (coord.x > texSize.x - 1) coord.x = texSize.x - 1;
 			if (coord.y < 0) coord.y = 0;
@@ -181,6 +185,38 @@ uvec4 textureBicubic(usampler2D sampler, vec2 texCoords){	\n
 	}
 	return uvec4(sum); \n
 } \n
+vec2 linear(float x){
+	vec2 coeffs;
+	coeffs[0] = 1.0-x;
+	coeffs[1] = x;
+	return coeffs; \n
+} \n
+uvec4 textureBilinear(usampler2D sampler, vec2 texCoords){	\n
+	ivec2 texSize = textureSize(sampler, 0); \n
+	texCoords = texCoords * vec2(texSize) - vec2(0.5);  \n
+	vec2 fxy = fract(texCoords);  \n
+	vec2 xlinear = linear(fxy.x);  \n
+	vec2 ylinear = linear(fxy.y); \n
+	texCoords -= fxy; \n
+	vec4 sum = vec4(0.0);
+	for (int i = 0; i < 2; i++){
+		vec4 xsum = vec4(0.0);
+		for (int j = 0; j < 2; j++){
+			ivec2 coord = ivec2(texCoords.x + j, texCoords.y + i);
+			if (coord.x < 0) coord.x = 0;
+			if (coord.x > texSize.x - 1) coord.x = texSize.x - 1;
+			if (coord.y < 0) coord.y = 0;
+			if (coord.y > texSize.y - 1) coord.y = texSize.y - 1;
+			vec4  sample = vec4(texelFetch(sampler, coord, 0)); 
+			xsum += sample * vec4(xlinear[j]);
+		}
+		sum += xsum * vec4(ylinear[i]);
+	}
+	return uvec4(sum); \n
+} \n
+
+
+
 void main(void)\n
 { \n
 	ivec2 texSize = textureSize(texSrc, 0); \n
@@ -190,8 +226,11 @@ void main(void)\n
 		dst = uvec4(texture(texSrc, coord)); \n
 //		dst = uvec4(128); \n
 	}\n
-	else{ \n
-	dst = textureBicubic(texSrc, coord); \n
+	else if (flag == 1){	\n
+		dst = textureBicubic(texSrc, coord); \n
+	} \n
+	else{\n
+		dst = textureBilinear(texSrc, coord); \n
 	} \n
 }\n
 );
@@ -250,8 +289,14 @@ void resize(const GlsMat& src, GlsMat& dst, Size dsize, double fx, double fy, in
 		flag = 0;
 	}break;
 	case(INTER_LINEAR) : {
-		src.setInterpolation(GL_LINEAR);
-		flag = 0;
+		if (src.depth() == CV_32F){
+			src.setInterpolation(GL_LINEAR);
+			flag = 0;
+		}
+		else{
+			src.setInterpolation(GL_NEAREST);
+			flag = 2;
+		}
 	}break;
 	case(INTER_CUBIC) : {
 //		src.setInterpolation(GL_LINEAR);
