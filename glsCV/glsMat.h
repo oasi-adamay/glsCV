@@ -50,12 +50,16 @@ private:
 
 	//! テクスチャ生成
 	void createTexture(const int _width, const int _height, int _type);
+	//! テクスチャ生成(3D)
+	void createTexture(const int _width, const int _height, const int _depth, int _type);
+
 	//! テクスチャ削除
 	void deleteTexture(void);
 
 public:
 	
 	int dims;	//! 配列の次元 >= 2
+	int plns;	//!< 面数(depth)
 	int rows;	//!< 行数(height)
 	int cols;	//!< 列数(width)
 
@@ -66,8 +70,8 @@ public:
 		const int& operator[](int i) const;
 		int& operator[](int i);
 		operator const int*() const;
-		bool operator == (const MSize& sz) const;
-		bool operator != (const MSize& sz) const;
+		//bool operator == (const MSize& sz) const;
+		//bool operator != (const MSize& sz) const;
 
 		int* p;
 	};
@@ -79,6 +83,11 @@ public:
 	explicit GlsMat(const Mat & cvmat);
 	//! size, typeのテクスチャーを生成します。
 	GlsMat(const Size size, const int type);
+	//! N次元クスチャーを生成します。２次元または３次元のみサポートします。
+	//! dims==2 の時　sizes[0]:rows / sizes[1]:cols
+	//! dims==3 の時　sizes[0]:planes / sizes[1]:rows / sizes[2]:cols
+	GlsMat(const int _dims, const int* sizes, const int type);
+
 	//! 空の行列です。テクスチャーは生成されません。
 	GlsMat(void);
 

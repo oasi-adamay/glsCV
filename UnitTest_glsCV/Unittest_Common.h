@@ -93,6 +93,7 @@ namespace UnitTest_glsCV
 			&& AlmostEqualUlpsAbsEps((float)val0[3], (float)val1[3], maxUlps, FLT_MIN);
 	}
 
+#if 0
 	template <typename T> static
 	bool AreEqual(Mat& mat0, Mat& mat1, int maxUlpsSpec = 0, float maxDiffSpec = 1e-6){
 		if (mat0.size() != mat1.size()){
@@ -155,17 +156,85 @@ namespace UnitTest_glsCV
 		if (errNum == 0) return true;
 		return false;
 	}
+#else
+	template <typename T> static
+		bool AreEqual(Mat& mat0, Mat& mat1, int maxUlpsSpec = 0, float maxDiffSpec = 1e-6){
+		if (mat0.size != mat1.size){
+			cerr << "mat0.size != mat1.size" << endl;
+			return false;
+		}
+
+		if (mat0.type() != mat1.type()){
+			cerr << "mat0.type() != mat1.type()" << endl;
+			return false;
+		}
+
+		Mat _mat0;
+		Mat _mat1;
+
+		if (mat0.isContinuous()) _mat0 = mat0;
+		else _mat0 = mat0.clone();
+
+		if (mat1.isContinuous()) _mat1 = mat1;
+		else _mat1 = mat1.clone();
 
 
-	template<typename T> static
-	void FillRandU(Mat &mat){
-		for (int y = 0; y < mat.rows; y++){
-			for (int x = 0; x < mat.cols; x++){
-				T* pSrc = mat.ptr<T>(y, x);
-				for (int ch = 0; ch < mat.channels(); ch++){
-					*pSrc++ = randu<T>();
+		T* pRef = _mat0.ptr<T>(0);
+		T* pDst = _mat1.ptr<T>(0);
+
+		int errNum = 0;
+		for (int i = 0; i < _mat0.total()*_mat0.channels(); i++){
+			T ref = *pRef++;
+			T dst = *pDst++;
+			int ulps = ULPs<T>(ref, dst);
+			float absdiff = abs((float)ref - (float)dst);
+			if (ulps > maxUlpsSpec && absdiff > maxDiffSpec){
+				errNum++;
+				if (errNum < 100){
+					cout << "ref:" << ref << "\t"
+						<< "dst:" << dst << "\t"
+						<< "ulps:" << ulps << "\t"
+						<< "diff:" << absdiff << endl;
 				}
 			}
+		}
+
+		cout << "ErrNum:" << errNum << endl;
+
+#if defined(_DEBUG)
+		if (errNum != 0){
+//			cv::imshow("[Ref]", mat0);
+//			cv::imshow("[Dst]", mat1);
+//			cout << "image watch:" << endl;
+//			cv::waitKey();
+		}
+#endif
+
+		if (errNum == 0) return true;
+		return false;
+	}
+
+#endif
+
+	//template<typename T> static
+	//void FillRandU(Mat &mat){
+	//	for (int y = 0; y < mat.rows; y++){
+	//		for (int x = 0; x < mat.cols; x++){
+	//			T* pSrc = mat.ptr<T>(y, x);
+	//			for (int ch = 0; ch < mat.channels(); ch++){
+	//				*pSrc++ = randu<T>();
+	//			}
+	//		}
+	//	}
+	//}
+
+	//ND aaray‘Î‰ž
+	template<typename T> static
+	void FillRandU(Mat &mat){
+		T* pSrc = mat.ptr<T>(0);
+
+		for (int i = 0; i < mat.total()*mat.channels(); i++){
+			*pSrc++ = randu<T>();
 		}
 	}
 
