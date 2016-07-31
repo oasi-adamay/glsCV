@@ -166,7 +166,7 @@ void nonmaximaSuppression(const Mat&mag, const Mat&angle, Mat& map, const float 
 		Mat imgDst_ = (Mat)glsDst;
 
 		int errNum = 0;
-		if (!AreEqual<T>(imgDst, imgDst_, ulps)) errNum -= 1;
+		if (!AreEqual<uchar>(imgDst, imgDst_, ulps)) errNum -= 1;
 
 		//cout << imgRef << endl;
 		//cout << imgDst << endl;
