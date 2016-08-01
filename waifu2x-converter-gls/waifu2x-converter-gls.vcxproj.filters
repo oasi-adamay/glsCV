@@ -108,6 +108,9 @@
     <ClInclude Include="include\tclap\ZshCompletionOutput.h">
       <Filter>ヘッダー ファイル\tclap</Filter>
     </ClInclude>
+    <ClInclude Include="src\convolutionalNeuralNetwork.hpp">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -120,6 +123,9 @@
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="src\modelHandler.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="src\convolutionalNeuralNetwork.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>

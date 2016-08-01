@@ -83,6 +83,7 @@ bool convertWithModels(cv::Mat &inputPlane, cv::Mat &outputPlane,
 
 }
 
+#ifdef USE_GLS
 static bool convertWithModelsBasic(cv::Mat &inputPlane, cv::Mat &outputPlane,
 		std::vector<std::unique_ptr<Model> > &models) {
 
@@ -118,6 +119,90 @@ static bool convertWithModelsBasic(cv::Mat &inputPlane, cv::Mat &outputPlane,
 	return true;
 
 }
+#elif	defined(USE_GLS_NEW)
+static bool convertWithModelsBasic(cv::Mat &inputPlane, cv::Mat &outputPlane,
+	std::vector<std::unique_ptr<Model> > &models) {
+
+	// padding is require before calling this function
+	CV_Assert(inputPlane.type() == CV_32FC1);
+
+	int _size[3] = { 1, inputPlane.size[0], inputPlane.size[1] };
+	cv::Mat _inputPlanes = cv::Mat(3, _size, CV_32FC1, inputPlane.data);
+	gls::GlsMat inputPlanes = (gls::GlsMat)_inputPlanes;
+	gls::GlsMat outputPlanes;
+
+
+	for (int index = 0; index < models.size(); index++) {
+
+		std::cout << "Layer#" << (index) <<
+			" : " << models[index]->getNInputPlanes() <<
+			" > " << models[index]->getNOutputPlanes() <<
+			std::endl;
+
+		if (!models[index]->filter(inputPlanes, outputPlanes)) {
+			std::exit(-1);
+		}
+		if (index != models.size() - 1) {
+			inputPlanes = outputPlanes;
+		}
+	}
+
+	{
+		cv::Mat _outputPlanes = (cv::Mat)outputPlanes;
+		outputPlane = cv::Mat(inputPlane.size(), inputPlane.type());
+		cv::Mat roi(inputPlane.size(), CV_32FC1, _outputPlanes.ptr<float>(0));
+		roi.copyTo(outputPlane);
+	}
+
+	return true;
+
+}
+
+
+#else
+static bool convertWithModelsBasic(cv::Mat &inputPlane, cv::Mat &outputPlane,
+	std::vector<std::unique_ptr<Model> > &models) {
+
+	// padding is require before calling this function
+	CV_Assert(inputPlane.type() == CV_32FC1);
+
+	int _size[3] = { 1, inputPlane.size[0], inputPlane.size[1] };
+	cv::Mat inputPlanes = cv::Mat(3, _size, CV_32FC1);
+	cv::Mat outputPlanes;
+
+	{
+		cv::Mat roi(inputPlane.size(), CV_32FC1, inputPlanes.ptr<float>(0));
+		inputPlane.copyTo(roi);
+	}
+
+
+	for (int index = 0; index < models.size(); index++) {
+
+		std::cout << "Layer#" << (index) <<
+			" : " << models[index]->getNInputPlanes() <<
+			" > " << models[index]->getNOutputPlanes() <<
+			std::endl;
+
+		if (!models[index]->filter(inputPlanes, outputPlanes)) {
+			std::exit(-1);
+		}
+		if (index != models.size() - 1) {
+			inputPlanes = outputPlanes;
+		}
+	}
+
+	{
+		outputPlane = cv::Mat(inputPlane.size(), inputPlane.type());
+		cv::Mat roi(inputPlane.size(), CV_32FC1, outputPlanes.ptr<float>(0));
+		roi.copyTo(outputPlane);
+	}
+
+	return true;
+
+}
+
+
+#endif
 
 static bool convertWithModelsBlockSplit(cv::Mat &inputPlane,
 		cv::Mat &outputPlane, std::vector<std::unique_ptr<Model> > &models) {

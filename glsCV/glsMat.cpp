@@ -64,25 +64,23 @@ static int gTextureNum = 0;
 #endif
 
 GlsMat::GlsMat(void) : size(&rows){
-	flag = 0;
-	plns = 0;
-	rows = 0;
-	cols = 0;
-	dims = 0;
+	init();
 }
 
 GlsMat::GlsMat(const GlsMat &obj) : size(&rows){
+	init();
 	*this = obj;
 }
 
 
 GlsMat::GlsMat(const Size size, const int ocvtype) : size(&rows){
-
+	init();
 	createTexture(size.width, size.height, ocvtype);
 }
 
 GlsMat::GlsMat(const int _dims, const int* sizes, const int ocvtype) : size(&rows){
 	GLS_Assert(_dims == 2 || _dims == 3);
+	init();
 	if (_dims == 2){
 		createTexture(sizes[1], sizes[0], ocvtype);
 	}
@@ -96,7 +94,24 @@ GlsMat::GlsMat(const int _dims, const int* sizes, const int ocvtype) : size(&row
 
 
 GlsMat::GlsMat(const Mat & cvmat) : size(&rows){
-	createTexture(cvmat.cols, cvmat.rows, cvmat.type());
+	init();
+	int _dims = cvmat.dims;
+	GLS_Assert(_dims == 2 || _dims == 3);
+
+	const int* sizes = cvmat.size;
+	const int ocvtype = cvmat.type();
+	if (_dims == 2){
+		createTexture(sizes[1], sizes[0], ocvtype);
+	}
+	else if (_dims == 3){
+		createTexture(sizes[2], sizes[1], sizes[0], ocvtype);
+	}
+	else{
+		GLS_Assert(0 && "not support.");
+	}
+
+//	GlsMat::GlsMat(cvmat.dims, cvmat.size, cvmat.type());
+//	createTexture(cvmat.cols, cvmat.rows, cvmat.type());
 	upload(cvmat);
 }
 
@@ -115,6 +130,9 @@ GlsMat& GlsMat::operator=(const GlsMat& rhs){
 	rows = rhs.rows;
 	plns = rhs.plns;
 	dims = rhs.dims;
+	if (rhs.size.p == &rhs.rows) size.p = &rows;
+	else if (rhs.size.p == &rhs.plns) size.p = &plns;
+	else GLS_Assert(0 && "unreachable.");
 
 	return *this;
 }
@@ -183,11 +201,7 @@ void GlsMat::deleteTexture(void){
 
 	GLuint tex = texid();
 	glDeleteTextures(1, &tex);
-	flag = 0;
-	rows = 0;
-	cols = 0;
-	dims = 0;
-
+	init();
 }
 
 

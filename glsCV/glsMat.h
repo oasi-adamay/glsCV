@@ -56,6 +56,15 @@ private:
 	//! テクスチャ削除
 	void deleteTexture(void);
 
+	//! 初期化
+	void init(void){
+		flag = 0;
+		dims = 0;
+		plns = 0;
+		rows = 0;
+		cols = 0;
+	}
+
 public:
 	
 	int dims;	//! 配列の次元 >= 2
