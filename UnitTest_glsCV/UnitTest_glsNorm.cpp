@@ -84,6 +84,13 @@ namespace UnitTest_glsCV
 	TEST_CLASS(UnitTest_glsNorm)
 	{
 	public:
+		//! basic
+		BEGIN_TEST_METHOD_ATTRIBUTE(glsNorm_CV_32FC1_NORM_INF)
+			//TEST_OWNER(L"OwnerName")
+			TEST_PRIORITY(1)
+			TEST_MY_TRAIT(L"basic")
+		END_TEST_METHOD_ATTRIBUTE()
+
 		TEST_METHOD(glsNorm_CV_32FC1_NORM_INF)
 		{
 			cout << __FUNCTION__ << endl;

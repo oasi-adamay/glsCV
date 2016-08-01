@@ -99,6 +99,14 @@ namespace UnitTest_glsCV
 			int errNum = test_glsSplit<uchar>(CV_8UC4);
 			Assert::AreEqual(0, errNum);
 		}
+
+		//! basic
+		BEGIN_TEST_METHOD_ATTRIBUTE(glsSplit_CV_32FC4)
+			//TEST_OWNER(L"OwnerName")
+			TEST_PRIORITY(1)
+			TEST_MY_TRAIT(L"basic")
+		END_TEST_METHOD_ATTRIBUTE()
+
 		TEST_METHOD(glsSplit_CV_32FC4)
 		{
 			cout << __FUNCTION__ << endl;

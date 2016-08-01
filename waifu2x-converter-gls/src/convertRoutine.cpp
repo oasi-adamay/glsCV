@@ -42,6 +42,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "convertRoutine.hpp"
 #include "glsCV.h"
 
+//#ifdef _DEBUG
+#if 1
+#include "Timer.h"
+#define _TMR_(...)  Timer tmr(__VA_ARGS__)
+#else
+#define _TMR_(...)
+#endif
+
 
 namespace w2xc {
 
@@ -83,6 +91,7 @@ bool convertWithModels(cv::Mat &inputPlane, cv::Mat &outputPlane,
 
 }
 
+#ifdef USE_GLS
 static bool convertWithModelsBasic(cv::Mat &inputPlane, cv::Mat &outputPlane,
 		std::vector<std::unique_ptr<Model> > &models) {
 
@@ -118,9 +127,107 @@ static bool convertWithModelsBasic(cv::Mat &inputPlane, cv::Mat &outputPlane,
 	return true;
 
 }
+#elif	defined(USE_GLS_NEW)
+static bool convertWithModelsBasic(cv::Mat &inputPlane, cv::Mat &outputPlane,
+	std::vector<std::unique_ptr<Model> > &models) {
+	_TMR_("convertWithModelsBasic\t:");
+
+	// padding is require before calling this function
+	CV_Assert(inputPlane.type() == CV_32FC1);
+	CV_Assert(inputPlane.dims == 2);
+	CV_Assert(inputPlane.isContinuous());
+
+	int _size[3] = { 1, inputPlane.size[0], inputPlane.size[1] };
+//	gls::GlsMat inputPlanes(cv::Mat(3, _size, CV_32FC1, inputPlane.data));		//upload
+	gls::GlsMat inputPlanes;
+	{
+		_TMR_("upload\t:");
+		cv::Mat _inputPlanes = cv::Mat(3, _size, CV_32FC1, inputPlane.data);
+		inputPlanes = (gls::GlsMat)_inputPlanes;
+	}
+	gls::GlsMat outputPlanes;
+
+
+	for (int index = 0; index < models.size(); index++) {
+
+		//std::cout << "Layer#" << (index) <<
+		//	" : " << models[index]->getNInputPlanes() <<
+		//	" > " << models[index]->getNOutputPlanes() <<
+		//	std::endl;
+		{
+			std::string str = "Layer#" + to_string(index)
+				+ " ( " + to_string(models[index]->getNInputPlanes())
+				+ " > " + to_string(models[index]->getNOutputPlanes())
+				+ " )\t:";
+			_TMR_(str);
+			if (!models[index]->filter(inputPlanes, outputPlanes)) {
+				std::exit(-1);
+			}
+		}
+		if (index != models.size() - 1) {
+			inputPlanes = outputPlanes;
+		}
+	}
+	{
+		_TMR_("download\t:");
+		outputPlane = cv::Mat(inputPlane.size(), inputPlane.type());
+		cv::Mat _outputPlanes(3, _size, CV_32FC1, outputPlane.data);
+		outputPlanes.download(_outputPlanes);
+	}
+
+	return true;
+
+}
+
+
+#else
+static bool convertWithModelsBasic(cv::Mat &inputPlane, cv::Mat &outputPlane,
+	std::vector<std::unique_ptr<Model> > &models) {
+
+	// padding is require before calling this function
+	CV_Assert(inputPlane.type() == CV_32FC1);
+
+	int _size[3] = { 1, inputPlane.size[0], inputPlane.size[1] };
+	cv::Mat inputPlanes = cv::Mat(3, _size, CV_32FC1);
+	cv::Mat outputPlanes;
+
+	{
+		cv::Mat roi(inputPlane.size(), CV_32FC1, inputPlanes.ptr<float>(0));
+		inputPlane.copyTo(roi);
+	}
+
+
+	for (int index = 0; index < models.size(); index++) {
+
+		std::cout << "Layer#" << (index) <<
+			" : " << models[index]->getNInputPlanes() <<
+			" > " << models[index]->getNOutputPlanes() <<
+			std::endl;
+
+		if (!models[index]->filter(inputPlanes, outputPlanes)) {
+			std::exit(-1);
+		}
+		if (index != models.size() - 1) {
+			inputPlanes = outputPlanes;
+		}
+	}
+
+	{
+		outputPlane = cv::Mat(inputPlane.size(), inputPlane.type());
+		cv::Mat roi(inputPlane.size(), CV_32FC1, outputPlanes.ptr<float>(0));
+		roi.copyTo(outputPlane);
+	}
+
+	return true;
+
+}
+
+
+#endif
 
 static bool convertWithModelsBlockSplit(cv::Mat &inputPlane,
 		cv::Mat &outputPlane, std::vector<std::unique_ptr<Model> > &models) {
+	_TMR_("convertWithModelsBlockSplit\t:");
 
 	// padding is not required before calling this function
 

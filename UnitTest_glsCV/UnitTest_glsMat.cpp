@@ -50,7 +50,7 @@ namespace UnitTest_glsCV
 {
 
 	template <typename T>
-	int test_GlsMat_download(const int cvtype, const Size size = Size(32, 24)){
+	int test_GlsMat_transfer(const int cvtype, const Size size = Size(32, 24)){
 		Mat imgSrc = Mat(size, cvtype);
 		Mat imgDst = Mat::zeros(imgSrc.size(), imgSrc.type());
 //		Mat imgDst;
@@ -88,255 +88,336 @@ namespace UnitTest_glsCV
 		return errNum;
 	}
 
+	template <typename T>
+	int test_GlsMat_transfer3D(const int cvtype, const int width = 32, const int height = 24, const int depth = 8){
+		int sizes[3];
+		sizes[0] = depth;
+		sizes[1] = height;
+		sizes[2] = width;
+		
+		Mat imgSrc = Mat(3,sizes, cvtype);
+		Mat imgDst = Mat::zeros(3, sizes, imgSrc.type());
+
+		cout << "Size[0]:" << imgSrc.size[0] << endl;
+		cout << "Size[1]:" << imgSrc.size[1] << endl;
+		cout << "Size[2]:" << imgSrc.size[2] << endl;
+
+		//---------------------------------
+		//init Src image
+		FillRandU<T>(imgSrc);
+
+		GlsMat glsSrc(imgSrc.dims, imgSrc.size, imgSrc.type());		//create GlsMat
+		{
+			_TMR_("GlsMat::upload:\t");
+			glsSrc.upload(imgSrc);	//upload
+		}
+		{
+			_TMR_("GlsMat::download:\t");
+			glsSrc.download(imgDst);		// download
+		}
+
+
+		//verify
+		int errNum = 0;
+		if (!AreEqual<T>(imgSrc, imgDst)) errNum = -1;
+
+
+		return errNum;
+	}
+
+
 	TEST_CLASS(UnitTest_GlsMat)
 	{
 	public:
-		TEST_METHOD(GlsMat_Copy_CV_8UC1)
+		TEST_METHOD(GlsMat_transfer_CV_8UC1)
 		{
 			cout << __FUNCTION__ << endl;
-			int errNum = test_GlsMat_download<uchar>(CV_8UC1);
+			int errNum = test_GlsMat_transfer<uchar>(CV_8UC1);
 			Assert::AreEqual(0, errNum);
 		}
-		TEST_METHOD(GlsMat_Copy_CV_8UC2)
+		TEST_METHOD(GlsMat_transfer_CV_8UC2)
 		{
 			cout << __FUNCTION__ << endl;
-			int errNum = test_GlsMat_download<uchar>(CV_8UC2);
+			int errNum = test_GlsMat_transfer<uchar>(CV_8UC2);
 			Assert::AreEqual(0, errNum);
 		}
-		TEST_METHOD(GlsMat_Copy_CV_8UC3)
+		TEST_METHOD(GlsMat_transfer_CV_8UC3)
 		{
 			cout << __FUNCTION__ << endl;
-			int errNum = test_GlsMat_download<uchar>(CV_8UC3);
+			int errNum = test_GlsMat_transfer<uchar>(CV_8UC3);
 			Assert::AreEqual(0, errNum);
 		}
-		TEST_METHOD(GlsMat_Copy_CV_8UC4)
+		TEST_METHOD(GlsMat_transfer_CV_8UC4)
 		{
 			cout << __FUNCTION__ << endl;
-			int errNum = test_GlsMat_download<uchar>(CV_8UC4);
+			int errNum = test_GlsMat_transfer<uchar>(CV_8UC4);
 			Assert::AreEqual(0, errNum);
 		}
-		TEST_METHOD(GlsMat_Copy_CV_8SC1)
+		TEST_METHOD(GlsMat_transfer_CV_8SC1)
 		{
 			cout << __FUNCTION__ << endl;
-			int errNum = test_GlsMat_download<schar>(CV_8SC1);
+			int errNum = test_GlsMat_transfer<schar>(CV_8SC1);
 			Assert::AreEqual(0, errNum);
 		}
-		TEST_METHOD(GlsMat_Copy_CV_8SC2)
+		TEST_METHOD(GlsMat_transfer_CV_8SC2)
 		{
 			cout << __FUNCTION__ << endl;
-			int errNum = test_GlsMat_download<schar>(CV_8SC2);
+			int errNum = test_GlsMat_transfer<schar>(CV_8SC2);
 			Assert::AreEqual(0, errNum);
 		}
-		TEST_METHOD(GlsMat_Copy_CV_8SC3)
+		TEST_METHOD(GlsMat_transfer_CV_8SC3)
 		{
 			cout << __FUNCTION__ << endl;
-			int errNum = test_GlsMat_download<schar>(CV_8SC3);
+			int errNum = test_GlsMat_transfer<schar>(CV_8SC3);
 			Assert::AreEqual(0, errNum);
 		}
-		TEST_METHOD(GlsMat_Copy_CV_8SC4)
+		TEST_METHOD(GlsMat_transfer_CV_8SC4)
 		{
 			cout << __FUNCTION__ << endl;
-			int errNum = test_GlsMat_download<schar>(CV_8SC4);
+			int errNum = test_GlsMat_transfer<schar>(CV_8SC4);
 			Assert::AreEqual(0, errNum);
 		}
-		TEST_METHOD(GlsMat_Copy_CV_16SC1)
+		TEST_METHOD(GlsMat_transfer_CV_16SC1)
 		{
 			cout << __FUNCTION__ << endl;
-			int errNum = test_GlsMat_download<short>(CV_16SC1);
+			int errNum = test_GlsMat_transfer<short>(CV_16SC1);
 			Assert::AreEqual(0, errNum);
 		}
-		TEST_METHOD(GlsMat_Copy_CV_16SC2)
+		TEST_METHOD(GlsMat_transfer_CV_16SC2)
 		{
 			cout << __FUNCTION__ << endl;
-			int errNum = test_GlsMat_download<short>(CV_16SC2);
+			int errNum = test_GlsMat_transfer<short>(CV_16SC2);
 			Assert::AreEqual(0, errNum);
 		}
-		TEST_METHOD(GlsMat_Copy_CV_16SC3)
-		{
-			cout << __FUNCTION__ << endl;
-			const int width = 32;
-			const int height = 24;
-			int errNum = test_GlsMat_download<short>(CV_16SC3);
-			Assert::AreEqual(0, errNum);
-		}
-		TEST_METHOD(GlsMat_Copy_CV_16SC4)
+		TEST_METHOD(GlsMat_transfer_CV_16SC3)
 		{
 			cout << __FUNCTION__ << endl;
 			const int width = 32;
 			const int height = 24;
-			int errNum = test_GlsMat_download<short>(CV_16SC4);
+			int errNum = test_GlsMat_transfer<short>(CV_16SC3);
 			Assert::AreEqual(0, errNum);
 		}
-		TEST_METHOD(GlsMat_Copy_CV_16UC1)
+		TEST_METHOD(GlsMat_transfer_CV_16SC4)
 		{
 			cout << __FUNCTION__ << endl;
 			const int width = 32;
 			const int height = 24;
-			int errNum = test_GlsMat_download<ushort>(CV_16UC1);
+			int errNum = test_GlsMat_transfer<short>(CV_16SC4);
 			Assert::AreEqual(0, errNum);
 		}
-		TEST_METHOD(GlsMat_Copy_CV_16UC2)
+		TEST_METHOD(GlsMat_transfer_CV_16UC1)
 		{
 			cout << __FUNCTION__ << endl;
 			const int width = 32;
 			const int height = 24;
-			int errNum = test_GlsMat_download<ushort>(CV_16UC2);
+			int errNum = test_GlsMat_transfer<ushort>(CV_16UC1);
 			Assert::AreEqual(0, errNum);
 		}
-		TEST_METHOD(GlsMat_Copy_CV_16UC3)
+		TEST_METHOD(GlsMat_transfer_CV_16UC2)
 		{
 			cout << __FUNCTION__ << endl;
 			const int width = 32;
 			const int height = 24;
-			int errNum = test_GlsMat_download<ushort>(CV_16UC3);
+			int errNum = test_GlsMat_transfer<ushort>(CV_16UC2);
 			Assert::AreEqual(0, errNum);
 		}
-		TEST_METHOD(GlsMat_Copy_CV_16UC4)
+		TEST_METHOD(GlsMat_transfer_CV_16UC3)
 		{
 			cout << __FUNCTION__ << endl;
 			const int width = 32;
 			const int height = 24;
-			int errNum = test_GlsMat_download<ushort>(CV_16UC4);
+			int errNum = test_GlsMat_transfer<ushort>(CV_16UC3);
 			Assert::AreEqual(0, errNum);
 		}
-		TEST_METHOD(GlsMat_Copy_CV_32SC1)
+		TEST_METHOD(GlsMat_transfer_CV_16UC4)
+		{
+			cout << __FUNCTION__ << endl;
+			const int width = 32;
+			const int height = 24;
+			int errNum = test_GlsMat_transfer<ushort>(CV_16UC4);
+			Assert::AreEqual(0, errNum);
+		}
+		TEST_METHOD(GlsMat_transfer_CV_32SC1)
 		{
 			cout << __FUNCTION__ << endl;
 			const int width  = 32;
 			const int height = 24;
-			int errNum = test_GlsMat_download<int>(CV_32SC1);
+			int errNum = test_GlsMat_transfer<int>(CV_32SC1);
 			Assert::AreEqual(0, errNum);
 		}
-		TEST_METHOD(GlsMat_Copy_CV_32SC2)
+		TEST_METHOD(GlsMat_transfer_CV_32SC2)
 		{
 			cout << __FUNCTION__ << endl;
 			const int width = 32;
 			const int height = 24;
-			int errNum = test_GlsMat_download<int>(CV_32SC2);
+			int errNum = test_GlsMat_transfer<int>(CV_32SC2);
 			Assert::AreEqual(0, errNum);
 		}
-		TEST_METHOD(GlsMat_Copy_CV_32SC3)
+		TEST_METHOD(GlsMat_transfer_CV_32SC3)
 		{
 			cout << __FUNCTION__ << endl;
 			const int width = 32;
 			const int height = 24;
-			int errNum = test_GlsMat_download<int>(CV_32SC3);
+			int errNum = test_GlsMat_transfer<int>(CV_32SC3);
 			Assert::AreEqual(0, errNum);
 		}
-		TEST_METHOD(GlsMat_Copy_CV_32SC4)
+		TEST_METHOD(GlsMat_transfer_CV_32SC4)
 		{
 			cout << __FUNCTION__ << endl;
 			const int width = 32;
 			const int height = 24;
-			int errNum = test_GlsMat_download<int>(CV_32SC4);
-			Assert::AreEqual(0, errNum);
-		}
-		TEST_METHOD(GlsMat_Copy_CV_32FC1)
-		{
-			cout << __FUNCTION__ << endl;
-			const int width = 32;
-			const int height = 24;
-			int errNum = test_GlsMat_download<float>(CV_32FC1);
-			Assert::AreEqual(0, errNum);
-		}
-		TEST_METHOD(GlsMat_Copy_CV_32FC2)
-		{
-			cout << __FUNCTION__ << endl;
-			const int width = 32;
-			const int height = 24;
-			int errNum = test_GlsMat_download<float>(CV_32FC2);
-			Assert::AreEqual(0, errNum);
-		}
-		TEST_METHOD(GlsMat_Copy_CV_32FC3)
-		{
-			cout << __FUNCTION__ << endl;
-			const int width = 32;
-			const int height = 24;
-			int errNum = test_GlsMat_download<float>(CV_32FC3);
-			Assert::AreEqual(0, errNum);
-		}
-		TEST_METHOD(GlsMat_Copy_CV_32FC4)
-		{
-			cout << __FUNCTION__ << endl;
-			const int width = 32;
-			const int height = 24;
-			int errNum = test_GlsMat_download<float>(CV_32FC4);
+			int errNum = test_GlsMat_transfer<int>(CV_32SC4);
 			Assert::AreEqual(0, errNum);
 		}
 
-		TEST_METHOD(GlsMat_Copy_CV_8UC1_4x8)
+		//! basic
+		BEGIN_TEST_METHOD_ATTRIBUTE(GlsMat_transfer_CV_32FC1)
+			//TEST_OWNER(L"OwnerName")
+			TEST_PRIORITY(1)
+			TEST_MY_TRAIT(L"basic")
+		END_TEST_METHOD_ATTRIBUTE()
+
+
+		TEST_METHOD(GlsMat_transfer_CV_32FC1)
 		{
 			cout << __FUNCTION__ << endl;
-			int errNum = test_GlsMat_download<uchar>(CV_8UC1, Size(4, 8));
+			const int width = 32;
+			const int height = 24;
+			int errNum = test_GlsMat_transfer<float>(CV_32FC1);
 			Assert::AreEqual(0, errNum);
 		}
-		TEST_METHOD(GlsMat_Copy_CV_8UC1_4x3)
+		TEST_METHOD(GlsMat_transfer_CV_32FC2)
 		{
 			cout << __FUNCTION__ << endl;
-			int errNum = test_GlsMat_download<uchar>(CV_8UC1, Size(4, 3));
+			const int width = 32;
+			const int height = 24;
+			int errNum = test_GlsMat_transfer<float>(CV_32FC2);
 			Assert::AreEqual(0, errNum);
 		}
-
-
-
-		TEST_METHOD(GlsMat_Copy_CV_32FC1_5x5)
+		TEST_METHOD(GlsMat_transfer_CV_32FC3)
 		{
 			cout << __FUNCTION__ << endl;
-			int errNum = test_GlsMat_download<float>(CV_32FC1, Size(5, 5));
+			const int width = 32;
+			const int height = 24;
+			int errNum = test_GlsMat_transfer<float>(CV_32FC3);
+			Assert::AreEqual(0, errNum);
+		}
+		TEST_METHOD(GlsMat_transfer_CV_32FC4)
+		{
+			cout << __FUNCTION__ << endl;
+			const int width = 32;
+			const int height = 24;
+			int errNum = test_GlsMat_transfer<float>(CV_32FC4);
 			Assert::AreEqual(0, errNum);
 		}
 
-		BEGIN_TEST_METHOD_ATTRIBUTE(GlsMat_Copy_CV_32FC1_1024x1024)
+		TEST_METHOD(GlsMat_transfer_CV_8UC1_4x8)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_GlsMat_transfer<uchar>(CV_8UC1, Size(4, 8));
+			Assert::AreEqual(0, errNum);
+		}
+		TEST_METHOD(GlsMat_transfer_CV_8UC1_4x3)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_GlsMat_transfer<uchar>(CV_8UC1, Size(4, 3));
+			Assert::AreEqual(0, errNum);
+		}
+
+
+
+		TEST_METHOD(GlsMat_transfer_CV_32FC1_5x5)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_GlsMat_transfer<float>(CV_32FC1, Size(5, 5));
+			Assert::AreEqual(0, errNum);
+		}
+
+		BEGIN_TEST_METHOD_ATTRIBUTE(GlsMat_transfer_CV_32FC1_1024x1024)
 			//TEST_OWNER(L"OwnerName")
 			//TEST_PRIORITY(1)
 			TEST_MY_TRAIT(L"benchmark")
 		END_TEST_METHOD_ATTRIBUTE()
 
-		TEST_METHOD(GlsMat_Copy_CV_32FC1_1024x1024)
+		TEST_METHOD(GlsMat_transfer_CV_32FC1_1024x1024)
 		{
 			cout << __FUNCTION__ << endl;
-			int errNum = test_GlsMat_download<float>(CV_32FC1, Size(1024, 1024));
+			int errNum = test_GlsMat_transfer<float>(CV_32FC1, Size(1024, 1024));
 			Assert::AreEqual(0, errNum);
 		}
 
-		TEST_METHOD(GlsMat_Copy_CV_32FC1_1x1)
+		TEST_METHOD(GlsMat_transfer_CV_32FC1_1x1)
 		{
 			cout << __FUNCTION__ << endl;
-			int errNum = test_GlsMat_download<float>(CV_32FC1, Size(1, 1));
+			int errNum = test_GlsMat_transfer<float>(CV_32FC1, Size(1, 1));
 			Assert::AreEqual(0, errNum);
 		}
 
-		TEST_METHOD(GlsMat_Copy_CV_32FC1_3x4)
+		TEST_METHOD(GlsMat_transfer_CV_32FC1_3x4)
 		{
 			cout << __FUNCTION__ << endl;
-			int errNum = test_GlsMat_download<float>(CV_32FC1, Size(3, 4));
+			int errNum = test_GlsMat_transfer<float>(CV_32FC1, Size(3, 4));
 			Assert::AreEqual(0, errNum);
 		}
 
-		TEST_METHOD(GlsMat_Copy_CV_32SC1_1x1)
+		TEST_METHOD(GlsMat_transfer_CV_32SC1_1x1)
 		{
 			cout << __FUNCTION__ << endl;
-			int errNum = test_GlsMat_download<int>(CV_32SC1, Size(1, 1));
+			int errNum = test_GlsMat_transfer<int>(CV_32SC1, Size(1, 1));
 			Assert::AreEqual(0, errNum);
 		}
 
 
 		//@@@ TODO issue #6
 #if 0
-		TEST_METHOD(GlsMat_Copy_CV_8UC1_3x4)
+		TEST_METHOD(GlsMat_transfer_CV_8UC1_3x4)
 		{
 			cout << __FUNCTION__ << endl;
-			int errNum = test_GlsMat_download<uchar>(CV_8UC1, Size(3, 4));
+			int errNum = test_GlsMat_transfer<uchar>(CV_8UC1, Size(3, 4));
 			Assert::AreEqual(0, errNum);
 		}
-		TEST_METHOD(GlsMat_Copy_CV_16UC1_3x4)
+		TEST_METHOD(GlsMat_transfer_CV_16UC1_3x4)
 		{
 			cout << __FUNCTION__ << endl;
-			int errNum = test_GlsMat_download<ushort>(CV_16UC1, Size(3, 4));
+			int errNum = test_GlsMat_transfer<ushort>(CV_16UC1, Size(3, 4));
 			Assert::AreEqual(0, errNum);
 		}
 #endif
 
+		//! basic
+		BEGIN_TEST_METHOD_ATTRIBUTE(GlsMat_transfer3D_CV_32FC1)
+			//TEST_OWNER(L"OwnerName")
+			TEST_PRIORITY(1)
+			TEST_MY_TRAIT(L"basic")
+		END_TEST_METHOD_ATTRIBUTE()
+
+		TEST_METHOD(GlsMat_transfer3D_CV_32FC1)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_GlsMat_transfer3D<float>(CV_32FC1);
+			Assert::AreEqual(0, errNum);
+		}
+
+		TEST_METHOD(GlsMat_transfer3D_CV_32FC2)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_GlsMat_transfer3D<float>(CV_32FC2);
+			Assert::AreEqual(0, errNum);
+		}
+
+		TEST_METHOD(GlsMat_transfer3D_CV_32FC3)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_GlsMat_transfer3D<float>(CV_32FC3);
+			Assert::AreEqual(0, errNum);
+		}
+
+		TEST_METHOD(GlsMat_transfer3D_CV_32FC4)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_GlsMat_transfer3D<float>(CV_32FC4);
+			Assert::AreEqual(0, errNum);
+		}
 
 
 	};

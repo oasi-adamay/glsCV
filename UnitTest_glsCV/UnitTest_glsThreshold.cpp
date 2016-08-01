@@ -95,6 +95,13 @@ namespace UnitTest_glsCV
 	{
 	public:
 		//glsThreshold
+		//! basic
+		BEGIN_TEST_METHOD_ATTRIBUTE(glsThreshold_CV_32FC1_THRESH_BINARY)
+			//TEST_OWNER(L"OwnerName")
+			TEST_PRIORITY(1)
+			TEST_MY_TRAIT(L"basic")
+		END_TEST_METHOD_ATTRIBUTE()
+
 		TEST_METHOD(glsThreshold_CV_32FC1_THRESH_BINARY)
 		{
 			cout << __FUNCTION__ << endl;

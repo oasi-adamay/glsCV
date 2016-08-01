@@ -1,4 +1,4 @@
-/*
+﻿/*
 Copyright (c) 2016, oasi-adamay
 All rights reserved.
 
@@ -28,43 +28,34 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-
-#ifndef _GLS_CV_H_
-#define _GLS_CV_H_
-
-
-#include "GlsMat.h"
-#include "glsShader.h"
-#include "glsCopy.h"
-#include "glsConvert.h"
-#include "glsDraw.h"
-#include "glsMerge.h"
-#include "glsSplit.h"
-#include "glsFft.h"
-#include "glsBasicOperation.h"
-#include "glsReduce.h"
-#include "glsMinMaxLoc.h"
-#include "glsMean.h"
-#include "glsNorm.h"
-#include "glsNormalize.h"
-#include "glsFilter.h"
-#include "glsBilateralFilter.h"
-#include "glsThreshold.h"
-#include "glsAdaptiveThreshold.h"
-#include "glsFlip.h"
-#include "glsResize.h"
-#include "glsWarpAffine.h"
-#include "glsRemap.h"
-#include "glsCartToPolar.h"
-#include "glsNonmaximaSuppression.h"
-#include "glsEdgeTracer.h"
-#include "glsCanny.h"
-#include "glsAccumulateWeighted.h"
-#include "glsConvolutionalNeuralNetwork.hpp"
+/*!
+@file	convolutionalNeuralNetwork.hpp
+@brief	convolutional neural network
+@author	oasi-adamay	
+ */
 
 
-GLFWwindow* glsCvInit(const int _width = 0, const int _height = 0);
-void glsCvTerminate(void);
+#ifndef CONVOLUTIONAL_NEURAL_NETWORK_HPP_
+#define CONVOLUTIONAL_NEURAL_NETWORK_HPP_
+
+#include <opencv2/opencv.hpp>
+
+namespace CNN {
+
+void ReLU_accumlate_filter2D(
+	cv::Mat &inputPlanes,				// input [planes][rows][cols]
+	cv::Mat &outputPlane,				// output [rows][cols]
+	cv::Mat &kernels,					// kernels [planes][ksize][ksize]
+	const float bias					// bias
+	);
+
+void convolutionalNeuralNetwork(
+	cv::Mat &inputPlanes,				///! input [planes][rows][cols]
+	cv::Mat &outputPlanes,				///! output [planes][rows][cols]
+	std::vector<cv::Mat>&weights,		///! kernels [inputPlanes*outputPlanes]([ksize][ksize])
+	std::vector<double>& biases			///! bias [outputPlanes]
+	);
 
 
-#endif
+}
+#endif /* CONVOLUTIONAL_NEURAL_NETWORK_HPP_ */

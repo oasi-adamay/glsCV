@@ -41,6 +41,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #include "modelHandler.hpp"
+#include "convolutionalNeuralNetwork.hpp"
+
 // #include <iostream> in modelHandler.hpp
 #include <fstream>
 
@@ -57,6 +59,7 @@ int Model::getNOutputPlanes() {
 	return nOutputPlanes;
 }
 
+#ifdef USE_GLS
 bool Model::filter(
 	std::vector<gls::GlsMat> &inputPlanes,
 	std::vector<gls::GlsMat> &outputPlanes
@@ -111,6 +114,53 @@ bool Model::filter(
 
 	return true;
 }
+#elif	defined(USE_GLS_NEW)
+bool Model::filter(
+	gls::GlsMat &inputPlanes,
+	gls::GlsMat &outputPlanes)
+{
+
+	CV_Assert(inputPlanes.dims == 3);
+
+	if (inputPlanes.size[0] != nInputPlanes) {
+		std::cerr << "Error : Model-filter : \n"
+			"number of input planes mismatch." << std::endl;
+		std::cerr << inputPlanes.size() << ","
+			<< nInputPlanes << std::endl;
+		return false;
+	}
+
+	int _size[3] = { nOutputPlanes, inputPlanes.size[1], inputPlanes.size[2] };
+	outputPlanes = gls::GlsMat(3, _size, CV_32FC1);
+
+	gls::convolutionalNeuralNetwork(inputPlanes, outputPlanes, weights, biases);
+
+
+	return true;
+}
+#else
+bool Model::filter(	cv::Mat &inputPlanes, cv::Mat &outputPlanes) {
+
+	CV_Assert(inputPlanes.dims == 3);
+
+	if (inputPlanes.size[0] != nInputPlanes) {
+		std::cerr << "Error : Model-filter : \n"
+			"number of input planes mismatch." << std::endl;
+		std::cerr << inputPlanes.size() << ","
+			<< nInputPlanes << std::endl;
+		return false;
+	}
+
+	int _size[3] = { nOutputPlanes, inputPlanes.size[1], inputPlanes.size[2] };
+	outputPlanes = cv::Mat(3, _size, CV_32FC1);
+
+	CNN::convolutionalNeuralNetwork(inputPlanes, outputPlanes, weights, biases);
+
+
+	return true;
+}
+
+#endif
 
 bool Model::loadModelFromJSONObject(picojson::object &jsonObj) {
 

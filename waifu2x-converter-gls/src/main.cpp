@@ -281,12 +281,12 @@ int main(int argc, char** argv) {
 	cv::Mat cubicImg;
 	cv::resize(srcImg, cubicImg, Size(0,0), 2.0, 2.0, cv::INTER_CUBIC);
 
-
+#if 0
 	cv::imshow("src",srcImg);
 	cv::imshow("dst", dstImg);
 	cv::imshow("cubic", cubicImg);
-	
 	cv::waitKey();
+#endif
 
 	glsCvTerminate();
 

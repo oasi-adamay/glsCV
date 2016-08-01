@@ -166,7 +166,7 @@ void nonmaximaSuppression(const Mat&mag, const Mat&angle, Mat& map, const float 
 		Mat imgDst_ = (Mat)glsDst;
 
 		int errNum = 0;
-		if (!AreEqual<T>(imgDst, imgDst_, ulps)) errNum -= 1;
+		if (!AreEqual<uchar>(imgDst, imgDst_, ulps)) errNum -= 1;
 
 		//cout << imgRef << endl;
 		//cout << imgDst << endl;
@@ -182,6 +182,13 @@ void nonmaximaSuppression(const Mat&mag, const Mat&angle, Mat& map, const float 
 	{
 	public:
 		//glsNonmaximaSuppression
+		//! basic
+		BEGIN_TEST_METHOD_ATTRIBUTE(glsNonmaximaSuppression_CV_32FC1)
+			//TEST_OWNER(L"OwnerName")
+			TEST_PRIORITY(1)
+			TEST_MY_TRAIT(L"basic")
+		END_TEST_METHOD_ATTRIBUTE()
+
 		TEST_METHOD(glsNonmaximaSuppression_CV_32FC1)
 		{
 			cout << __FUNCTION__ << endl;

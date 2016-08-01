@@ -149,6 +149,7 @@
     <ClInclude Include="glsCanny.h" />
     <ClInclude Include="glsCartToPolar.h" />
     <ClInclude Include="glsConvert.h" />
+    <ClInclude Include="glsConvolutionalNeuralNetwork.hpp" />
     <ClInclude Include="glsCopy.h" />
     <ClInclude Include="glsCV.h" />
     <ClInclude Include="glsDraw.h" />
@@ -187,6 +188,7 @@
     <ClCompile Include="glsCanny.cpp" />
     <ClCompile Include="glsCartToPolar.cpp" />
     <ClCompile Include="glsConvert.cpp" />
+    <ClCompile Include="glsConvolutionalNeuralNetwork.cpp" />
     <ClCompile Include="glsCopy.cpp" />
     <ClCompile Include="glsCV.cpp" />
     <ClCompile Include="glsDraw.cpp" />

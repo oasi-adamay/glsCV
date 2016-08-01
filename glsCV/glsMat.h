@@ -50,21 +50,58 @@ private:
 
 	//! テクスチャ生成
 	void createTexture(const int _width, const int _height, int _type);
+	//! テクスチャ生成(3D)
+	void createTexture(const int _width, const int _height, const int _depth, int _type);
+
 	//! テクスチャ削除
 	void deleteTexture(void);
 
+	//! 初期化
+	void init(void){
+		flag = 0;
+		dims = 0;
+		plns = 0;
+		rows = 0;
+		cols = 0;
+	}
+
 public:
 	
+	int dims;	//! 配列の次元 >= 2
+	int plns;	//!< 面数(depth)
 	int rows;	//!< 行数(height)
 	int cols;	//!< 列数(width)
+
+	struct MSize
+	{
+		MSize(int* _p);
+		Size operator()(void) const;
+		const int& operator[](int i) const;
+		int& operator[](int i);
+		operator const int*() const;
+		//bool operator == (const MSize& sz) const;
+		//bool operator != (const MSize& sz) const;
+
+		int* p;
+	};
+	MSize size;
+
 
 
 	//! cv::matと同じサイズ、同じtypeのテクスチャーを生成し、データをuploadします。
 	explicit GlsMat(const Mat & cvmat);
 	//! size, typeのテクスチャーを生成します。
 	GlsMat(const Size size, const int type);
+	//! N次元クスチャーを生成します。２次元または３次元のみサポートします。
+	//! dims==2 の時　sizes[0]:rows / sizes[1]:cols
+	//! dims==3 の時　sizes[0]:planes / sizes[1]:rows / sizes[2]:cols
+	GlsMat(const int _dims, const int* sizes, const int type);
+
 	//! 空の行列です。テクスチャーは生成されません。
 	GlsMat(void);
+
+	//! コピーコンストラクタ
+	GlsMat(const GlsMat &);
 
 	//! デストラクタ　参照カウントが最後のエントリを示すときに、テクスチャーを削除します。
 	~GlsMat(void);
@@ -73,7 +110,7 @@ public:
 	GlsMat& operator=(const GlsMat& rhs);
 
 	//! 行列サイズ(width,height)
-	Size size(void) const { return Size(cols, rows); }
+	//Size size(void) const { return Size(cols, rows); }
 	//! 行列要素の型を返します．OpenCVのMat.type()と同じです。
 	int type(void) const { return CV_MAT_TYPE(flag); }
 	//! チャンネル数　(1-4)

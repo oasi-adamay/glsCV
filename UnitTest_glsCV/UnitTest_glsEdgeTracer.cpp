@@ -228,6 +228,13 @@ static void edgeTracer(const Mat& src, Mat& dst)
 	{
 	public:
 		//glsEdgeTracer
+		//! basic
+		BEGIN_TEST_METHOD_ATTRIBUTE(glsEdgeTracer_CV_8UC1)
+			//TEST_OWNER(L"OwnerName")
+			TEST_PRIORITY(1)
+			TEST_MY_TRAIT(L"basic")
+		END_TEST_METHOD_ATTRIBUTE()
+
 		TEST_METHOD(glsEdgeTracer_CV_8UC1)
 		{
 			cout << __FUNCTION__ << endl;

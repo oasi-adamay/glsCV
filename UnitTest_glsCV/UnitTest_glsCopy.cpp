@@ -101,6 +101,12 @@ namespace UnitTest_glsCV
 	{
 	public:
 		//glsCopy
+		//! basic
+		BEGIN_TEST_METHOD_ATTRIBUTE(glsCopy_CV_32FC1)
+			//TEST_OWNER(L"OwnerName")
+			TEST_PRIORITY(1)
+			TEST_MY_TRAIT(L"basic")
+		END_TEST_METHOD_ATTRIBUTE()
 
 		TEST_METHOD(glsCopy_CV_32FC1)
 		{
@@ -201,6 +207,13 @@ namespace UnitTest_glsCV
 	{
 	public:
 		//glsCopyRect
+		//! basic
+		BEGIN_TEST_METHOD_ATTRIBUTE(glsCopyRect_CV_32FC1)
+			//TEST_OWNER(L"OwnerName")
+			TEST_PRIORITY(1)
+			TEST_MY_TRAIT(L"basic")
+		END_TEST_METHOD_ATTRIBUTE()
+
 		TEST_METHOD(glsCopyRect_CV_32FC1)
 		{
 			cout << __FUNCTION__ << endl;
@@ -311,6 +324,13 @@ namespace UnitTest_glsCV
 	TEST_CLASS(UnitTest_glsTiled)
 	{
 	public:
+		//! basic
+		BEGIN_TEST_METHOD_ATTRIBUTE(glsTiles_CV_32FC1)
+			//TEST_OWNER(L"OwnerName")
+			TEST_PRIORITY(1)
+			TEST_MY_TRAIT(L"basic")
+		END_TEST_METHOD_ATTRIBUTE()
+
 		TEST_METHOD(glsTiles_CV_32FC1)
 		{
 			cout << __FUNCTION__ << endl;
@@ -372,6 +392,13 @@ namespace UnitTest_glsCV
 	TEST_CLASS(UnitTest_glsUntiled)
 	{
 	public:
+		//! basic
+		BEGIN_TEST_METHOD_ATTRIBUTE(glsUntiled_CV_32FC1)
+			//TEST_OWNER(L"OwnerName")
+			TEST_PRIORITY(1)
+			TEST_MY_TRAIT(L"basic")
+		END_TEST_METHOD_ATTRIBUTE()
+
 		TEST_METHOD(glsUntiled_CV_32FC1)
 		{
 			cout << __FUNCTION__ << endl;

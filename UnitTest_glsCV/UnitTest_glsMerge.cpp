@@ -110,6 +110,14 @@ namespace UnitTest_glsCV
 			int errNum = test_glsMerge<uchar>(CV_8UC1, 4);
 			Assert::AreEqual(0, errNum);
 		}
+
+		//! basic
+		BEGIN_TEST_METHOD_ATTRIBUTE(glsMerge_CV_32FC1_2)
+			//TEST_OWNER(L"OwnerName")
+			TEST_PRIORITY(1)
+			TEST_MY_TRAIT(L"basic")
+		END_TEST_METHOD_ATTRIBUTE()
+
 		TEST_METHOD(glsMerge_CV_32FC1_2)
 		{
 			cout << __FUNCTION__ << endl;

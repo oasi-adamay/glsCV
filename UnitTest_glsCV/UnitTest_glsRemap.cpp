@@ -102,12 +102,20 @@ namespace UnitTest_glsCV
 	TEST_CLASS(UnitTest_glsRemap)
 	{
 	public:
+
 		TEST_METHOD(glsRemap_CV_32FC1_INTER_NEAREST)
 		{
 			cout << __FUNCTION__ << endl;
 			int errNum = test_glsRemap<float>(CV_32FC1, INTER_NEAREST);
 			Assert::AreEqual(0, errNum);
 		}
+
+		//! basic
+		BEGIN_TEST_METHOD_ATTRIBUTE(glsRemap_CV_32FC1_INTER_LINEAR)
+			//TEST_OWNER(L"OwnerName")
+			TEST_PRIORITY(1)
+			TEST_MY_TRAIT(L"basic")
+		END_TEST_METHOD_ATTRIBUTE()
 
 		TEST_METHOD(glsRemap_CV_32FC1_INTER_LINEAR)
 		{
