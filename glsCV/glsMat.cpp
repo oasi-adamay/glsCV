@@ -483,7 +483,9 @@ void GlsMat::download(Mat&dst) const{
 				isSameSize &= (dst.size[i] == size[i]);
 			}
 		}
-		bool replace = dst.isContinuous() && (isSameSize) && (dst.type() == type());
+		bool isSameType = (dst.type() == type());
+
+		bool replace = dst.isContinuous() && isSameSize && isSameType;
 
 		if (replace){
 			_dst = dst;
@@ -511,11 +513,11 @@ void GlsMat::download(Mat&dst) const{
 		//else{
 		//	_dst.copyTo(dst);
 		//}
-		if (dst.isContinuous()){
-			dst = _dst;
+		if (!dst.isContinuous() && isSameSize && isSameType){
+			_dst.copyTo(dst);
 		}
 		else{
-			_dst.copyTo(dst);
+			dst = _dst;
 		}
 
 	}
