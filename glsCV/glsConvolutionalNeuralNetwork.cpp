@@ -175,7 +175,9 @@ void convolutionalNeuralNetwork(
 
 		//Render!!
 		glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
-		glFlush();
+		//glFlush();
+		glFinish();
+
 	}
 
 }
