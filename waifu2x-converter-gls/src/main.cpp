@@ -71,20 +71,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define MODEL_BIN
 
 int main(int argc, char** argv) {
-
+	{	//_TMR
+	_TMR_("total time\t:");
 	glsCvInit();
-
 
 	// definition of command line arguments
 	TCLAP::CmdLine cmd("waifu2x reimplementation using OpenCV", ' ', "1.0.0");
 
 	TCLAP::ValueArg<std::string> cmdInputFile("i", "input_file",
-			"path to input image file (you should input full path)", true, "",
-			"string", cmd);
+		"path to input image file (you should input full path)", true, "",
+		"string", cmd);
 
 	TCLAP::ValueArg<std::string> cmdOutputFile("o", "output_file",
-			"path to output image file (you should input full path)", false,
-			"(auto)", "string", cmd);
+		"path to output image file (you should input full path)", false,
+		"(auto)", "string", cmd);
 
 	std::vector<std::string> cmdModeConstraintV;
 	cmdModeConstraintV.push_back("noise");
@@ -92,32 +92,33 @@ int main(int argc, char** argv) {
 	cmdModeConstraintV.push_back("noise_scale");
 	TCLAP::ValuesConstraint<std::string> cmdModeConstraint(cmdModeConstraintV);
 	TCLAP::ValueArg<std::string> cmdMode("m", "mode", "image processing mode",
-			false, "noise_scale", &cmdModeConstraint, cmd);
+		false, "noise_scale", &cmdModeConstraint, cmd);
 
 	std::vector<int> cmdNRLConstraintV;
 	cmdNRLConstraintV.push_back(1);
 	cmdNRLConstraintV.push_back(2);
 	TCLAP::ValuesConstraint<int> cmdNRLConstraint(cmdNRLConstraintV);
 	TCLAP::ValueArg<int> cmdNRLevel("", "noise_level", "noise reduction level",
-			false, 1, &cmdNRLConstraint, cmd);
+		false, 1, &cmdNRLConstraint, cmd);
 
 	TCLAP::ValueArg<double> cmdScaleRatio("", "scale_ratio",
-			"custom scale ratio", false, 2.0, "double", cmd);
+		"custom scale ratio", false, 2.0, "double", cmd);
 
 	TCLAP::ValueArg<std::string> cmdModelPath("", "model_dir",
-			"path to custom model directory (don't append last / )", false,
-			"models", "string", cmd);
+		"path to custom model directory (don't append last / )", false,
+		"models", "string", cmd);
 
 	TCLAP::ValueArg<int> cmdNumberOfJobs("j", "jobs",
-			"number of threads launching at the same time", false, 1, "integer",
-			cmd);
+		"number of threads launching at the same time", false, 1, "integer",
+		cmd);
 
 	// definition of command line argument : end
 
 	// parse command line arguments
 	try {
 		cmd.parse(argc, argv);
-	} catch (std::exception &e) {
+	}
+	catch (std::exception &e) {
 		std::cerr << e.what() << std::endl;
 		std::cerr << "Error : cmd.parse() threw exception" << std::endl;
 		std::exit(-1);
@@ -145,7 +146,7 @@ int main(int argc, char** argv) {
 #else
 	strModelExt = ".bin";
 #endif
-	 
+
 	// ===== Noise Reduction Phase =====
 	if (cmdMode.getValue() == "noise" || cmdMode.getValue() == "noise_scale") {
 		_TMR_("Noise Reduction Phase:");
@@ -172,7 +173,7 @@ int main(int argc, char** argv) {
 		w2xc::convertWithModels(imageY, imageSplit[0], models);
 
 		cv::merge(imageSplit, image);
-		
+
 	} // noise reduction phase : end
 
 	// ===== scaling phase =====
@@ -183,16 +184,16 @@ int main(int argc, char** argv) {
 
 		// calculate iteration times of 2x scaling and shrink ratio which will use at last
 		int iterTimesTwiceScaling = static_cast<int>(std::ceil(
-				std::log2(cmdScaleRatio.getValue())));
+			std::log2(cmdScaleRatio.getValue())));
 		double shrinkRatio = 0.0;
 		if (static_cast<int>(cmdScaleRatio.getValue())
-				!= std::pow(2, iterTimesTwiceScaling)) {
+			!= std::pow(2, iterTimesTwiceScaling)) {
 			shrinkRatio = cmdScaleRatio.getValue()
-					/ std::pow(2.0, static_cast<double>(iterTimesTwiceScaling));
+				/ std::pow(2.0, static_cast<double>(iterTimesTwiceScaling));
 		}
 
 		std::string modelFileName(cmdModelPath.getValue());
-		modelFileName = modelFileName + "/scale2.0x_model" +strModelExt;
+		modelFileName = modelFileName + "/scale2.0x_model" + strModelExt;
 
 		std::vector<std::unique_ptr<w2xc::Model> > models;
 
@@ -207,10 +208,10 @@ int main(int argc, char** argv) {
 		std::cout << "start scaling" << std::endl;
 		// 2x scaling
 		for (int nIteration = 0; nIteration < iterTimesTwiceScaling;
-				nIteration++) {
+			nIteration++) {
 
 			std::cout << "#" << std::to_string(nIteration + 1)
-					<< " 2x scaling..." << std::endl;
+				<< " 2x scaling..." << std::endl;
 
 			cv::Size imageSize = image.size();
 			imageSize.width *= 2;
@@ -225,13 +226,13 @@ int main(int argc, char** argv) {
 			// generate bicubic scaled image and split
 			imageSplit.clear();
 			cv::Mat image2xBicubic;
-			cv::resize(image,image2xBicubic,imageSize,0,0,cv::INTER_CUBIC);
+			cv::resize(image, image2xBicubic, imageSize, 0, 0, cv::INTER_CUBIC);
 			cv::split(image2xBicubic, imageSplit);
 
 
-			if(!w2xc::convertWithModels(imageY, imageSplit[0], models)){
+			if (!w2xc::convertWithModels(imageY, imageSplit[0], models)){
 				std::cerr << "w2xc::convertWithModels : something error has occured.\n"
-						"stop." << std::endl;
+					"stop." << std::endl;
 				std::exit(1);
 			};
 
@@ -242,11 +243,11 @@ int main(int argc, char** argv) {
 		if (shrinkRatio != 0.0) {
 			cv::Size lastImageSize = image.size();
 			lastImageSize.width =
-					static_cast<int>(static_cast<double>(lastImageSize.width
-							* shrinkRatio));
+				static_cast<int>(static_cast<double>(lastImageSize.width
+				* shrinkRatio));
 			lastImageSize.height =
-					static_cast<int>(static_cast<double>(lastImageSize.height
-							* shrinkRatio));
+				static_cast<int>(static_cast<double>(lastImageSize.height
+				* shrinkRatio));
 			cv::resize(image, image, lastImageSize, 0, 0, cv::INTER_LINEAR);
 		}
 
@@ -261,13 +262,13 @@ int main(int argc, char** argv) {
 		outputFileName.erase(tailDot, outputFileName.length());
 		outputFileName = outputFileName + "(" + cmdMode.getValue() + ")";
 		std::string &mode = cmdMode.getValue();
-		if(mode.find("noise") != mode.npos){
+		if (mode.find("noise") != mode.npos){
 			outputFileName = outputFileName + "(Level" + std::to_string(cmdNRLevel.getValue())
-			+ ")";
+				+ ")";
 		}
-		if(mode.find("scale") != mode.npos){
+		if (mode.find("scale") != mode.npos){
 			outputFileName = outputFileName + "(x" + std::to_string(cmdScaleRatio.getValue())
-			+ ")";
+				+ ")";
 		}
 		outputFileName += ".png";
 	}
@@ -279,15 +280,17 @@ int main(int argc, char** argv) {
 	cv::Mat dstImg = image.clone();
 
 	cv::Mat cubicImg;
-	cv::resize(srcImg, cubicImg, Size(0,0), 2.0, 2.0, cv::INTER_CUBIC);
+	cv::resize(srcImg, cubicImg, Size(0, 0), 2.0, 2.0, cv::INTER_CUBIC);
+
+
+	glsCvTerminate();
+	}	//_TMR
 
 #if 0
-	cv::imshow("src",srcImg);
+	cv::imshow("src", srcImg);
 	cv::imshow("dst", dstImg);
 	cv::imshow("cubic", cubicImg);
 #endif
-
-	glsCvTerminate();
 
 	std::cin.get();
 	return 0;
