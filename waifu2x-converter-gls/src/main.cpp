@@ -148,7 +148,7 @@ int main(int argc, char** argv) {
 	 
 	// ===== Noise Reduction Phase =====
 	if (cmdMode.getValue() == "noise" || cmdMode.getValue() == "noise_scale") {
-		_TMR_("[TMR]Noise Reduction:");
+		_TMR_("Noise Reduction Phase:");
 		std::cout << "Noise Reduction Phase." << std::endl;
 
 		std::string modelFileName(cmdModelPath.getValue());
@@ -178,7 +178,7 @@ int main(int argc, char** argv) {
 	// ===== scaling phase =====
 
 	if (cmdMode.getValue() == "scale" || cmdMode.getValue() == "noise_scale") {
-		_TMR_("[TMR]scaling:");
+		_TMR_("scaling Phase:");
 		std::cout << "scaling phase." << std::endl;
 
 		// calculate iteration times of 2x scaling and shrink ratio which will use at last
@@ -285,10 +285,10 @@ int main(int argc, char** argv) {
 	cv::imshow("src",srcImg);
 	cv::imshow("dst", dstImg);
 	cv::imshow("cubic", cubicImg);
-	cv::waitKey();
 #endif
 
 	glsCvTerminate();
 
+	std::cin.get();
 	return 0;
 }

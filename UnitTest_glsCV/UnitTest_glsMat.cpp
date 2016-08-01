@@ -419,6 +419,14 @@ namespace UnitTest_glsCV
 			Assert::AreEqual(0, errNum);
 		}
 
+		TEST_METHOD(GlsMat_transfer3D_CV_32FC1_32x24x1)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_GlsMat_transfer3D<float>(CV_32FC1,32,24,1);
+			Assert::AreEqual(0, errNum);
+		}
+
+
 
 	};
 
