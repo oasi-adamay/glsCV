@@ -215,8 +215,10 @@ void convolutionalNeuralNetwork(
 	for (int opIndex = 0; opIndex < outputPlanes.size[0]; opIndex++) {
 		int _sz[3] = { inputPlanes.size[0], kSize.height, kSize.width };
 		cv::Mat kernels = cv::Mat(3, _sz, CV_32FC1, weights.ptr<float>(inputPlanes.size[0] * opIndex));
-		GlsMat kernelPlanes = (GlsMat)kernels;
-
+		GlsMat kernelPlanes;
+		if (shader == &ShaderConvolutionalNeuralNetwork){
+			kernelPlanes = (GlsMat)kernels;		//upload kernels to texture
+		}
 
 		//setup dest tex
 		glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, outputPlanes.texid(), 0, opIndex);
@@ -227,6 +229,7 @@ void convolutionalNeuralNetwork(
 		glUniform1i(shader->uniformLocArray[0], 0);
 
 		if (shader == &ShaderConvolutionalNeuralNetwork){
+
 			//setup kernel tex
 			glActiveTexture(GL_TEXTURE1);
 			glBindTexture(GL_TEXTURE_2D_ARRAY, kernelPlanes.texid());
