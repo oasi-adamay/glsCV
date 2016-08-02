@@ -49,6 +49,9 @@ private:
 	int flag;					//!< フォーマット等を保存するフラグ
 
 	//! テクスチャ生成
+	void createTexture(const int _dims, const int* _sizes, int _type);
+
+	//! テクスチャ生成(2D)
 	void createTexture(const int _width, const int _height, int _type);
 	//! テクスチャ生成(3D)
 	void createTexture(const int _width, const int _height, const int _depth, int _type);

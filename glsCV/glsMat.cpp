@@ -81,37 +81,15 @@ GlsMat::GlsMat(const Size size, const int ocvtype) : size(&rows){
 GlsMat::GlsMat(const int _dims, const int* sizes, const int ocvtype) : size(&rows){
 	GLS_Assert(_dims == 2 || _dims == 3);
 	init();
-	if (_dims == 2){
-		createTexture(sizes[1], sizes[0], ocvtype);
-	}
-	else if (_dims == 3){
-		createTexture(sizes[2], sizes[1], sizes[0], ocvtype);
-	}
-	else{
-		GLS_Assert( 0 && "not support.");
-	}
+	createTexture(_dims, sizes, ocvtype);
 }
 
 
 GlsMat::GlsMat(const Mat & cvmat) : size(&rows){
+	GLS_Assert(cvmat.dims == 2 || cvmat.dims == 3);
 	init();
-	int _dims = cvmat.dims;
-	GLS_Assert(_dims == 2 || _dims == 3);
-
-	const int* sizes = cvmat.size;
-	const int ocvtype = cvmat.type();
-	if (_dims == 2){
-		createTexture(sizes[1], sizes[0], ocvtype);
-	}
-	else if (_dims == 3){
-		createTexture(sizes[2], sizes[1], sizes[0], ocvtype);
-	}
-	else{
-		GLS_Assert(0 && "not support.");
-	}
-
-//	GlsMat::GlsMat(cvmat.dims, cvmat.size, cvmat.type());
-//	createTexture(cvmat.cols, cvmat.rows, cvmat.type());
+	createTexture(cvmat.dims, cvmat.size, cvmat.type());
+	GlsMat::GlsMat(cvmat.dims, cvmat.size, cvmat.type());
 	upload(cvmat);
 }
 
@@ -144,6 +122,21 @@ GlsMat::~GlsMat(void){
 		deleteTexture();
 	}
 }
+
+void GlsMat::createTexture(const int _dims, const int* _sizes, int _type){
+	GLS_Assert(_dims == 2 || _dims == 3);
+	if (_dims == 2){
+		createTexture(_sizes[1], _sizes[0], _type);
+	}
+	else if (_dims == 3){
+		createTexture(_sizes[2], _sizes[1], _sizes[0], _type);
+	}
+	else{
+		GLS_Assert(0 && "not support.");
+	}
+
+}
+
 
 void GlsMat::createTexture(
 	const int _width,				//image width
