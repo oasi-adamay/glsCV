@@ -47,7 +47,7 @@ namespace UnitTest_glsCV
 
 		Size size(32,24);
 		cout << "Size:" << size << endl;
-		int ulps = 0;
+		int ulps = 16;
 
 		int dims = 3;
 		int ipSize[3] = { inputLayers, size.height, size.width };
@@ -128,6 +128,27 @@ namespace UnitTest_glsCV
 		{
 			cout << __FUNCTION__ << endl;
 			int errNum = test_glsConvolutionalNeuralNetwork<float>(CV_32FC1, 8, 1, Size(3, 3));
+			Assert::AreEqual(0, errNum);
+		}
+
+		TEST_METHOD(glsConvolutionalNeuralNetwork_8to8_5x5)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_glsConvolutionalNeuralNetwork<float>(CV_32FC1, 8, 8, Size(5, 5));
+			Assert::AreEqual(0, errNum);
+		}
+
+		TEST_METHOD(glsConvolutionalNeuralNetwork_1to8_5x5)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_glsConvolutionalNeuralNetwork<float>(CV_32FC1, 1, 8, Size(5, 5));
+			Assert::AreEqual(0, errNum);
+		}
+
+		TEST_METHOD(glsConvolutionalNeuralNetwork_8to1_5x5)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_glsConvolutionalNeuralNetwork<float>(CV_32FC1, 8, 1, Size(5, 5));
 			Assert::AreEqual(0, errNum);
 		}
 

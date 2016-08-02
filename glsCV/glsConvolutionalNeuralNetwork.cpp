@@ -47,24 +47,96 @@ include
 namespace gls {
 
 
+
 // glsConvolutionalNeuralNetwork shader
-class glsShaderConvolutionalNeuralNetwork : public glsShaderBase
+class glsShaderConvolutionalNeuralNetworkBase : public glsShaderBase
+{
+protected:
+	list<string> UniformNameList(void);
+
+public:
+	glsShaderConvolutionalNeuralNetworkBase(const string& _name) :glsShaderBase(_name){}
+};
+
+list<string> glsShaderConvolutionalNeuralNetworkBase::UniformNameList(void){
+	list<string> lst;
+	lst.push_back("texSrc");
+	lst.push_back("weights");
+	lst.push_back("bias");
+	return lst;
+}
+
+class  glsShaderConvolutionalNeuralNetwork : public glsShaderConvolutionalNeuralNetworkBase
 {
 protected:
 	string FragmentShaderCode(void);
-	//	list<string> UniformNameList(void);
 
 public:
-	glsShaderConvolutionalNeuralNetwork(void) :glsShaderBase(__FUNCTION__){}
+	glsShaderConvolutionalNeuralNetwork(void) :glsShaderConvolutionalNeuralNetworkBase(__FUNCTION__){}
 
 };
+glsShaderConvolutionalNeuralNetwork ShaderConvolutionalNeuralNetwork;
+
+
+class  glsShaderConvolutionalNeuralNetwork3x3 : public glsShaderConvolutionalNeuralNetworkBase
+{
+protected:
+	string FragmentShaderCode(void);
+
+public:
+	glsShaderConvolutionalNeuralNetwork3x3(void) :glsShaderConvolutionalNeuralNetworkBase(__FUNCTION__){}
+};
+glsShaderConvolutionalNeuralNetwork3x3 ShaderConvolutionalNeuralNetwork3x3;
+
+
+
 
 string glsShaderConvolutionalNeuralNetwork::FragmentShaderCode(void){
 	const char fragmentShaderCode[] = TO_STR(
 #version 330 core	\n
 precision highp float;	\n
 uniform sampler2DArray	texSrc; \n
-uniform sampler2DArray	texKernel; \n
+uniform sampler2DArray	weights; \n
+uniform float bias; \n
+layout(location = 0) out float dst; \n
+void main()\n
+{\n
+	ivec3 texSize = textureSize(texSrc, 0); \n
+	ivec3 kSize = textureSize(weights, 0); \n
+	int kxsize = kSize.x; \n
+	int kysize = kSize.y; \n
+	int kxp = kxsize / 2; \n
+	int kxm = -kxp; \n
+	int kyp = kysize / 2; \n
+	int kym = -kyp; \n
+
+	// Convolution & Accumulate	\n
+	float s = 0.0; \n
+	for (int i = 0; i < texSize.z; i++) { \n
+		ivec3 uvt = ivec3(gl_FragCoord.xy, 0); \n
+		for (int ky = kym; ky <= kyp; ky++){	\n
+			for (int kx = kxm; kx <= kxp; kx++){	\n
+				float data = texelFetch(texSrc, uvt + ivec3(kx,ky,i), 0).r; \n
+				float wei = texelFetch(weights, ivec3(kx+kxp, ky+kyp, i), 0).r; \n
+				s += data*wei; \n
+			} \n
+		} \n
+	}\n
+	// Leaky ReLU\n
+	s += bias; \n
+	s = max(s, 0) + min(s, 0) * 0.1; \n
+	dst = s; \n
+}\n
+);
+	return fragmentShaderCode;
+}
+
+string glsShaderConvolutionalNeuralNetwork3x3::FragmentShaderCode(void){
+	const char fragmentShaderCode[] = TO_STR(
+#version 330 core	\n
+precision highp float;	\n
+uniform sampler2DArray	texSrc; \n
+uniform vec3	weights[3 * 128]; \n
 uniform float bias; \n
 layout(location = 0) out float dst; \n
 void main()\n
@@ -89,18 +161,9 @@ void main()\n
 			texelFetchOffset(texSrc, uvt, 0, ivec2( 0, 1)).r,\n
 			texelFetchOffset(texSrc, uvt, 0, ivec2( 1, 1)).r); \n
 		uvt = ivec3(1, 1, i);\n
-		k0 = vec3(	\n
-			texelFetchOffset(texKernel, uvt, 0, ivec2(-1, -1)).r, \n
-			texelFetchOffset(texKernel, uvt, 0, ivec2( 0, -1)).r,\n
-			texelFetchOffset(texKernel, uvt, 0, ivec2( 1, -1)).r); \n
-		k1 = vec3(	\n
-			texelFetchOffset(texKernel, uvt, 0, ivec2(-1, 0)).r,\n
-			texelFetch(texKernel, uvt, 0).r,\n
-			texelFetchOffset(texKernel, uvt, 0, ivec2( 1, 0)).r); \n
-		k2 = vec3(	\n
-			texelFetchOffset(texKernel, uvt, 0, ivec2(-1, 1)).r, \n
-			texelFetchOffset(texKernel, uvt, 0, ivec2( 0, 1)).r,\n
-			texelFetchOffset(texKernel, uvt, 0, ivec2( 1, 1)).r); \n
+		k0 = weights[i * 3 + 0];	\n
+		k1 = weights[i * 3 + 1];	\n
+		k2 = weights[i * 3 + 2];	\n
 		s += dot(t0, k0) + dot(t1, k1) + dot(t2, k2);\n
 	}\n
 	// Leaky ReLU\n
@@ -112,9 +175,6 @@ void main()\n
 	return fragmentShaderCode;
 }
 
-//-----------------------------------------------------------------------------
-//global 
-glsShaderConvolutionalNeuralNetwork ShaderConvolutionalNeuralNetwork;
 
 
 void convolutionalNeuralNetwork(
@@ -130,7 +190,19 @@ void convolutionalNeuralNetwork(
 
 	cv::Size ipSize = cv::Size(inputPlanes.size[2], inputPlanes.size[1]);
 
-	glsShaderConvolutionalNeuralNetwork*shader = &ShaderConvolutionalNeuralNetwork;
+	GLint max_fragment_uniform_vectors;
+	glGetIntegerv(GL_MAX_FRAGMENT_UNIFORM_VECTORS, &max_fragment_uniform_vectors);
+
+	glsShaderConvolutionalNeuralNetworkBase* shader;
+
+	if (weights[0].cols == 3 && weights[0].rows == 3
+		&& max_fragment_uniform_vectors > (3*128+2)){
+		//kernel size == 3x3 で、uniform変数の割り当てられるならば、特殊化したシェーダを利用
+		shader = &ShaderConvolutionalNeuralNetwork3x3;
+	}
+	else{
+		shader = &ShaderConvolutionalNeuralNetwork;
+	}
 
 	glUseProgram(shader->program());
 
@@ -158,15 +230,20 @@ void convolutionalNeuralNetwork(
 		//setup src tex
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D_ARRAY, inputPlanes.texid());
-		glUniform1i(glGetUniformLocation(shader->program(), "texSrc"), 0);		///TODO
+		glUniform1i(shader->uniformLocArray[0], 0);
 
-		//setup kernel tex
-		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D_ARRAY, kernelPlanes.texid());
-		glUniform1i(glGetUniformLocation(shader->program(), "texKernel"), 1);	///TODO
+		if (shader == &ShaderConvolutionalNeuralNetwork){
+			//setup kernel tex
+			glActiveTexture(GL_TEXTURE1);
+			glBindTexture(GL_TEXTURE_2D_ARRAY, kernelPlanes.texid());
+			glUniform1i(shader->uniformLocArray[1], 1);
+		}
+		else{
+			glUniform3fv(shader->uniformLocArray[1], 3 * inputPlanes.size[0], kernels.ptr<float>());
+		}
 
 		//uniform
-		shader->setUniform("bias", (float)biases[opIndex]);		///TODO
+		glUniform1f(shader->uniformLocArray[2], (float)biases[opIndex]);
 
 		shader->DrawBuffers(1);
 

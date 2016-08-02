@@ -52,7 +52,7 @@ private:
 	glsShaderBase& operator=(const glsShaderBase&);   ///  Uncopyable
 
 	shared_ptr<GLuint> _program;	//!< program idを保存する、shared_ptr
-	vector<GLuint> uniformLocArray;	//!<  uniform location cache
+//	vector<GLuint> uniformLocArray;	//!<  uniform location cache
 
 	/*!
 	setup info 
@@ -185,6 +185,7 @@ public:
 		glUniform4fv(glGetUniformLocation(program(), name.c_str()), 1, _val);
 	}
 
+	vector<GLuint> uniformLocArray;	//!<  uniform location cache
 
 };
 
