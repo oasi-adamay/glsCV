@@ -113,12 +113,6 @@ namespace UnitTest_glsCV
 	TEST_CLASS(UnitTest_glsMinMaxLoc)
 	{
 	public:
-		//! basic
-		BEGIN_TEST_METHOD_ATTRIBUTE(glsMinMaxLoc_CV_32FC1)
-			//TEST_OWNER(L"OwnerName")
-			TEST_PRIORITY(1)
-			TEST_MY_TRAIT(L"basic")
-		END_TEST_METHOD_ATTRIBUTE()
 
 		TEST_METHOD(glsMinMaxLoc_CV_32FC1)
 		{
@@ -126,6 +120,13 @@ namespace UnitTest_glsCV
 			int errNum = test_glsMinMaxLoc<float>(CV_32FC1);
 			Assert::AreEqual(0, errNum);
 		}
+		BEGIN_TEST_METHOD_ATTRIBUTE(glsMinMaxLoc_CV_32FC1)
+			//TEST_OWNER(L"OwnerName")
+			TEST_PRIORITY(1)
+			TEST_MY_TRAIT(L"basic")
+		END_TEST_METHOD_ATTRIBUTE()
+
+
 		TEST_METHOD(glsMinMax_CV_32FC1)
 		{
 			cout << __FUNCTION__ << endl;
@@ -133,11 +134,6 @@ namespace UnitTest_glsCV
 			Assert::AreEqual(0, errNum);
 		}
 
-		BEGIN_TEST_METHOD_ATTRIBUTE(glsMinMaxLoc_CV_32FC1_1024x1024)
-			//TEST_OWNER(L"OwnerName")
-			//TEST_PRIORITY(1)
-			TEST_MY_TRAIT(L"benchmark")
-		END_TEST_METHOD_ATTRIBUTE()
 
 		TEST_METHOD(glsMinMaxLoc_CV_32FC1_1024x1024)
 		{
@@ -145,8 +141,7 @@ namespace UnitTest_glsCV
 			int errNum = test_glsMinMaxLoc<float>(CV_32FC1 , false , Size(1024,1024));
 			Assert::AreEqual(0, errNum);
 		}
-
-		BEGIN_TEST_METHOD_ATTRIBUTE(glsMinMax_CV_32FC1_1024x1024)
+		BEGIN_TEST_METHOD_ATTRIBUTE(glsMinMaxLoc_CV_32FC1_1024x1024)
 			//TEST_OWNER(L"OwnerName")
 			//TEST_PRIORITY(1)
 			TEST_MY_TRAIT(L"benchmark")
@@ -158,6 +153,12 @@ namespace UnitTest_glsCV
 			int errNum = test_glsMinMaxLoc<float>(CV_32FC1, true, Size(1024, 1024));
 			Assert::AreEqual(0, errNum);
 		}
+		BEGIN_TEST_METHOD_ATTRIBUTE(glsMinMax_CV_32FC1_1024x1024)
+			//TEST_OWNER(L"OwnerName")
+			//TEST_PRIORITY(1)
+			TEST_MY_TRAIT(L"benchmark")
+		END_TEST_METHOD_ATTRIBUTE()
+
 	};
 
 }

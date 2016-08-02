@@ -182,12 +182,6 @@ void nonmaximaSuppression(const Mat&mag, const Mat&angle, Mat& map, const float 
 	{
 	public:
 		//glsNonmaximaSuppression
-		//! basic
-		BEGIN_TEST_METHOD_ATTRIBUTE(glsNonmaximaSuppression_CV_32FC1)
-			//TEST_OWNER(L"OwnerName")
-			TEST_PRIORITY(1)
-			TEST_MY_TRAIT(L"basic")
-		END_TEST_METHOD_ATTRIBUTE()
 
 		TEST_METHOD(glsNonmaximaSuppression_CV_32FC1)
 		{
@@ -195,6 +189,12 @@ void nonmaximaSuppression(const Mat&mag, const Mat&angle, Mat& map, const float 
 			int errNum = test_glsNonmaximaSuppression<float>(CV_32FC1);
 			Assert::AreEqual(0, errNum);
 		}
+		BEGIN_TEST_METHOD_ATTRIBUTE(glsNonmaximaSuppression_CV_32FC1)
+			//TEST_OWNER(L"OwnerName")
+			TEST_PRIORITY(1)
+			TEST_MY_TRAIT(L"basic")
+		END_TEST_METHOD_ATTRIBUTE()
+
 
 
 	};

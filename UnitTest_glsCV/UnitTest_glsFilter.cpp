@@ -96,12 +96,6 @@ namespace UnitTest_glsCV
 	TEST_CLASS(UnitTest_glsSepFilter2D)
 	{
 	public:
-		//! basic
-		BEGIN_TEST_METHOD_ATTRIBUTE(glsSepFilter2D_CV_32FC1)
-			//TEST_OWNER(L"OwnerName")
-			TEST_PRIORITY(1)
-			TEST_MY_TRAIT(L"basic")
-		END_TEST_METHOD_ATTRIBUTE()
 
 		TEST_METHOD(glsSepFilter2D_CV_32FC1)
 		{
@@ -109,6 +103,13 @@ namespace UnitTest_glsCV
 			int errNum = test_glsSepFilter2D<float>(CV_32FC1);
 			Assert::AreEqual(0, errNum);
 		}
+		BEGIN_TEST_METHOD_ATTRIBUTE(glsSepFilter2D_CV_32FC1)
+			//TEST_OWNER(L"OwnerName")
+			TEST_PRIORITY(1)
+			TEST_MY_TRAIT(L"basic")
+		END_TEST_METHOD_ATTRIBUTE()
+
+
 		TEST_METHOD(glsSepFilter2D_CV_32FC2)
 		{
 			cout << __FUNCTION__ << endl;
@@ -177,12 +178,6 @@ namespace UnitTest_glsCV
 	TEST_CLASS(UnitTest_glsGaussianBlur)
 	{
 	public:
-		//! basic
-		BEGIN_TEST_METHOD_ATTRIBUTE(glsGaussianBlur_CV_32FC1)
-			//TEST_OWNER(L"OwnerName")
-			TEST_PRIORITY(1)
-			TEST_MY_TRAIT(L"basic")
-		END_TEST_METHOD_ATTRIBUTE()
 
 		TEST_METHOD(glsGaussianBlur_CV_32FC1)
 		{
@@ -190,6 +185,12 @@ namespace UnitTest_glsCV
 			int errNum = test_glsGaussianBlur<float>(CV_32FC1);
 			Assert::AreEqual(0, errNum);
 		}
+		BEGIN_TEST_METHOD_ATTRIBUTE(glsGaussianBlur_CV_32FC1)
+			//TEST_OWNER(L"OwnerName")
+			TEST_PRIORITY(1)
+			TEST_MY_TRAIT(L"basic")
+		END_TEST_METHOD_ATTRIBUTE()
+
 
 		TEST_METHOD(glsGaussianBlur_CV_8UC1)
 		{
@@ -206,12 +207,6 @@ namespace UnitTest_glsCV
 		}
 
 
-		//! benchmark
-		BEGIN_TEST_METHOD_ATTRIBUTE(glsGaussianBlur_CV_32FC1_5x5_1024x1024)
-			//TEST_OWNER(L"OwnerName")
-			//TEST_PRIORITY(1)
-			TEST_MY_TRAIT(L"benchmark")
-			END_TEST_METHOD_ATTRIBUTE()
 
 		TEST_METHOD(glsGaussianBlur_CV_32FC1_5x5_1024x1024)
 		{
@@ -219,6 +214,11 @@ namespace UnitTest_glsCV
 			int errNum = test_glsGaussianBlur<float>(CV_32FC1, 0, Size(5, 5),  Size(1024, 1024));
 			Assert::AreEqual(0, errNum);
 		}
+		BEGIN_TEST_METHOD_ATTRIBUTE(glsGaussianBlur_CV_32FC1_5x5_1024x1024)
+			//TEST_OWNER(L"OwnerName")
+			//TEST_PRIORITY(1)
+			TEST_MY_TRAIT(L"benchmark")
+		END_TEST_METHOD_ATTRIBUTE()
 
 
 	};
@@ -269,12 +269,6 @@ namespace UnitTest_glsCV
 	TEST_CLASS(UnitTest_glsBoxFilter)
 	{
 	public:
-		//! basic
-		BEGIN_TEST_METHOD_ATTRIBUTE(glsBoxFilter_CV_32FC1)
-			//TEST_OWNER(L"OwnerName")
-			TEST_PRIORITY(1)
-			TEST_MY_TRAIT(L"basic")
-		END_TEST_METHOD_ATTRIBUTE()
 
 
 		TEST_METHOD(glsBoxFilter_CV_32FC1)
@@ -283,6 +277,12 @@ namespace UnitTest_glsCV
 			int errNum = test_glsBoxFilter<float>(CV_32FC1);
 			Assert::AreEqual(0, errNum);
 		}
+		BEGIN_TEST_METHOD_ATTRIBUTE(glsBoxFilter_CV_32FC1)
+			//TEST_OWNER(L"OwnerName")
+			TEST_PRIORITY(1)
+			TEST_MY_TRAIT(L"basic")
+		END_TEST_METHOD_ATTRIBUTE()
+
 		TEST_METHOD(glsBoxFilter_CV_8UC1)
 		{
 			cout << __FUNCTION__ << endl;
@@ -298,32 +298,33 @@ namespace UnitTest_glsCV
 
 
 
-		//! benchmark
-		BEGIN_TEST_METHOD_ATTRIBUTE(glsBoxFilter_CV_32FC1_5x5_1024x1024)
-			//TEST_OWNER(L"OwnerName")
-			//TEST_PRIORITY(1)
-			TEST_MY_TRAIT(L"benchmark")
-			END_TEST_METHOD_ATTRIBUTE()
 
-			TEST_METHOD(glsBoxFilter_CV_32FC1_5x5_1024x1024)
+		TEST_METHOD(glsBoxFilter_CV_32FC1_5x5_1024x1024)
 		{
 			cout << __FUNCTION__ << endl;
 			int errNum = test_glsBoxFilter<float>(CV_32FC1, 0, Size(5, 5), Size(1024, 1024));
 			Assert::AreEqual(0, errNum);
 		}
-
-		BEGIN_TEST_METHOD_ATTRIBUTE(glsBoxFilter_CV_32FC1_33x33_1024x1024)
+		BEGIN_TEST_METHOD_ATTRIBUTE(glsBoxFilter_CV_32FC1_5x5_1024x1024)
 			//TEST_OWNER(L"OwnerName")
 			//TEST_PRIORITY(1)
 			TEST_MY_TRAIT(L"benchmark")
-			END_TEST_METHOD_ATTRIBUTE()
+		END_TEST_METHOD_ATTRIBUTE()
 
-			TEST_METHOD(glsBoxFilter_CV_32FC1_33x33_1024x1024)
+
+
+		TEST_METHOD(glsBoxFilter_CV_32FC1_33x33_1024x1024)
 		{
 			cout << __FUNCTION__ << endl;
 			int errNum = test_glsBoxFilter<float>(CV_32FC1, 0, Size(33, 33), Size(1024, 1024));
 			Assert::AreEqual(0, errNum);
 		}
+		BEGIN_TEST_METHOD_ATTRIBUTE(glsBoxFilter_CV_32FC1_33x33_1024x1024)
+			//TEST_OWNER(L"OwnerName")
+			//TEST_PRIORITY(1)
+			TEST_MY_TRAIT(L"benchmark")
+		END_TEST_METHOD_ATTRIBUTE()
+
 
 
 	};
@@ -376,12 +377,6 @@ namespace UnitTest_glsCV
 	TEST_CLASS(UnitTest_glsSobel)
 	{
 	public:
-		//! basic
-		BEGIN_TEST_METHOD_ATTRIBUTE(glsSobel_CV_32FC1_1_0)
-			//TEST_OWNER(L"OwnerName")
-			TEST_PRIORITY(1)
-			TEST_MY_TRAIT(L"basic")
-		END_TEST_METHOD_ATTRIBUTE()
 
 		TEST_METHOD(glsSobel_CV_32FC1_1_0)
 		{
@@ -389,6 +384,12 @@ namespace UnitTest_glsCV
 			int errNum = test_glsSobel<float>(CV_32FC1,1,0);
 			Assert::AreEqual(0, errNum);
 		}
+		BEGIN_TEST_METHOD_ATTRIBUTE(glsSobel_CV_32FC1_1_0)
+			//TEST_OWNER(L"OwnerName")
+			TEST_PRIORITY(1)
+			TEST_MY_TRAIT(L"basic")
+		END_TEST_METHOD_ATTRIBUTE()
+
 
 		TEST_METHOD(glsSobel_CV_32FC1_0_1)
 		{
@@ -457,13 +458,6 @@ namespace UnitTest_glsCV
 	TEST_CLASS(UnitTest_glsLaplacian)
 	{
 	public:
-		//! basic
-		BEGIN_TEST_METHOD_ATTRIBUTE(glsLaplacian_CV_32FC1_1)
-			//TEST_OWNER(L"OwnerName")
-			TEST_PRIORITY(1)
-			TEST_MY_TRAIT(L"basic")
-		END_TEST_METHOD_ATTRIBUTE()
-
 
 		TEST_METHOD(glsLaplacian_CV_32FC1_1)
 		{
@@ -471,6 +465,12 @@ namespace UnitTest_glsCV
 			int errNum = test_glsLaplacian<float>(CV_32FC1, 1);
 			Assert::AreEqual(0, errNum);
 		}
+		BEGIN_TEST_METHOD_ATTRIBUTE(glsLaplacian_CV_32FC1_1)
+			//TEST_OWNER(L"OwnerName")
+			TEST_PRIORITY(1)
+			TEST_MY_TRAIT(L"basic")
+		END_TEST_METHOD_ATTRIBUTE()
+
 
 		TEST_METHOD(glsLaplacian_CV_32FC1_3)
 		{
@@ -540,20 +540,18 @@ namespace UnitTest_glsCV
 	TEST_CLASS(UnitTest_glsFilter2D)
 	{
 	public:
-		//! basic
-		BEGIN_TEST_METHOD_ATTRIBUTE(glsFilter2D_5x5_CV_32FC1)
-			//TEST_OWNER(L"OwnerName")
-			TEST_PRIORITY(1)
-			TEST_MY_TRAIT(L"basic")
-		END_TEST_METHOD_ATTRIBUTE()
-
-
 		TEST_METHOD(glsFilter2D_5x5_CV_32FC1)
 		{
 			cout << __FUNCTION__ << endl;
 			int errNum = test_glsFilter2D<float>(CV_32FC1, Size(5, 5));
 			Assert::AreEqual(0, errNum);
 		}
+		BEGIN_TEST_METHOD_ATTRIBUTE(glsFilter2D_5x5_CV_32FC1)
+			//TEST_OWNER(L"OwnerName")
+			TEST_PRIORITY(1)
+			TEST_MY_TRAIT(L"basic")
+		END_TEST_METHOD_ATTRIBUTE()
+
 
 		TEST_METHOD(glsFilter2D_3x3_CV_32FC1)
 		{

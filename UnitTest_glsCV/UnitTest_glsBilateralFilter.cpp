@@ -93,12 +93,6 @@ namespace UnitTest_glsCV
 	TEST_CLASS(UnitTest_glsBilateralFilter)
 	{
 	public:
-		//! basic
-		BEGIN_TEST_METHOD_ATTRIBUTE(glsBilateralFilter_CV_32FC1)
-			//TEST_OWNER(L"OwnerName")
-			TEST_PRIORITY(1)
-			TEST_MY_TRAIT(L"basic")
-		END_TEST_METHOD_ATTRIBUTE()
 
 		TEST_METHOD(glsBilateralFilter_CV_32FC1)
 		{
@@ -106,6 +100,12 @@ namespace UnitTest_glsCV
 			int errNum = test_glsBilateralFilter<float>(CV_32FC1);
 			Assert::AreEqual(0, errNum);
 		}
+		BEGIN_TEST_METHOD_ATTRIBUTE(glsBilateralFilter_CV_32FC1)
+			//TEST_OWNER(L"OwnerName")
+			TEST_PRIORITY(1)
+			TEST_MY_TRAIT(L"basic")
+		END_TEST_METHOD_ATTRIBUTE()
+
 
 		TEST_METHOD(glsBilateralFilter_CV_32FC3)
 		{
@@ -114,13 +114,6 @@ namespace UnitTest_glsCV
 			Assert::AreEqual(0, errNum);
 		}
 
-#if 1
-		//! benchmark
-		BEGIN_TEST_METHOD_ATTRIBUTE(glsBilateralFilter_CV_32FC1_5x5_1024x1024)
-			//TEST_OWNER(L"OwnerName")
-			//TEST_PRIORITY(1)
-			TEST_MY_TRAIT(L"benchmark")
-			END_TEST_METHOD_ATTRIBUTE()
 
 		TEST_METHOD(glsBilateralFilter_CV_32FC1_5x5_1024x1024)
 		{
@@ -128,7 +121,12 @@ namespace UnitTest_glsCV
 			int errNum = test_glsBilateralFilter<float>(CV_32FC1, 5,  Size(1024, 1024));
 			Assert::AreEqual(0, errNum);
 		}
-#endif
+		BEGIN_TEST_METHOD_ATTRIBUTE(glsBilateralFilter_CV_32FC1_5x5_1024x1024)
+			//TEST_OWNER(L"OwnerName")
+			//TEST_PRIORITY(1)
+			TEST_MY_TRAIT(L"benchmark")
+		END_TEST_METHOD_ATTRIBUTE()
+
 
 	};
 

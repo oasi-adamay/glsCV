@@ -270,13 +270,6 @@ namespace UnitTest_glsCV
 			Assert::AreEqual(0, errNum);
 		}
 
-		//! basic
-		BEGIN_TEST_METHOD_ATTRIBUTE(GlsMat_transfer_CV_32FC1)
-			//TEST_OWNER(L"OwnerName")
-			TEST_PRIORITY(1)
-			TEST_MY_TRAIT(L"basic")
-		END_TEST_METHOD_ATTRIBUTE()
-
 
 		TEST_METHOD(GlsMat_transfer_CV_32FC1)
 		{
@@ -286,6 +279,14 @@ namespace UnitTest_glsCV
 			int errNum = test_GlsMat_transfer<float>(CV_32FC1);
 			Assert::AreEqual(0, errNum);
 		}
+		BEGIN_TEST_METHOD_ATTRIBUTE(GlsMat_transfer_CV_32FC1)
+			//TEST_OWNER(L"OwnerName")
+			TEST_PRIORITY(1)
+			TEST_MY_TRAIT(L"basic")
+		END_TEST_METHOD_ATTRIBUTE()
+
+
+
 		TEST_METHOD(GlsMat_transfer_CV_32FC2)
 		{
 			cout << __FUNCTION__ << endl;
@@ -333,11 +334,6 @@ namespace UnitTest_glsCV
 			Assert::AreEqual(0, errNum);
 		}
 
-		BEGIN_TEST_METHOD_ATTRIBUTE(GlsMat_transfer_CV_32FC1_1024x1024)
-			//TEST_OWNER(L"OwnerName")
-			//TEST_PRIORITY(1)
-			TEST_MY_TRAIT(L"benchmark")
-		END_TEST_METHOD_ATTRIBUTE()
 
 		TEST_METHOD(GlsMat_transfer_CV_32FC1_1024x1024)
 		{
@@ -345,6 +341,12 @@ namespace UnitTest_glsCV
 			int errNum = test_GlsMat_transfer<float>(CV_32FC1, Size(1024, 1024));
 			Assert::AreEqual(0, errNum);
 		}
+		BEGIN_TEST_METHOD_ATTRIBUTE(GlsMat_transfer_CV_32FC1_1024x1024)
+			//TEST_OWNER(L"OwnerName")
+			//TEST_PRIORITY(1)
+			TEST_MY_TRAIT(L"benchmark")
+		END_TEST_METHOD_ATTRIBUTE()
+
 
 		TEST_METHOD(GlsMat_transfer_CV_32FC1_1x1)
 		{
@@ -369,27 +371,33 @@ namespace UnitTest_glsCV
 
 
 		//@@@ TODO issue #6
-#if 0
 		TEST_METHOD(GlsMat_transfer_CV_8UC1_3x4)
 		{
 			cout << __FUNCTION__ << endl;
 			int errNum = test_GlsMat_transfer<uchar>(CV_8UC1, Size(3, 4));
 			Assert::AreEqual(0, errNum);
 		}
+		BEGIN_TEST_METHOD_ATTRIBUTE(GlsMat_transfer_CV_8UC1_3x4)
+			//TEST_OWNER(L"OwnerName")
+			//TEST_PRIORITY(1)
+			TEST_MY_TRAIT(L"TODO")
+			TEST_IGNORE()
+		END_TEST_METHOD_ATTRIBUTE()
+
 		TEST_METHOD(GlsMat_transfer_CV_16UC1_3x4)
 		{
 			cout << __FUNCTION__ << endl;
 			int errNum = test_GlsMat_transfer<ushort>(CV_16UC1, Size(3, 4));
 			Assert::AreEqual(0, errNum);
 		}
-#endif
-
-		//! basic
-		BEGIN_TEST_METHOD_ATTRIBUTE(GlsMat_transfer3D_CV_32FC1)
+		BEGIN_TEST_METHOD_ATTRIBUTE(GlsMat_transfer_CV_16UC1_3x4)
 			//TEST_OWNER(L"OwnerName")
-			TEST_PRIORITY(1)
-			TEST_MY_TRAIT(L"basic")
+			//TEST_PRIORITY(1)
+			TEST_MY_TRAIT(L"TODO")
+			TEST_IGNORE()
 		END_TEST_METHOD_ATTRIBUTE()
+
+
 
 		TEST_METHOD(GlsMat_transfer3D_CV_32FC1)
 		{
@@ -397,6 +405,12 @@ namespace UnitTest_glsCV
 			int errNum = test_GlsMat_transfer3D<float>(CV_32FC1);
 			Assert::AreEqual(0, errNum);
 		}
+		BEGIN_TEST_METHOD_ATTRIBUTE(GlsMat_transfer3D_CV_32FC1)
+			//TEST_OWNER(L"OwnerName")
+			TEST_PRIORITY(1)
+			TEST_MY_TRAIT(L"basic")
+		END_TEST_METHOD_ATTRIBUTE()
+
 
 		TEST_METHOD(GlsMat_transfer3D_CV_32FC2)
 		{
