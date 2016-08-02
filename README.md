@@ -1,70 +1,43 @@
 # glsCV
 OpenGLSLを使用したCVライブラリ  
 
-## LICENSE
-BSD-3clause license  
+リアルタイムカメラ、waifu2x　等のアプリケーション
 
-## 概要
+## glsCV
+OpenGLSLを使用したCVライブラリ  
 - OpenGL/OpenGLSLで記述した、OpenCV　Likeなライブラリ
 - cv::gpu(CUDA)と同じように、I/FはOpenCV互換
 - NVIDIA非搭載のNotePCでも実行可能
 - OpenGL　3.3 core profileを使用
-- Frament shader　のみで頑張ってみる。　
 
-## 機能
-- 配列操作
- - split, merge, tiled, untiled, copy, flip, cartToPolar 
-- 要素毎の演算
- - add, subtract, multiply, divide, min, max, mulSpectrums, log, exp, pow
- - convert, cvtColor
-- 行列の縮約
- - reduce, norm, mean, meanStdDev, minMaxLoc
-- 演算
- - FFT, normalize
-- フィルタ
- - sepFilter2D, filter2D, gaussianFilter, boxFilter, Sobel, Laplacian, bilateralFilter, Canny, accumulateWeighted
- - threshold, adaptiveThreshold
-- 幾何変換
- - remap ,resize, warpAffine 
+[more] (glsCV/README.md)
+
+## glsCam
+カメラからキャプチャーした画像をリアルタイム画像処理  
+- FFT, threshold, bilateral-filter , edge image ,　CANNY
+- pre-filter (temporary noise reduction)
+- resize (bicubic)
+
+[more] (glsCam/README.md)  
+
+## waifu2x-converter-gls
+waifu2x のglsCVによる最適化  
+[more] (waifu2x-converter-gls/README.md)  
+
+## LICENSE
+BSD-3clause license  
 
 ## 開発環境
- * Windows8
+ * Windows8 / Windows10
  * VC2013
   * NupenGL 0.1.0.1  (glew,glfw)
-  * glm 0.9.7.1
-  * OpenCV 2.1.10
-  
+  * OpenCV 2.4.10
+
 ## build
  1. glsCV.sln をVCで開く  
  2. Nugetでパッケージのインストール  
  2.1. "ツール->NuGet パッケージマネージャ->ソリューションのNugetパッケージの管理"より、以下のパッケージをインストール  
   * NupenGL 0.1.0.1  (glew,glfw)
   * glm 0.9.7.1
-  * OpenCV 2.1.10
+  * OpenCV 2.4.10
  3. ソリューションのbuild  
-
-## glsCam
-サンプルアプリケーション  
-カメラからキャプチャーした画像をリアルタイム画像処理  
-
-### short cut key
- * N : Normal view (RGB)
- * G : Gary
- * B : Bilateral Filter(RGB)
- * H : Soble - Horizontal filter (Gray)
- * V : Soble - Vertical filter (Gray)
- * L : LAPLACIAN Filter (Gray)
- * T : Threadshold image (Gray)
- * A : Adaptive Threadshold image (Gray)
- * F : FFT (Gray)
- * W : FFT window view (Gray)
- * C : Cannay
- * E : Edge image
- * P : Toggle Pre-filter On/Off
- * PAGE UP/DOWN : Zoom up/down (Bi-Cubilc)
-
- 
-
-
-
-
