@@ -40,7 +40,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <opencv2/opencv.hpp>
 
-#define _WEIGHT_3D_MAT
 
 namespace CNN {
 
@@ -54,11 +53,7 @@ void ReLU_accumlate_filter2D(
 void convolutionalNeuralNetwork(
 	cv::Mat &inputPlanes,				///! input [planes][rows][cols]
 	cv::Mat &outputPlanes,				///! output [planes][rows][cols]
-#if !defined _WEIGHT_3D_MAT
-	std::vector<cv::Mat>&weights,		///! kernels [inputPlanes*outputPlanes]([ksize][ksize])
-#else
 	cv::Mat &weights,					///! kernels [inputPlanes*outputPlanes][ksize][ksize]
-#endif
 	std::vector<double>& biases			///! bias [outputPlanes]
 	);
 

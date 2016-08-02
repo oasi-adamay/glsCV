@@ -59,7 +59,6 @@ namespace UnitTest_glsCV
 		Mat inputPlanes = Mat(dims, ipSize, cvtype);
 		Mat outputPlanes = Mat(dims, opSize, cvtype);
 
-//		std::vector<cv::Mat>weights(inputLayers*outputLayers, Mat(ksize, CV_32FC1));
 		cv::Mat weights(dims, _kSize, CV_32FC1);
 		std::vector<double> biases(outputLayers);
 
@@ -67,10 +66,6 @@ namespace UnitTest_glsCV
 		FillRandU<T>(weights);
 		weights -= 0.5f;
 
-		//for (size_t i = 0; i < weights.size(); i++){
-		//	FillRandU<float>(weights[i]);
-		//	weights[i] -= 0.5f;
-		//}
 		for (size_t i = 0; i < biases.size(); i++){
 			biases[i] = randu<double>() - 0.5;
 		}

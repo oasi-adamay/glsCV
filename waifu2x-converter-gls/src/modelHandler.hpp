@@ -58,19 +58,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace w2xc {
 
-#define _WEIGHT_3D_MAT
 
 class Model {
 
 private:
 	int nInputPlanes;
 	int nOutputPlanes;
-#if !defined(_WEIGHT_3D_MAT)
-	std::vector<cv::Mat> weights;
-#else
 	cv::Mat weights;
-#endif
-
 	std::vector<double> biases;
 	int kernelSize;
 
@@ -98,13 +92,8 @@ public:
 			std::exit(-1);
 		} // kH == kW
 
-#if !defined(_WEIGHT_3D_MAT)
-		weights = std::vector<cv::Mat>(nInputPlanes * nOutputPlanes,
-				cv::Mat(kernelSize, kernelSize, CV_32FC1));
-#else
 		int _size[3] = { nInputPlanes * nOutputPlanes, kernelSize, kernelSize };
 		weights = Mat(3, _size, CV_32FC1);
-#endif
 		biases = std::vector<double>(nOutputPlanes, 0.0);
 
 		if (!loadModelFromJSONObject(jsonObj)) {
