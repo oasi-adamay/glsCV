@@ -99,12 +99,6 @@ namespace UnitTest_glsCV
 	TEST_CLASS(UnitTest_glsAdaptiveThreshold)
 	{
 	public:
-		//! basic
-		BEGIN_TEST_METHOD_ATTRIBUTE(glsAdaptiveThreshold_CV_8UC1_ADAPTIVE_THRESH_MEAN_Cx5)
-			//TEST_OWNER(L"OwnerName")
-			TEST_PRIORITY(1)
-			TEST_MY_TRAIT(L"basic")
-		END_TEST_METHOD_ATTRIBUTE()
 
 		TEST_METHOD(glsAdaptiveThreshold_CV_8UC1_ADAPTIVE_THRESH_MEAN_Cx5)
 		{
@@ -112,6 +106,13 @@ namespace UnitTest_glsCV
 			int errNum = test_glsAdaptiveThreshold<uchar>(CV_8UC1, ADAPTIVE_THRESH_MEAN_C, THRESH_BINARY,5);
 			Assert::AreEqual(0, errNum);
 		}
+		BEGIN_TEST_METHOD_ATTRIBUTE(glsAdaptiveThreshold_CV_8UC1_ADAPTIVE_THRESH_MEAN_Cx5)
+			//TEST_OWNER(L"OwnerName")
+			TEST_PRIORITY(1)
+			TEST_MY_TRAIT(L"basic")
+		END_TEST_METHOD_ATTRIBUTE()
+
+
 		TEST_METHOD(glsAdaptiveThreshold_CV_8UC1_ADAPTIVE_THRESH_GAUSSIAN_C_Cx5)
 		{
 			cout << __FUNCTION__ << endl;

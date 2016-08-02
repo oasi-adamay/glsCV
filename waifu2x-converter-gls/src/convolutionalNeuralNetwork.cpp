@@ -61,8 +61,9 @@ void ReLU_accumlate_filter2D(
 		cv::Mat inputPlane = cv::Mat(ipSize, CV_32FC1, inputPlanes.ptr<float>(ipIndex));
 		cv::Mat kernel = cv::Mat(kSize, CV_32FC1, kernels.ptr<float>(ipIndex));
 		cv::Mat filterOutput;
-		cv::filter2D(inputPlane, filterOutput, -1, kernel, cv::Point(-1, -1), 0.0, cv::BORDER_REPLICATE);
-
+//		cv::filter2D(inputPlane, filterOutput, -1, kernel, cv::Point(-1, -1), 0.0, cv::BORDER_REPLICATE);
+		cv::filter2D(inputPlane, filterOutput, -1, kernel, cv::Point(-1, -1), 0.0, cv::BORDER_CONSTANT);	//compatibility for gls::convolutionalNeuralNetwork
+		
 		//		cv::add(uIntermediatePlane, filterOutput, uIntermediatePlane);
 		cv::accumulate(filterOutput, uIntermediatePlane);
 

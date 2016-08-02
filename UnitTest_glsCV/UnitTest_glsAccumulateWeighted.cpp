@@ -76,20 +76,18 @@ namespace UnitTest_glsCV
 	{
 	public:
 		//glsAccumulateWeighted
-		//! basic
-		BEGIN_TEST_METHOD_ATTRIBUTE(glsAccumulateWeighted_CV_32FC1)
-			//TEST_OWNER(L"OwnerName")
-			TEST_PRIORITY(1)
-			TEST_MY_TRAIT(L"basic")
-		END_TEST_METHOD_ATTRIBUTE()
-
-
 		TEST_METHOD(glsAccumulateWeighted_CV_32FC1)
 		{
 			cout << __FUNCTION__ << endl;
 			int errNum = test_glsAccumulateWeighted<float>(CV_32FC1, 0.25);
 			Assert::AreEqual(0, errNum);
 		}
+		BEGIN_TEST_METHOD_ATTRIBUTE(glsAccumulateWeighted_CV_32FC1)
+			//TEST_OWNER(L"OwnerName")
+			TEST_PRIORITY(1)
+			TEST_MY_TRAIT(L"basic")
+		END_TEST_METHOD_ATTRIBUTE()
+
 
 
 	};

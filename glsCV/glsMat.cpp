@@ -81,37 +81,15 @@ GlsMat::GlsMat(const Size size, const int ocvtype) : size(&rows){
 GlsMat::GlsMat(const int _dims, const int* sizes, const int ocvtype) : size(&rows){
 	GLS_Assert(_dims == 2 || _dims == 3);
 	init();
-	if (_dims == 2){
-		createTexture(sizes[1], sizes[0], ocvtype);
-	}
-	else if (_dims == 3){
-		createTexture(sizes[2], sizes[1], sizes[0], ocvtype);
-	}
-	else{
-		GLS_Assert( 0 && "not support.");
-	}
+	createTexture(_dims, sizes, ocvtype);
 }
 
 
 GlsMat::GlsMat(const Mat & cvmat) : size(&rows){
+	GLS_Assert(cvmat.dims == 2 || cvmat.dims == 3);
 	init();
-	int _dims = cvmat.dims;
-	GLS_Assert(_dims == 2 || _dims == 3);
-
-	const int* sizes = cvmat.size;
-	const int ocvtype = cvmat.type();
-	if (_dims == 2){
-		createTexture(sizes[1], sizes[0], ocvtype);
-	}
-	else if (_dims == 3){
-		createTexture(sizes[2], sizes[1], sizes[0], ocvtype);
-	}
-	else{
-		GLS_Assert(0 && "not support.");
-	}
-
-//	GlsMat::GlsMat(cvmat.dims, cvmat.size, cvmat.type());
-//	createTexture(cvmat.cols, cvmat.rows, cvmat.type());
+	createTexture(cvmat.dims, cvmat.size, cvmat.type());
+	GlsMat::GlsMat(cvmat.dims, cvmat.size, cvmat.type());
 	upload(cvmat);
 }
 
@@ -144,6 +122,21 @@ GlsMat::~GlsMat(void){
 		deleteTexture();
 	}
 }
+
+void GlsMat::createTexture(const int _dims, const int* _sizes, int _type){
+	GLS_Assert(_dims == 2 || _dims == 3);
+	if (_dims == 2){
+		createTexture(_sizes[1], _sizes[0], _type);
+	}
+	else if (_dims == 3){
+		createTexture(_sizes[2], _sizes[1], _sizes[0], _type);
+	}
+	else{
+		GLS_Assert(0 && "not support.");
+	}
+
+}
+
 
 void GlsMat::createTexture(
 	const int _width,				//image width
@@ -251,7 +244,6 @@ void GlsMat::createTexture(const int _width, const int _height, const int _depth
 //	return texArray[y*blkX + x];
 //}
 
-#ifdef _USE_PBO_UP
 //-----------------------------------------------------------------------------
 //OpenCV mat to OpenGL  pbo
 static void mat2pbo(const Mat&src, const GLuint pbo){
@@ -263,15 +255,22 @@ static void mat2pbo(const Mat&src, const GLuint pbo){
 		GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
 	GLS_Assert(ptr != 0);
 
-	int lSize = src.cols * (int)src.elemSize();	// line size in byte
+#if 0
 #ifdef _OPENMP
 #pragma omp parallel for
 #endif
-	for (int y = 0; y < src.rows; y++){
-		const uchar* pSrc = src.ptr<uchar>(y);
-		uchar* pDst = ptr + lSize * y;
-		std::memcpy(pDst, pSrc, lSize);
+	for (int i = 0; i < src.size[0]; i++){
+		size_t _step = src.step[0];
+		uchar* pSrc = src.data + _step * i;
+		uchar* pDst = ptr + _step * i;
+		std::memcpy(pDst, pSrc, _step);
 	}
+#else
+	uchar* pSrc = src.data;
+	uchar* pDst = ptr;
+	std::memcpy(pDst, pSrc, size);
+
+#endif
 	glUnmapBuffer(GL_PIXEL_UNPACK_BUFFER);
 }
 
@@ -286,136 +285,87 @@ static void pbo2mat(const GLuint pbo, Mat&dst){
 		GL_MAP_READ_BIT);
 	GLS_Assert(ptr != 0);
 
-	int lSize = dst.cols * (int)dst.elemSize();	// line size in byte
+#if 1
 #ifdef _OPENMP
 #pragma omp parallel for
 #endif
-	for (int y = 0; y < dst.rows; y++){
-		uchar* pSrc = ptr + lSize * y;
-		uchar* pDst = dst.ptr<uchar>(y);
-		memcpy(pDst, pSrc, lSize);
+	for (int i = 0; i < dst.size[0]; i++){
+		size_t _step = dst.step[0];
+		uchar* pSrc = ptr + _step * i;
+		uchar* pDst = dst.data + _step *i;
+		std::memcpy(pDst, pSrc, _step);
 	}
+#else
+	uchar* pSrc = ptr;
+	uchar* pDst = dst.data;
+	std::memcpy(pDst, pSrc, size);
+
+#endif
 	glUnmapBuffer(GL_PIXEL_PACK_BUFFER);
 
 }
 
+#ifdef _USE_PBO_UP
 //-----------------------------------------------------------------------------
 //Upload texture from cv::Mat to GL texture
 void GlsMat::upload(const Mat&src){
 	_TMR_("-upload :\t");
 
 	CV_Assert(src.type() == type());
-	CV_Assert(src.cols == cols);
-	CV_Assert(src.rows == rows);
+	CV_Assert(src.dims == dims);
+	if (src.dims == 2){
+		CV_Assert(src.size() == size());
+	}
+	else{
+		CV_Assert(src.size[0] == size[0]);
+		CV_Assert(src.size[1] == size[1]);
+		CV_Assert(src.size[2] == size[2]);
+	}
 
+	Mat _src;
+	if (src.isContinuous()){
+		_src = src;
+	}
+	else{
+		_src = src.clone();
+	}
+	CV_Assert(_src.isContinuous());
 
 	{
-		int size = cols*rows * (int)src.elemSize();
-		GLuint pbo[2];
-		glGenBuffers(2, &pbo[0]);
-		for (int i = 0; i < 2; i++){
-			glBindBuffer(GL_PIXEL_UNPACK_BUFFER, pbo[i]);
-			glBufferData(GL_PIXEL_UNPACK_BUFFER, size, 0, GL_DYNAMIC_READ);
-			glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
-		}
+		int _size = (int)total() * (int)_src.elemSize();
+		GLuint pbo;
 
-		int bank = 0;
-		int i = 0;
-		{
-			int by = i / blkX;
-			int bx = i % blkX;
-			int x = (bx)* cols;
-			int y = (by)* rows;
-			Rect rect(x, y, cols, rows);
-			Mat roi = Mat(src, rect);	// 1/2  1/2 rect
-			mat2pbo(roi, pbo[bank]);
-		}
+		glGenBuffers(1, &pbo);
+		glBindBuffer(GL_PIXEL_UNPACK_BUFFER, pbo);
+		glBufferData(GL_PIXEL_UNPACK_BUFFER, _size, 0, GL_DYNAMIC_READ);
+		glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
 
-		while (1){
-			//bind current pbo for app->pbo transfer
-			glBindBuffer(GL_PIXEL_UNPACK_BUFFER, pbo[bank]); //bind pbo
+		mat2pbo(_src, pbo);
 
-			//Copy pixels from pbo to texture object
-			glBindTexture(GL_TEXTURE_2D, texArray[i]);
-			glBindBuffer(GL_PIXEL_UNPACK_BUFFER, pbo[bank]); //bind pbo
+		//bind current pbo for app->pbo transfer
+		glBindBuffer(GL_PIXEL_UNPACK_BUFFER, pbo); //bind pbo
+
+		//Copy pixels from pbo to texture object
+		if (src.dims == 2){
+			glBindTexture(GL_TEXTURE_2D, texid());
+			glBindBuffer(GL_PIXEL_UNPACK_BUFFER, pbo); //bind pbo
 			glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, cols, rows, glFormat(), glType(), 0);
 			GL_CHECK_ERROR();
+		}
+		else if (src.dims == 3){
+			glBindTexture(GL_TEXTURE_2D_ARRAY, texid());
+			glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, 0, size[2], size[1], size[0], glFormat(), glType(), 0);
+			GL_CHECK_ERROR();
+			glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
+		}
+		else {
+			GLS_Assert(0 && "dims must be 2 or 3.");
+		}
 
-			i++;
-			bank = bank ^ 1;
-			if (i >= texArray.size()) break;
-			{
-				int by = i / blkX;
-				int bx = i % blkX;
-				int x = (bx)* cols;
-				int y = (by)* rows;
-				Rect rect(x, y, cols, rows);
-				Mat roi = Mat(src, rect);	// 1/2  1/2 rect
-				mat2pbo(roi, pbo[bank]);
-			}
-
-}
-		glDeleteBuffers(2, &pbo[0]);
+		glDeleteBuffers(1, &pbo);
 	}
-
 }
-
-void GlsMat::download(Mat&dst) const{
-	//	cout << "download:start" << endl;
-
-	_TMR_("-download:\t");
-
-	//	dst = Mat(size(), type());
-
-	// texture
-
-	{	//download from texture
-		int size = cols*rows * (int)dst.elemSize();
-		GLuint pbo[2];
-		glGenBuffers(2, &pbo[0]);
-		for (int i = 0; i < 2; i++){
-			glBindBuffer(GL_PIXEL_UNPACK_BUFFER, pbo[i]);
-			glBufferData(GL_PIXEL_UNPACK_BUFFER, size, 0, GL_DYNAMIC_DRAW);
-			glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
-		}
-		int bank = 0;
-		int i = 0;
-
-		{
-			//Copy pixels from texture object to pbo_bank
-			glBindTexture(GL_TEXTURE_2D, texArray[i]);
-			glBindBuffer(GL_PIXEL_PACK_BUFFER, pbo[bank]); //bind pbo
-			glGetTexImage(GL_TEXTURE_2D, 0, glFormat(), glType(), 0);
-		}
-
-		while (1){
-			if (i + 1 < texArray.size()){
-				//Copy pixels from texture object to pbo_bank
-				glBindTexture(GL_TEXTURE_2D, texArray[i + 1]);
-				glBindBuffer(GL_PIXEL_PACK_BUFFER, pbo[bank ^ 1]); //bind pbo
-				glGetTexImage(GL_TEXTURE_2D, 0, glFormat(), glType(), 0);
-			}
-
-			int by = i / blkX;
-			int bx = i % blkX;
-			int x = (bx)* cols;
-			int y = (by)* rows;
-			Rect rect(x, y, cols, rows);
-			Mat roi = Mat(dst, rect);	// 1/2  1/2 rect
-			pbo2mat(pbo[bank], roi);
-			i++;
-			bank = bank ^ 1;
-
-			if (i >= texArray.size()) break;
-		}
-		glDeleteBuffers(2, &pbo[0]);
-	}
-
-	//	cout << "download:end" << endl;
-}
-
 #else
-
 //-----------------------------------------------------------------------------
 //Upload texture from cv::Mat to GL texture
 void GlsMat::upload(const Mat&src){
@@ -462,6 +412,78 @@ void GlsMat::upload(const Mat&src){
 	}
 
 }
+
+
+#endif
+
+#ifdef _USE_PBO_DOWN 
+void GlsMat::download(Mat&dst) const{
+	//	cout << "download:start" << endl;
+
+	_TMR_("-download:\t");
+
+	Mat _dst;
+	bool isSameSize = true;
+	isSameSize &= (dst.dims == dims);
+	if (isSameSize){
+		for (int i = 0; i < dims; i++){
+			isSameSize &= (dst.size[i] == size[i]);
+		}
+	}
+	bool isSameType = (dst.type() == type());
+
+	bool replace = dst.isContinuous() && isSameSize && isSameType;
+
+	if (replace){
+		_dst = dst;
+	}
+	else{
+		_dst = Mat(dims, size, type());
+	}
+
+
+	{	//download from texture
+		int _size = (int)_dst.total() * (int)_dst.elemSize();
+		GLuint pbo = 0;
+		glGenBuffers(1, &pbo);
+		glBindBuffer(GL_PIXEL_PACK_BUFFER, pbo);
+		glBufferData(GL_PIXEL_PACK_BUFFER, _size, 0, GL_DYNAMIC_DRAW);
+		GLS_Assert(pbo);
+
+		//Copy pixels from texture object to pbok
+		if (dims == 2){
+			glBindTexture(GL_TEXTURE_2D, texid());
+			glGetTexImage(GL_TEXTURE_2D, 0, glFormat(), glType(), 0);
+			GL_CHECK_ERROR();
+			glBindTexture(GL_TEXTURE_2D, 0);
+		}
+		else if (dims == 3){
+			glBindTexture(GL_TEXTURE_2D_ARRAY, texid());
+			glGetTexImage(GL_TEXTURE_2D_ARRAY, 0, glFormat(), glType(), 0);
+			GL_CHECK_ERROR();
+			glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
+
+		}
+		else {
+			GLS_Assert(0 && "dims must be 2 or 3.");
+		}
+
+		pbo2mat(pbo, _dst);
+		glDeleteBuffers(1, &pbo);
+	}
+
+	if (!dst.isContinuous() && isSameSize && isSameType){
+		_dst.copyTo(dst);
+	}
+	else{
+		dst = _dst;
+	}
+
+	//	cout << "download:end" << endl;
+}
+
+#else
+
 
 
 
@@ -589,6 +611,16 @@ inline GlsMat::MSize::operator const int*() const { return p; }
 //{
 //	return !(*this == sz);
 //}
+
+inline size_t GlsMat::total() const
+{
+	if (dims <= 2)
+		return (size_t)rows*cols;
+	size_t p = 1;
+	for (int i = 0; i < dims; i++)
+		p *= size[i];
+	return p;
+}
 
 
 

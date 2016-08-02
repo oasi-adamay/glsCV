@@ -95,12 +95,6 @@ namespace UnitTest_glsCV
 	{
 	public:
 		//glsThreshold
-		//! basic
-		BEGIN_TEST_METHOD_ATTRIBUTE(glsThreshold_CV_32FC1_THRESH_BINARY)
-			//TEST_OWNER(L"OwnerName")
-			TEST_PRIORITY(1)
-			TEST_MY_TRAIT(L"basic")
-		END_TEST_METHOD_ATTRIBUTE()
 
 		TEST_METHOD(glsThreshold_CV_32FC1_THRESH_BINARY)
 		{
@@ -108,6 +102,13 @@ namespace UnitTest_glsCV
 			int errNum = test_glsThreshold<float>(CV_32FC1, THRESH_BINARY);
 			Assert::AreEqual(0, errNum);
 		}
+		BEGIN_TEST_METHOD_ATTRIBUTE(glsThreshold_CV_32FC1_THRESH_BINARY)
+			//TEST_OWNER(L"OwnerName")
+			TEST_PRIORITY(1)
+			TEST_MY_TRAIT(L"basic")
+		END_TEST_METHOD_ATTRIBUTE()
+
+
 		TEST_METHOD(glsThreshold_CV_32FC1_THRESH_BINARY_INV)
 		{
 			cout << __FUNCTION__ << endl;

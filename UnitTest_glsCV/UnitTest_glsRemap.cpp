@@ -110,12 +110,6 @@ namespace UnitTest_glsCV
 			Assert::AreEqual(0, errNum);
 		}
 
-		//! basic
-		BEGIN_TEST_METHOD_ATTRIBUTE(glsRemap_CV_32FC1_INTER_LINEAR)
-			//TEST_OWNER(L"OwnerName")
-			TEST_PRIORITY(1)
-			TEST_MY_TRAIT(L"basic")
-		END_TEST_METHOD_ATTRIBUTE()
 
 		TEST_METHOD(glsRemap_CV_32FC1_INTER_LINEAR)
 		{
@@ -123,13 +117,26 @@ namespace UnitTest_glsCV
 			int errNum = test_glsRemap<float>(CV_32FC1, INTER_LINEAR);
 			Assert::AreEqual(0, errNum);
 		}
+		BEGIN_TEST_METHOD_ATTRIBUTE(glsRemap_CV_32FC1_INTER_LINEAR)
+			//TEST_OWNER(L"OwnerName")
+			TEST_PRIORITY(1)
+			TEST_MY_TRAIT(L"basic")
+		END_TEST_METHOD_ATTRIBUTE()
 
-		//TEST_METHOD(glsRemap_CV_32FC1_INTER_CUBIC)
-		//{
-		//	cout << __FUNCTION__ << endl;
-		//	int errNum = test_glsRemap<float>(CV_32FC1, INTER_CUBIC);
-		//	Assert::AreEqual(0, errNum);
-		//}
+
+		TEST_METHOD(glsRemap_CV_32FC1_INTER_CUBIC)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_glsRemap<float>(CV_32FC1, INTER_CUBIC);
+			Assert::AreEqual(0, errNum);
+		}
+		BEGIN_TEST_METHOD_ATTRIBUTE(glsRemap_CV_32FC1_INTER_CUBIC)
+			//TEST_OWNER(L"OwnerName")
+			//TEST_PRIORITY(1)
+			//TEST_MY_TRAIT(L"basic")
+			TEST_IGNORE()
+		END_TEST_METHOD_ATTRIBUTE()
+
 
 
 	};

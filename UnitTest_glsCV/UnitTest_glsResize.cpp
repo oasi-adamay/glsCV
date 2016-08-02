@@ -107,12 +107,19 @@ namespace UnitTest_glsCV
 			Assert::AreEqual(0, errNum);
 		}
 
-		//TEST_METHOD(glsResize_CV_32FC1_INTER_NEAREST_x1p5)
-		//{
-		//	cout << __FUNCTION__ << endl;
-		//	int errNum = test_glsResize<float>(CV_32FC1, INTER_NEAREST, 1.5, 1.5);
-		//	Assert::AreEqual(0, errNum);
-		//}
+		TEST_METHOD(glsResize_CV_32FC1_INTER_NEAREST_x1p5)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_glsResize<float>(CV_32FC1, INTER_NEAREST, 1.5, 1.5);
+			Assert::AreEqual(0, errNum);
+		}
+		BEGIN_TEST_METHOD_ATTRIBUTE(glsResize_CV_32FC1_INTER_NEAREST_x1p5)
+			//TEST_OWNER(L"OwnerName")
+			//TEST_PRIORITY(1)
+			//TEST_MY_TRAIT(L"basic")
+			TEST_IGNORE()
+		END_TEST_METHOD_ATTRIBUTE()
+
 
 
 		TEST_METHOD(glsResize_CV_32FC1_INTER_NEAREST_x2)
@@ -144,19 +151,18 @@ namespace UnitTest_glsCV
 			Assert::AreEqual(0, errNum);
 		}
 
-		//! basic
-		BEGIN_TEST_METHOD_ATTRIBUTE(glsResize_CV_32FC1_INTER_CUBIC_x1)
-			//TEST_OWNER(L"OwnerName")
-			TEST_PRIORITY(1)
-			TEST_MY_TRAIT(L"basic")
-		END_TEST_METHOD_ATTRIBUTE()
-
 		TEST_METHOD(glsResize_CV_32FC1_INTER_CUBIC_x1)
 		{
 			cout << __FUNCTION__ << endl;
 			int errNum = test_glsResize<float>(CV_32FC1, INTER_CUBIC, 1.0, 1.0);
 			Assert::AreEqual(0, errNum);
 		}
+		BEGIN_TEST_METHOD_ATTRIBUTE(glsResize_CV_32FC1_INTER_CUBIC_x1)
+			//TEST_OWNER(L"OwnerName")
+			TEST_PRIORITY(1)
+			TEST_MY_TRAIT(L"basic")
+		END_TEST_METHOD_ATTRIBUTE()
+
 
 		TEST_METHOD(glsResize_CV_32FC1_INTER_CUBIC_x1p5)
 		{

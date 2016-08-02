@@ -99,12 +99,6 @@ namespace UnitTest_glsCV
 	TEST_CLASS(UnitTest_glsFft)
 	{
 	public:
-		//! basic
-		BEGIN_TEST_METHOD_ATTRIBUTE(FFT)
-			//TEST_OWNER(L"OwnerName")
-			TEST_PRIORITY(1)
-			TEST_MY_TRAIT(L"basic")
-		END_TEST_METHOD_ATTRIBUTE()
 
 		TEST_METHOD(FFT)
 		{
@@ -114,6 +108,12 @@ namespace UnitTest_glsCV
 			int errNum = test_glsFft(N, flags);
 			Assert::AreEqual(0, errNum);
 		}
+		BEGIN_TEST_METHOD_ATTRIBUTE(FFT)
+			//TEST_OWNER(L"OwnerName")
+			TEST_PRIORITY(1)
+			TEST_MY_TRAIT(L"basic")
+		END_TEST_METHOD_ATTRIBUTE()
+
 
 
 		TEST_METHOD(FFT_SCALE)
@@ -143,12 +143,6 @@ namespace UnitTest_glsCV
 			Assert::AreEqual(0, errNum);
 		}
 
-		//! benchmark
-		BEGIN_TEST_METHOD_ATTRIBUTE(FFT_SCALE_1024)
-			//TEST_OWNER(L"OwnerName")
-			//TEST_PRIORITY(1)
-			TEST_MY_TRAIT(L"benchmark")
-		END_TEST_METHOD_ATTRIBUTE()
 
 
 		TEST_METHOD(FFT_SCALE_1024)
@@ -163,13 +157,12 @@ namespace UnitTest_glsCV
 			}
 			Assert::AreEqual(0, errNum);
 		}
-
-		//! benchmark
-		BEGIN_TEST_METHOD_ATTRIBUTE(FFT_SCALE_2048)
+		BEGIN_TEST_METHOD_ATTRIBUTE(FFT_SCALE_1024)
 			//TEST_OWNER(L"OwnerName")
 			//TEST_PRIORITY(1)
 			TEST_MY_TRAIT(L"benchmark")
 		END_TEST_METHOD_ATTRIBUTE()
+
 
 
 		TEST_METHOD(FFT_SCALE_2048)
@@ -184,6 +177,12 @@ namespace UnitTest_glsCV
 			}
 			Assert::AreEqual(0, errNum);
 		}
+		BEGIN_TEST_METHOD_ATTRIBUTE(FFT_SCALE_2048)
+			//TEST_OWNER(L"OwnerName")
+			//TEST_PRIORITY(1)
+			TEST_MY_TRAIT(L"benchmark")
+		END_TEST_METHOD_ATTRIBUTE()
+
 
 
 

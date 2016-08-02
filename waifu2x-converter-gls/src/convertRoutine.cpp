@@ -43,7 +43,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "glsCV.h"
 
 //#ifdef _DEBUG
-#if 1
+#define _ENABLE_TMR_
+
+#if defined(_ENABLE_TMR_)
 #include "Timer.h"
 #define _TMR_(...)  Timer tmr(__VA_ARGS__)
 #else
@@ -148,13 +150,22 @@ static bool convertWithModelsBasic(cv::Mat &inputPlane, cv::Mat &outputPlane,
 	gls::GlsMat outputPlanes;
 
 
-	for (int index = 0; index < models.size(); index++) {
-
-		//std::cout << "Layer#" << (index) <<
-		//	" : " << models[index]->getNInputPlanes() <<
-		//	" > " << models[index]->getNOutputPlanes() <<
-		//	std::endl;
+	for (int index = 0; index <= models.size(); index++) {
+#if !defined(_ENABLE_TMR_)
 		{
+			std::cout << "\r[";
+			int progress = 0;
+			for (; progress < index; progress++)               std::cout << "=";
+			for (; progress < (int)models.size(); progress++)  std::cout << " ";
+			std::cout << "]";
+			std::cout.flush();
+		}
+#endif
+		if (index >= (int)models.size()) {
+			break;
+		}
+
+		{	// core processing
 			std::string str = "Layer#" + to_string(index)
 				+ " ( " + to_string(models[index]->getNInputPlanes())
 				+ " > " + to_string(models[index]->getNOutputPlanes())
@@ -175,6 +186,7 @@ static bool convertWithModelsBasic(cv::Mat &inputPlane, cv::Mat &outputPlane,
 		outputPlanes.download(_outputPlanes);
 	}
 
+	std::cout << " complete." << std::endl;
 	return true;
 
 }

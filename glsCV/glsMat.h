@@ -49,6 +49,9 @@ private:
 	int flag;					//!< フォーマット等を保存するフラグ
 
 	//! テクスチャ生成
+	void createTexture(const int _dims, const int* _sizes, int _type);
+
+	//! テクスチャ生成(2D)
 	void createTexture(const int _width, const int _height, int _type);
 	//! テクスチャ生成(3D)
 	void createTexture(const int _width, const int _height, const int _depth, int _type);
@@ -120,7 +123,11 @@ public:
 
 	//! 配列が要素を持たない（テクスチャーが生成されていない）場合に true を返します．
 	bool empty(void) const { return _texid.use_count() == 0; }
+
+	//! 行列が連続であるか否かを調べます． 
 	bool isContinuous(void) const { return true; }
+
+	size_t total(void) const;
 
 	/*!
 	OpenGL　wrapper

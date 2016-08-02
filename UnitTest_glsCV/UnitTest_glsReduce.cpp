@@ -84,12 +84,6 @@ namespace UnitTest_glsCV
 	TEST_CLASS(UnitTest_glsReduce)
 	{
 	public:
-		//! basic
-		BEGIN_TEST_METHOD_ATTRIBUTE(glsReduce_CV_32FC1_0_CV_REDUCE_MAX)
-			//TEST_OWNER(L"OwnerName")
-			TEST_PRIORITY(1)
-			TEST_MY_TRAIT(L"basic")
-		END_TEST_METHOD_ATTRIBUTE()
 
 		TEST_METHOD(glsReduce_CV_32FC1_0_CV_REDUCE_MAX)
 		{
@@ -97,6 +91,13 @@ namespace UnitTest_glsCV
 			int errNum = test_glsReduce<float>(CV_32FC1, 0, CV_REDUCE_MAX);
 			Assert::AreEqual(0, errNum);
 		}
+		BEGIN_TEST_METHOD_ATTRIBUTE(glsReduce_CV_32FC1_0_CV_REDUCE_MAX)
+			//TEST_OWNER(L"OwnerName")
+			TEST_PRIORITY(1)
+			TEST_MY_TRAIT(L"basic")
+		END_TEST_METHOD_ATTRIBUTE()
+
+
 		TEST_METHOD(glsReduce_CV_32FC1_1_CV_REDUCE_MAX)
 		{
 			cout << __FUNCTION__ << endl;

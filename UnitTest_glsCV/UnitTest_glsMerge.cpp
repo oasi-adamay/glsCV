@@ -111,12 +111,6 @@ namespace UnitTest_glsCV
 			Assert::AreEqual(0, errNum);
 		}
 
-		//! basic
-		BEGIN_TEST_METHOD_ATTRIBUTE(glsMerge_CV_32FC1_2)
-			//TEST_OWNER(L"OwnerName")
-			TEST_PRIORITY(1)
-			TEST_MY_TRAIT(L"basic")
-		END_TEST_METHOD_ATTRIBUTE()
 
 		TEST_METHOD(glsMerge_CV_32FC1_2)
 		{
@@ -124,6 +118,12 @@ namespace UnitTest_glsCV
 			int errNum = test_glsMerge<float>(CV_32FC1,2);
 			Assert::AreEqual(0, errNum);
 		}
+		BEGIN_TEST_METHOD_ATTRIBUTE(glsMerge_CV_32FC1_2)
+			//TEST_OWNER(L"OwnerName")
+			TEST_PRIORITY(1)
+			TEST_MY_TRAIT(L"basic")
+		END_TEST_METHOD_ATTRIBUTE()
+
 
 	};
 

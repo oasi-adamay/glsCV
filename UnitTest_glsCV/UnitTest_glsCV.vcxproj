@@ -167,6 +167,10 @@
     <ClInclude Include="Unittest_Common.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\waifu2x-converter-gls\src\convolutionalNeuralNetwork.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">stdafx.h</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">stdafx.h</ForcedIncludeFiles>
+    </ClCompile>
     <ClCompile Include="fft_stockhum.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -182,6 +186,7 @@
     <ClCompile Include="UnitTest_glsCanny.cpp" />
     <ClCompile Include="UnitTest_glsCartToPolar.cpp" />
     <ClCompile Include="UnitTest_glsConvert.cpp" />
+    <ClCompile Include="UnitTest_glsConvolutionalNeuralNetwork.cpp" />
     <ClCompile Include="UnitTest_glsCopy.cpp" />
     <ClCompile Include="UnitTest_glsEdgeTracer.cpp" />
     <ClCompile Include="unittest_glsFft.cpp" />
