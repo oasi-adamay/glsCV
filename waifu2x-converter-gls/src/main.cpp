@@ -135,7 +135,7 @@ int main(int argc, char** argv) {
 	cv::Mat srcImg = image.clone();
 
 	image.convertTo(image, CV_32F, 1.0 / 255.0);
-	cv::cvtColor(image, image, cv::COLOR_RGB2YUV);
+	cv::cvtColor(image, image, cv::COLOR_BGR2YUV);
 
 	// set number of jobs for processing models
 	w2xc::modelUtility::getInstance().setNumberOfJobs(cmdNumberOfJobs.getValue());
@@ -237,6 +237,12 @@ int main(int argc, char** argv) {
 			};
 
 			cv::merge(imageSplit, image);
+#if 0
+			{
+				_TMR_("delete models\t:");
+				models.clear();
+			}
+#endif
 
 		} // 2x scaling : end
 
@@ -253,7 +259,7 @@ int main(int argc, char** argv) {
 
 	}
 
-	cv::cvtColor(image, image, cv::COLOR_YUV2RGB);
+	cv::cvtColor(image, image, cv::COLOR_YUV2BGR);
 	image.convertTo(image, CV_8U, 255.0);
 	std::string outputFileName = cmdOutputFile.getValue();
 	if (outputFileName == "(auto)") {
