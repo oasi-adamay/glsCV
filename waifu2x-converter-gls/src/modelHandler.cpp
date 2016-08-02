@@ -175,8 +175,13 @@ bool Model::loadModelFromJSONObject(picojson::object &jsonObj) {
 
 		for (auto&& weightMatV : wInputPlane) {
 			picojson::array &weightMat = weightMatV.get<picojson::array>();
+#if !defined(_WEIGHT_3D_MAT)
 			cv::Mat writeMatrix = cv::Mat::zeros(kernelSize, kernelSize,
 			CV_32FC1);
+#else
+			cv::Mat writeMatrix = cv::Mat(kernelSize, kernelSize,
+				CV_32FC1, weights.ptr<float>(matProgress));
+#endif
 
 			for (int writingRow = 0; writingRow < kernelSize; writingRow++) {
 				auto& weightMatRowV = weightMat.at(writingRow);
@@ -190,7 +195,10 @@ bool Model::loadModelFromJSONObject(picojson::object &jsonObj) {
 
 			} // for(weightMat) (writing 1 matrix finished)
 
+#if !defined(_WEIGHT_3D_MAT)
 			weights.at(matProgress) = std::move(writeMatrix);
+#endif
+
 			matProgress++;
 		} // for(wInputPlane) (writing matrices in set of wInputPlane finished)
 
@@ -213,7 +221,12 @@ Model::Model(std::istream& binFile) {
 	binFile.read((char*)&nOutputPlanes, sizeof(int));
 	binFile.read((char*)&kernelSize, sizeof(int));
 
+#if !defined(_WEIGHT_3D_MAT)
 	weights = std::vector<cv::Mat>(nInputPlanes * nOutputPlanes, cv::Mat(kernelSize, kernelSize, CV_32FC1));
+#else
+	int _size[3] = { nInputPlanes * nOutputPlanes, kernelSize, kernelSize };
+	weights = Mat(3, _size, CV_32FC1);
+#endif
 	biases = std::vector<double>(nOutputPlanes, 0.0);
 
 	if (!loadModelFromBin(binFile)) {
@@ -233,7 +246,13 @@ bool Model::loadModelFromBin(std::istream& binFile)
 	int matProgress = 0;
 	for (int i = 0; i < nOutputPlanes; i++) {
 		for (int j = 0; j < nInputPlanes; j++) {
+#if !defined(_WEIGHT_3D_MAT)
 			cv::Mat writeMatrix = cv::Mat::zeros(kernelSize, kernelSize, CV_32FC1);
+#else
+			cv::Mat writeMatrix = cv::Mat(kernelSize, kernelSize,
+				CV_32FC1, weights.ptr<float>(matProgress));
+#endif
+
 
 			for (int writingRow = 0; writingRow < kernelSize; writingRow++) {
 				for (int index = 0; index < kernelSize; index++) {
@@ -242,7 +261,9 @@ bool Model::loadModelFromBin(std::istream& binFile)
 					writeMatrix.at<float>(writingRow, index) = data;
 				}
 			}
+#if !defined(_WEIGHT_3D_MAT)
 			weights.at(matProgress) = std::move(writeMatrix);
+#endif
 			matProgress++;
 		}
 	}
@@ -263,7 +284,12 @@ bool Model::saveModelToBin(std::ostream& binFile)
 	int matProgress = 0;
 	for (int i = 0; i < nOutputPlanes; i++) {
 		for (int j = 0; j < nInputPlanes; j++) {
+#if !defined(_WEIGHT_3D_MAT)
 			const cv::Mat& writeMatrix = weights.at(matProgress);
+#else
+			const cv::Mat writeMatrix = cv::Mat(kernelSize, kernelSize,
+				CV_32FC1, weights.ptr<float>(matProgress));
+#endif
 
 			for (int writingRow = 0; writingRow < kernelSize; writingRow++) {
 				for (int index = 0; index < kernelSize; index++) {
@@ -393,15 +419,20 @@ cv::Size modelUtility::getBlockSize(){
 // for debugging
 
 void Model::printWeightMatrix() {
-
+#if !defined(_WEIGHT_3D_MAT)
 	for (auto&& weightMatrix : weights) {
 		std::cout << weightMatrix << std::endl;
 	}
+#else
+	for (int i = 0; i < weights.size[0]; i++) {
+		cv::Mat weightMatrix(weights.size[1], weights.size[2], weights.type(), weights.data + weights.step[0]);
+		std::cout << weightMatrix << std::endl;
+	}
+#endif
 
 }
 
 void Model::printBiases() {
-
 	for (auto&& bias : biases) {
 		std::cout << bias << std::endl;
 	}
