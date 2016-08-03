@@ -191,6 +191,8 @@ void convolutionalNeuralNetwork(
 
 	cv::Size ipSize = cv::Size(inputPlanes.size[2], inputPlanes.size[1]);
 	cv::Size kSize = Size(weights.size[2], weights.size[1]);
+	int _kSize[3] = { inputPlanes.size[0], kSize.height, kSize.width };
+
 
 	GLint max_fragment_uniform_vectors;
 	glGetIntegerv(GL_MAX_FRAGMENT_UNIFORM_VECTORS, &max_fragment_uniform_vectors);
@@ -210,14 +212,12 @@ void convolutionalNeuralNetwork(
 
 	glsVAO vao(glGetAttribLocation(shader->program(), "position"));
 	glsFBO fbo(1);	//create  & bind FBO
-
+	GlsMat kernelPlanes(3, _kSize ,CV_32FC1);
 
 	for (int opIndex = 0; opIndex < outputPlanes.size[0]; opIndex++) {
-		int _sz[3] = { inputPlanes.size[0], kSize.height, kSize.width };
-		cv::Mat kernels = cv::Mat(3, _sz, CV_32FC1, weights.ptr<float>(inputPlanes.size[0] * opIndex));
-		GlsMat kernelPlanes;
+		cv::Mat kernels = cv::Mat(3, _kSize, CV_32FC1, weights.ptr<float>(inputPlanes.size[0] * opIndex));
 		if (shader == &ShaderConvolutionalNeuralNetwork){
-			kernelPlanes = (GlsMat)kernels;		//upload kernels to texture
+			kernelPlanes.upload(kernels);		//upload kernels to texture
 		}
 
 		//setup dest tex
@@ -229,7 +229,6 @@ void convolutionalNeuralNetwork(
 		glUniform1i(shader->uniformLocArray[0], 0);
 
 		if (shader == &ShaderConvolutionalNeuralNetwork){
-
 			//setup kernel tex
 			glActiveTexture(GL_TEXTURE1);
 			glBindTexture(GL_TEXTURE_2D_ARRAY, kernelPlanes.texid());
@@ -249,10 +248,11 @@ void convolutionalNeuralNetwork(
 
 		//Render!!
 		glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
-		//glFlush();
-		glFinish();
+		glFlush();
+		//glFinish();
 
 	}
+	glFinish();
 
 }
 

@@ -43,7 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "glsCV.h"
 
 //#ifdef _DEBUG
-#define _ENABLE_TMR_
+//#define _ENABLE_TMR_
 
 #if defined(_ENABLE_TMR_)
 #include "Timer.h"
