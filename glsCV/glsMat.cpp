@@ -268,6 +268,7 @@ static void mat2pbo(const Mat&src, const GLuint pbo){
 #else
 	uchar* pSrc = src.data;
 	uchar* pDst = ptr;
+#pragma warning(suppress: 28183)
 	std::memcpy(pDst, pSrc, size);
 
 #endif
@@ -293,6 +294,7 @@ static void pbo2mat(const GLuint pbo, Mat&dst){
 		size_t _step = dst.step[0];
 		uchar* pSrc = ptr + _step * i;
 		uchar* pDst = dst.data + _step *i;
+#pragma warning(suppress: 28183)
 		std::memcpy(pDst, pSrc, _step);
 	}
 #else
