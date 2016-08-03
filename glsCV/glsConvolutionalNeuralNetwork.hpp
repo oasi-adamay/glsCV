@@ -40,12 +40,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <opencv2/opencv.hpp>
 
+
 namespace gls {
 
 void convolutionalNeuralNetwork(
 	GlsMat &inputPlanes,				///! input [planes][rows][cols]
 	GlsMat &outputPlanes,				///! output [planes][rows][cols]
-	std::vector<cv::Mat>&weights,		///! kernels [inputPlanes*outputPlanes]([ksize][ksize])
+	cv::Mat &weights,					///! kernels [inputPlanes*outputPlanes][ksize][ksize]
 	std::vector<double>& biases			///! bias [outputPlanes]
 	);
 

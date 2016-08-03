@@ -180,22 +180,26 @@ void main()\n
 void convolutionalNeuralNetwork(
 	GlsMat &inputPlanes,				///! input [planes][rows][cols]
 	GlsMat &outputPlanes,				///! output [planes][rows][cols]
-	std::vector<cv::Mat>&weights,		///! kernels [inputPlanes*outputPlanes]([ksize][ksize])
+	cv::Mat &weights,					///! kernels [inputPlanes*outputPlanes][ksize][ksize]
 	std::vector<double>& biases			///! bias [outputPlanes]
 	)
 {
 	CV_Assert(inputPlanes.dims == 3);
 	CV_Assert(outputPlanes.dims == 3);
-	CV_Assert(inputPlanes.size[0] * outputPlanes.size[0] == weights.size());
+	CV_Assert(weights.dims == 3);
+	CV_Assert(inputPlanes.size[0] * outputPlanes.size[0] == weights.size[0]);
 
 	cv::Size ipSize = cv::Size(inputPlanes.size[2], inputPlanes.size[1]);
+	cv::Size kSize = Size(weights.size[2], weights.size[1]);
+	int _kSize[3] = { inputPlanes.size[0], kSize.height, kSize.width };
+
 
 	GLint max_fragment_uniform_vectors;
 	glGetIntegerv(GL_MAX_FRAGMENT_UNIFORM_VECTORS, &max_fragment_uniform_vectors);
 
 	glsShaderConvolutionalNeuralNetworkBase* shader;
 
-	if (weights[0].cols == 3 && weights[0].rows == 3
+	if (kSize.width == 3 && kSize.height == 3
 		&& max_fragment_uniform_vectors > (3*128+2)){
 		//kernel size == 3x3 で、uniform変数の割り当てられるならば、特殊化したシェーダを利用
 		shader = &ShaderConvolutionalNeuralNetwork3x3;
@@ -208,21 +212,13 @@ void convolutionalNeuralNetwork(
 
 	glsVAO vao(glGetAttribLocation(shader->program(), "position"));
 	glsFBO fbo(1);	//create  & bind FBO
-
+	GlsMat kernelPlanes(3, _kSize ,CV_32FC1);
 
 	for (int opIndex = 0; opIndex < outputPlanes.size[0]; opIndex++) {
-		cv::Size kSize = weights[0].size();
-		int _sz[3] = { inputPlanes.size[0], kSize.height, kSize.width };
-
-		//密なkernel配列を作成
-		cv::Mat kernels = cv::Mat(3, _sz, CV_32FC1);
-		for (int ipIndex = 0; ipIndex < inputPlanes.size[0]; ipIndex++) {
-			cv::Mat kernel = cv::Mat(kSize, CV_32FC1, kernels.ptr<float>(ipIndex));
-			weights[inputPlanes.size[0] * opIndex + ipIndex].copyTo(kernel);
+		cv::Mat kernels = cv::Mat(3, _kSize, CV_32FC1, weights.ptr<float>(inputPlanes.size[0] * opIndex));
+		if (shader == &ShaderConvolutionalNeuralNetwork){
+			kernelPlanes.upload(kernels);		//upload kernels to texture
 		}
-		GlsMat kernelPlanes = (GlsMat)kernels;
-
-
 
 		//setup dest tex
 		glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, outputPlanes.texid(), 0, opIndex);
@@ -252,10 +248,11 @@ void convolutionalNeuralNetwork(
 
 		//Render!!
 		glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
-		//glFlush();
-		glFinish();
+		glFlush();
+		//glFinish();
 
 	}
+	glFinish();
 
 }
 

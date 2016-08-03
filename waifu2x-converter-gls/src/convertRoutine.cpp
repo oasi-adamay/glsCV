@@ -43,7 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "glsCV.h"
 
 //#ifdef _DEBUG
-#define _ENABLE_TMR_
+//#define _ENABLE_TMR_
 
 #if defined(_ENABLE_TMR_)
 #include "Timer.h"
@@ -143,7 +143,7 @@ static bool convertWithModelsBasic(cv::Mat &inputPlane, cv::Mat &outputPlane,
 //	gls::GlsMat inputPlanes(cv::Mat(3, _size, CV_32FC1, inputPlane.data));		//upload
 	gls::GlsMat inputPlanes;
 	{
-		_TMR_("upload\t:");
+		_TMR_("upload  \t\t:");
 		cv::Mat _inputPlanes = cv::Mat(3, _size, CV_32FC1, inputPlane.data);
 		inputPlanes = (gls::GlsMat)_inputPlanes;
 	}
@@ -179,8 +179,8 @@ static bool convertWithModelsBasic(cv::Mat &inputPlane, cv::Mat &outputPlane,
 			inputPlanes = outputPlanes;
 		}
 	}
-	{
-		_TMR_("download\t:");
+	{ 
+		_TMR_("download\t\t:");
 		outputPlane = cv::Mat(inputPlane.size(), inputPlane.type());
 		cv::Mat _outputPlanes(3, _size, CV_32FC1, outputPlane.data);
 		outputPlanes.download(_outputPlanes);

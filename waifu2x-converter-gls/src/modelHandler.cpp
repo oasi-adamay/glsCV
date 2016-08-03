@@ -175,8 +175,8 @@ bool Model::loadModelFromJSONObject(picojson::object &jsonObj) {
 
 		for (auto&& weightMatV : wInputPlane) {
 			picojson::array &weightMat = weightMatV.get<picojson::array>();
-			cv::Mat writeMatrix = cv::Mat::zeros(kernelSize, kernelSize,
-			CV_32FC1);
+			cv::Mat writeMatrix = cv::Mat(kernelSize, kernelSize,
+				CV_32FC1, weights.ptr<float>(matProgress));
 
 			for (int writingRow = 0; writingRow < kernelSize; writingRow++) {
 				auto& weightMatRowV = weightMat.at(writingRow);
@@ -190,7 +190,7 @@ bool Model::loadModelFromJSONObject(picojson::object &jsonObj) {
 
 			} // for(weightMat) (writing 1 matrix finished)
 
-			weights.at(matProgress) = std::move(writeMatrix);
+
 			matProgress++;
 		} // for(wInputPlane) (writing matrices in set of wInputPlane finished)
 
@@ -213,7 +213,8 @@ Model::Model(std::istream& binFile) {
 	binFile.read((char*)&nOutputPlanes, sizeof(int));
 	binFile.read((char*)&kernelSize, sizeof(int));
 
-	weights = std::vector<cv::Mat>(nInputPlanes * nOutputPlanes, cv::Mat(kernelSize, kernelSize, CV_32FC1));
+	int _size[3] = { nInputPlanes * nOutputPlanes, kernelSize, kernelSize };
+	weights = Mat(3, _size, CV_32FC1);
 	biases = std::vector<double>(nOutputPlanes, 0.0);
 
 	if (!loadModelFromBin(binFile)) {
@@ -233,7 +234,8 @@ bool Model::loadModelFromBin(std::istream& binFile)
 	int matProgress = 0;
 	for (int i = 0; i < nOutputPlanes; i++) {
 		for (int j = 0; j < nInputPlanes; j++) {
-			cv::Mat writeMatrix = cv::Mat::zeros(kernelSize, kernelSize, CV_32FC1);
+			cv::Mat writeMatrix = cv::Mat(kernelSize, kernelSize,
+				CV_32FC1, weights.ptr<float>(matProgress));
 
 			for (int writingRow = 0; writingRow < kernelSize; writingRow++) {
 				for (int index = 0; index < kernelSize; index++) {
@@ -242,7 +244,6 @@ bool Model::loadModelFromBin(std::istream& binFile)
 					writeMatrix.at<float>(writingRow, index) = data;
 				}
 			}
-			weights.at(matProgress) = std::move(writeMatrix);
 			matProgress++;
 		}
 	}
@@ -263,7 +264,8 @@ bool Model::saveModelToBin(std::ostream& binFile)
 	int matProgress = 0;
 	for (int i = 0; i < nOutputPlanes; i++) {
 		for (int j = 0; j < nInputPlanes; j++) {
-			const cv::Mat& writeMatrix = weights.at(matProgress);
+			const cv::Mat writeMatrix = cv::Mat(kernelSize, kernelSize,
+				CV_32FC1, weights.ptr<float>(matProgress));
 
 			for (int writingRow = 0; writingRow < kernelSize; writingRow++) {
 				for (int index = 0; index < kernelSize; index++) {
@@ -393,15 +395,13 @@ cv::Size modelUtility::getBlockSize(){
 // for debugging
 
 void Model::printWeightMatrix() {
-
-	for (auto&& weightMatrix : weights) {
+	for (int i = 0; i < weights.size[0]; i++) {
+		cv::Mat weightMatrix(weights.size[1], weights.size[2], weights.type(), weights.data + weights.step[0]);
 		std::cout << weightMatrix << std::endl;
 	}
-
 }
 
 void Model::printBiases() {
-
 	for (auto&& bias : biases) {
 		std::cout << bias << std::endl;
 	}

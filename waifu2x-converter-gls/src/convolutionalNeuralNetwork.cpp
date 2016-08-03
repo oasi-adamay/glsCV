@@ -92,30 +92,25 @@ void ReLU_accumlate_filter2D(
 void convolutionalNeuralNetwork(
 	cv::Mat &inputPlanes,				///! input [planes][rows][cols]
 	cv::Mat &outputPlanes,				///! output [planes][rows][cols]
-	std::vector<cv::Mat>&weights,		///! kernels [inputPlanes*outputPlanes]([ksize][ksize])
+	cv::Mat &weights,					///! kernels [inputPlanes*outputPlanes][ksize][ksize]
 	std::vector<double>& biases			///! bias [outputPlanes]
 	)
 {
 	CV_Assert(inputPlanes.dims == 3);
 	CV_Assert(outputPlanes.dims == 3);
-	CV_Assert(inputPlanes.size[0] * outputPlanes.size[0] == weights.size());
+	CV_Assert(weights.dims == 3);
+	CV_Assert(inputPlanes.size[0] * outputPlanes.size[0] == weights.size[0]);
 
 	cv::Size ipSize = cv::Size(inputPlanes.size[2], inputPlanes.size[1]);
+	cv::Size kSize = Size(weights.size[2], weights.size[1]);
+
 
 #ifdef _OPENMP
 #pragma omp parallel for
 #endif
 	for (int opIndex = 0; opIndex < outputPlanes.size[0]; opIndex++) {
-		cv::Size kSize = weights[0].size();
 		int _sz[3] = { inputPlanes.size[0], kSize.height, kSize.width };
-
-		//密なkernel配列を作成
-		cv::Mat kernels = cv::Mat(3, _sz, CV_32FC1);
-		for (int ipIndex = 0; ipIndex < inputPlanes.size[0]; ipIndex++) {
-			cv::Mat kernel = cv::Mat(kSize, CV_32FC1, kernels.ptr<float>(ipIndex));
-			weights[inputPlanes.size[0] * opIndex + ipIndex].copyTo(kernel);
-		}
-
+		cv::Mat kernels = cv::Mat(3, _sz, CV_32FC1, weights.ptr<float>(inputPlanes.size[0] * opIndex));
 		cv::Mat outputPlane = cv::Mat(ipSize, CV_32FC1, outputPlanes.ptr<float>(opIndex));
 		ReLU_accumlate_filter2D(inputPlanes, outputPlane, kernels, (float)biases[opIndex]);
 	}

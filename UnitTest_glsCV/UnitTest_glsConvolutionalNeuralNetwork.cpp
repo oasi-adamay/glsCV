@@ -47,23 +47,25 @@ namespace UnitTest_glsCV
 
 		Size size(32,24);
 		cout << "Size:" << size << endl;
-		int ulps = 16;
+		int ulps = 4;
+		float diff = 1e-5;
+
 
 		int dims = 3;
 		int ipSize[3] = { inputLayers, size.height, size.width };
 		int opSize[3] = { outputLayers, size.height, size.width };
+		int _kSize[3] = { inputLayers*outputLayers, ksize.height, ksize.width };
 
 		Mat inputPlanes = Mat(dims, ipSize, cvtype);
 		Mat outputPlanes = Mat(dims, opSize, cvtype);
 
-		std::vector<cv::Mat>weights(inputLayers*outputLayers, Mat(ksize, CV_32FC1));
+		cv::Mat weights(dims, _kSize, CV_32FC1);
 		std::vector<double> biases(outputLayers);
 
 		FillRandU<T>(inputPlanes);
-		for (size_t i = 0; i < weights.size(); i++){
-			FillRandU<float>(weights[i]);
-			weights[i] -= 0.5f;
-		}
+		FillRandU<T>(weights);
+		weights -= 0.5f;
+
 		for (size_t i = 0; i < biases.size(); i++){
 			biases[i] = randu<double>() - 0.5;
 		}
@@ -91,8 +93,8 @@ namespace UnitTest_glsCV
 
 
 		int errNum = 0;
-		if (!AreEqual<T>(inputPlanes, (Mat)_inputPlanes, ulps)) errNum -= 1;
-		if (!AreEqual<T>(outputPlanes, (Mat)_outputPlanes, ulps)) errNum -= 1;
+		if (!AreEqual<T>(inputPlanes, (Mat)_inputPlanes, ulps, diff)) errNum -= 1;
+		if (!AreEqual<T>(outputPlanes, (Mat)_outputPlanes, ulps, diff)) errNum -= 1;
 
 
 		return errNum;

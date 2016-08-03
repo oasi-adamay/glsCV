@@ -71,7 +71,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define MODEL_BIN
 
 int main(int argc, char** argv) {
-	{	//_TMR
 	_TMR_("total time\t:");
 	glsCvInit();
 
@@ -132,7 +131,10 @@ int main(int argc, char** argv) {
 		std::exit(-1);
 	}
 
-	cv::Mat srcImg = image.clone();
+//	cv::Mat srcImg = image.clone();
+
+	{
+		_TMR_("Process Time\t:");
 
 	image.convertTo(image, CV_32F, 1.0 / 255.0);
 	cv::cvtColor(image, image, cv::COLOR_BGR2YUV);
@@ -149,7 +151,7 @@ int main(int argc, char** argv) {
 
 	// ===== Noise Reduction Phase =====
 	if (cmdMode.getValue() == "noise" || cmdMode.getValue() == "noise_scale") {
-		_TMR_("Noise Reduction Phase:");
+		_TMR_("Noise Reduction\t:");
 		std::cout << "Noise Reduction Phase." << std::endl;
 
 		std::string modelFileName(cmdModelPath.getValue());
@@ -179,7 +181,7 @@ int main(int argc, char** argv) {
 	// ===== scaling phase =====
 
 	if (cmdMode.getValue() == "scale" || cmdMode.getValue() == "noise_scale") {
-		_TMR_("scaling Phase:");
+		_TMR_("scaling Phase\t\t:");
 		std::cout << "scaling phase." << std::endl;
 
 		// calculate iteration times of 2x scaling and shrink ratio which will use at last
@@ -261,6 +263,8 @@ int main(int argc, char** argv) {
 
 	cv::cvtColor(image, image, cv::COLOR_YUV2BGR);
 	image.convertTo(image, CV_8U, 255.0);
+	}	//_TMR
+
 	std::string outputFileName = cmdOutputFile.getValue();
 	if (outputFileName == "(auto)") {
 		outputFileName = cmdInputFile.getValue();
@@ -283,14 +287,12 @@ int main(int argc, char** argv) {
 
 	std::cout << "process successfully done!" << std::endl;
 
-	cv::Mat dstImg = image.clone();
-
-	cv::Mat cubicImg;
-	cv::resize(srcImg, cubicImg, Size(0, 0), 2.0, 2.0, cv::INTER_CUBIC);
+	//cv::Mat dstImg = image.clone();
+	//cv::Mat cubicImg;
+	//cv::resize(srcImg, cubicImg, Size(0, 0), 2.0, 2.0, cv::INTER_CUBIC);
 
 
 	glsCvTerminate();
-	}	//_TMR
 
 #if 0
 	cv::imshow("src", srcImg);
@@ -298,6 +300,6 @@ int main(int argc, char** argv) {
 	cv::imshow("cubic", cubicImg);
 #endif
 
-	std::cin.get();
+//	std::cin.get();
 	return 0;
 }
