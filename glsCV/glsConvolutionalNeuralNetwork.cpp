@@ -126,11 +126,13 @@ void main()\n
 	// Convolution & Accumulate	\n
 	float s = 0.0; \n
 	for (int i = 0; i < texSize.z; i++) { \n
-		ivec3 uvt = ivec3(gl_FragCoord.xy, 0); \n
+		ivec3 uvt0 = ivec3(gl_FragCoord.xy, i); \n
+		ivec3 uvt1 = ivec3(kxp, kyp, i); \n
 		for (int ky = kym; ky <= kyp; ky++){	\n
 			for (int kx = kxm; kx <= kxp; kx++){	\n
-				float data = texelFetch(texSrc, uvt + ivec3(kx,ky,i), 0).r; \n
-				float wei = texelFetch(weights, ivec3(kx+kxp, ky+kyp, i), 0).r; \n
+				ivec3 ofs = ivec3(kx, ky, 0); \n
+				float data = texelFetch(texSrc, uvt0 + ofs, 0).r; \n
+				float wei = texelFetch(weights, uvt1 + ofs, 0).r; \n
 				s += data*wei; \n
 			} \n
 		} \n
@@ -355,7 +357,6 @@ void convolutionalNeuralNetwork(
 	else{
 		shader = &ShaderConvolutionalNeuralNetworkVec4;
 	}
-
 
 	glUseProgram(shader->program());
 
