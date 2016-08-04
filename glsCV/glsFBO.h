@@ -34,11 +34,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace gls
 {
 
+//! simple frame buffer object
+//! automatically call glBindFramebuffer at the time of construct.
 class glsFBO{
 private:
+	DISALLOW_COPY_AND_ASSIGN(glsFBO);
 	GLuint fbo;
 public:
-	glsFBO(const int attachment_num = 1);
+	glsFBO(void);
 	~glsFBO(void);
 };
 

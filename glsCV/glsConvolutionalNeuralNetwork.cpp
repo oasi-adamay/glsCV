@@ -361,7 +361,7 @@ void convolutionalNeuralNetwork(
 	glUseProgram(shader->program());
 
 	glsVAO vao(glGetAttribLocation(shader->program(), "position"));
-	glsFBO fbo(1);	//create  & bind FBO
+	glsFBO fbo;		//create  & bind FBO
 	GlsMat kernelPlanes(3, _kSize, weights.type());
 
 	for (int opIndex = 0; opIndex < outputPlanes.size[0]; opIndex++) {

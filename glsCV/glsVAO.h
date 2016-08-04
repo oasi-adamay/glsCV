@@ -34,10 +34,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace gls
 {
 
+//! simple vertex array object & vertex buffer object
+//! at the time of construct, following function is called.
+//! - glGenVertexArrays (create vao)
+//! - glGenBuffers	(create vboo)
+//! - glBindVertexArray (bind vao)
+//! - glBindBuffer (bind vao to vao)
+//! - glBufferData (upload 4 - vertex points)
+//! - glEnableVertexAttribArray ( specified attribute location by args)
 class glsVAO{
 private:
-	GLuint vao;
-	GLuint vbo;
+	DISALLOW_COPY_AND_ASSIGN(glsVAO);
+	GLuint vao;	//vertex array object id
+	GLuint vbo;	//vertex buffer object id
 public:
 	glsVAO(GLuint attrLoc);
 	~glsVAO(void);

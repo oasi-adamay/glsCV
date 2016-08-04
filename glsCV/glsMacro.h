@@ -1,4 +1,4 @@
-/*
+﻿/*
 Copyright (c) 2016, oasi-adamay
 All rights reserved.
 
@@ -47,17 +47,24 @@ const char* glsErrorString(GLenum err);
 /*
 opengl API error check
 
-OpenGL��API�R�[����ɌĂԁB
-����error������΁Aassert����B
+OpenGLのAPIコール後に呼ぶ。
+何かerrorがあれば、assertする。
 */
 #define GL_CHECK_ERROR()  GLS_Assert(glGetError() == GL_NO_ERROR)
 #endif
 
 
 /*
-�����񃊃e������
+文字列リテラル化
 */
 #define TO_STR(...) #__VA_ARGS__
 
+/*
+コピーコンストラクタと=演算子関数を無効にするマクロ
+これはクラスのprivate:宣言内で使うべき。
+*/
+#define DISALLOW_COPY_AND_ASSIGN(TypeName) \
+  TypeName(const TypeName&);               \
+  void operator=(const TypeName&)
 
 #endif

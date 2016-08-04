@@ -34,19 +34,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace gls
 {
 
+//! simple atomic counter
 class AtomicCounter{
 private:
+	DISALLOW_COPY_AND_ASSIGN(AtomicCounter);
+
 	GLuint id;
-
-	AtomicCounter(const AtomicCounter&);              // disallow_copy_assin
-	AtomicCounter& operator=(const AtomicCounter&);   // disallow_copy_assin
-
 public:
 	AtomicCounter(void);
 	~AtomicCounter(void);
-	void Bind(void) const;
-	unsigned int Get(void) const;
-	void Set(unsigned int val);
+	void Bind(void) const;			//! bind atomic counter
+	unsigned int Get(void) const;	//! get counter
+	void Set(unsigned int val);		//! set counter
 
 };
 
