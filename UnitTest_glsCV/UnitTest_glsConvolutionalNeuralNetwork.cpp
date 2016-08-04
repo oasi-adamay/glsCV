@@ -252,7 +252,7 @@ namespace UnitTest_glsCV
 //		Size size(5, 4);
 		cout << "Size:" << size << endl;
 		int ulps = 4;
-		float diff = 1e-5f;
+		float diff = 1e-4f;
 
 		const int channels = 4;
 		int ipCh = inputLayers / channels > 0 ? channels : inputLayers;	//input channels
@@ -298,7 +298,7 @@ namespace UnitTest_glsCV
 				biases						///! bias [outputPlanes]
 				);
 		}
-#if 1
+#if 0
 		Mat _inputPlanes;
 		Mat _outputPlanes;
 		Mat _weights;
@@ -324,22 +324,31 @@ namespace UnitTest_glsCV
 
 
 #else
-		GlsMat _inputPlanes = (GlsMat)inputPlanes;
-		GlsMat _outputPlanes = GlsMat(dims, opSize, cvtype);
+		Mat _inputPlanes;
+		Mat _outputPlanes;
+		Mat _weights;
+
+		pack<T>(inputPlanes, _inputPlanes, channels);
+		pack<T>(weights, _weights, _inputPlanes.channels());
+		pack<T>(outputPlanes, _outputPlanes, channels);
+
+		GlsMat __inputPlanes = (GlsMat)_inputPlanes;
+		GlsMat __outputPlanes(_outputPlanes.dims, _outputPlanes.size, _outputPlanes.type());
 
 		{
 			gls::convolutionalNeuralNetwork(
-				_inputPlanes,				///! input [planes][rows][cols]
-				_outputPlanes,				///! output [planes][rows][cols]
-				weights,					///! kernels [inputPlanes*outputPlanes]([ksize][ksize])
+				__inputPlanes,				///! input [planes][rows][cols]
+				__outputPlanes,				///! output [planes][rows][cols]
+				_weights,					///! kernels [inputPlanes*outputPlanes]([ksize][ksize])
 				biases						///! bias [outputPlanes]
 				);
 		}
 
 
 		int errNum = 0;
-		if (!AreEqual<T>(inputPlanes, (Mat)_inputPlanes, ulps, diff)) errNum -= 1;
-		if (!AreEqual<T>(outputPlanes, (Mat)_outputPlanes, ulps, diff)) errNum -= 1;
+		unpack<T>((Mat)__outputPlanes, _outputPlanes);
+
+		if (!AreEqual<T>(outputPlanes, _outputPlanes, ulps, diff)) errNum -= 1;
 #endif
 
 		return errNum;

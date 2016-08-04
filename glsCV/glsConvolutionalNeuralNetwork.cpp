@@ -63,6 +63,8 @@ list<string> glsShaderConvolutionalNeuralNetworkBase::UniformNameList(void){
 	lst.push_back("texSrc");
 	lst.push_back("weights");
 	lst.push_back("bias");
+	lst.push_back("srcChannels");
+	lst.push_back("dstChannels");
 	return lst;
 }
 
@@ -87,6 +89,17 @@ public:
 	glsShaderConvolutionalNeuralNetwork3x3(void) :glsShaderConvolutionalNeuralNetworkBase(__FUNCTION__){}
 };
 glsShaderConvolutionalNeuralNetwork3x3 ShaderConvolutionalNeuralNetwork3x3;
+
+class  glsShaderConvolutionalNeuralNetworkVec4 : public glsShaderConvolutionalNeuralNetworkBase
+{
+protected:
+	string FragmentShaderCode(void);
+
+public:
+	glsShaderConvolutionalNeuralNetworkVec4(void) :glsShaderConvolutionalNeuralNetworkBase(__FUNCTION__){}
+
+};
+glsShaderConvolutionalNeuralNetworkVec4 ShaderConvolutionalNeuralNetworkVec4;
 
 
 
@@ -175,6 +188,126 @@ void main()\n
 	return fragmentShaderCode;
 }
 
+#if 1
+string glsShaderConvolutionalNeuralNetworkVec4::FragmentShaderCode(void){
+	const char fragmentShaderCode[] = TO_STR(
+		#version 330 core	\n
+		precision highp float;	\n
+		uniform sampler2DArray	texSrc; \n
+		uniform sampler2DArray	weights; \n
+		uniform vec4 bias; \n
+		uniform int srcChannels; \n
+		uniform int dstChannels; \n
+		layout(location = 0) out vec4 dst; \n
+		void main()\n
+	{ \n
+	ivec3 texSize = textureSize(texSrc, 0); \n
+	ivec3 kSize = textureSize(weights, 0); \n
+	int kxsize = kSize.x; \n
+	int kysize = kSize.y; \n
+	int kxp = kxsize / 2; \n
+	int kxm = -kxp; \n
+	int kyp = kysize / 2; \n
+	int kym = -kyp; \n
+
+	// Convolution & Accumulate	\n
+	vec4 s; \n
+	for (int dCh = 0; dCh < dstChannels; dCh++) { \n
+		vec4 accm = vec4(0.0); \n
+		for (int i = 0; i < texSize.z; i++) { \n
+			ivec3 uvt0 = ivec3(gl_FragCoord.xy, i); \n
+			ivec3 uvt1 = ivec3(kxp, kyp, i + texSize.z *dCh); \n
+			for (int ky = kym; ky <= kyp; ky++){	\n
+				for (int kx = kxm; kx <= kxp; kx++){	\n
+					vec4 data = texelFetch(texSrc, uvt0 + ivec3(kx, ky, 0), 0); \n
+					vec4 wei = texelFetch(weights, uvt1 + ivec3(kx, ky, 0), 0); \n
+					accm += data*wei; \n
+				} \n
+			} \n
+		}\n
+		float _s = 0.0;	\n 
+		for (int sCh = 0; sCh < srcChannels; sCh++) { \n
+			_s += accm[sCh];	\n
+		}	\n
+		s[dCh] = _s;
+	}\n
+	// Leaky ReLU\n
+	s += bias; \n
+	s = max(s, 0) + min(s, 0) * 0.1; \n
+	dst = s; \n
+}\n
+);
+	return fragmentShaderCode;
+}
+#else
+string glsShaderConvolutionalNeuralNetworkVec4::FragmentShaderCode(void){
+	const char fragmentShaderCode[] = TO_STR(
+		#version 330 core	\n
+		precision highp float;	\n
+		uniform sampler2DArray	texSrc; \n
+		uniform sampler2DArray	weights; \n
+		uniform vec4 bias; \n
+		uniform int srcChannels; \n
+		uniform int dstChannels; \n
+		layout(location = 0) out vec4 dst; \n
+		void main()\n
+	{ \n
+	ivec3 texSize = textureSize(texSrc, 0); \n
+
+	// Convolution & Accumulate	\n
+	vec4 s; \n
+	for (int dCh = 0; dCh < dstChannels; dCh++) { \n
+		vec4 accm = vec4(0.0); \n
+		for (int i = 0; i < texSize.z; i++) { \n
+			ivec3 uvt0 = ivec3(gl_FragCoord.xy, i); \n
+			ivec3 uvt1 = ivec3(1, 1, i + texSize.z *dCh); \n
+			vec4 data;\n
+			vec4 wei;\n
+			data = texelFetchOffset(texSrc, uvt0, 0, ivec2(-1, -1)); \n
+			wei = texelFetchOffset(weights, uvt1, 0, ivec2(-1, -1)); \n
+			accm += data*wei; \n
+			data = texelFetchOffset(texSrc, uvt0, 0, ivec2(+0, -1)); \n
+			wei = texelFetchOffset(weights, uvt1, 0, ivec2(+0, -1)); \n
+			accm += data*wei; \n
+			data = texelFetchOffset(texSrc, uvt0, 0, ivec2(+1, -1)); \n
+			wei = texelFetchOffset(weights, uvt1, 0, ivec2(+1, -1)); \n
+			accm += data*wei; \n
+			data = texelFetchOffset(texSrc, uvt0, 0, ivec2(-1, +0)); \n
+			wei = texelFetchOffset(weights, uvt1, 0, ivec2(-1, +0)); \n
+			accm += data*wei; \n
+			data = texelFetchOffset(texSrc, uvt0, 0, ivec2(+0, +0)); \n
+			wei = texelFetchOffset(weights, uvt1, 0, ivec2(+0, +0)); \n
+			accm += data*wei; \n
+			data = texelFetchOffset(texSrc, uvt0, 0, ivec2(+1, +0)); \n
+			wei = texelFetchOffset(weights, uvt1, 0, ivec2(+1, +0)); \n
+			accm += data*wei; \n
+			data = texelFetchOffset(texSrc, uvt0, 0, ivec2(-1, +1)); \n
+			wei = texelFetchOffset(weights, uvt1, 0, ivec2(-1, +1)); \n
+			accm += data*wei; \n
+			data = texelFetchOffset(texSrc, uvt0, 0, ivec2(+0, +1)); \n
+			wei = texelFetchOffset(weights, uvt1, 0, ivec2(+0, +1)); \n
+			accm += data*wei; \n
+			data = texelFetchOffset(texSrc, uvt0, 0, ivec2(+1, +1)); \n
+			wei = texelFetchOffset(weights, uvt1, 0, ivec2(+1, +1)); \n
+			accm += data*wei; \n
+		}\n
+		float _s = 0.0;	\n 
+		for (int sCh = 0; sCh < srcChannels; sCh++) { \n
+			_s += accm[sCh];	\n
+		}	\n
+		s[dCh] = _s;
+	}\n
+	// Leaky ReLU\n
+	s += bias; \n
+	s = max(s, 0) + min(s, 0) * 0.1; \n
+	dst = s; \n
+}\n
+);
+	return fragmentShaderCode;
+}
+
+#endif
+
 
 
 void convolutionalNeuralNetwork(
@@ -187,36 +320,53 @@ void convolutionalNeuralNetwork(
 	CV_Assert(inputPlanes.dims == 3);
 	CV_Assert(outputPlanes.dims == 3);
 	CV_Assert(weights.dims == 3);
-	CV_Assert(inputPlanes.size[0] * outputPlanes.size[0] == weights.size[0]);
+	const int n_inputPlanes = inputPlanes.size[0];
+	const int n_inputChannels = inputPlanes.channels();
+	const int n_outputPlanes = outputPlanes.size[0];
+	const int n_outputChannels = outputPlanes.channels();
+	const int n_weightPlanes = weights.size[0];
+	const int n_weightChannels = weights.channels();
+	CV_Assert(n_inputPlanes * n_inputChannels *
+		n_outputPlanes * n_outputChannels
+		== n_weightPlanes * n_weightChannels);
 
 	cv::Size ipSize = cv::Size(inputPlanes.size[2], inputPlanes.size[1]);
 	cv::Size kSize = Size(weights.size[2], weights.size[1]);
-	int _kSize[3] = { inputPlanes.size[0], kSize.height, kSize.width };
-
+	int _kSize[3] = { n_inputPlanes * n_outputChannels, kSize.height, kSize.width };
 
 	GLint max_fragment_uniform_vectors;
 	glGetIntegerv(GL_MAX_FRAGMENT_UNIFORM_VECTORS, &max_fragment_uniform_vectors);
 
-	glsShaderConvolutionalNeuralNetworkBase* shader;
+	GLint max_uniform_block_size;	// in byte?
+	glGetIntegerv(GL_MAX_UNIFORM_BLOCK_SIZE, &max_uniform_block_size);
+	
 
-	if (kSize.width == 3 && kSize.height == 3
-		&& max_fragment_uniform_vectors > (3*128+2)){
-		//kernel size == 3x3 で、uniform変数の割り当てられるならば、特殊化したシェーダを利用
-		shader = &ShaderConvolutionalNeuralNetwork3x3;
+	glsShaderConvolutionalNeuralNetworkBase* shader = 0;
+	if (n_inputChannels == 1 && n_outputChannels == 1){
+		if (kSize.width == 3 && kSize.height == 3
+			&& max_fragment_uniform_vectors > (3 * 128 + 16)){
+			//kernel size == 3x3 で、uniform変数の割り当てられるならば、特殊化したシェーダを利用
+			shader = &ShaderConvolutionalNeuralNetwork3x3;
+		}
+		else{
+			shader = &ShaderConvolutionalNeuralNetwork;
+		}
 	}
 	else{
-		shader = &ShaderConvolutionalNeuralNetwork;
+		shader = &ShaderConvolutionalNeuralNetworkVec4;
 	}
+
 
 	glUseProgram(shader->program());
 
 	glsVAO vao(glGetAttribLocation(shader->program(), "position"));
 	glsFBO fbo(1);	//create  & bind FBO
-	GlsMat kernelPlanes(3, _kSize ,CV_32FC1);
+	GlsMat kernelPlanes(3, _kSize, weights.type());
 
 	for (int opIndex = 0; opIndex < outputPlanes.size[0]; opIndex++) {
-		cv::Mat kernels = cv::Mat(3, _kSize, CV_32FC1, weights.ptr<float>(inputPlanes.size[0] * opIndex));
-		if (shader == &ShaderConvolutionalNeuralNetwork){
+		cv::Mat kernels = cv::Mat(3, _kSize, weights.type(), weights.ptr<float>(_kSize[0] * opIndex));
+		if (shader == &ShaderConvolutionalNeuralNetwork ||
+			shader == &ShaderConvolutionalNeuralNetworkVec4	){
 			kernelPlanes.upload(kernels);		//upload kernels to texture
 		}
 
@@ -228,18 +378,37 @@ void convolutionalNeuralNetwork(
 		glBindTexture(GL_TEXTURE_2D_ARRAY, inputPlanes.texid());
 		glUniform1i(shader->uniformLocArray[0], 0);
 
+		float bias[4];
+		for (int i = 0; i < n_outputChannels; i++){
+			bias[i] = (float)biases[n_outputChannels*opIndex+i];
+		}
+
 		if (shader == &ShaderConvolutionalNeuralNetwork){
 			//setup kernel tex
 			glActiveTexture(GL_TEXTURE1);
 			glBindTexture(GL_TEXTURE_2D_ARRAY, kernelPlanes.texid());
 			glUniform1i(shader->uniformLocArray[1], 1);
+			glUniform1f(shader->uniformLocArray[2], bias[0]);
+		}
+		else if(shader == &ShaderConvolutionalNeuralNetwork3x3){
+			glUniform3fv(shader->uniformLocArray[1], 3 * inputPlanes.size[0], kernels.ptr<float>());
+			glUniform1f(shader->uniformLocArray[2], bias[0]);
+		}
+		else if (shader == &ShaderConvolutionalNeuralNetworkVec4){
+			//setup kernel tex
+			glActiveTexture(GL_TEXTURE1);
+			glBindTexture(GL_TEXTURE_2D_ARRAY, kernelPlanes.texid());
+
+			glUniform1i(shader->uniformLocArray[1], 1);
+			glUniform4fv(shader->uniformLocArray[2], 1,bias);
+			glUniform1i(shader->uniformLocArray[3], n_inputChannels);
+			glUniform1i(shader->uniformLocArray[4], n_outputChannels);
+
 		}
 		else{
-			glUniform3fv(shader->uniformLocArray[1], 3 * inputPlanes.size[0], kernels.ptr<float>());
+			GLS_Assert(0 && "unreachable");
 		}
 
-		//uniform
-		glUniform1f(shader->uniformLocArray[2], (float)biases[opIndex]);
 
 		shader->DrawBuffers(1);
 

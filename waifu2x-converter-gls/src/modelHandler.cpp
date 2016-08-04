@@ -48,6 +48,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "glsCV.h"
 
+//#define _ENABLE_TMR_
+
+#if defined(_ENABLE_TMR_)
+#include "Timer.h"
+#define _TMR_(...)  Timer tmr(__VA_ARGS__)
+#else
+#define _TMR_(...)
+#endif
+
 
 namespace w2xc {
 
@@ -115,6 +124,43 @@ bool Model::filter(
 	return true;
 }
 #elif	defined(USE_GLS_NEW)
+template <typename T>
+void pack(Mat& src, Mat& dst, int channels = 4){
+	_TMR_("pack\t:");
+	CV_Assert(src.dims == 3);
+	CV_Assert(src.channels() == 1);
+
+	const int srcPlanes = src.size[0];
+	const Size srcSize(src.size[2], src.size[1]);
+	const int srcChannels = src.channels();
+
+	//		const int dstChannels = channels;
+	const int dstChannels = srcPlanes / channels > 0 ? channels : srcChannels;
+	const int dstPlanes = srcPlanes / dstChannels;
+	const Size dstSize = srcSize;
+
+	CV_Assert(srcPlanes % dstChannels == 0);
+
+	const int sizes[3] = { dstPlanes, dstSize.height, dstSize.width };
+
+	dst = Mat(3, sizes, CV_MAKETYPE(src.depth(), dstChannels));
+
+	for (int i = 0; i < src.size[0]; i++){
+		for (int j = 0; j < src.size[1]; j++){
+			for (int k = 0; k < src.size[2]; k++){
+				for (int cn = 0; cn < srcChannels; cn++){
+					int _i = i / dstChannels;
+					int _j = j;
+					int _k = k;
+					int _cn = i % dstChannels;
+					*(dst.ptr<T>(_i, _j, _k) + _cn) = *(src.ptr<T>(i, j, k) + cn);
+				}
+			}
+		}
+	}
+}
+
+
 bool Model::filter(
 	gls::GlsMat &inputPlanes,
 	gls::GlsMat &outputPlanes)
@@ -122,6 +168,8 @@ bool Model::filter(
 
 	CV_Assert(inputPlanes.dims == 3);
 
+
+#if 1	//normal
 	if (inputPlanes.size[0] != nInputPlanes) {
 		std::cerr << "Error : Model-filter : \n"
 			"number of input planes mismatch." << std::endl;
@@ -132,8 +180,36 @@ bool Model::filter(
 
 	int _size[3] = { nOutputPlanes, inputPlanes.size[1], inputPlanes.size[2] };
 	outputPlanes = gls::GlsMat(3, _size, CV_32FC1);
-
 	gls::convolutionalNeuralNetwork(inputPlanes, outputPlanes, weights, biases);
+#else	//channel interleave
+	const Size ipSize(inputPlanes.size[2], inputPlanes.size[1]);
+	const int n_inputChannels = inputPlanes.channels();
+	const int n_inputPlanes = inputPlanes.size[0];
+
+	if (n_inputPlanes*n_inputChannels != nInputPlanes) {
+		std::cerr << "Error : Model-filter : \n"
+			"number of input planes mismatch." << std::endl;
+		std::cerr << n_inputPlanes*n_inputChannels << ","
+			<< nInputPlanes << std::endl;
+		return false;
+	}
+
+
+
+	const int n_weightChannels = n_inputChannels;
+	Mat weightsPack;
+	pack<float>(weights, weightsPack, n_weightChannels);
+
+	const int channels = 4;
+	const int n_outputChannels = nOutputPlanes / channels  > 0 ? channels : 1;
+	const int n_outputPlanes = nOutputPlanes / n_outputChannels;
+
+	int _size[3] = { n_outputPlanes, ipSize.height,ipSize.width};
+	outputPlanes = gls::GlsMat(3, _size, CV_MAKETYPE(inputPlanes.depth(), n_outputChannels));
+	gls::convolutionalNeuralNetwork(inputPlanes, outputPlanes, weightsPack, biases);
+
+
+#endif
 
 
 	return true;
