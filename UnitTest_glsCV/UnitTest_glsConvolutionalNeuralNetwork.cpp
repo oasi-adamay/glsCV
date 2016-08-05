@@ -388,6 +388,12 @@ namespace UnitTest_glsCV
 			int errNum = test_glsConvolutionalNeuralNetwork_Pack<float>(CV_32FC1, 128, 1, Size(3, 3));
 			Assert::AreEqual(0, errNum);
 		}
+		TEST_METHOD(glsConvolutionalNeuralNetwork_Pack_8to8_5x5)
+		{
+			cout << __FUNCTION__ << endl;
+			int errNum = test_glsConvolutionalNeuralNetwork_Pack<float>(CV_32FC1, 32, 32, Size(5, 5));
+			Assert::AreEqual(0, errNum);
+		}
 
 
 
