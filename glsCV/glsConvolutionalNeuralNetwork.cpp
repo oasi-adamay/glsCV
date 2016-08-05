@@ -335,8 +335,14 @@ string glsShaderConvolutionalNeuralNetwork3x3Vec4::FragmentShaderCode(void){
 	return fragmentShaderCode;
 }
 
-template <typename T>
-static void pack(Mat& src, Mat& dst, int channels = 4){
+//! packed format に変換
+//!	CV_Assert(src.dims == 3); CV_Assert(src.channels() == 1);
+//! 
+//! srcPlanes / channels > 0 の時
+//! [plns][rows][cols](1) => [plns/channels][rows][cols](channels)
+//! srcPlanes / channels == 0 の時
+//! [plns][rows][cols](1) => [plns][rows][cols](1)
+template <typename T> static void pack(Mat& src, Mat& dst, int channels = 4){
 	CV_Assert(src.dims == 3);
 	CV_Assert(src.channels() == 1);
 
@@ -363,6 +369,39 @@ static void pack(Mat& src, Mat& dst, int channels = 4){
 					int _j = j;
 					int _k = k;
 					int _cn = i % dstChannels;
+					*(dst.ptr<T>(_i, _j, _k) + _cn) = *(src.ptr<T>(i, j, k) + cn);
+				}
+			}
+		}
+	}
+}
+
+//! expand channels for 3d Mat
+//!	CV_Assert(src.dims == 3); CV_Assert(src.channels() == 1);
+//! [plns][rows][cols](1) => [plns/channels][rows][cols](channels)
+template <typename T> static void expand(Mat& src, Mat& dst, int channels = 4){
+	CV_Assert(src.dims == 3);
+	CV_Assert(src.channels() == 1);
+
+	const int srcPlanes = src.size[0];
+	const Size srcSize(src.size[2], src.size[1]);
+	const int srcChannels = src.channels();
+
+	const int dstChannels = channels;
+	const int dstPlanes = srcPlanes;
+	const Size dstSize = srcSize;
+	const int sizes[3] = { dstPlanes, dstSize.height, dstSize.width };
+
+	dst = Mat(3, sizes, CV_MAKETYPE(src.depth(), dstChannels));
+
+	for (int i = 0; i < src.size[0]; i++){
+		for (int j = 0; j < src.size[1]; j++){
+			for (int k = 0; k < src.size[2]; k++){
+				for (int cn = 0; cn < srcChannels; cn++){
+					int _i = i;
+					int _j = j;
+					int _k = k;
+					int _cn = cn;
 					*(dst.ptr<T>(_i, _j, _k) + _cn) = *(src.ptr<T>(i, j, k) + cn);
 				}
 			}
@@ -441,8 +480,7 @@ void convolutionalNeuralNetwork(
 		}
 	}
 	else{
-		if (kSize.width == 3 && kSize.height == 3 
-			&& n_inputChannels != 1 ){
+		if (kSize.width == 3 && kSize.height == 3){
 //			cout << "use ShaderConvolutionalNeuralNetwork3x3Vec4" << endl;
 			shader = &ShaderConvolutionalNeuralNetwork3x3Vec4;
 		}
@@ -505,13 +543,19 @@ void convolutionalNeuralNetwork(
 
 		}
 		else if (shader == &ShaderConvolutionalNeuralNetwork3x3Vec4){
-			GLS_Assert(n_inputChannels != 1);
+			Mat _kernels;
+			if (n_inputChannels == 4){
+				_kernels = kernels;
+			}
+			else{
+				expand<float>(kernels, _kernels,4);
+			}
 
 			const int uniformBlockBinding = 0;
-			const size_t size_in_byte = n_outputChannels * n_inputPlanes * kernels.size[1] * kernels.size[2] * kernels.elemSize();
+			const size_t size_in_byte = _kernels.total() * _kernels.elemSize();
 
 			glBindBuffer(GL_UNIFORM_BUFFER, ubo);
-			glBufferData(GL_UNIFORM_BUFFER, size_in_byte , kernels.ptr<float>(), GL_STATIC_DRAW);
+			glBufferData(GL_UNIFORM_BUFFER, size_in_byte , _kernels.data, GL_STATIC_DRAW);
 			glUniformBlockBinding(shader->program(), glGetUniformBlockIndex(shader->program(), "block"), uniformBlockBinding);
 			glBindBufferBase(GL_UNIFORM_BUFFER, uniformBlockBinding, ubo);
 
