@@ -137,7 +137,9 @@ static bool convertWithModelsBasic(cv::Mat &inputPlane, cv::Mat &outputPlane,
 	// padding is require before calling this function
 	CV_Assert(inputPlane.type() == CV_32FC1);
 	CV_Assert(inputPlane.dims == 2);
-	CV_Assert(inputPlane.isContinuous());
+	if (!inputPlane.isContinuous()){
+		inputPlane = inputPlane.clone();	// to be continuous
+	}
 
 	int _size[3] = { 1, inputPlane.size[0], inputPlane.size[1] };
 //	gls::GlsMat inputPlanes(cv::Mat(3, _size, CV_32FC1, inputPlane.data));		//upload

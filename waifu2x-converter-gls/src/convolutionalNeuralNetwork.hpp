@@ -43,11 +43,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace CNN {
 
+#if 0
 void ReLU_accumlate_filter2D(
 	cv::Mat &inputPlanes,				// input [planes][rows][cols]
 	cv::Mat &outputPlane,				// output [rows][cols]
 	cv::Mat &kernels,					// kernels [planes][ksize][ksize]
-	const float bias					// bias
+	const float* bias					// bias
 	);
 
 void convolutionalNeuralNetwork(
@@ -56,7 +57,22 @@ void convolutionalNeuralNetwork(
 	cv::Mat &weights,					///! kernels [inputPlanes*outputPlanes][ksize][ksize]
 	std::vector<double>& biases			///! bias [outputPlanes]
 	);
+#else
+void ReLU_accumlate_filter2D(
+	cv::Mat &inputPlanes,				// input [planes][rows][cols]
+	cv::Mat &outputPlane,				// output [rows][cols]
+	cv::Mat &kernels,					// kernels [planes][ksize][ksize]
+	const double* bias					// bias
+	);
 
+void convolutionalNeuralNetwork(
+	cv::Mat &inputPlanes,				///! input [planes][rows][cols]
+	cv::Mat &outputPlanes,				///! output [planes][rows][cols]
+	cv::Mat &weights,					///! kernels [inputPlanes*outputPlanes][ksize][ksize]
+	std::vector<double>& biases,		///! bias [outputPlanes]
+	bool outputPacked = false			///! output plane to be packed.
+	);
+#endif
 
 }
 #endif /* CONVOLUTIONAL_NEURAL_NETWORK_HPP_ */

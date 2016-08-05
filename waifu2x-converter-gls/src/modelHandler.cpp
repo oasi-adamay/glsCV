@@ -48,6 +48,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "glsCV.h"
 
+//#define _ENABLE_TMR_
+
+#if defined(_ENABLE_TMR_)
+#include "Timer.h"
+#define _TMR_(...)  Timer tmr(__VA_ARGS__)
+#else
+#define _TMR_(...)
+#endif
+
 
 namespace w2xc {
 
@@ -59,62 +68,8 @@ int Model::getNOutputPlanes() {
 	return nOutputPlanes;
 }
 
-#ifdef USE_GLS
-bool Model::filter(
-	std::vector<gls::GlsMat> &inputPlanes,
-	std::vector<gls::GlsMat> &outputPlanes
-)
-{
 
-	if (inputPlanes.size() != nInputPlanes) {
-		std::cerr << "Error : Model-filter : \n"
-				"number of input planes mismatch." << std::endl;
-		std::cerr << inputPlanes.size() << ","
-				<< nInputPlanes << std::endl;
-		return false;
-	}
-
-	outputPlanes.resize(nOutputPlanes);
-
-	cv::Size ipSize = inputPlanes[0].size();
-
-	// filter processing
-	// input : inputPlanes
-	// kernel : weightMatrices
-	for (int opIndex = 0; opIndex < nOutputPlanes ; opIndex++) {
-
-		int wMatIndex = nInputPlanes * opIndex;
-		gls::GlsMat uIntermediatePlane = (GlsMat)cv::Mat::zeros(ipSize, CV_32FC1); // all zero matrix;
-
-		for (int ipIndex = 0; ipIndex < nInputPlanes; ipIndex++) {
-
-			gls::GlsMat filterOutput;
-			gls::filter2D(inputPlanes[ipIndex], filterOutput, -1, weights[wMatIndex + ipIndex],
-				cv::Point(-1, -1), 0.0 /*, cv::BORDER_REPLICATE*/);
-			gls::add(uIntermediatePlane, filterOutput, uIntermediatePlane);
-
-		}
-
-		gls::add(biases[opIndex], uIntermediatePlane, uIntermediatePlane);
-		gls::GlsMat moreThanZero;
-		gls::GlsMat lessThanZero;
-		gls::max(0.0, uIntermediatePlane, moreThanZero);
-		gls::min(0.0, uIntermediatePlane, lessThanZero);
-		gls::multiply(0.1, lessThanZero, lessThanZero);
-		gls::add(lessThanZero, moreThanZero, uIntermediatePlane);
-		outputPlanes[opIndex] = uIntermediatePlane;
-
-	} // for index
-
-	return true;
-
-
-
-//	filterWorker(inputPlanes, weights, outputPlanes, 0, nOutputPlanes);
-
-	return true;
-}
-#elif	defined(USE_GLS_NEW)
+#if	defined(USE_GLS_NEW)
 bool Model::filter(
 	gls::GlsMat &inputPlanes,
 	gls::GlsMat &outputPlanes)
@@ -122,19 +77,25 @@ bool Model::filter(
 
 	CV_Assert(inputPlanes.dims == 3);
 
-	if (inputPlanes.size[0] != nInputPlanes) {
+	const Size ipSize(inputPlanes.size[2], inputPlanes.size[1]);
+	const int n_inputChannels = inputPlanes.channels();
+	const int n_inputPlanes = inputPlanes.size[0];
+
+	if (n_inputPlanes*n_inputChannels != nInputPlanes) {
 		std::cerr << "Error : Model-filter : \n"
 			"number of input planes mismatch." << std::endl;
-		std::cerr << inputPlanes.size() << ","
+		std::cerr << n_inputPlanes*n_inputChannels << ","
 			<< nInputPlanes << std::endl;
 		return false;
 	}
 
-	int _size[3] = { nOutputPlanes, inputPlanes.size[1], inputPlanes.size[2] };
-	outputPlanes = gls::GlsMat(3, _size, CV_32FC1);
+#if 0	 
+	const bool outputPacked = false;
+#else
+	const bool outputPacked = true;
+#endif
 
-	gls::convolutionalNeuralNetwork(inputPlanes, outputPlanes, weights, biases);
-
+	gls::convolutionalNeuralNetwork(inputPlanes, outputPlanes, weights, biases, outputPacked);
 
 	return true;
 }

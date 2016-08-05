@@ -53,7 +53,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "glsCV.h"
 
-//#define USE_GLS
 #define USE_GLS_NEW
 
 namespace w2xc {
@@ -121,12 +120,7 @@ public:
 	// setter function
 
 	// public operation function
-#ifdef USE_GLS
-	bool Model::filter(
-		std::vector<gls::GlsMat> &inputPlanes,
-		std::vector<gls::GlsMat> &outputPlanes
-		);
-#elif	defined(USE_GLS_NEW)
+#if	defined(USE_GLS_NEW)
 	bool Model::filter(
 		gls::GlsMat &inputPlanes,
 		gls::GlsMat &outputPlanes);
