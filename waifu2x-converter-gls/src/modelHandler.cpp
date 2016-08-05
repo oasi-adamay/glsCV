@@ -169,7 +169,7 @@ bool Model::filter(
 	CV_Assert(inputPlanes.dims == 3);
 
 
-#if 1	//normal
+#if 0	//normal
 	if (inputPlanes.size[0] != nInputPlanes) {
 		std::cerr << "Error : Model-filter : \n"
 			"number of input planes mismatch." << std::endl;

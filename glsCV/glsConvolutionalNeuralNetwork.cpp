@@ -101,6 +101,17 @@ public:
 };
 glsShaderConvolutionalNeuralNetworkVec4 ShaderConvolutionalNeuralNetworkVec4;
 
+class  glsShaderConvolutionalNeuralNetwork3x3Vec4 : public glsShaderConvolutionalNeuralNetworkBase
+{
+protected:
+	string FragmentShaderCode(void);
+
+public:
+	glsShaderConvolutionalNeuralNetwork3x3Vec4(void) :glsShaderConvolutionalNeuralNetworkBase(__FUNCTION__){}
+
+};
+glsShaderConvolutionalNeuralNetwork3x3Vec4 ShaderConvolutionalNeuralNetwork3x3Vec4;
+
 
 
 
@@ -190,7 +201,6 @@ void main()\n
 	return fragmentShaderCode;
 }
 
-#if 1
 string glsShaderConvolutionalNeuralNetworkVec4::FragmentShaderCode(void){
 	const char fragmentShaderCode[] = TO_STR(
 		#version 330 core	\n
@@ -241,13 +251,14 @@ string glsShaderConvolutionalNeuralNetworkVec4::FragmentShaderCode(void){
 );
 	return fragmentShaderCode;
 }
-#else
-string glsShaderConvolutionalNeuralNetworkVec4::FragmentShaderCode(void){
+
+string glsShaderConvolutionalNeuralNetwork3x3Vec4::FragmentShaderCode(void){
 	const char fragmentShaderCode[] = TO_STR(
 		#version 330 core	\n
 		precision highp float;	\n
 		uniform sampler2DArray	texSrc; \n
-		uniform sampler2DArray	weights; \n
+//		uniform vec4 weights[4 * (128 / 4) * 3 * 3]; \n
+		uniform vec4 weights[1022]; \n
 		uniform vec4 bias; \n
 		uniform int srcChannels; \n
 		uniform int dstChannels; \n
@@ -262,35 +273,35 @@ string glsShaderConvolutionalNeuralNetworkVec4::FragmentShaderCode(void){
 		vec4 accm = vec4(0.0); \n
 		for (int i = 0; i < texSize.z; i++) { \n
 			ivec3 uvt0 = ivec3(gl_FragCoord.xy, i); \n
-			ivec3 uvt1 = ivec3(1, 1, i + texSize.z *dCh); \n
+			int base = dCh * (texSize.z * 3 * 3) + i*(3*3);\n
 			vec4 data;\n
 			vec4 wei;\n
 			data = texelFetchOffset(texSrc, uvt0, 0, ivec2(-1, -1)); \n
-			wei = texelFetchOffset(weights, uvt1, 0, ivec2(-1, -1)); \n
+			wei = weights[base + 0]; \n
 			accm += data*wei; \n
 			data = texelFetchOffset(texSrc, uvt0, 0, ivec2(+0, -1)); \n
-			wei = texelFetchOffset(weights, uvt1, 0, ivec2(+0, -1)); \n
+			wei = weights[base + 1]; \n
 			accm += data*wei; \n
 			data = texelFetchOffset(texSrc, uvt0, 0, ivec2(+1, -1)); \n
-			wei = texelFetchOffset(weights, uvt1, 0, ivec2(+1, -1)); \n
+			wei = weights[base + 2]; \n
 			accm += data*wei; \n
 			data = texelFetchOffset(texSrc, uvt0, 0, ivec2(-1, +0)); \n
-			wei = texelFetchOffset(weights, uvt1, 0, ivec2(-1, +0)); \n
+			wei = weights[base + 3]; \n
 			accm += data*wei; \n
 			data = texelFetchOffset(texSrc, uvt0, 0, ivec2(+0, +0)); \n
-			wei = texelFetchOffset(weights, uvt1, 0, ivec2(+0, +0)); \n
+			wei = weights[base + 4]; \n
 			accm += data*wei; \n
 			data = texelFetchOffset(texSrc, uvt0, 0, ivec2(+1, +0)); \n
-			wei = texelFetchOffset(weights, uvt1, 0, ivec2(+1, +0)); \n
+			wei = weights[base + 5]; \n
 			accm += data*wei; \n
 			data = texelFetchOffset(texSrc, uvt0, 0, ivec2(-1, +1)); \n
-			wei = texelFetchOffset(weights, uvt1, 0, ivec2(-1, +1)); \n
+			wei = weights[base + 6]; \n
 			accm += data*wei; \n
 			data = texelFetchOffset(texSrc, uvt0, 0, ivec2(+0, +1)); \n
-			wei = texelFetchOffset(weights, uvt1, 0, ivec2(+0, +1)); \n
+			wei = weights[base + 7]; \n
 			accm += data*wei; \n
 			data = texelFetchOffset(texSrc, uvt0, 0, ivec2(+1, +1)); \n
-			wei = texelFetchOffset(weights, uvt1, 0, ivec2(+1, +1)); \n
+			wei = weights[base + 8]; \n
 			accm += data*wei; \n
 		}\n
 		float _s = 0.0;	\n 
@@ -307,8 +318,6 @@ string glsShaderConvolutionalNeuralNetworkVec4::FragmentShaderCode(void){
 );
 	return fragmentShaderCode;
 }
-
-#endif
 
 
 
@@ -355,7 +364,17 @@ void convolutionalNeuralNetwork(
 		}
 	}
 	else{
-		shader = &ShaderConvolutionalNeuralNetworkVec4;
+		if (kSize.width == 3 && kSize.height == 3 
+			&& n_inputChannels != 1 
+			&& n_inputPlanes * n_outputChannels *3*3 <1020){
+//			cout << "use ShaderConvolutionalNeuralNetwork3x3Vec4" << endl;
+			shader = &ShaderConvolutionalNeuralNetwork3x3Vec4;
+//			shader = &ShaderConvolutionalNeuralNetworkVec4;
+		}
+		else{
+//			cout << "use ShaderConvolutionalNeuralNetworkVec4" << endl;
+			shader = &ShaderConvolutionalNeuralNetworkVec4;
+		}
 	}
 
 	glUseProgram(shader->program());
@@ -406,6 +425,17 @@ void convolutionalNeuralNetwork(
 			glUniform1i(shader->uniformLocArray[4], n_outputChannels);
 
 		}
+		else if (shader == &ShaderConvolutionalNeuralNetwork3x3Vec4){
+			if (n_inputChannels==1){
+				glUniform1fv(shader->uniformLocArray[1], 3 * 3 * n_outputChannels * inputPlanes.size[0], kernels.ptr<float>());
+			}
+			else{
+				glUniform4fv(shader->uniformLocArray[1], 3 * 3 * n_outputChannels * inputPlanes.size[0], kernels.ptr<float>());
+			}
+			glUniform4fv(shader->uniformLocArray[2], 1, bias);
+			glUniform1i(shader->uniformLocArray[3], n_inputChannels);
+			glUniform1i(shader->uniformLocArray[4], n_outputChannels);
+		}
 		else{
 			GLS_Assert(0 && "unreachable");
 		}
@@ -423,7 +453,7 @@ void convolutionalNeuralNetwork(
 
 	}
 	glFinish();
-
+	GL_CHECK_ERROR();
 }
 
 
