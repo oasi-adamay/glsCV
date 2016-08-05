@@ -258,7 +258,9 @@ string glsShaderConvolutionalNeuralNetwork3x3Vec4::FragmentShaderCode(void){
 		precision highp float;	\n
 		uniform sampler2DArray	texSrc; \n
 //		uniform vec4 weights[4 * (128 / 4) * 3 * 3]; \n
-		uniform vec4 weights[1022]; \n
+		layout(std140) uniform block{ \n
+			vec4 weights[4 * (128 / 4) * 3 * 3]; \n
+		};	\n
 		uniform vec4 bias; \n
 		uniform int srcChannels; \n
 		uniform int dstChannels; \n
@@ -365,11 +367,9 @@ void convolutionalNeuralNetwork(
 	}
 	else{
 		if (kSize.width == 3 && kSize.height == 3 
-			&& n_inputChannels != 1 
-			&& n_inputPlanes * n_outputChannels *3*3 <1020){
+			&& n_inputChannels != 1 ){
 //			cout << "use ShaderConvolutionalNeuralNetwork3x3Vec4" << endl;
 			shader = &ShaderConvolutionalNeuralNetwork3x3Vec4;
-//			shader = &ShaderConvolutionalNeuralNetworkVec4;
 		}
 		else{
 //			cout << "use ShaderConvolutionalNeuralNetworkVec4" << endl;
@@ -377,10 +377,14 @@ void convolutionalNeuralNetwork(
 		}
 	}
 
+
 	glUseProgram(shader->program());
 
 	glsVAO vao(glGetAttribLocation(shader->program(), "position"));
-	glsFBO fbo;		//create  & bind FBO
+	glsFBO fbo;		
+	GLuint ubo = 0;
+	glGenBuffers(1, &ubo);
+
 	GlsMat kernelPlanes(3, _kSize, weights.type());
 
 	for (int opIndex = 0; opIndex < outputPlanes.size[0]; opIndex++) {
@@ -426,15 +430,21 @@ void convolutionalNeuralNetwork(
 
 		}
 		else if (shader == &ShaderConvolutionalNeuralNetwork3x3Vec4){
-			if (n_inputChannels==1){
-				glUniform1fv(shader->uniformLocArray[1], 3 * 3 * n_outputChannels * inputPlanes.size[0], kernels.ptr<float>());
-			}
-			else{
-				glUniform4fv(shader->uniformLocArray[1], 3 * 3 * n_outputChannels * inputPlanes.size[0], kernels.ptr<float>());
-			}
+			GLS_Assert(n_inputChannels != 1);
+
+			const int uniformBlockBinding = 0;
+			const size_t size_in_byte = n_outputChannels * n_inputPlanes * kernels.size[1] * kernels.size[2] * kernels.elemSize();
+
+			glBindBuffer(GL_UNIFORM_BUFFER, ubo);
+			glBufferData(GL_UNIFORM_BUFFER, size_in_byte , kernels.ptr<float>(), GL_STATIC_DRAW);
+			glUniformBlockBinding(shader->program(), glGetUniformBlockIndex(shader->program(), "block"), uniformBlockBinding);
+			glBindBufferBase(GL_UNIFORM_BUFFER, uniformBlockBinding, ubo);
+
 			glUniform4fv(shader->uniformLocArray[2], 1, bias);
 			glUniform1i(shader->uniformLocArray[3], n_inputChannels);
 			glUniform1i(shader->uniformLocArray[4], n_outputChannels);
+			GL_CHECK_ERROR();
+
 		}
 		else{
 			GLS_Assert(0 && "unreachable");
@@ -454,6 +464,9 @@ void convolutionalNeuralNetwork(
 	}
 	glFinish();
 	GL_CHECK_ERROR();
+
+	glDeleteBuffers(1, &ubo);
+
 }
 
 
