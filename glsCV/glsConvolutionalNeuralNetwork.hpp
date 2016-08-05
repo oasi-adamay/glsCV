@@ -47,7 +47,8 @@ void convolutionalNeuralNetwork(
 	GlsMat &inputPlanes,				///! input [planes][rows][cols]
 	GlsMat &outputPlanes,				///! output [planes][rows][cols]
 	cv::Mat &weights,					///! kernels [inputPlanes*outputPlanes][ksize][ksize]
-	std::vector<double>& biases			///! bias [outputPlanes]
+	std::vector<double>& biases,		///! bias [outputPlanes]
+	bool outputPacked = false			///! output plane to be packed.
 	);
 
 

@@ -53,11 +53,10 @@ namespace UnitTest_glsCV
 
 		int dims = 3;
 		int ipSize[3] = { inputLayers, size.height, size.width };
-		int opSize[3] = { outputLayers, size.height, size.width };
 		int _kSize[3] = { inputLayers*outputLayers, ksize.height, ksize.width };
 
 		Mat inputPlanes = Mat(dims, ipSize, cvtype);
-		Mat outputPlanes = Mat(dims, opSize, cvtype);
+		Mat outputPlanes;
 
 		cv::Mat weights(dims, _kSize, CV_32FC1);
 		std::vector<double> biases(outputLayers);
@@ -80,7 +79,7 @@ namespace UnitTest_glsCV
 		}
 
 		GlsMat _inputPlanes = (GlsMat)inputPlanes;
-		GlsMat _outputPlanes = GlsMat(dims, opSize, cvtype);
+		GlsMat _outputPlanes;
 
 		{
 			gls::convolutionalNeuralNetwork(
@@ -253,18 +252,20 @@ namespace UnitTest_glsCV
 		cout << "Size:" << size << endl;
 		int ulps = 4;
 		float diff = 1e-4f;
+		const bool outputPacked = true;
 
 		const int channels = 4;
+
 		int ipCh = inputLayers / channels > 0 ? channels : inputLayers;	//input channels
-		int opCh = outputLayers / channels > 0 ? channels : outputLayers;	//output channels
+//		int opCh = outputLayers / channels > 0 ? channels : outputLayers;	//output channels
 
 		int dims = 3;
 		int ipSize[3] = { inputLayers, size.height, size.width };
-		int opSize[3] = { outputLayers, size.height, size.width };
+//		int opSize[3] = { outputLayers, size.height, size.width };
 		int _kSize[3] = { inputLayers*outputLayers, ksize.height, ksize.width };
 
 		Mat inputPlanes = Mat(dims, ipSize, cvtype);
-		Mat outputPlanes = Mat(dims, opSize, cvtype);
+		Mat outputPlanes;// = Mat(dims, opSize, cvtype);
 
 		cv::Mat weights(dims, _kSize, CV_32FC1);
 		std::vector<double> biases(outputLayers);
@@ -295,61 +296,34 @@ namespace UnitTest_glsCV
 				inputPlanes,				///! input [planes][rows][cols]
 				outputPlanes,				///! output [planes][rows][cols]
 				weights,					///! kernels [inputPlanes*outputPlanes]([ksize][ksize])
-				biases						///! bias [outputPlanes]
+				biases,						///! bias [outputPlanes]
+				outputPacked				///! output plane to be packed.
 				);
 		}
-#if 0
+
 		Mat _inputPlanes;
 		Mat _outputPlanes;
-		Mat _weights;
 
 		pack<T>(inputPlanes, _inputPlanes, channels);
-		pack<T>(weights, _weights, _inputPlanes.channels());
-		pack<T>(outputPlanes, _outputPlanes, channels);
-
-		{
-			CNN::convolutionalNeuralNetwork(
-				_inputPlanes,				///! input [planes][rows][cols]
-				_outputPlanes,				///! output [planes][rows][cols]
-				_weights,					///! kernels [inputPlanes*outputPlanes]([ksize][ksize])
-				biases						///! bias [outputPlanes]
-				);
-		}
-		Mat __outputPlanes;
-		unpack<T>(_outputPlanes, __outputPlanes);
-
-
-		int errNum = 0;
-		if (!AreEqual<T>(outputPlanes, __outputPlanes, ulps, diff)) errNum -= 1;
-
-
-#else
-		Mat _inputPlanes;
-		Mat _outputPlanes;
-		Mat _weights;
-
-		pack<T>(inputPlanes, _inputPlanes, channels);
-		pack<T>(weights, _weights, _inputPlanes.channels());
-		pack<T>(outputPlanes, _outputPlanes, channels);
 
 		GlsMat __inputPlanes = (GlsMat)_inputPlanes;
-		GlsMat __outputPlanes(_outputPlanes.dims, _outputPlanes.size, _outputPlanes.type());
+		GlsMat __outputPlanes;
 
 		{
 			gls::convolutionalNeuralNetwork(
 				__inputPlanes,				///! input [planes][rows][cols]
 				__outputPlanes,				///! output [planes][rows][cols]
-				_weights,					///! kernels [inputPlanes*outputPlanes]([ksize][ksize])
-				biases						///! bias [outputPlanes]
+				weights,					///! kernels [inputPlanes*outputPlanes]([ksize][ksize])
+				biases,						///! bias [outputPlanes]
+				outputPacked				///! output plane to be packed.
 				);
 		}
 
 
 		int errNum = 0;
-		unpack<T>((Mat)__outputPlanes, _outputPlanes);
-
-		if (!AreEqual<T>(outputPlanes, _outputPlanes, ulps, diff)) errNum -= 1;
-#endif
+//		unpack<T>((Mat)__outputPlanes, _outputPlanes);
+//		if (!AreEqual<T>(outputPlanes, _outputPlanes, ulps, diff)) errNum -= 1;
+		if (!AreEqual<T>(outputPlanes, (Mat)__outputPlanes, ulps, diff)) errNum -= 1;
 
 		return errNum;
 	}

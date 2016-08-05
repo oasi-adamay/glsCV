@@ -118,6 +118,42 @@ void convolutionalNeuralNetwork(
 }
 
 #else
+template <typename T>
+static void pack(Mat& src, Mat& dst, int channels = 4){
+	CV_Assert(src.dims == 3);
+	CV_Assert(src.channels() == 1);
+
+	const int srcPlanes = src.size[0];
+	const Size srcSize(src.size[2], src.size[1]);
+	const int srcChannels = src.channels();
+
+	//		const int dstChannels = channels;
+	const int dstChannels = srcPlanes / channels > 0 ? channels : srcChannels;
+	const int dstPlanes = srcPlanes / dstChannels;
+	const Size dstSize = srcSize;
+
+	CV_Assert(srcPlanes % dstChannels == 0);
+
+	const int sizes[3] = { dstPlanes, dstSize.height, dstSize.width };
+
+	dst = Mat(3, sizes, CV_MAKETYPE(src.depth(), dstChannels));
+
+	for (int i = 0; i < src.size[0]; i++){
+		for (int j = 0; j < src.size[1]; j++){
+			for (int k = 0; k < src.size[2]; k++){
+				for (int cn = 0; cn < srcChannels; cn++){
+					int _i = i / dstChannels;
+					int _j = j;
+					int _k = k;
+					int _cn = i % dstChannels;
+					*(dst.ptr<T>(_i, _j, _k) + _cn) = *(src.ptr<T>(i, j, k) + cn);
+				}
+			}
+		}
+	}
+}
+
+
 void ReLU_accumlate_filter2D(
 	cv::Mat &inputPlanes,				// input [ip][rows][cols](ich)
 	cv::Mat &outputPlane,				// output [rows][cols](och)
@@ -182,28 +218,44 @@ void ReLU_accumlate_filter2D(
 void convolutionalNeuralNetwork(
 	cv::Mat &inputPlanes,				///! input [planes/ch][rows][cols](ch)
 	cv::Mat &outputPlanes,				///! output [planes/ch][rows][cols](ch)
-	cv::Mat &weights,					///! kernels [outputPlanes*inputPlanes/ch][ksize][ksize](ch)
-	std::vector<double>& biases			///! bias [outputPlanes]
+	cv::Mat &_weights,					///! kernels [outputPlanes*inputPlanes/ch][ksize][ksize](ch)
+	std::vector<double>& biases,		///! bias [outputPlanes]
+	bool outputPacked					///! output plane to be packed.
 	)
 {
 	CV_Assert(inputPlanes.dims == 3);
-	CV_Assert(outputPlanes.dims == 3);
-	CV_Assert(weights.dims == 3);
+//	CV_Assert(outputPlanes.dims == 3);
+	CV_Assert(_weights.dims == 3);
+
+	cv::Size ipSize = cv::Size(inputPlanes.size[2], inputPlanes.size[1]);
+	cv::Size kSize = Size(_weights.size[2], _weights.size[1]);
 
 	const int n_inputPlanes = inputPlanes.size[0];
 	const int n_inputChannels = inputPlanes.channels();
-	const int n_outputPlanes = outputPlanes.size[0];
-	const int n_outputChannels = outputPlanes.channels();
-	const int n_weightPlanes = weights.size[0];
-	const int n_weightChannels = weights.channels();
-
-
+	const int n_outputChannels = outputPacked ?
+		(biases.size() / 4 > 0 ? 4 : 1) :
+		1;
+	const int n_outputPlanes = (int)biases.size() / n_outputChannels;
+	//const int n_outputPlanes = outputPlanes.size[0];
+	//const int n_outputChannels = outputPlanes.channels();
 	CV_Assert(n_inputPlanes * n_inputChannels *
-			  n_outputPlanes * n_outputChannels
-			  == n_weightPlanes * n_weightChannels);
+		n_outputPlanes * n_outputChannels
+		== _weights.size[0] * _weights.channels());
 
-	cv::Size ipSize = cv::Size(inputPlanes.size[2], inputPlanes.size[1]);
-	cv::Size kSize = Size(weights.size[2], weights.size[1]);
+	Mat weights;
+	if (_weights.channels() == inputPlanes.channels()){
+		weights = _weights;
+	}
+	else{
+		//if inputPlanes is packed, pack weights.  
+		pack<float>(_weights, weights, inputPlanes.channels());
+	}
+
+	{	//allocate output planes
+		int _size[3] = { n_outputPlanes, ipSize.height, ipSize.width };
+		outputPlanes = cv::Mat(3, _size, CV_MAKETYPE(inputPlanes.depth(), n_outputChannels));
+	}
+
 
 	int _sz[3] = { n_inputPlanes * n_outputChannels, kSize.height, kSize.width };
 

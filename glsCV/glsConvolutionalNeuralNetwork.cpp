@@ -276,8 +276,8 @@ string glsShaderConvolutionalNeuralNetwork3x3Vec4::FragmentShaderCode(void){
 		for (int i = 0; i < texSize.z; i++) { \n
 			ivec3 uvt0 = ivec3(gl_FragCoord.xy, i); \n
 			int base = dCh * (texSize.z * 3 * 3) + i*(3*3);\n
-			vec4 data;\n
 			vec4 wei;\n
+			vec4 data;\n
 			data = texelFetchOffset(texSrc, uvt0, 0, ivec2(-1, -1)); \n
 			wei = weights[base + 0]; \n
 			accm += data*wei; \n
@@ -305,6 +305,20 @@ string glsShaderConvolutionalNeuralNetwork3x3Vec4::FragmentShaderCode(void){
 			data = texelFetchOffset(texSrc, uvt0, 0, ivec2(+1, +1)); \n
 			wei = weights[base + 8]; \n
 			accm += data*wei; \n
+			//vec4 data[9]; \n
+			//data[0] = texelFetchOffset(texSrc, uvt0, 0, ivec2(-1, -1)); \n
+			//data[1] = texelFetchOffset(texSrc, uvt0, 0, ivec2(+0, -1)); \n
+			//data[2] = texelFetchOffset(texSrc, uvt0, 0, ivec2(+1, -1)); \n
+			//data[3] = texelFetchOffset(texSrc, uvt0, 0, ivec2(-1, +0)); \n
+			//data[4] = texelFetchOffset(texSrc, uvt0, 0, ivec2(+0, +0)); \n
+			//data[5] = texelFetchOffset(texSrc, uvt0, 0, ivec2(+1, +0)); \n
+			//data[6] = texelFetchOffset(texSrc, uvt0, 0, ivec2(-1, +1)); \n
+			//data[7] = texelFetchOffset(texSrc, uvt0, 0, ivec2(+0, +1)); \n
+			//data[8] = texelFetchOffset(texSrc, uvt0, 0, ivec2(+1, +1)); \n
+			//for (int i = 0; i < 9; i++){  \n
+			//	wei = weights[base + i]; \n
+			//	accm += data[i]*wei; \n
+			//} \n
 		}\n
 		float _s = 0.0;	\n 
 		for (int sCh = 0; sCh < srcChannels; sCh++) { \n
@@ -321,30 +335,91 @@ string glsShaderConvolutionalNeuralNetwork3x3Vec4::FragmentShaderCode(void){
 	return fragmentShaderCode;
 }
 
+template <typename T>
+static void pack(Mat& src, Mat& dst, int channels = 4){
+	CV_Assert(src.dims == 3);
+	CV_Assert(src.channels() == 1);
+
+	const int srcPlanes = src.size[0];
+	const Size srcSize(src.size[2], src.size[1]);
+	const int srcChannels = src.channels();
+
+	//		const int dstChannels = channels;
+	const int dstChannels = srcPlanes / channels > 0 ? channels : srcChannels;
+	const int dstPlanes = srcPlanes / dstChannels;
+	const Size dstSize = srcSize;
+
+	CV_Assert(srcPlanes % dstChannels == 0);
+
+	const int sizes[3] = { dstPlanes, dstSize.height, dstSize.width };
+
+	dst = Mat(3, sizes, CV_MAKETYPE(src.depth(), dstChannels));
+
+	for (int i = 0; i < src.size[0]; i++){
+		for (int j = 0; j < src.size[1]; j++){
+			for (int k = 0; k < src.size[2]; k++){
+				for (int cn = 0; cn < srcChannels; cn++){
+					int _i = i / dstChannels;
+					int _j = j;
+					int _k = k;
+					int _cn = i % dstChannels;
+					*(dst.ptr<T>(_i, _j, _k) + _cn) = *(src.ptr<T>(i, j, k) + cn);
+				}
+			}
+		}
+	}
+}
+
 
 
 void convolutionalNeuralNetwork(
 	GlsMat &inputPlanes,				///! input [planes][rows][cols]
 	GlsMat &outputPlanes,				///! output [planes][rows][cols]
-	cv::Mat &weights,					///! kernels [inputPlanes*outputPlanes][ksize][ksize]
-	std::vector<double>& biases			///! bias [outputPlanes]
+	cv::Mat &_weights,					///! kernels [inputPlanes*outputPlanes][ksize][ksize]
+	std::vector<double>& biases,		///! bias [outputPlanes]
+	bool outputPacked					///! output plane to be packed.
 	)
 {
 	CV_Assert(inputPlanes.dims == 3);
-	CV_Assert(outputPlanes.dims == 3);
-	CV_Assert(weights.dims == 3);
+//	CV_Assert(outputPlanes.dims == 3);
+	CV_Assert(_weights.dims == 3);
+
+
+	cv::Size ipSize = cv::Size(inputPlanes.size[2], inputPlanes.size[1]);
+	cv::Size kSize = Size(_weights.size[2], _weights.size[1]);
+
 	const int n_inputPlanes = inputPlanes.size[0];
 	const int n_inputChannels = inputPlanes.channels();
-	const int n_outputPlanes = outputPlanes.size[0];
-	const int n_outputChannels = outputPlanes.channels();
+	const int n_outputChannels = outputPacked ?
+		(biases.size() / 4 > 0 ? 4 : 1) :
+		1;
+	const int n_outputPlanes = (int)biases.size() / n_outputChannels;
+
+
+	CV_Assert(n_inputPlanes * n_inputChannels *
+		n_outputPlanes * n_outputChannels
+		== _weights.size[0] * _weights.channels());
+
+	Mat weights;
+	if (_weights.channels() == inputPlanes.channels()){
+		weights = _weights;
+	}
+	else{
+		//if inputPlanes is packed, pack weights.  
+		pack<float>(_weights, weights, inputPlanes.channels());
+	}
+
+	{	//allocate output planes
+		int _size[3] = { n_outputPlanes, ipSize.height, ipSize.width };
+		outputPlanes = gls::GlsMat(3, _size, CV_MAKETYPE(inputPlanes.depth(), n_outputChannels));
+	}
+
 	const int n_weightPlanes = weights.size[0];
 	const int n_weightChannels = weights.channels();
 	CV_Assert(n_inputPlanes * n_inputChannels *
 		n_outputPlanes * n_outputChannels
 		== n_weightPlanes * n_weightChannels);
 
-	cv::Size ipSize = cv::Size(inputPlanes.size[2], inputPlanes.size[1]);
-	cv::Size kSize = Size(weights.size[2], weights.size[1]);
 	int _kSize[3] = { n_inputPlanes * n_outputChannels, kSize.height, kSize.width };
 
 	GLint max_fragment_uniform_vectors;
@@ -468,6 +543,7 @@ void convolutionalNeuralNetwork(
 	glDeleteBuffers(1, &ubo);
 
 }
+
 
 
 }//namespace

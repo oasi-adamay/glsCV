@@ -68,99 +68,8 @@ int Model::getNOutputPlanes() {
 	return nOutputPlanes;
 }
 
-#ifdef USE_GLS
-bool Model::filter(
-	std::vector<gls::GlsMat> &inputPlanes,
-	std::vector<gls::GlsMat> &outputPlanes
-)
-{
 
-	if (inputPlanes.size() != nInputPlanes) {
-		std::cerr << "Error : Model-filter : \n"
-				"number of input planes mismatch." << std::endl;
-		std::cerr << inputPlanes.size() << ","
-				<< nInputPlanes << std::endl;
-		return false;
-	}
-
-	outputPlanes.resize(nOutputPlanes);
-
-	cv::Size ipSize = inputPlanes[0].size();
-
-	// filter processing
-	// input : inputPlanes
-	// kernel : weightMatrices
-	for (int opIndex = 0; opIndex < nOutputPlanes ; opIndex++) {
-
-		int wMatIndex = nInputPlanes * opIndex;
-		gls::GlsMat uIntermediatePlane = (GlsMat)cv::Mat::zeros(ipSize, CV_32FC1); // all zero matrix;
-
-		for (int ipIndex = 0; ipIndex < nInputPlanes; ipIndex++) {
-
-			gls::GlsMat filterOutput;
-			gls::filter2D(inputPlanes[ipIndex], filterOutput, -1, weights[wMatIndex + ipIndex],
-				cv::Point(-1, -1), 0.0 /*, cv::BORDER_REPLICATE*/);
-			gls::add(uIntermediatePlane, filterOutput, uIntermediatePlane);
-
-		}
-
-		gls::add(biases[opIndex], uIntermediatePlane, uIntermediatePlane);
-		gls::GlsMat moreThanZero;
-		gls::GlsMat lessThanZero;
-		gls::max(0.0, uIntermediatePlane, moreThanZero);
-		gls::min(0.0, uIntermediatePlane, lessThanZero);
-		gls::multiply(0.1, lessThanZero, lessThanZero);
-		gls::add(lessThanZero, moreThanZero, uIntermediatePlane);
-		outputPlanes[opIndex] = uIntermediatePlane;
-
-	} // for index
-
-	return true;
-
-
-
-//	filterWorker(inputPlanes, weights, outputPlanes, 0, nOutputPlanes);
-
-	return true;
-}
-#elif	defined(USE_GLS_NEW)
-template <typename T>
-void pack(Mat& src, Mat& dst, int channels = 4){
-	_TMR_("pack\t:");
-	CV_Assert(src.dims == 3);
-	CV_Assert(src.channels() == 1);
-
-	const int srcPlanes = src.size[0];
-	const Size srcSize(src.size[2], src.size[1]);
-	const int srcChannels = src.channels();
-
-	//		const int dstChannels = channels;
-	const int dstChannels = srcPlanes / channels > 0 ? channels : srcChannels;
-	const int dstPlanes = srcPlanes / dstChannels;
-	const Size dstSize = srcSize;
-
-	CV_Assert(srcPlanes % dstChannels == 0);
-
-	const int sizes[3] = { dstPlanes, dstSize.height, dstSize.width };
-
-	dst = Mat(3, sizes, CV_MAKETYPE(src.depth(), dstChannels));
-
-	for (int i = 0; i < src.size[0]; i++){
-		for (int j = 0; j < src.size[1]; j++){
-			for (int k = 0; k < src.size[2]; k++){
-				for (int cn = 0; cn < srcChannels; cn++){
-					int _i = i / dstChannels;
-					int _j = j;
-					int _k = k;
-					int _cn = i % dstChannels;
-					*(dst.ptr<T>(_i, _j, _k) + _cn) = *(src.ptr<T>(i, j, k) + cn);
-				}
-			}
-		}
-	}
-}
-
-
+#if	defined(USE_GLS_NEW)
 bool Model::filter(
 	gls::GlsMat &inputPlanes,
 	gls::GlsMat &outputPlanes)
@@ -168,20 +77,6 @@ bool Model::filter(
 
 	CV_Assert(inputPlanes.dims == 3);
 
-
-#if 0	//normal
-	if (inputPlanes.size[0] != nInputPlanes) {
-		std::cerr << "Error : Model-filter : \n"
-			"number of input planes mismatch." << std::endl;
-		std::cerr << inputPlanes.size() << ","
-			<< nInputPlanes << std::endl;
-		return false;
-	}
-
-	int _size[3] = { nOutputPlanes, inputPlanes.size[1], inputPlanes.size[2] };
-	outputPlanes = gls::GlsMat(3, _size, CV_32FC1);
-	gls::convolutionalNeuralNetwork(inputPlanes, outputPlanes, weights, biases);
-#else	//channel interleave
 	const Size ipSize(inputPlanes.size[2], inputPlanes.size[1]);
 	const int n_inputChannels = inputPlanes.channels();
 	const int n_inputPlanes = inputPlanes.size[0];
@@ -194,23 +89,13 @@ bool Model::filter(
 		return false;
 	}
 
-
-
-	const int n_weightChannels = n_inputChannels;
-	Mat weightsPack;
-	pack<float>(weights, weightsPack, n_weightChannels);
-
-	const int channels = 4;
-	const int n_outputChannels = nOutputPlanes / channels  > 0 ? channels : 1;
-	const int n_outputPlanes = nOutputPlanes / n_outputChannels;
-
-	int _size[3] = { n_outputPlanes, ipSize.height,ipSize.width};
-	outputPlanes = gls::GlsMat(3, _size, CV_MAKETYPE(inputPlanes.depth(), n_outputChannels));
-	gls::convolutionalNeuralNetwork(inputPlanes, outputPlanes, weightsPack, biases);
-
-
+#if 0	 
+	const bool outputPacked = false;
+#else
+	const bool outputPacked = true;
 #endif
 
+	gls::convolutionalNeuralNetwork(inputPlanes, outputPlanes, weights, biases, outputPacked);
 
 	return true;
 }
