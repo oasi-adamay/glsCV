@@ -38,6 +38,7 @@ include
 
 #include "glsFft.h"
 #include "glsCopy.h"	//tiled / untiled
+#include "glsMerge.h"
 
 
 #define _USE_MATH_DEFINES
@@ -199,17 +200,28 @@ static bool IsPow2(unsigned int x){
 
 
 //-----------------------------------------------------------------------------
-void fft(const GlsMat& src, GlsMat& dst, int flag){
-	GLS_Assert(src.channels() == 2);
-	GLS_Assert(src.depth() == CV_32F);
+void fft(const GlsMat& _src, GlsMat& dst, int flag){
+	GLS_Assert(_src.channels() == 2 || _src.channels() == 1);
+	GLS_Assert(_src.depth() == CV_32F);
 
 
-	int N = src.cols;
+	int N = _src.cols;
 	GLS_Assert(IsPow2(N));
 
 	Size blkNum(2,2);
 	vector<vector<GlsMat>> _dst0 = vector<vector<GlsMat>>(blkNum.height, vector<GlsMat>(blkNum.width));
 	vector<vector<GlsMat>> _dst1 = vector<vector<GlsMat>>(blkNum.height, vector<GlsMat>(blkNum.width));
+
+	GlsMat src;
+	if (_src.channels() == 1){
+		// to complex mat
+		vector<GlsMat> tmp(2);
+		tmp[0] = _src;
+		gls::merge(tmp, src);
+	}
+	else{
+		src = _src;
+	}
 
 	gls::tiled(src, _dst0, blkNum);
 	for (int by = 0; by < blkNum.height; by++){
