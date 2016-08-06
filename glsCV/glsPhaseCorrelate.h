@@ -1,4 +1,4 @@
-/*
+﻿/*
 Copyright (c) 2016, oasi-adamay
 All rights reserved.
 
@@ -28,44 +28,34 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#ifndef _GLS_PHASE_CORRELATE_H_
+#define _GLS_PHASE_CORRELATE_H_
 
-#ifndef _GLS_CV_H_
-#define _GLS_CV_H_
+namespace gls
+{
 
+/*!
+phase only correlat
 
-#include "GlsMat.h"
-#include "glsShader.h"
-#include "glsCopy.h"
-#include "glsConvert.h"
-#include "glsDraw.h"
-#include "glsMerge.h"
-#include "glsSplit.h"
-#include "glsFft.h"
-#include "glsBasicOperation.h"
-#include "glsReduce.h"
-#include "glsMinMaxLoc.h"
-#include "glsMean.h"
-#include "glsNorm.h"
-#include "glsNormalize.h"
-#include "glsFilter.h"
-#include "glsBilateralFilter.h"
-#include "glsThreshold.h"
-#include "glsAdaptiveThreshold.h"
-#include "glsFlip.h"
-#include "glsResize.h"
-#include "glsWarpAffine.h"
-#include "glsRemap.h"
-#include "glsCartToPolar.h"
-#include "glsNonmaximaSuppression.h"
-#include "glsEdgeTracer.h"
-#include "glsCanny.h"
-#include "glsAccumulateWeighted.h"
-#include "glsConvolutionalNeuralNetwork.hpp"
-#include "glsPhaseCorrelate.h"
+@param src1 – 入力配列1 (CV_32FC1) サイズはN^2
+@param src2 – 入力配列2 (CV_32FC1) src1と同じ大きさ。
+@param window – 窓関数
+@param response – 
+@return src1に対する、src2の位置
+*/
+Point2d phaseCorrelateRes(const GlsMat& src1, const GlsMat& src2, GlsMat& window, double* response = 0);
 
 
-GLFWwindow* glsCvInit(const int _width = 0, const int _height = 0);
-void glsCvTerminate(void);
+/*!
+phase only correlat
 
+@param src1 – 入力配列1 (CV_32FC1) サイズはN^2
+@param src2 – 入力配列2 (CV_32FC1) src1と同じ大きさ。 
+@param window – 窓関数
+@return src1に対する、src2の位置
+*/
+Point2d phaseCorrelate(const GlsMat& src1, const GlsMat& src2, GlsMat& window);
+
+}//namespace gls
 
 #endif
