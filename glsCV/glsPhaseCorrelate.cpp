@@ -47,6 +47,15 @@ include
 namespace gls
 {
 
+//#ifdef _DEBUG
+//#define _ENAMBLR_TMR_
+#ifdef  _ENAMBLR_TMR_
+#include "Timer.h"
+#define _TMR_(...)  Timer tmr(__VA_ARGS__)
+#else
+#define _TMR_(...)
+#endif
+
 
 static Point2d weightedCentroid(Mat src, cv::Point peakLocation, cv::Size weightBoxSize, double* response)
 {
@@ -131,6 +140,7 @@ static Point2d weightedCentroid(Mat src, cv::Point peakLocation, cv::Size weight
 
 
 Point2d phaseCorrelateRes(const GlsMat& src1, const GlsMat& src2, GlsMat& window, double* response){
+	_TMR_("gls::phaseCorrelateRes:");
 	CV_Assert(src1.type() == src2.type());
 	CV_Assert(src1.type() == CV_32FC1);
 	CV_Assert(src1.size() == src2.size());
@@ -167,6 +177,7 @@ Point2d phaseCorrelateRes(const GlsMat& src1, const GlsMat& src2, GlsMat& window
 	// perform window multiplication if available
 	if (!paddedWin.empty())
 	{
+		_TMR_("gls::phaseCorrelateRes - window:");
 		// apply window to both images before proceeding...
 		gls::multiply(paddedWin, padded1, padded1);
 		gls::multiply(paddedWin, padded2, padded2);
@@ -174,27 +185,40 @@ Point2d phaseCorrelateRes(const GlsMat& src1, const GlsMat& src2, GlsMat& window
 
 	// execute phase correlation equation
 	// Reference: http://en.wikipedia.org/wiki/Phase_correlation
+	{
+		_TMR_("gls::phaseCorrelateRes - fft:");
+		gls::fft(padded1, FFT1);
+		gls::fft(padded2, FFT2);
+	}
+	{
+		_TMR_("gls::phaseCorrelateRes - poc:");
+		gls::mulSpectrumsPhaseOnly(FFT1, FFT2, C);
+	}
+	{
+		_TMR_("gls::phaseCorrelateRes - ifft:");
+		gls::fft(C, C, GLS_FFT_INVERSE | GLS_FFT_SHIFT);
 
-	gls::fft(padded1, FFT1);
-	gls::fft(padded2, FFT2);
-	gls::mulSpectrumsPhaseOnly(FFT1, FFT2, C);
-	gls::fft(C, C, GLS_FFT_INVERSE | GLS_FFT_SHIFT);
-
-//	gls::magSpectrums(C, C);
-	vector<GlsMat> cpx(2);
-	gls::split(C, cpx);
-	C = cpx[0];
+		//	gls::magSpectrums(C, C);
+		vector<GlsMat> cpx(2);
+		gls::split(C, cpx);
+		C = cpx[0];
+	}
 
 	// locate the highest peak
 	Point peakLoc;
-
-	gls::minMaxLoc(C, NULL, NULL, NULL, &peakLoc);
-//	gls::minMaxLoc(C, NULL, response, NULL, &peakLoc);
+	{
+		_TMR_("gls::phaseCorrelateRes - peek search:");
+		gls::minMaxLoc(C, NULL, NULL, NULL, &peakLoc);
+		//	gls::minMaxLoc(C, NULL, response, NULL, &peakLoc);
+	}
 	
 	// get the phase shift with sub-pixel accuracy, 5x5 window seems about right here...
 	Point2d t;
-	t = weightedCentroid((Mat)C, peakLoc, Size(5, 5), response);
-//	t = Point2d(peakLoc);
+	{
+		_TMR_("gls::phaseCorrelateRes - peek estimate:");
+		t = weightedCentroid((Mat)C, peakLoc, Size(5, 5), response);
+		//	t = Point2d(peakLoc);
+	}
 	
 	// max response is M*N (not exactly, might be slightly larger due to rounding errors)
 	if (response)
