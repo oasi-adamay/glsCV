@@ -56,27 +56,28 @@ namespace gls
 {
 
 // glsFft shader
-class glsShaderFft : public glsShaderBase
+class glsShaderFftRadix2 : public glsShaderBase
 {
 protected:
 	string FragmentShaderCode(void);
 	list<string> UniformNameList(void);
 
 public:
-	glsShaderFft(void) :glsShaderBase(__FUNCTION__){}
+	glsShaderFftRadix2(void) :glsShaderBase(__FUNCTION__){}
 
 };
 
 
 //-----------------------------------------------------------------------------
 //global 
-glsShaderFft ShaderFft;
+glsShaderFftRadix2 ShaderFftRadix2;
 
 
 
 //-----------------------------------------------------------------------------
-//glsShaderFft
-string glsShaderFft::FragmentShaderCode(void){
+//glsShaderFftRadix2
+// Stockham,DIT radix2
+string glsShaderFftRadix2::FragmentShaderCode(void){
 	const char fragmentShaderCode[] = TO_STR(
 #version 330 core\n
 precision highp float;\n
@@ -176,7 +177,7 @@ void main(void)\n
 	return fragmentShaderCode;
 }
 
-list<string> glsShaderFft::UniformNameList(void){
+list<string> glsShaderFftRadix2::UniformNameList(void){
 	list<string> lst;
 	lst.push_back("texSrc0");
 	lst.push_back("texSrc1");
@@ -208,10 +209,6 @@ void fft(const GlsMat& _src, GlsMat& dst, int flag){
 	int N = _src.cols;
 	GLS_Assert(IsPow2(N));
 
-	Size blkNum(2,2);
-	vector<vector<GlsMat>> _dst0 = vector<vector<GlsMat>>(blkNum.height, vector<GlsMat>(blkNum.width));
-	vector<vector<GlsMat>> _dst1 = vector<vector<GlsMat>>(blkNum.height, vector<GlsMat>(blkNum.width));
-
 	GlsMat src;
 	if (_src.channels() == 1){
 		// to complex mat
@@ -222,6 +219,11 @@ void fft(const GlsMat& _src, GlsMat& dst, int flag){
 	else{
 		src = _src;
 	}
+
+
+	Size blkNum(2,2);
+	vector<vector<GlsMat>> _dst0 = vector<vector<GlsMat>>(blkNum.height, vector<GlsMat>(blkNum.width));
+	vector<vector<GlsMat>> _dst1 = vector<vector<GlsMat>>(blkNum.height, vector<GlsMat>(blkNum.width));
 
 	gls::tiled(src, _dst0, blkNum);
 	for (int by = 0; by < blkNum.height; by++){
@@ -240,7 +242,8 @@ void fft(const GlsMat& _src, GlsMat& dst, int flag){
 
 		Mat w(Size(N / 2, 1), CV_32FC2);
 #ifdef _OPENMP
-#pragma omp parallel for
+//#pragma omp parallel for
+#pragma omp parallel for if(N>=256)
 #endif
 		for (int n = 0; n < N / 2; n++){
 			float jw = (float)(-2 * M_PI * n / N);
@@ -292,7 +295,7 @@ void fft(const GlsMat& _src, GlsMat& dst, int flag){
 				float xscl = 1.0f;
 				float xconj = ((flag & GLS_FFT_INVERSE) && (p == 0)) ? -1.0f : 1.0f;
 				float yconj = 1.0f;
-				ShaderFft.Execute(texSrc[0], texSrc[1], texW, 0, N, p, q, xscl, yscl, xconj, yconj, texDst[0], texDst[1]);
+				ShaderFftRadix2.Execute(texSrc[0], texSrc[1], texW, 0, N, p, q, xscl, yscl, xconj, yconj, texDst[0], texDst[1]);
 
 			}
 		}
@@ -307,7 +310,7 @@ void fft(const GlsMat& _src, GlsMat& dst, int flag){
 				float xscl = 1.0f;
 				float xconj = 1.0f;
 				float yconj = ((flag & GLS_FFT_INVERSE) && (q == 0)) ? -1.0f : 1.0f;
-				ShaderFft.Execute(texSrc[0], texSrc[1], texW, 1, N, p, q, xscl, yscl, xconj, yconj, texDst[0], texDst[1]);
+				ShaderFftRadix2.Execute(texSrc[0], texSrc[1], texW, 1, N, p, q, xscl, yscl, xconj, yconj, texDst[0], texDst[1]);
 			}
 		}
 	}
