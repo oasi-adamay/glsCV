@@ -13,7 +13,7 @@ BSD-3clause license
 
 ## 機能
 - 配列操作
- - split, merge, tiled, untiled, copy, flip, cartToPolar 
+ - split, merge, tiled, untiled, copy, flip, cartToPolar
 - 要素毎の演算
  - add, subtract, multiply, divide, min, max, mulSpectrums, log, exp, pow
  - convert, cvtColor
@@ -25,15 +25,14 @@ BSD-3clause license
  - sepFilter2D, filter2D, gaussianFilter, boxFilter, Sobel, Laplacian, bilateralFilter, Canny, accumulateWeighted
  - threshold, adaptiveThreshold
 - 幾何変換
- - remap ,resize, warpAffine 
+ - remap ,resize, warpAffine
 
 ## 開発環境
- * Windows8
+ * Windows8 / 10
  * VC2013
   * NupenGL 0.1.0.1  (glew,glfw)
-  * glm 0.9.7.1
-  * OpenCV 2.1.10
-  
+  * OpenCV 2.4.10
+
 ## build
  1. glsCV.sln をVCで開く  
  2. Nugetでパッケージのインストール  
@@ -42,4 +41,3 @@ BSD-3clause license
   * glm 0.9.7.1
   * OpenCV 2.1.10
  3. ソリューションのbuild  
-
