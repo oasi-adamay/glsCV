@@ -830,29 +830,29 @@ void fft_dit_Stockham_radix4_type0(const Mat& src, Mat &dst){
 
 					int ix = n;
 					int ix0 = ix + (N / 4) * 0;
-					int ix2 = ix + (N / 4) * 1;
-					int ix1 = ix + (N / 4) * 2;
+					int ix1 = ix + (N / 4) * 1;
+					int ix2 = ix + (N / 4) * 2;
 					int ix3 = ix + (N / 4) * 3;
 
 					int iy = n;
 					int iy0 = iy + (N / 4) * 0;
-					int iy2 = iy + (N / 4) * 1;
-					int iy1 = iy + (N / 4) * 2;
+					int iy1 = iy + (N / 4) * 1;
+					int iy2 = iy + (N / 4) * 2;
 					int iy3 = iy + (N / 4) * 3;
 
 					cout << "src(" << ix0 << "," << ix1 << "," << ix2 << "," << ix3 << ")\t";
 					cout << "dst(" << iy0 << "," << iy1 << "," << iy2 << "," << iy3 << ")\t";
 					cout << endl;
 
-					const Vec2f a0 = x[ix0];
-					const Vec2f b0 = x[ix1];
-					const Vec2f a1 = x[ix2];
-					const Vec2f b1 = x[ix3];
+					const Vec2f x0 = x[ix0];
+					const Vec2f x1 = x[ix1];
+					const Vec2f x2 = x[ix2];
+					const Vec2f x3 = x[ix3];
 
-					y[iy0] = a0 + b0;
-					y[iy1] = a0 - b0;
-					y[iy2] = a1 + b1;
-					y[iy3] = a1 - b1;
+					y[iy0] = x0 + x2;
+					y[iy1] = x1 + x3;
+					y[iy2] = x0 - x2;
+					y[iy3] = x1 - x3;
 
 				}
 			}

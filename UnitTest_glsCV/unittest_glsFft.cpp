@@ -112,6 +112,7 @@ namespace UnitTest_glsCV
 			{
 				Timer tmr("glsFft:  \t");
 				gls::fft(_src, _dst,_flags);
+				glFinish();
 			}
 			_dst.download(imgFft);
 		}
@@ -162,31 +163,6 @@ namespace UnitTest_glsCV
 			int errNum = test_glsFft(N, flags);
 			Assert::AreEqual(0, errNum);
 		}
-
-
-		TEST_METHOD(FFT_32)
-		{
-			cout << __FUNCTION__ << endl;
-			const int N = 32;
-			const int flags = 0;
-			int errNum = test_glsFft(N, flags, false);
-			Assert::AreEqual(0, errNum);
-		}
-
-		TEST_METHOD(FFT_64)
-		{
-			cout << __FUNCTION__ << endl;
-			const int N = 64;
-			const int flags = 0;
-			int errNum = test_glsFft(N, flags,false);
-			Assert::AreEqual(0, errNum);
-		}
-		BEGIN_TEST_METHOD_ATTRIBUTE(FFT_64)
-			//TEST_OWNER(L"OwnerName")
-			TEST_PRIORITY(1)
-			TEST_MY_TRAIT(L"basic")
-		END_TEST_METHOD_ATTRIBUTE()
-
 
 
 		TEST_METHOD(FFT_128x128_SCALE)
@@ -328,6 +304,37 @@ namespace UnitTest_glsCV
 			TEST_MY_TRAIT(L"benchmark")
 		END_TEST_METHOD_ATTRIBUTE()
 
+
+		TEST_METHOD(FFT_32)
+		{
+			cout << __FUNCTION__ << endl;
+			const int N = 32;
+			const int flags = 0;
+			int errNum = test_glsFft(N, flags, false);
+			Assert::AreEqual(0, errNum);
+		}
+		BEGIN_TEST_METHOD_ATTRIBUTE(FFT_32)
+			//TEST_OWNER(L"OwnerName")
+			TEST_PRIORITY(1)
+			TEST_MY_TRAIT(L"basic")
+			TEST_IGNORE()
+		END_TEST_METHOD_ATTRIBUTE()
+
+
+		TEST_METHOD(FFT_64)
+		{
+			cout << __FUNCTION__ << endl;
+			const int N = 64;
+			const int flags = 0;
+			int errNum = test_glsFft(N, flags, false);
+			Assert::AreEqual(0, errNum);
+		}
+		BEGIN_TEST_METHOD_ATTRIBUTE(FFT_64)
+			//TEST_OWNER(L"OwnerName")
+			TEST_PRIORITY(1)
+			TEST_MY_TRAIT(L"basic")
+			TEST_IGNORE()
+		END_TEST_METHOD_ATTRIBUTE()
 
 
 
