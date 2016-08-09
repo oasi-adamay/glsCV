@@ -42,10 +42,19 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 namespace UnitTest_glsCV
 {	
 
-	int test_glsFft(const int N, const int flags){
+	int test_glsFft(const int N, const int flags,const bool is2D = true){
 		int ULPS = 64;
 		float EPS = 1e-4f;
-		Mat imgSrc = Mat(Size(N, N), CV_32FC2);
+		Size size;
+		if (is2D){
+			size = Size(N, N);
+		}
+		else{
+			size = Size(N, 1);
+//			size = Size(1 , N);
+		}
+		
+		Mat imgSrc = Mat(size, CV_32FC2);
 		Mat imgFft = Mat::zeros(imgSrc.size(), imgSrc.type());
 		Mat imgFftRef = Mat::zeros(imgSrc.size(), imgSrc.type());
 
@@ -55,7 +64,8 @@ namespace UnitTest_glsCV
 		//init Src image
 		FillRandU<float>(imgSrc);
 
-#if 1
+		//reference select
+#if 1	
 		//---------------------------------
 		//CPU FFT(cv::dft)
 		{
@@ -72,6 +82,26 @@ namespace UnitTest_glsCV
 		}
 #endif
 
+		//target select
+#if 0
+		//---------------------------------
+		//CPU FFT(cv::dft)
+		{
+			Timer tmr("Stockham:   \t");
+			void fft_dit_Stockham_radix2_type0(const Mat& src, Mat &dst);
+			fft_dit_Stockham_radix2_type0(imgSrc, imgFft);
+		}
+#elif 0
+		{
+			Timer tmr("Stockham:   \t");
+			//void fft_dif_Stockham_radix4_type0(const Mat& src, Mat &dst);
+			//fft_dif_Stockham_radix4_type0(imgSrc, imgFft);
+			void fft_dit_Stockham_radix4_type0(const Mat& src, Mat &dst);
+			fft_dit_Stockham_radix4_type0(imgSrc, imgFft);
+		}
+
+
+#else
 		//---------------------------------
 		{
 			int _flags = 0;
@@ -85,6 +115,7 @@ namespace UnitTest_glsCV
 			}
 			_dst.download(imgFft);
 		}
+#endif
 
 		//verify
 		int errNum = 0;
@@ -100,7 +131,7 @@ namespace UnitTest_glsCV
 	{
 	public:
 
-		TEST_METHOD(FFT)
+		TEST_METHOD(FFT_256x256)
 		{
 			cout << __FUNCTION__ << endl;
 			const int N = 256;
@@ -108,7 +139,49 @@ namespace UnitTest_glsCV
 			int errNum = test_glsFft(N, flags);
 			Assert::AreEqual(0, errNum);
 		}
-		BEGIN_TEST_METHOD_ATTRIBUTE(FFT)
+		BEGIN_TEST_METHOD_ATTRIBUTE(FFT_256x256)
+			//TEST_OWNER(L"OwnerName")
+			TEST_PRIORITY(1)
+			TEST_MY_TRAIT(L"basic")
+		END_TEST_METHOD_ATTRIBUTE()
+
+		TEST_METHOD(FFT_32x32)
+		{
+			cout << __FUNCTION__ << endl;
+			const int N = 32;
+			const int flags = 0;
+			int errNum = test_glsFft(N, flags);
+			Assert::AreEqual(0, errNum);
+		}
+
+		TEST_METHOD(FFT_16x16)
+		{
+			cout << __FUNCTION__ << endl;
+			const int N = 16;
+			const int flags = 0;
+			int errNum = test_glsFft(N, flags);
+			Assert::AreEqual(0, errNum);
+		}
+
+
+		TEST_METHOD(FFT_32)
+		{
+			cout << __FUNCTION__ << endl;
+			const int N = 32;
+			const int flags = 0;
+			int errNum = test_glsFft(N, flags, false);
+			Assert::AreEqual(0, errNum);
+		}
+
+		TEST_METHOD(FFT_64)
+		{
+			cout << __FUNCTION__ << endl;
+			const int N = 64;
+			const int flags = 0;
+			int errNum = test_glsFft(N, flags,false);
+			Assert::AreEqual(0, errNum);
+		}
+		BEGIN_TEST_METHOD_ATTRIBUTE(FFT_64)
 			//TEST_OWNER(L"OwnerName")
 			TEST_PRIORITY(1)
 			TEST_MY_TRAIT(L"basic")
@@ -116,7 +189,7 @@ namespace UnitTest_glsCV
 
 
 
-		TEST_METHOD(FFT_SCALE)
+		TEST_METHOD(FFT_128x128_SCALE)
 		{
 			cout << __FUNCTION__ << endl;
 			const int N = 128;
@@ -125,7 +198,7 @@ namespace UnitTest_glsCV
 			Assert::AreEqual(0, errNum);
 		}
 
-		TEST_METHOD(IFFT)
+		TEST_METHOD(IFFT_64x64)
 		{
 			cout << __FUNCTION__ << endl;
 			const int N = 64;
@@ -134,7 +207,7 @@ namespace UnitTest_glsCV
 			Assert::AreEqual(0, errNum);
 		}
 
-		TEST_METHOD(IFFT_SCALE)
+		TEST_METHOD(IFFT_32x32_SCALE)
 		{
 			cout << __FUNCTION__ << endl;
 			const int N = 32;
@@ -144,7 +217,7 @@ namespace UnitTest_glsCV
 		}
 
 
-		TEST_METHOD(FFT_SCALE_64_benchmark)
+		TEST_METHOD(FFT_64x64_SCALE_benchmark)
 		{
 			cout << __FUNCTION__ << endl;
 			const int N = 64;
@@ -156,13 +229,13 @@ namespace UnitTest_glsCV
 			}
 			Assert::AreEqual(0, errNum);
 		}
-		BEGIN_TEST_METHOD_ATTRIBUTE(FFT_SCALE_64_benchmark)
+		BEGIN_TEST_METHOD_ATTRIBUTE(FFT_64x64_SCALE_benchmark)
 			//TEST_OWNER(L"OwnerName")
 			//TEST_PRIORITY(1)
 			TEST_MY_TRAIT(L"benchmark")
 		END_TEST_METHOD_ATTRIBUTE()
 
-		TEST_METHOD(FFT_SCALE_128_benchmark)
+		TEST_METHOD(FFT_128x128_SCALE_benchmark)
 		{
 			cout << __FUNCTION__ << endl;
 			const int N = 128;
@@ -174,13 +247,13 @@ namespace UnitTest_glsCV
 			}
 			Assert::AreEqual(0, errNum);
 		}
-		BEGIN_TEST_METHOD_ATTRIBUTE(FFT_SCALE_128_benchmark)
+		BEGIN_TEST_METHOD_ATTRIBUTE(FFT_128x128_SCALE_benchmark)
 			//TEST_OWNER(L"OwnerName")
 			//TEST_PRIORITY(1)
 			TEST_MY_TRAIT(L"benchmark")
 		END_TEST_METHOD_ATTRIBUTE()
 
-		TEST_METHOD(FFT_SCALE_256_benchmark)
+		TEST_METHOD(FFT_256x256_SCALE_benchmark)
 		{
 			cout << __FUNCTION__ << endl;
 			const int N = 256;
@@ -192,13 +265,13 @@ namespace UnitTest_glsCV
 			}
 			Assert::AreEqual(0, errNum);
 		}
-		BEGIN_TEST_METHOD_ATTRIBUTE(FFT_SCALE_256_benchmark)
+		BEGIN_TEST_METHOD_ATTRIBUTE(FFT_256x256_SCALE_benchmark)
 			//TEST_OWNER(L"OwnerName")
 			//TEST_PRIORITY(1)
 			TEST_MY_TRAIT(L"benchmark")
 		END_TEST_METHOD_ATTRIBUTE()
 
-		TEST_METHOD(FFT_SCALE_512_benchmark)
+		TEST_METHOD(FFT_512x512_SCALE_benchmark)
 		{
 			cout << __FUNCTION__ << endl;
 			const int N = 512;
@@ -210,14 +283,14 @@ namespace UnitTest_glsCV
 			}
 			Assert::AreEqual(0, errNum);
 		}
-		BEGIN_TEST_METHOD_ATTRIBUTE(FFT_SCALE_512_benchmark)
+		BEGIN_TEST_METHOD_ATTRIBUTE(FFT_512x512_SCALE_benchmark)
 			//TEST_OWNER(L"OwnerName")
 			//TEST_PRIORITY(1)
 			TEST_MY_TRAIT(L"benchmark")
 		END_TEST_METHOD_ATTRIBUTE()
 
 
-		TEST_METHOD(FFT_SCALE_1024_benchmark)
+		TEST_METHOD(FFT_1024x1024_SCALE_benchmark)
 		{
 			cout << __FUNCTION__ << endl;
 			const int N = 1024;
@@ -229,7 +302,7 @@ namespace UnitTest_glsCV
 			}
 			Assert::AreEqual(0, errNum);
 		}
-		BEGIN_TEST_METHOD_ATTRIBUTE(FFT_SCALE_1024_benchmark)
+		BEGIN_TEST_METHOD_ATTRIBUTE(FFT_1024x1024_SCALE_benchmark)
 			//TEST_OWNER(L"OwnerName")
 			//TEST_PRIORITY(1)
 			TEST_MY_TRAIT(L"benchmark")
@@ -237,7 +310,7 @@ namespace UnitTest_glsCV
 
 
 
-		TEST_METHOD(FFT_SCALE_2048_benchmark)
+		TEST_METHOD(FFT_2048x2048_SCALE_benchmark)
 		{
 			cout << __FUNCTION__ << endl;
 			const int N = 2048;
@@ -249,7 +322,7 @@ namespace UnitTest_glsCV
 			}
 			Assert::AreEqual(0, errNum);
 		}
-		BEGIN_TEST_METHOD_ATTRIBUTE(FFT_SCALE_2048_benchmark)
+		BEGIN_TEST_METHOD_ATTRIBUTE(FFT_2048x2048_SCALE_benchmark)
 			//TEST_OWNER(L"OwnerName")
 			//TEST_PRIORITY(1)
 			TEST_MY_TRAIT(L"benchmark")

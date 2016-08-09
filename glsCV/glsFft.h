@@ -47,9 +47,6 @@ namespace gls
 void fft(const GlsMat& src, GlsMat& dst, int flag = 0);
 
 
-
-void fft(const Mat& src, Mat& dst, int flag = 0);
-
 }//namespace gls
 
 

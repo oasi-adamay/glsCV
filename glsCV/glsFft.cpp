@@ -251,23 +251,6 @@ void fft(const GlsMat& _src, GlsMat& dst, int flag){
 			w.at<Vec2f>(0, n) = val;
 		}
 		texW.upload(w);
-
-
-		//vector<vec2> w(N / 2);
-		// --- twidle ----
-		//#ifdef _OPENMP
-		//#pragma omp parallel for
-		//#endif
-		//for (int n = 0; n < N / 2; n++){
-		//	float jw = (float)(-2 * M_PI * n / N);
-		//	w[n][0] = cos(jw);
-		//	w[n][1] = sin(jw);
-		//}
-		//void* data = &w[0];
-
-		//glBindTexture(GL_TEXTURE_2D, texW);
-		//glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, (GLsizei)w.size(), 1, texture.glFormat(), texture.glType(), data);
-		//glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
 	vector<vector<GlsMat>>* texbuf[2] = { &_dst0, &_dst1 };
@@ -331,30 +314,6 @@ void fft(const GlsMat& _src, GlsMat& dst, int flag){
 
 
 
-void fft(const Mat& src, Mat& dst, int flag){
-	CV_Assert(src.type() == CV_32FC2);
-	CV_Assert(src.cols == src.rows);
-
-	int N = src.cols;
-	CV_Assert(IsPow2(N));
-
-	GlsMat _src(src.size(), src.type());
-	GlsMat _dst;
-
-	//---------------------------------
-	//upload
-	_src.upload(src);
-
-	//---------------------------------
-	//fft
-	gls::fft(_src, _dst,flag);
-
-	//---------------------------------
-	//download
-	_dst.download(dst);
-
-
-}
 
 }//namespace gls
 
