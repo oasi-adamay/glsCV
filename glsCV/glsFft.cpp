@@ -666,13 +666,15 @@ static void fft_redix4(const GlsMat& src, GlsMat& dst, int flag){
 
 
 
-	//if (flag & GLS_FFT_SHIFT){
-	//	(*texbuf[bank ^ 1])[0][0] = (*texbuf[bank])[1][1];
-	//	(*texbuf[bank ^ 1])[0][1] = (*texbuf[bank])[1][0];
-	//	(*texbuf[bank ^ 1])[1][0] = (*texbuf[bank])[0][1];
-	//	(*texbuf[bank ^ 1])[1][1] = (*texbuf[bank])[0][0];
-	//	bank = bank ^ 1;
-	//}
+	if (flag & GLS_FFT_SHIFT){
+		const int _tbl[4] = { 2, 3, 0, 1 };
+		for (int i = 0; i < 4; i++){
+			for (int j = 0; j < 4; j++){
+				(*texbuf[bank ^ 1])[_tbl[i]][_tbl[j]] = (*texbuf[bank])[i][j];
+			}
+		}
+		bank = bank ^ 1;
+	}
 
 	gls::untiled(*texbuf[bank], dst);
 }
