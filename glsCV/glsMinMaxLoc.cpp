@@ -147,7 +147,7 @@ glsShaderBase* selectShader(int type){
 
 
 void minMaxLoc(const GlsMat& src, double* minVal, double* maxVal, Point* minLoc, Point* maxLoc, const GlsMat& mask){
-	GLS_Assert(src.depth() == CV_32F);
+	GLS_Assert(src.type() == CV_32FC1);
 	GLS_Assert(mask.empty());	// not implement yet
 
 	GlsMat _minvec;
@@ -155,10 +155,10 @@ void minMaxLoc(const GlsMat& src, double* minVal, double* maxVal, Point* minLoc,
 	GlsMat _minloc;
 	GlsMat _maxloc;
 
-	if (minVal) _minvec = GlsMat(Size(1, src.rows), CV_MAKE_TYPE(src.depth(), 1));
-	if (maxVal) _maxvec = GlsMat(Size(1, src.rows), CV_MAKE_TYPE(src.depth(), 1));
-	if (minLoc) _minloc = GlsMat(Size(1, src.rows), CV_32SC1);
-	if (maxLoc) _maxloc = GlsMat(Size(1, src.rows), CV_32SC1);
+	_minvec = GlsMat(Size(1, src.rows), CV_MAKE_TYPE(src.depth(), 1));
+	_maxvec = GlsMat(Size(1, src.rows), CV_MAKE_TYPE(src.depth(), 1));
+	_minloc = GlsMat(Size(1, src.rows), CV_32SC1);
+	_maxloc = GlsMat(Size(1, src.rows), CV_32SC1);
 
 	glsShaderBase* shader = selectShader(src.type());
 
@@ -171,10 +171,10 @@ void minMaxLoc(const GlsMat& src, double* minVal, double* maxVal, Point* minLoc,
 		GlsMat _minloc1;
 		GlsMat _maxloc1;
 
-		if (minVal) _minvec1 = GlsMat(Size(1, 1), CV_MAKE_TYPE(src.depth(), 1));
-		if (maxVal) _maxvec1 = GlsMat(Size(1, 1), CV_MAKE_TYPE(src.depth(), 1));
-		if (minLoc) _minloc1 = GlsMat(Size(1, 1), CV_32SC2);
-		if (maxLoc) _maxloc1 = GlsMat(Size(1, 1), CV_32SC2);
+		_minvec1 = GlsMat(Size(1, 1), CV_MAKE_TYPE(src.depth(), 1));
+		_maxvec1 = GlsMat(Size(1, 1), CV_MAKE_TYPE(src.depth(), 1));
+		_minloc1 = GlsMat(Size(1, 1), CV_32SC2);
+		_maxloc1 = GlsMat(Size(1, 1), CV_32SC2);
 
 		shader->Execute(1, _minvec, _maxvec, _minloc, _maxloc, _minvec1, _maxvec1, _minloc1, _maxloc1);
 

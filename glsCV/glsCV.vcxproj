@@ -166,6 +166,7 @@
     <ClInclude Include="glsNonmaximaSuppression.h" />
     <ClInclude Include="glsNorm.h" />
     <ClInclude Include="glsNormalize.h" />
+    <ClInclude Include="glsPhaseCorrelate.h" />
     <ClInclude Include="glsReduce.h" />
     <ClInclude Include="glsRemap.h" />
     <ClInclude Include="glsResize.h" />
@@ -204,6 +205,7 @@
     <ClCompile Include="glsNonmaximaSuppression.cpp" />
     <ClCompile Include="glsNorm.cpp" />
     <ClCompile Include="glsNormalize.cpp" />
+    <ClCompile Include="glsPhaseCorrelate.cpp" />
     <ClCompile Include="glsReduce.cpp" />
     <ClCompile Include="glsRemap.cpp" />
     <ClCompile Include="glsResize.cpp" />

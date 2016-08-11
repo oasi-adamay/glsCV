@@ -119,6 +119,9 @@
     <ClCompile Include="..\waifu2x-converter-gls\src\convolutionalNeuralNetwork.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
+    <ClCompile Include="UnitTest_glsPhaseCorrelate.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

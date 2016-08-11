@@ -113,11 +113,14 @@ GLFWwindow* glsCvInit(const int _width, const int _height){
 	//-----------------------------------------------------------------------------
 	glfwWindowHint(GLFW_SAMPLES, 4);
 
+//#if __APPLE__
+#if 1
 	// GL3.3 Core profile
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	//	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+#endif
 
 	if (offscreen){
 		glfwWindowHint(GLFW_VISIBLE, 0);	//オフスクリーン
@@ -132,7 +135,8 @@ GLFWwindow* glsCvInit(const int _width, const int _height){
 	}
 	glfwMakeContextCurrent(window);
 
-#if defined _WIN32
+//#if defined _WIN32
+#ifdef __glew_h__
 	// Initialize GLEW
 	glewExperimental = GL_TRUE;			///!!!! important for core profile // コアプロファイルで必要となります
 	if (glewInit() != GLEW_OK) {
@@ -145,6 +149,7 @@ GLFWwindow* glsCvInit(const int _width, const int _height){
 
 	glGetError();	// clear error flag!
 
+	//if (0)
 	{
 		cout << "GL_VENDOR:" << glGetString(GL_VENDOR) << endl;
 		cout << "GL_RENDERER:" << glGetString(GL_RENDERER) << endl;

@@ -197,13 +197,8 @@ int _tmain(int argc, _TCHAR* argv[])
 			gls::cvtColor(glsFrame, glsFrame, CV_BGR2GRAY);
 			gls::copyRect(glsFrame, glsFrame, rectFft);
 			gls::multiply(glsFftWin, glsFrame, glsFrame);
-			vector<GlsMat> plnGls(2);
-			plnGls[0] = glsFrame;
-			plnGls[1] = glsZero;
-			GlsMat glsComplx;
-			gls::merge(plnGls, glsComplx);
-			gls::fft(glsComplx, glsComplx, GLS_FFT_SHIFT);
-			gls::logMagSpectrums(glsComplx, glsFrame, 1.0);
+			gls::fft(glsFrame, glsFrame, gls::GLS_FFT_SHIFT);
+			gls::logMagSpectrums(glsFrame, glsFrame, 1.0);
 			gls::normalize(glsFrame, glsFrame, 0, 1, NORM_MINMAX);
 		}break;
 		case(E_CAM_MODE::FFT_RECT) : {
