@@ -99,7 +99,11 @@ namespace UnitTest_glsCV
 
 	int test_glsFft(const int N, const int flags,const int dir = -1){
 		int ULPS = 64;
-		float EPS = 1e-4f;
+		float EPS = 1e-6f;
+		if (!(flags & DFT_SCALE)){
+			EPS *= (N);
+		}
+
 		Size size;
 		if (dir<0){	//2D
 			size = Size(N, N);
@@ -110,12 +114,19 @@ namespace UnitTest_glsCV
 		else{ //vertical 1D
 			size = Size(1 , N);
 		}
+
+		cout << "Size:" << size << endl;
+		cout << "ULPS:" << ULPS << endl;
+		cout << "EPS:" << EPS << endl;
+
+
+
+
 		
 		Mat imgSrc = Mat(size, CV_32FC2);
 		Mat imgFft = Mat::zeros(imgSrc.size(), imgSrc.type());
 		Mat imgFftRef = Mat::zeros(imgSrc.size(), imgSrc.type());
 
-		cout << "Size:" << imgSrc.size() << endl;
 
 		//---------------------------------
 		//init Src image
