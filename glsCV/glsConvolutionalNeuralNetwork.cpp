@@ -517,8 +517,8 @@ void convolutionalNeuralNetwork(
 	glsShaderConvolutionalNeuralNetworkBase* shader = 0;
 	shader = selectShader(kSize, n_inputChannels, n_outputChannels);
 	glUseProgram(shader->program());
-
-	glsVAO vao(glGetAttribLocation(shader->program(), "position"));
+	
+	glsVAO vao(shader->attribLocArray[0]);
 	glsFBO fbo;		
 	GLuint ubo = 0;
 	glGenBuffers(1, &ubo);

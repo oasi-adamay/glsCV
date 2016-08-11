@@ -346,13 +346,12 @@ void glsShaderBase::setup(SetupInfo* info, const First& first, const Rest&... re
 template<class First, class... Rest>
 void glsShaderBase::Execute(const First& first, const Rest&... rest)
 {
-	glsVAO vao(glGetAttribLocation(program(), "position"));
-//	glsFBO fbo(1);
 
 	//program
-	{
-		glUseProgram(program());
-	}
+	glUseProgram(program());
+
+	//vao
+	glsVAO vao(attribLocArray[0]);
 
 	//setup
 	SetupInfo info = { 0 };
