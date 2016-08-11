@@ -41,6 +41,61 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace UnitTest_glsCV
 {	
+	static void fftShift(Mat& out)
+	{
+		if (out.rows == 1 && out.cols == 1)
+		{
+			// trivially shifted.
+			return;
+		}
+
+		vector<Mat> planes;
+		split(out, planes);
+
+		int xMid = out.cols >> 1;
+		int yMid = out.rows >> 1;
+
+		bool is_1d = xMid == 0 || yMid == 0;
+
+		if (is_1d)
+		{
+			xMid = xMid + yMid;
+
+			for (size_t i = 0; i < planes.size(); i++)
+			{
+				Mat tmp;
+				Mat half0(planes[i], Rect(0, 0, xMid, 1));
+				Mat half1(planes[i], Rect(xMid, 0, xMid, 1));
+
+				half0.copyTo(tmp);
+				half1.copyTo(half0);
+				tmp.copyTo(half1);
+			}
+		}
+		else
+		{
+			for (size_t i = 0; i < planes.size(); i++)
+			{
+				// perform quadrant swaps...
+				Mat tmp;
+				Mat q0(planes[i], Rect(0, 0, xMid, yMid));
+				Mat q1(planes[i], Rect(xMid, 0, xMid, yMid));
+				Mat q2(planes[i], Rect(0, yMid, xMid, yMid));
+				Mat q3(planes[i], Rect(xMid, yMid, xMid, yMid));
+
+				q0.copyTo(tmp);
+				q3.copyTo(q0);
+				tmp.copyTo(q3);
+
+				q1.copyTo(tmp);
+				q2.copyTo(q1);
+				tmp.copyTo(q2);
+			}
+		}
+
+		merge(planes, out);
+	}
+
 
 	int test_glsFft(const int N, const int flags,const bool is2D = true){
 		int ULPS = 64;
@@ -71,6 +126,9 @@ namespace UnitTest_glsCV
 		{
 			Timer tmr("cv:dft:   \t");
 			cv::dft(imgSrc, imgFftRef, flags);
+			if (flags & gls::GLS_FFT_SHIFT){
+				fftShift(imgFftRef);
+			}
 		}
 #else
 		//---------------------------------
@@ -105,8 +163,9 @@ namespace UnitTest_glsCV
 		//---------------------------------
 		{
 			int _flags = 0;
-			if (flags & DFT_SCALE)	_flags |= GLS_FFT_SCALE;
-			if (flags & DFT_INVERSE)_flags |= GLS_FFT_INVERSE;
+			if (flags & DFT_SCALE)	_flags |= gls::GLS_FFT_SCALE;
+			if (flags & DFT_INVERSE)_flags |= gls::GLS_FFT_INVERSE;
+			if (flags & gls::GLS_FFT_SHIFT)_flags |= gls::GLS_FFT_SHIFT;
 			GlsMat _src(imgSrc);
 			GlsMat _dst;
 			{
@@ -160,6 +219,15 @@ namespace UnitTest_glsCV
 			cout << __FUNCTION__ << endl;
 			const int N = 16;
 			const int flags = 0;
+			int errNum = test_glsFft(N, flags);
+			Assert::AreEqual(0, errNum);
+		}
+
+		TEST_METHOD(FFT_32x32_SHFIT)
+		{
+			cout << __FUNCTION__ << endl;
+			const int N = 16;
+			const int flags = gls::GLS_FFT_SHIFT;
 			int errNum = test_glsFft(N, flags);
 			Assert::AreEqual(0, errNum);
 		}

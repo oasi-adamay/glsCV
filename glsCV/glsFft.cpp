@@ -53,7 +53,7 @@ include
 #endif
 
 // use radix 4
-//#define _USE_RADIX4
+#define _USE_RADIX4
 
 // disable openmp
 // unittestで稀に例外が発生するため。

@@ -34,9 +34,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace gls
 {
 
-#define GLS_FFT_SCALE	   (1<<1)
-#define GLS_FFT_INVERSE   (1<<2)
-#define GLS_FFT_SHIFT	   (1<<3)	
+
+
+//#define GLS_FFT_SCALE	   (1<<1)
+//#define GLS_FFT_INVERSE   (1<<2)
+//#define GLS_FFT_SHIFT	   (1<<3)	
+
+enum {
+	GLS_FFT_SCALE = DFT_SCALE,		// with scale 1/N
+	GLS_FFT_INVERSE = DFT_INVERSE,	// inverse fft
+	GLS_FFT_SHIFT = 64				// sfhit output 
+};
 
 
 /*!
