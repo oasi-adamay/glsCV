@@ -264,17 +264,18 @@ namespace UnitTest_glsCV
 
 
 	template <typename T>
-	int test_glsTiled(int cvtype){
+	int test_glsTiled(int cvtype, Size blkNum = Size(2, 2)){
 		const int width = 32;
 		const int height = 24;
 		//const int width = 12;
 		//const int height = 8;
-		Size blkNum = Size(2, 2);
 
 		Mat imgSrc = Mat(Size(width, height), cvtype);
 		Mat imgDst(imgSrc.size(), imgSrc.type());
 
 		cout << "Size:" << imgSrc.size() << endl;
+		cout << "blkNum:" << blkNum << endl;
+
 
 		//---------------------------------
 		//init Src image
@@ -324,40 +325,66 @@ namespace UnitTest_glsCV
 	TEST_CLASS(UnitTest_glsTiled)
 	{
 	public:
-		TEST_METHOD(glsTiles_CV_32FC1)
+		TEST_METHOD(glsTiles_CV_32FC1_2x2)
 		{
 			cout << __FUNCTION__ << endl;
-			int errNum = test_glsTiled<float>(CV_32FC1);
+			Size blkNum = Size(2, 2);
+			int errNum = test_glsTiled<float>(CV_32FC1, blkNum);
 			Assert::AreEqual(0, errNum);
 		}
-		BEGIN_TEST_METHOD_ATTRIBUTE(glsTiles_CV_32FC1)
+		BEGIN_TEST_METHOD_ATTRIBUTE(glsTiles_CV_32FC1_2x2)
 			//TEST_OWNER(L"OwnerName")
 			TEST_PRIORITY(1)
 			TEST_MY_TRAIT(L"basic")
 		END_TEST_METHOD_ATTRIBUTE()
 
-
-		TEST_METHOD(glsTiles_CV_8UC1)
+		TEST_METHOD(glsTiles_CV_32FC1_4x4)
 		{
 			cout << __FUNCTION__ << endl;
-			int errNum = test_glsTiled<uchar>(CV_8UC1);
+			Size blkNum = Size(4, 4);
+			int errNum = test_glsTiled<float>(CV_32FC1, blkNum);
+			Assert::AreEqual(0, errNum);
+		}
+
+		TEST_METHOD(glsTiles_CV_32FC1_4x1)
+		{
+			cout << __FUNCTION__ << endl;
+			Size blkNum = Size(4, 1);
+			int errNum = test_glsTiled<float>(CV_32FC1, blkNum);
+			Assert::AreEqual(0, errNum);
+		}
+
+		TEST_METHOD(glsTiles_CV_32FC1_1x4)
+		{
+			cout << __FUNCTION__ << endl;
+			Size blkNum = Size(1, 4);
+			int errNum = test_glsTiled<float>(CV_32FC1, blkNum);
+			Assert::AreEqual(0, errNum);
+		}
+
+
+		TEST_METHOD(glsTiles_CV_8UC1_2x2)
+		{
+			cout << __FUNCTION__ << endl;
+			Size blkNum = Size(2, 2);
+			int errNum = test_glsTiled<uchar>(CV_8UC1, blkNum);
 			Assert::AreEqual(0, errNum);
 		}
 
 	};
 
 	template <typename T>
-	int test_glsUntiled(int cvtype){
-		//const int width = 32;
-		//const int height = 24;
-		const int width = 8;
-		const int height = 6;
-		Size blkNum = Size(2, 2);
+	int test_glsUntiled(int cvtype, Size blkNum = Size(2, 2)){
+		const int width = 32;
+		const int height = 24;
+		//const int width = 8;
+		//const int height = 6;
 
 		Mat imgSrc = Mat(Size(width, height), cvtype);
 		Mat imgDst;
 
 		cout << "Size:" << imgSrc.size() << endl;
+		cout << "blkNum:" << blkNum << endl;
 
 		//---------------------------------
 		//init Src image
@@ -393,22 +420,50 @@ namespace UnitTest_glsCV
 	{
 	public:
 
-		TEST_METHOD(glsUntiled_CV_32FC1)
+		TEST_METHOD(glsUntiled_CV_32FC1_2x2)
 		{
 			cout << __FUNCTION__ << endl;
-			int errNum = test_glsUntiled<float>(CV_32FC1);
+			Size blkNum = Size(2, 2);
+			int errNum = test_glsUntiled<float>(CV_32FC1, blkNum);
 			Assert::AreEqual(0, errNum);
 		}
-		BEGIN_TEST_METHOD_ATTRIBUTE(glsUntiled_CV_32FC1)
+		BEGIN_TEST_METHOD_ATTRIBUTE(glsUntiled_CV_32FC1_2x2)
 			//TEST_OWNER(L"OwnerName")
 			TEST_PRIORITY(1)
 			TEST_MY_TRAIT(L"basic")
 		END_TEST_METHOD_ATTRIBUTE()
 
-		TEST_METHOD(glsUntiled_CV_8UC1)
+		TEST_METHOD(glsUntiled_CV_32FC1_4x4)
 		{
 			cout << __FUNCTION__ << endl;
-			int errNum = test_glsUntiled<uchar>(CV_8UC1);
+			Size blkNum = Size(4, 4);
+			int errNum = test_glsUntiled<float>(CV_32FC1, blkNum);
+			Assert::AreEqual(0, errNum);
+		}
+
+		TEST_METHOD(glsUntiled_CV_32FC1_4x1)
+		{
+			cout << __FUNCTION__ << endl;
+			Size blkNum = Size(4, 1);
+			int errNum = test_glsUntiled<float>(CV_32FC1, blkNum);
+			Assert::AreEqual(0, errNum);
+		}
+
+		TEST_METHOD(glsUntiled_CV_32FC1_1x4)
+		{
+			cout << __FUNCTION__ << endl;
+			Size blkNum = Size(1, 4);
+			int errNum = test_glsUntiled<float>(CV_32FC1, blkNum);
+			Assert::AreEqual(0, errNum);
+		}
+
+
+
+		TEST_METHOD(glsUntiled_CV_8UC1_2x2)
+		{
+			cout << __FUNCTION__ << endl;
+			Size blkNum = Size(2, 2);
+			int errNum = test_glsUntiled<uchar>(CV_8UC1, blkNum);
 			Assert::AreEqual(0, errNum);
 		}
 
