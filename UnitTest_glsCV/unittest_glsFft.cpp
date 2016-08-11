@@ -97,16 +97,18 @@ namespace UnitTest_glsCV
 	}
 
 
-	int test_glsFft(const int N, const int flags,const bool is2D = true){
+	int test_glsFft(const int N, const int flags,const int dir = -1){
 		int ULPS = 64;
 		float EPS = 1e-4f;
 		Size size;
-		if (is2D){
+		if (dir<0){	//2D
 			size = Size(N, N);
 		}
-		else{
+		else if (dir == 0){	//horizontal 1D
 			size = Size(N, 1);
-//			size = Size(1 , N);
+		}
+		else{ //vertical 1D
+			size = Size(1 , N);
 		}
 		
 		Mat imgSrc = Mat(size, CV_32FC2);
@@ -373,35 +375,35 @@ namespace UnitTest_glsCV
 		END_TEST_METHOD_ATTRIBUTE()
 
 
-		TEST_METHOD(FFT_32)
+		TEST_METHOD(FFT_32H)
 		{
 			cout << __FUNCTION__ << endl;
 			const int N = 32;
 			const int flags = 0;
-			int errNum = test_glsFft(N, flags, false);
+			int errNum = test_glsFft(N, flags, 0);
 			Assert::AreEqual(0, errNum);
 		}
-		BEGIN_TEST_METHOD_ATTRIBUTE(FFT_32)
+		BEGIN_TEST_METHOD_ATTRIBUTE(FFT_32H)
 			//TEST_OWNER(L"OwnerName")
 			TEST_PRIORITY(1)
 			TEST_MY_TRAIT(L"basic")
-			TEST_IGNORE()
+			//TEST_IGNORE()
 		END_TEST_METHOD_ATTRIBUTE()
 
 
-		TEST_METHOD(FFT_64)
+		TEST_METHOD(FFT_64V)
 		{
 			cout << __FUNCTION__ << endl;
 			const int N = 64;
 			const int flags = 0;
-			int errNum = test_glsFft(N, flags, false);
+			int errNum = test_glsFft(N, flags, 1);
 			Assert::AreEqual(0, errNum);
 		}
-		BEGIN_TEST_METHOD_ATTRIBUTE(FFT_64)
+		BEGIN_TEST_METHOD_ATTRIBUTE(FFT_64V)
 			//TEST_OWNER(L"OwnerName")
 			TEST_PRIORITY(1)
 			TEST_MY_TRAIT(L"basic")
-			TEST_IGNORE()
+			//TEST_IGNORE()
 		END_TEST_METHOD_ATTRIBUTE()
 
 

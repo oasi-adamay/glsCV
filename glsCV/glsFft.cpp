@@ -368,12 +368,25 @@ static void fft_redix2(const GlsMat& src, GlsMat& dst, int flag){
 	GLS_Assert(src.channels() == 2);
 	GLS_Assert(src.depth() == CV_32F);
 
+	int N;
+	Size blkNum;
 
-	int N = src.cols;
-	GLS_Assert(IsPow2(N));
+	if (src.cols == src.rows){
+		N = src.cols;
+		blkNum = Size(2, 2);
+	}
+	else if (src.cols == 1){
+		N = src.rows;
+		blkNum = Size(1, 2);
+	}
+	else if (src.rows == 1){
+		N = src.cols;
+		blkNum = Size(2, 1);
+	}
+	else{
+		GLS_Assert(0 && "Not surpport");
+	}
 
-
-	Size blkNum(2,2);
 	vector<vector<GlsMat>> _dst0 = vector<vector<GlsMat>>(blkNum.height, vector<GlsMat>(blkNum.width));
 	vector<vector<GlsMat>> _dst1 = vector<vector<GlsMat>>(blkNum.height, vector<GlsMat>(blkNum.width));
 
@@ -409,20 +422,19 @@ static void fft_redix2(const GlsMat& src, GlsMat& dst, int flag){
 
 	//Execute
 	int bank = 0;
+	vector<GlsMat> texSrc(2);
+	vector<GlsMat> texDst(2);
 
-	{
-		_TMR_("-execute:\t");
+	if (src.cols != 1){
+		// --- FFT rows ----
+		//cout << "---FFT rows---" << endl;
+		_TMR_("-execute(rows):\t");
 
 		int Q = 0;
 		while ((1 << Q) < N){ Q++; }
-
-		vector<GlsMat> texSrc(2);
-		vector<GlsMat> texDst(2);
-
-		// --- FFT rows ----
 		for (int p = 0, q = Q - 1; q >= 0; p++, q--, bank = bank ^ 1) {
-			for (int i = 0; i < 2; i++){
-				for (int j = 0; j < 2; j++){
+			for (int i = 0; i < blkNum.height; i++){
+				for (int j = 0; j < blkNum.width; j++){
 					texSrc[j] = (*texbuf[bank])[i][j];
 					texDst[j] = (*texbuf[bank ^ 1])[i][j];
 				}
@@ -437,10 +449,16 @@ static void fft_redix2(const GlsMat& src, GlsMat& dst, int flag){
 
 			}
 		}
+	}
+	if (src.rows != 1){
 		// --- FFT cols ----
+		//cout << "---FFT cols---" << endl;
+		_TMR_("-execute(cols):\t");
+		int Q = 0;
+		while ((1 << Q) < N){ Q++; }
 		for (int p = 0, q = Q - 1; q >= 0; p++, q--, bank = bank ^ 1) {
-			for (int j = 0; j < 2; j++){
-				for (int i = 0; i < 2; i++){
+			for (int j = 0; j < blkNum.width; j++){
+				for (int i = 0; i < blkNum.height; i++){
 					texSrc[i] = (*texbuf[bank])[i][j];
 					texDst[i] = (*texbuf[bank ^ 1])[i][j];
 				}
@@ -457,14 +475,16 @@ static void fft_redix2(const GlsMat& src, GlsMat& dst, int flag){
 	}
 
 
-
 	if (flag & GLS_FFT_SHIFT){
-		(*texbuf[bank ^ 1])[0][0] = (*texbuf[bank])[1][1];
-		(*texbuf[bank ^ 1])[0][1] = (*texbuf[bank])[1][0];
-		(*texbuf[bank ^ 1])[1][0] = (*texbuf[bank])[0][1];
-		(*texbuf[bank ^ 1])[1][1] = (*texbuf[bank])[0][0];
+		const int _tbl[2] = { 1, 0 };
+		for (int i = 0; i < blkNum.height; i++){
+			for (int j = 0; j < blkNum.width; j++){
+				(*texbuf[bank ^ 1])[_tbl[i]][_tbl[j]] = (*texbuf[bank])[i][j];
+			}
+		}
 		bank = bank ^ 1;
 	}
+
 
 	gls::untiled(*texbuf[bank], dst);
 }
@@ -475,12 +495,27 @@ static void fft_redix4(const GlsMat& src, GlsMat& dst, int flag){
 	GLS_Assert(src.channels() == 2);
 	GLS_Assert(src.depth() == CV_32F);
 
+	int N;
+	Size blkNum;
 
-	int N = src.cols;
+	if (src.cols == src.rows){
+		N = src.cols;
+		blkNum = Size(4, 4);
+	}
+	else if (src.cols == 1){
+		N = src.rows;
+		blkNum = Size(1, 4);
+	}
+	else if (src.rows == 1){
+		N = src.cols;
+		blkNum = Size(4, 1);
+	}
+	else{
+		GLS_Assert(0 && "Not surpport");
+	}
+
 	GLS_Assert(IsPow2(N));
 
-
-	Size blkNum(4, 4);
 	vector<vector<GlsMat>> _dst0 = vector<vector<GlsMat>>(blkNum.height, vector<GlsMat>(blkNum.width));
 	vector<vector<GlsMat>> _dst1 = vector<vector<GlsMat>>(blkNum.height, vector<GlsMat>(blkNum.width));
 
@@ -516,27 +551,24 @@ static void fft_redix4(const GlsMat& src, GlsMat& dst, int flag){
 
 	//Execute
 	int bank = 0;
+	vector<GlsMat> texSrc(4);
+	vector<GlsMat> texDst(4);
 
-	{
-		_TMR_("-execute:\t");
-
-		int Q = 0;
-
-		vector<GlsMat> texSrc(4);
-		vector<GlsMat> texDst(4);
-
+	if(src.cols!=1){
 		// --- FFT rows ----
 		//cout << "---FFT rows---" << endl;
+		_TMR_("-execute(rows):\t");
+		int Q = 0;
 		while ((1 << Q) < N){ Q++; }
 		if (Q % 2){	//radix2
 			//cout << "---radix2(x2)---" << endl;
-			for (int i = 0; i < 4; i++){
-				for (int j = 0; j < 4; j++){
+			for (int i = 0; i < blkNum.height; i++){
+				for (int j = 0; j < blkNum.width; j++){
 					texSrc[j] = (*texbuf[bank])[i][j];
 					texDst[j] = (*texbuf[bank ^ 1])[i][j];
 				}
 				int _flag = 0; //radix2,horizontal
-				Vec4i ctrl(_flag,N,0,0);
+				Vec4i ctrl(_flag, N, 0, 0);
 				Vec2f xscl(1.0f, 1.0f);
 				Vec2f yscl(1.0f, 1.0f);
 				Vec4f scale(xscl[0], xscl[1], yscl[0], yscl[1]);
@@ -551,9 +583,8 @@ static void fft_redix4(const GlsMat& src, GlsMat& dst, int flag){
 			//cout << "p:" << p << "\t";
 			//cout << "q:" << q << "\t";
 			//cout << endl;
-
-			for (int i = 0; i < 4; i++){
-				for (int j = 0; j < 4; j++){
+			for (int i = 0; i < blkNum.height; i++){
+				for (int j = 0; j < blkNum.width; j++){
 					texSrc[j] = (*texbuf[bank])[i][j];
 					texDst[j] = (*texbuf[bank ^ 1])[i][j];
 				}
@@ -567,14 +598,17 @@ static void fft_redix4(const GlsMat& src, GlsMat& dst, int flag){
 				ShaderFftRadix4.Execute(texSrc[0], texSrc[1], texSrc[2], texSrc[3], texW, ctrl, scale, texDst[0], texDst[1], texDst[2], texDst[3]);
 			}
 		}
+	}
+	if (src.rows != 1){
 		// --- FFT cols ----
 		//cout << "---FFT cols---" << endl;
-		Q = 0;
+		_TMR_("-execute(cols):\t");
+		int Q = 0;
 		while ((1 << Q) < N){ Q++; }
 		if (Q % 2){	//radix2
 			//cout << "---radix2(x2)---" << endl;
-			for (int j = 0; j < 4; j++){
-				for (int i = 0; i < 4; i++){
+			for (int j = 0; j < blkNum.width; j++){
+				for (int i = 0; i < blkNum.height; i++){
 					texSrc[i] = (*texbuf[bank])[i][j];
 					texDst[i] = (*texbuf[bank ^ 1])[i][j];
 				}
@@ -595,8 +629,8 @@ static void fft_redix4(const GlsMat& src, GlsMat& dst, int flag){
 			//cout << "q:" << q << "\t";
 			//cout << endl;
 
-			for (int j = 0; j < 4; j++){
-				for (int i = 0; i < 4; i++){
+			for (int j = 0; j < blkNum.width; j++){
+				for (int i = 0; i < blkNum.height; i++){
 					texSrc[i] = (*texbuf[bank])[i][j];
 					texDst[i] = (*texbuf[bank ^ 1])[i][j];
 				}
@@ -616,8 +650,8 @@ static void fft_redix4(const GlsMat& src, GlsMat& dst, int flag){
 
 	if (flag & GLS_FFT_SHIFT){
 		const int _tbl[4] = { 2, 3, 0, 1 };
-		for (int i = 0; i < 4; i++){
-			for (int j = 0; j < 4; j++){
+		for (int i = 0; i < blkNum.height; i++){
+			for (int j = 0; j < blkNum.width; j++){
 				(*texbuf[bank ^ 1])[_tbl[i]][_tbl[j]] = (*texbuf[bank])[i][j];
 			}
 		}
