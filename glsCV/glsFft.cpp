@@ -53,7 +53,7 @@ include
 #endif
 
 // use radix 4
-#define _USE_RADIX4
+//#define _USE_RADIX4
 
 // disable openmp
 // unittestで稀に例外が発生するため。
@@ -89,100 +89,83 @@ glsShaderFftRadix2 ShaderFftRadix2;
 // Stockham,DIT radix2
 string glsShaderFftRadix2::FragmentShaderCode(void){
 	const char fragmentShaderCode[] = TO_STR(
-#version 330 core\n
-precision highp float;\n
-uniform sampler2D	texSrc0;\n
-uniform sampler2D	texSrc1;\n
-uniform sampler2D	texW;\n
-uniform  int i_flag;	//bit0:(0:holizontal 1:vertical)\n
-uniform  int i_N;\n
-uniform  int i_p;\n
-uniform  int i_q;\n
-uniform  float f_xscl;\n
-uniform  float f_yscl;\n
-uniform  float f_xconj;\n
-uniform  float f_yconj;\n
-\n
-layout (location = 0) out vec2 dst0;\n
-layout (location = 1) out vec2 dst1;\n
-\n
-#define FLAG_DIR	 (1<<0)\n
-\n
-\n
-int insertZeroBits(\n
-	const int src,\n
-	const int idx,\n
-	const int num\n
-	)\n
-{\n
-	int ret = src << num;\n
-	ret &= ~((1 << (idx + num)) - 1);\n
-	ret |= src & ((1 << idx) - 1);\n
-	return ret;\n
-}\n
-\n
-void main(void)\n
-{\n
-	int p = i_p;\n
-	int q = i_q;\n
-	int N = i_N;\n
-	int dir = ((i_flag & FLAG_DIR)==0) ?0:1;\n
-	float xscl = f_xscl;\n
-	float yscl = f_yscl;\n
-	float xconj = f_xconj;\n
-	float yconj = f_yconj;\n
-\n
-	int n;\n
-	vec2 x0;\n
-	vec2 x1;\n
-	vec2 w;\n
-\n
-	n= int(gl_FragCoord[dir]);\n
-	int iw = (n >> q) << q;\n
-	int ix0 = insertZeroBits(n, q, 1);\n
-	int ix1 = ix0 + (1 << q);\n
-	w = texelFetch(texW,ivec2(iw,0),0).rg;\n
-\n
-\n
-	if(dir ==0){\n
-		if(ix0 < N/2) x0 = texelFetch(texSrc0,ivec2(ix0,gl_FragCoord.y),0).rg;\n
-		else x0 = texelFetch(texSrc1,ivec2(ix0-N/2,gl_FragCoord.y),0).rg;\n
-\n
-		if(ix1 < N/2) x1 = texelFetch(texSrc0,ivec2(ix1,gl_FragCoord.y),0).rg;\n
-		else x1 = texelFetch(texSrc1,ivec2(ix1-N/2,gl_FragCoord.y),0).rg;\n
-	}\n
-	else{\n
-		if(ix0 < N/2) x0 = texelFetch(texSrc0,ivec2(gl_FragCoord.x,ix0),0).rg;\n
-		else x0 = texelFetch(texSrc1,ivec2(gl_FragCoord.x,ix0-N/2),0).rg;\n
-\n
-		if(ix1 < N/2) x1 = texelFetch(texSrc0,ivec2(gl_FragCoord.x,ix1),0).rg;\n
-		else x1 = texelFetch(texSrc1,ivec2(gl_FragCoord.x,ix1-N/2),0).rg;\n
-	}\n
-\n
-//	x0 = x0*xscl;\n
-//	x1 = x1*xscl;\n
-	x0.g = x0.g*xconj;\n
-	x1.g = x1.g*xconj;\n
-\n
-	vec2 tmp;\n
-	tmp.r = x1.r * w.r - x1.g * w.g;\n
-	tmp.g = x1.r * w.g + x1.g * w.r;\n
-\n
-	vec2 y0;\n
-	vec2 y1;\n
-\n
-	y0 = x0 + tmp;\n
-	y1 = x0 - tmp;\n
-\n
-	y0 = y0*yscl;\n
-	y1 = y1*yscl;\n
-	y0.g = y0.g*yconj;\n
-	y1.g = y1.g*yconj;\n
-\n
-	dst0 = y0;\n
-	dst1 = y1;\n
-\n
-}\n
+#version 330 core	\n
+precision highp float;	\n
+#define FLAG_DIR	 (1<<0)	\n
+
+uniform sampler2D	texSrc0;
+uniform sampler2D	texSrc1;
+uniform sampler2D	texW;
+uniform ivec4 ctrl;	// [0]:flag(bit0:(0:holizontal 1:vertical) [1]:N  [2]:p [3]:q
+uniform vec4 scale;	// [0,1]:xscl [2,3]:yscl
+
+layout (location = 0) out vec2 dst0;
+layout (location = 1) out vec2 dst1;
+
+int insertZeroBits(const int src,const int idx,const int num){
+	int ret = src << num;
+	ret &= ~((1 << (idx + num)) - 1);
+	ret |= src & ((1 << idx) - 1);
+	return ret;
+}
+vec2 mul(vec2 a, vec2 b){
+	vec2 ans;
+	ans[0] = a[0] * b[0] - a[1] * b[1];
+	ans[1] = a[0] * b[1] + a[1] * b[0];
+	return ans;
+}
+void main(void){
+	int p = ctrl[2];
+	int q = ctrl[3];
+	int N = ctrl[1];
+	int dir = ((ctrl[0] & FLAG_DIR) == 0) ? 0 : 1;
+	vec2 xscl = scale.rg;
+	vec2 yscl = scale.ba;
+
+	int n = int(gl_FragCoord[dir]);
+	int iw = (n >> q) << q;
+	int ix0 = insertZeroBits(n, q, 1);
+	int ix1 = ix0 + (1 << q);
+
+	vec2 x0, x1;
+	vec2 w;
+	w = texelFetch(texW, ivec2(iw, 0), 0).rg;
+
+	int tx0 = ix0 / (N / 2); ix0 = ix0 % (N / 2);
+	int tx1 = ix1 / (N / 2); ix1 = ix1 % (N / 2);
+	ivec2 coord0, coord1, coord2, coord3;
+	if (dir == 0){
+		coord0 = ivec2(ix0, gl_FragCoord.y);
+		coord1 = ivec2(ix1, gl_FragCoord.y);
+	}
+	else{
+		coord0 = ivec2(gl_FragCoord.x, ix0);
+		coord1 = ivec2(gl_FragCoord.x, ix1);
+	}
+
+	switch (tx0){
+	case(0) : x0 = texelFetch(texSrc0, coord0, 0).rg; break;
+	case(1) : x0 = texelFetch(texSrc1, coord0, 0).rg; break;
+	};
+	switch (tx1){
+	case(0) : x1 = texelFetch(texSrc0, coord1, 0).rg; break;
+	case(1) : x1 = texelFetch(texSrc1, coord1, 0).rg; break;
+	};
+
+	// input scaler 
+	x0 = x0*xscl;
+	x1 = x1*xscl;
+
+	// twidle
+	vec2 tmp = mul(x1, w);
+	vec2 y0 = x0 + tmp;
+	vec2 y1 = x0 - tmp;
+
+	// output scaler 
+	dst0 = y0*yscl;
+	dst1 = y1*yscl;
+
+}
 );
 	return fragmentShaderCode;
 }
@@ -192,14 +175,8 @@ list<string> glsShaderFftRadix2::UniformNameList(void){
 	lst.push_back("texSrc0");
 	lst.push_back("texSrc1");
 	lst.push_back("texW");
-	lst.push_back("i_flag");
-	lst.push_back("i_N");
-	lst.push_back("i_p");
-	lst.push_back("i_q");
-	lst.push_back("f_xscl");
-	lst.push_back("f_yscl");
-	lst.push_back("f_xconj");
-	lst.push_back("f_yconj");
+	lst.push_back("ctrl");
+	lst.push_back("scale");
 	return lst;
 }
 
@@ -449,11 +426,14 @@ static void fft_redix2(const GlsMat& src, GlsMat& dst, int flag){
 					texSrc[j] = (*texbuf[bank])[i][j];
 					texDst[j] = (*texbuf[bank ^ 1])[i][j];
 				}
-				float yscl = ((flag & GLS_FFT_SCALE) && (q == 0)) ? 1.0f / (float)N : 1.0f;
-				float xscl = 1.0f;
-				float xconj = ((flag & GLS_FFT_INVERSE) && (p == 0)) ? -1.0f : 1.0f;
-				float yconj = 1.0f;
-				ShaderFftRadix2.Execute(texSrc[0], texSrc[1], texW, 0, N, p, q, xscl, yscl, xconj, yconj, texDst[0], texDst[1]);
+				int _flag = 0; //radix2,horizontal
+				Vec4i ctrl(_flag, N, p, q);
+				Vec2f xscl(1.0f, 1.0f);
+				Vec2f yscl(1.0f, 1.0f);
+				if ((flag & GLS_FFT_INVERSE) && (p == 0)) xscl[1] *= -1;
+				if ((flag & GLS_FFT_SCALE) && (q == 0)) yscl /= (float)N;
+				Vec4f scale(xscl[0], xscl[1], yscl[0], yscl[1]);
+				ShaderFftRadix2.Execute(texSrc[0], texSrc[1], texW, ctrl, scale, texDst[0], texDst[1]);
 
 			}
 		}
@@ -464,11 +444,14 @@ static void fft_redix2(const GlsMat& src, GlsMat& dst, int flag){
 					texSrc[i] = (*texbuf[bank])[i][j];
 					texDst[i] = (*texbuf[bank ^ 1])[i][j];
 				}
-				float yscl = ((flag & GLS_FFT_SCALE) && (q == 0)) ? 1.0f / (float)N : 1.0f;
-				float xscl = 1.0f;
-				float xconj = 1.0f;
-				float yconj = ((flag & GLS_FFT_INVERSE) && (q == 0)) ? -1.0f : 1.0f;
-				ShaderFftRadix2.Execute(texSrc[0], texSrc[1], texW, 1, N, p, q, xscl, yscl, xconj, yconj, texDst[0], texDst[1]);
+				int _flag = (1 << 0); //radix2,vertical
+				Vec4i ctrl(_flag, N, p, q);
+				Vec2f xscl(1.0f, 1.0f);
+				Vec2f yscl(1.0f, 1.0f);
+				if ((flag & GLS_FFT_INVERSE) && (q == 0)) yscl[1] *= -1;
+				if ((flag & GLS_FFT_SCALE) && (q == 0)) yscl /= (float)N;
+				Vec4f scale(xscl[0], xscl[1], yscl[0], yscl[1]);
+				ShaderFftRadix2.Execute(texSrc[0], texSrc[1], texW, ctrl, scale, texDst[0], texDst[1]);
 			}
 		}
 	}
