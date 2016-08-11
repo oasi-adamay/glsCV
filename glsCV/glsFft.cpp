@@ -1,4 +1,4 @@
-/*
+﻿/*
 Copyright (c) 2016, oasi-adamay
 All rights reserved.
 
@@ -54,6 +54,12 @@ include
 
 // use radix 4
 #define _USE_RADIX4
+
+// disable openmp
+// unittestで稀に例外が発生するため。
+#ifdef _OPENMP
+#undef _OPENMP
+#endif
 
 
 namespace gls
@@ -273,9 +279,6 @@ void main(void)\n
 	float xconj = f_xconj; \n
 	float yconj = f_yconj; \n
 	int n = int(gl_FragCoord[dir]); \n
-	int n1 = (N / 4) * 1;
-	int n2 = (N / 4) * 2;
-	int n3 = (N / 4) * 3;
 
 	vec2 x0,x1,x2,x3; \n
 	vec2 y0,y1,y2,y3; \n
@@ -284,9 +287,9 @@ void main(void)\n
 
 	if (radix4==0){ //radix2
 		ix0 = n;
-		ix1 = ix0 + n1;
-		ix2 = ix0 + n2;
-		ix3 = ix0 + n3;
+		ix1 = ix0 + (N / 4) * 1;
+		ix2 = ix0 + (N / 4) * 2;
+		ix3 = ix0 + (N / 4) * 3;
 	}
 	else{	//radix4
 		ix0 = insertZeroBits(n, q, 2); \n
@@ -540,19 +543,19 @@ static void fft_redix4(const GlsMat& src, GlsMat& dst, int flag){
 	}
 
 
-	GlsMat texW(Size(N / 2, 1), src.type());
+	GlsMat texW(Size(N / 4, 1), src.type());
 
 	//---------------------------------
 	// upload twidle texture
 	{
 		_TMR_("-twidle:  \t");
 
-		Mat w(Size(N / 2, 1), CV_32FC2);
+		Mat w(texW.size(), CV_32FC2);
 #ifdef _OPENMP
 		//#pragma omp parallel for
 #pragma omp parallel for if(N>=256)
 #endif
-		for (int n = 0; n < N / 2; n++){
+		for (int n = 0; n < w.cols; n++){
 			float jw = (float)(-2 * M_PI * n / N);
 			Vec2f val(cos(jw), sin(jw));
 			w.at<Vec2f>(0, n) = val;
