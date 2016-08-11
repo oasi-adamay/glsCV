@@ -225,64 +225,46 @@ glsShaderFftRadix4 ShaderFftRadix4;
 // Stockham,DIT Radix4
 string glsShaderFftRadix4::FragmentShaderCode(void){
 	const char fragmentShaderCode[] = TO_STR(
-		#version 330 core\n
-		precision highp float; \n
-		uniform sampler2D	texSrc0; \n
-		uniform sampler2D	texSrc1; \n
-		uniform sampler2D	texSrc2; \n
-		uniform sampler2D	texSrc3; \n
-		uniform sampler2D	texW; \n
-		uniform  int i_flag;	//bit0:(0:holizontal 1:vertical) bit1:(0:radix2 1:radix4)\n
-	uniform  int i_N; \n
-		uniform  int i_p; \n
-		uniform  int i_q; \n
-		uniform  float f_xscl; \n
-		uniform  float f_yscl; \n
-		uniform  float f_xconj; \n
-		uniform  float f_yconj; \n
-		\n
-		layout(location = 0) out vec2 dst0; \n
-		layout(location = 1) out vec2 dst1; \n
-		layout(location = 2) out vec2 dst2; \n
-		layout(location = 3) out vec2 dst3; \n
-		\n
-#define FLAG_DIR	 (1<<0)\n
-#define FLAG_RADIX4	 (1<<1)\n
-int insertZeroBits(\n
-	const int src, \n
-	const int idx, \n
-	const int num\n
-)\n
-{ \n
-	int ret = src << num; \n
-	ret &= ~((1 << (idx + num)) - 1); \n
-	ret |= src & ((1 << idx) - 1); \n
-	return ret; \n
-}\n
+#version 330 core\n
+precision highp float;	\n
+#define FLAG_DIR	 (1<<0)	\n
+#define FLAG_RADIX4	 (1<<1)	\n
+uniform sampler2D	texSrc0;
+uniform sampler2D	texSrc1;
+uniform sampler2D	texSrc2;
+uniform sampler2D	texSrc3;
+uniform sampler2D	texW;
+uniform ivec4 ctrl;	// [0]:flag(bit0:(0:holizontal 1:vertical) bit1:(0:radix2 1:radix4)) [1]:N  [2]:p [3]:q
+uniform vec4 scale;	// [0,1]:xscl [2,3]:yscl
+layout(location = 0) out vec2 dst0;
+layout(location = 1) out vec2 dst1;
+layout(location = 2) out vec2 dst2;
+layout(location = 3) out vec2 dst3;
+int insertZeroBits(const int src,const int idx,const int num){
+	int ret = src << num;
+	ret &= ~((1 << (idx + num)) - 1);
+	ret |= src & ((1 << idx) - 1);
+	return ret;
+}
 vec2 mul(vec2 a, vec2 b){
 	vec2 ans;
 	ans[0] = a[0] * b[0] - a[1] * b[1];
 	ans[1] = a[0] * b[1] + a[1] * b[0];
 	return ans;
 }
+void main(void)
+{
+	int p = ctrl[2];
+	int q = ctrl[3];
+	int N = ctrl[1];
+	int dir = ((ctrl[0] & FLAG_DIR) == 0) ? 0 : 1;
+	int radix4 = ((ctrl[0] & FLAG_RADIX4) == 0) ? 0 : 1;
+	vec2 xscl = scale.rg;
+	vec2 yscl = scale.ba;
+	int n = int(gl_FragCoord[dir]);
 
-\n
-void main(void)\n
-{ \n
-	int p = i_p; \n
-	int q = i_q; \n
-	int N = i_N; \n
-	int dir = ((i_flag & FLAG_DIR) == 0) ? 0 : 1; \n
-	int radix4 = ((i_flag & FLAG_RADIX4) == 0) ? 0 : 1; \n
-	float xscl = f_xscl; \n
-	float yscl = f_yscl; \n
-	float xconj = f_xconj; \n
-	float yconj = f_yconj; \n
-	int n = int(gl_FragCoord[dir]); \n
-
-	vec2 x0,x1,x2,x3; \n
-	vec2 y0,y1,y2,y3; \n
-
+	vec2 x0,x1,x2,x3;
+	vec2 y0,y1,y2,y3;
 	int ix0,ix2,ix1,ix3;
 
 	if (radix4==0){ //radix2
@@ -292,10 +274,10 @@ void main(void)\n
 		ix3 = ix0 + (N / 4) * 3;
 	}
 	else{	//radix4
-		ix0 = insertZeroBits(n, q, 2); \n
-		ix1 = ix0 + (1 << q)*1; \n
-		ix2 = ix0 + (1 << q)*2; \n
-		ix3 = ix0 + (1 << q)*3; \n
+		ix0 = insertZeroBits(n, q, 2);
+		ix1 = ix0 + (1 << q)*1;
+		ix2 = ix0 + (1 << q)*2;
+		ix3 = ix0 + (1 << q)*3;
 	}
 
 	int tx0 = ix0 / (N / 4); ix0 = ix0 % (N / 4);
@@ -318,34 +300,35 @@ void main(void)\n
 	}
 
 	switch (tx0){
-	case(0) : x0 = texelFetch(texSrc0, coord0, 0).rg; break; \n
-	case(1) : x0 = texelFetch(texSrc1, coord0, 0).rg; break; \n
-	case(2) : x0 = texelFetch(texSrc2, coord0, 0).rg; break; \n
-	case(3) : x0 = texelFetch(texSrc3, coord0, 0).rg; break; \n
+	case(0) : x0 = texelFetch(texSrc0, coord0, 0).rg; break;
+	case(1) : x0 = texelFetch(texSrc1, coord0, 0).rg; break;
+	case(2) : x0 = texelFetch(texSrc2, coord0, 0).rg; break;
+	case(3) : x0 = texelFetch(texSrc3, coord0, 0).rg; break;
 	};
 	switch (tx1){
-	case(0) : x1 = texelFetch(texSrc0, coord1, 0).rg; break; \n
-	case(1) : x1 = texelFetch(texSrc1, coord1, 0).rg; break; \n
-	case(2) : x1 = texelFetch(texSrc2, coord1, 0).rg; break; \n
-	case(3) : x1 = texelFetch(texSrc3, coord1, 0).rg; break; \n
+	case(0) : x1 = texelFetch(texSrc0, coord1, 0).rg; break;
+	case(1) : x1 = texelFetch(texSrc1, coord1, 0).rg; break;
+	case(2) : x1 = texelFetch(texSrc2, coord1, 0).rg; break;
+	case(3) : x1 = texelFetch(texSrc3, coord1, 0).rg; break;
 	};
 	switch (tx2){
-	case(0) : x2 = texelFetch(texSrc0, coord2, 0).rg; break; \n
-	case(1) : x2 = texelFetch(texSrc1, coord2, 0).rg; break; \n
-	case(2) : x2 = texelFetch(texSrc2, coord2, 0).rg; break; \n
-	case(3) : x2 = texelFetch(texSrc3, coord2, 0).rg; break; \n
+	case(0) : x2 = texelFetch(texSrc0, coord2, 0).rg; break;
+	case(1) : x2 = texelFetch(texSrc1, coord2, 0).rg; break;
+	case(2) : x2 = texelFetch(texSrc2, coord2, 0).rg; break;
+	case(3) : x2 = texelFetch(texSrc3, coord2, 0).rg; break;
 	};
 	switch (tx3){
-	case(0) : x3 = texelFetch(texSrc0, coord3, 0).rg; break; \n
-	case(1) : x3 = texelFetch(texSrc1, coord3, 0).rg; break; \n
-	case(2) : x3 = texelFetch(texSrc2, coord3, 0).rg; break; \n
-	case(3) : x3 = texelFetch(texSrc3, coord3, 0).rg; break; \n
+	case(0) : x3 = texelFetch(texSrc0, coord3, 0).rg; break;
+	case(1) : x3 = texelFetch(texSrc1, coord3, 0).rg; break;
+	case(2) : x3 = texelFetch(texSrc2, coord3, 0).rg; break;
+	case(3) : x3 = texelFetch(texSrc3, coord3, 0).rg; break;
 	};
 
-	x0.g = x0.g*xconj; \n
-	x1.g = x1.g*xconj; \n
-	x2.g = x2.g*xconj; \n
-	x3.g = x3.g*xconj; \n
+	// input scaler 
+	x0 = x0*xscl;
+	x1 = x1*xscl;
+	x2 = x2*xscl;
+	x3 = x3*xscl;
 
 	if (radix4==0){ //radix2
 		y0 = x0 + x2;
@@ -354,8 +337,8 @@ void main(void)\n
 		y3 = x1 - x3;
 	}
 	else{	//radix4
-		int iw = (n >> q) << q; \n
-		vec2 w1 = texelFetch(texW, ivec2(iw, 0), 0).rg; \n
+		int iw = (n >> q) << q;
+		vec2 w1 = texelFetch(texW, ivec2(iw, 0), 0).rg;
 		vec2 w2 = mul(w1, w1);
 		vec2 w3 = mul(w1, w2);
 		vec2 a = x0;
@@ -372,23 +355,12 @@ void main(void)\n
 		y2 = apc - bpd;
 		y3 = amc + jbmd;
 	}
-
-	y0 = y0*yscl; \n
-	y1 = y1*yscl; \n
-	y2 = y2*yscl; \n
-	y3 = y3*yscl; \n
-
-	y0.g = y0.g*yconj; \n
-	y1.g = y1.g*yconj; \n
-	y2.g = y2.g*yconj; \n
-	y3.g = y3.g*yconj; \n
-
-	dst0 = y0; \n
-	dst1 = y1; \n
-	dst2 = y2; \n
-	dst3 = y3; \n
-	\n
-}\n
+	// output scaler 
+	dst0 = y0*yscl;
+	dst1 = y1*yscl;
+	dst2 = y2*yscl;
+	dst3 = y3*yscl;
+}
 	);
 	return fragmentShaderCode;
 }
@@ -400,14 +372,8 @@ list<string> glsShaderFftRadix4::UniformNameList(void){
 	lst.push_back("texSrc2");
 	lst.push_back("texSrc3");
 	lst.push_back("texW");
-	lst.push_back("i_flag");
-	lst.push_back("i_N");
-	lst.push_back("i_p");
-	lst.push_back("i_q");
-	lst.push_back("f_xscl");
-	lst.push_back("f_yscl");
-	lst.push_back("f_xconj");
-	lst.push_back("f_yconj");
+	lst.push_back("ctrl");
+	lst.push_back("scale");
 	return lst;
 }
 
@@ -586,16 +552,12 @@ static void fft_redix4(const GlsMat& src, GlsMat& dst, int flag){
 					texSrc[j] = (*texbuf[bank])[i][j];
 					texDst[j] = (*texbuf[bank ^ 1])[i][j];
 				}
-				//float yscl = ((flag & GLS_FFT_SCALE) && (q == 0)) ? 1.0f / (float)N : 1.0f;
-				//float xscl = 1.0f;
-				//float xconj = ((flag & GLS_FFT_INVERSE) && (p == 0)) ? -1.0f : 1.0f;
-				//float yconj = 1.0f;
-				float yscl = 1.0f;
-				float xscl = 1.0f;
-				float xconj = 1.0f;
-				float yconj = 1.0f;
 				int _flag = 0; //radix2,horizontal
-				ShaderFftRadix4.Execute(texSrc[0], texSrc[1], texSrc[2], texSrc[3], texW, _flag, N, 0, 0, xscl, yscl, xconj, yconj, texDst[0], texDst[1], texDst[2], texDst[3]);
+				Vec4i ctrl(_flag,N,0,0);
+				Vec2f xscl(1.0f, 1.0f);
+				Vec2f yscl(1.0f, 1.0f);
+				Vec4f scale(xscl[0], xscl[1], yscl[0], yscl[1]);
+				ShaderFftRadix4.Execute(texSrc[0], texSrc[1], texSrc[2], texSrc[3], texW, ctrl, scale, texDst[0], texDst[1], texDst[2], texDst[3]);
 			}
 			Q -= 1;
 			bank ^= 1;
@@ -612,12 +574,14 @@ static void fft_redix4(const GlsMat& src, GlsMat& dst, int flag){
 					texSrc[j] = (*texbuf[bank])[i][j];
 					texDst[j] = (*texbuf[bank ^ 1])[i][j];
 				}
-				float yscl = ((flag & GLS_FFT_SCALE) && (q == 0)) ? 1.0f / (float)N : 1.0f;
-				float xscl = 1.0f;
-				float xconj = ((flag & GLS_FFT_INVERSE) && (p == 0)) ? -1.0f : 1.0f;
-				float yconj = 1.0f;
 				int _flag = 1 << 1; //radix4,horizontal
-				ShaderFftRadix4.Execute(texSrc[0], texSrc[1], texSrc[2], texSrc[3], texW, _flag, N, p, q, xscl, yscl, xconj, yconj, texDst[0], texDst[1], texDst[2], texDst[3]);
+				Vec4i ctrl(_flag, N, p, q);
+				Vec2f xscl(1.0f, 1.0f);
+				Vec2f yscl(1.0f, 1.0f);
+				if ((flag & GLS_FFT_INVERSE) && (p == 0)) xscl[1] *= -1;
+				if ((flag & GLS_FFT_SCALE) && (q == 0)) yscl /= (float)N;
+				Vec4f scale(xscl[0], xscl[1], yscl[0], yscl[1]);
+				ShaderFftRadix4.Execute(texSrc[0], texSrc[1], texSrc[2], texSrc[3], texW, ctrl, scale, texDst[0], texDst[1], texDst[2], texDst[3]);
 			}
 		}
 		// --- FFT cols ----
@@ -631,16 +595,12 @@ static void fft_redix4(const GlsMat& src, GlsMat& dst, int flag){
 					texSrc[i] = (*texbuf[bank])[i][j];
 					texDst[i] = (*texbuf[bank ^ 1])[i][j];
 				}
-				//float yscl = ((flag & GLS_FFT_SCALE) && (q == 0)) ? 1.0f / (float)N : 1.0f;
-				//float xscl = 1.0f;
-				//float xconj = ((flag & GLS_FFT_INVERSE) && (p == 0)) ? -1.0f : 1.0f;
-				//float yconj = 1.0f;
-				float yscl = 1.0f;
-				float xscl = 1.0f;
-				float xconj = 1.0f;
-				float yconj = 1.0f;
 				int _flag = 1 << 0; //radix2,vertical
-				ShaderFftRadix4.Execute(texSrc[0], texSrc[1], texSrc[2], texSrc[3], texW, _flag, N, 0, 0, xscl, yscl, xconj, yconj, texDst[0], texDst[1], texDst[2], texDst[3]);
+				Vec4i ctrl(_flag, N, 0, 0);
+				Vec2f xscl(1.0f, 1.0f);
+				Vec2f yscl(1.0f, 1.0f);
+				Vec4f scale(xscl[0], xscl[1], yscl[0], yscl[1]);
+				ShaderFftRadix4.Execute(texSrc[0], texSrc[1], texSrc[2], texSrc[3], texW, ctrl, scale, texDst[0], texDst[1], texDst[2], texDst[3]);
 			}
 			Q -= 1;
 			bank ^= 1;
@@ -657,12 +617,14 @@ static void fft_redix4(const GlsMat& src, GlsMat& dst, int flag){
 					texSrc[i] = (*texbuf[bank])[i][j];
 					texDst[i] = (*texbuf[bank ^ 1])[i][j];
 				}
-				float yscl = ((flag & GLS_FFT_SCALE) && (q == 0)) ? 1.0f / (float)N : 1.0f;
-				float xscl = 1.0f;
-				float xconj = 1.0f;
-				float yconj = ((flag & GLS_FFT_INVERSE) && (q == 0)) ? -1.0f : 1.0f;
 				int _flag = (1<<1) + (1<<0); //radix4,vertical
-				ShaderFftRadix4.Execute(texSrc[0], texSrc[1], texSrc[2], texSrc[3], texW, _flag, N, p, q, xscl, yscl, xconj, yconj, texDst[0], texDst[1], texDst[2], texDst[3]);
+				Vec4i ctrl(_flag, N, p, q);
+				Vec2f xscl(1.0f, 1.0f);
+				Vec2f yscl(1.0f, 1.0f);
+				if ((flag & GLS_FFT_INVERSE) && (q == 0)) yscl[1] *= -1;
+				if ((flag & GLS_FFT_SCALE) && (q == 0)) yscl /= (float)N;
+				Vec4f scale(xscl[0], xscl[1], yscl[0], yscl[1]);
+				ShaderFftRadix4.Execute(texSrc[0], texSrc[1], texSrc[2], texSrc[3], texW, ctrl, scale, texDst[0], texDst[1], texDst[2], texDst[3]);
 			}
 		}
 	}
