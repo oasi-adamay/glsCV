@@ -35,8 +35,12 @@ namespace gls
 {
 
 
-//! formatを変更します。
-void convert(const GlsMat& src, GlsMat& dst,const float scl = 1.0);
+//! 行列のデータを別の型に変換します．オプションで，スケーリングか可能です．
+//! -src:入力行列．
+//! -dst:出力行列．適切なサイズ，型ではない場合は，処理の前に再配置されます
+//! -rtype:出力行列に要求する型,（チャンネル数は元の行列と同じなので）正確には，要求するビット深度，です． rtype が負の場合は，出力行列は元の行列と同じ型になります
+//! -scl:オプションのスケールファクタ
+void convert(const GlsMat& src, GlsMat& dst, int rtype, const double scl = 1.0);
 
 //! 画像の色空間を変換します．(一部のみ実装)
 void cvtColor(const GlsMat& src, GlsMat& dst, const int code);

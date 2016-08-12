@@ -181,7 +181,7 @@ int _tmain(int argc, _TCHAR* argv[])
 		{	// common pre-process
 			glsFrame = (GlsMat)frame;							//upload 
 			gls::flip(glsFrame, glsFrame, 0);					//flip up to down
-			gls::convert(glsFrame, glsFrame, 1.0f / 256.0f);	//convert to float
+			gls::convert(glsFrame, glsFrame, CV_32F,1.0f / 256.0f);	//convert to float
 			if (camMode & ENABLE_PRE_FILTER){					//pre-filter
 				if (glsFrameAcc.empty() || (camMode & RESET_ACC)){
 					gls::copy(glsFrame, glsFrameAcc);
