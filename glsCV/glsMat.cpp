@@ -35,6 +35,7 @@ include
 */
 #include "glsMacro.h"
 #include "GlsMat.h"
+#include "glsCopy.h"
 
 
 //#ifdef _DEBUG
@@ -623,6 +624,19 @@ inline size_t GlsMat::total() const
 		p *= size[i];
 	return p;
 }
+
+
+void GlsMat::copyTo(GlsMat& m) const{
+	gls::copy(*this, m);
+}
+
+GlsMat GlsMat::clone(void) const{
+	GlsMat ret(size(), type());
+	copyTo(ret);
+	return ret;
+}
+
+
 
 
 
