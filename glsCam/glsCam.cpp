@@ -166,12 +166,12 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	GlsMat glsFrameAcc;
 
-	cv::TickMeter timer;
-	timer.reset();
+//	cv::TickMeter timer;
+//	timer.reset();
 
 	do{
-		timer.reset();
-		timer.start();
+//		timer.reset();
+//		timer.start();
 
 		cv::Mat frame;
 		camera >> frame;						// キャプチャ映像から画像を切り出す
@@ -290,9 +290,9 @@ int _tmain(int argc, _TCHAR* argv[])
 		glfwPollEvents();
 		controls(window, camMode, camZoom); // key check
 
-		timer.stop();
-		double fps = 1.0 / timer.getTimeSec();
-		glfwSetWindowTitle(window, ("glsCam [" + to_string(fps) + "]").c_str());
+//		timer.stop();
+//		double fps = 1.0 / timer.getTimeSec();
+//		glfwSetWindowTitle(window, ("glsCam [" + to_string(fps) + "]").c_str());
 
 	}
 	while (glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS &&

@@ -107,7 +107,8 @@ namespace UnitTest_glsCV
 		Point2d mv_gl;
 		{
 			Timer tmr("cv::phaseCorrelateRes:\t");
-			mv_cv = cv::phaseCorrelateRes(imgSrc, imgSft, window, &res_cv);
+			///@@@ opencv 3.x 
+			//mv_cv = cv::phaseCorrelateRes(imgSrc, imgSft, window, &res_cv);
 		}
 		{
 			Timer tmr("gls::phaseCorrelateRes:\t");

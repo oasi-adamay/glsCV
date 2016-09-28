@@ -44,7 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define MODEL_HANDLER_HPP_
 
 #include <opencv2/opencv.hpp>
-#include <opencv2/ocl/ocl.hpp>
+//#include <opencv2/ocl/ocl.hpp>
 #include "picojson.h"
 #include <iostream>
 #include <memory>
