@@ -29,9 +29,9 @@ BSD-3clause license
 
 ## 開発環境
  * Windows8 / Windows10
- * VC2013
+ * VC2015 ~~VC2013~~
   * NupenGL 0.1.0.1  (glew,glfw)
-  * OpenCV 2.4.10
+  * OpenCV 3.0.0 ~~2.4.10~~
 
 ## build
  1. glsCV.sln をVCで開く  
