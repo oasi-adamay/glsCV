@@ -12,13 +12,17 @@ public:
 	~Timer(void){ meter.stop(); std::cout << msg << meter.getTimeMilli() << "[ms]" << std::endl; }
 };
 #else
+#include <time.h>
 class Timer {
 private:
-	string msg;
+	clock_t start, end;
+	std::string msg;
+	void Start(void) { start = clock(); }
+	void Stop(void) { end = clock(); }
+	double GetTimeMilli(void) { return 1000 * (end - start) / CLOCKS_PER_SEC; }
 public:
-	Timer(string _msg) { msg = _msg;}
-	~Timer(void) { ; }
+	Timer(std::string _msg) { msg = _msg; Start(); }
+	~Timer(void) { Stop(); std::cout << msg << GetTimeMilli() << "[ms]" << std::endl; }
 };
 #endif
-
 #endif
