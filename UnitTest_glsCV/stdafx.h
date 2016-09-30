@@ -45,6 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <tchar.h>
 #include <string>
 #include <vector>
+#include <list>
 #include <iostream>
 #include <fstream>
 #include <algorithm>
