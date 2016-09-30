@@ -80,6 +80,7 @@ namespace UnitTest_glsCV
 		for (int i = 0; i < loop; i++){
 			_TMR_("gls::minMaxLoc:");
 			gls::minMaxLoc(glsSrc, pminVal, pmaxVal, pminLoc, pmaxLoc);
+			glFinish();
 		}
 
 		if (_min)cout << "minVal:" << minValRef << ",\t" << minVal << endl;

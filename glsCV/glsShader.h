@@ -98,7 +98,7 @@ protected:
 	virtual string VertexShaderCode(void);
 	virtual string FragmentShaderCode(void){ return string(""); }
 	virtual list<string> UniformNameList(void){ return list<string>(0,""); }
-
+	virtual list<string> AttribNameList(void);
 
 	//gloabl list
 //	static list<glsShaderBase*> ShaderList;
@@ -186,7 +186,7 @@ public:
 	}
 
 	vector<GLuint> uniformLocArray;	//!<  uniform location cache
-
+	vector<GLuint> attribLocArray;	//!<  attribute location cache
 };
 
 

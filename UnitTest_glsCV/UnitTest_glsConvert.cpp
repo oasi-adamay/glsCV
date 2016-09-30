@@ -62,7 +62,7 @@ namespace UnitTest_glsCV
 //		GlsMat glsDst(imgRef, false); //create GlsMat not upload!
 		GlsMat glsDst;
 
-		gls::convert(glsSrc, glsDst, scale);
+		gls::convert(glsSrc, glsDst, typeD, scale);
 		glsDst.download(imgDst);		// download
 
 		if (imgDst.size() != imgRef.size()){

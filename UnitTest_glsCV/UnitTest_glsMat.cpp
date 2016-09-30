@@ -126,6 +126,95 @@ namespace UnitTest_glsCV
 	}
 
 
+	//---------------------------------------------------
+	//copyTo
+	template <typename T>
+	int test_GlsMat_copyTo(int cvtype, Size size = Size(32, 24)){
+
+		Mat imgSrc = Mat(size, cvtype);
+		Mat imgRef;
+		Mat imgDst;
+
+		cout << "Size:" << imgSrc.size() << endl;
+
+		//---------------------------------
+		//init Src image
+		FillRandU<T>(imgSrc);
+
+		{
+			_TMR_("-cv::copyTo:\t");
+			imgSrc.copyTo(imgRef);
+		}
+
+		//----------------------
+		GlsMat glsSrc(imgSrc);		//create GlsMat and  upload
+		GlsMat glsDst;
+		{
+			_TMR_("-copyTo:\t");
+			glsSrc.copyTo(glsDst); //copy texture
+		}
+
+
+		glsDst.download(imgDst);		// download
+
+		int errNum = 0;
+		if (!AreEqual<T>(imgRef, imgDst)) errNum = -1;
+
+		//cout << imgSrc << endl;
+		//cout << imgDst << endl;
+		//cout << imgDst - imgSrc << endl;
+
+
+		return errNum;
+	}
+
+	//---------------------------------------------------
+	//clone
+	template <typename T>
+	int test_GlsMat_clone(int cvtype, Size size = Size(32, 24)){
+
+		Mat imgSrc = Mat(size, cvtype);
+		Mat imgRef;
+		Mat imgDst;
+
+		cout << "Size:" << imgSrc.size() << endl;
+
+		//---------------------------------
+		//init Src image
+		FillRandU<T>(imgSrc);
+
+		{
+			_TMR_("-cv::copyTo:\t");
+			imgSrc.copyTo(imgRef);
+		}
+
+		//----------------------
+		GlsMat glsSrc(imgSrc);		//create GlsMat and  upload
+		GlsMat glsDst;
+		{
+			_TMR_("-clone:\t");
+			glsDst = glsSrc.clone();	//clone texture
+		}
+		//if src mat is changed after clone, it no affect dst mat.
+		gls::add(Scalar(1.0f), glsSrc, glsSrc);
+
+
+
+		glsDst.download(imgDst);		// download
+
+		int errNum = 0;
+		if (!AreEqual<T>(imgRef, imgDst)) errNum = -1;
+
+		//cout << imgSrc << endl;
+		//cout << imgDst << endl;
+		//cout << imgDst - imgSrc << endl;
+
+		return errNum;
+	}
+
+
+
+
 	TEST_CLASS(UnitTest_GlsMat)
 	{
 	public:
@@ -441,8 +530,41 @@ namespace UnitTest_glsCV
 		}
 
 
+		//-----------------------------------------------------
+		TEST_METHOD(GlsMat_copyTo_CV_32FC1)
+		{
+			cout << __FUNCTION__ << endl;
+			const int width = 32;
+			const int height = 24;
+			int errNum = test_GlsMat_copyTo<float>(CV_32FC1);
+			Assert::AreEqual(0, errNum);
+		}
+		BEGIN_TEST_METHOD_ATTRIBUTE(GlsMat_copyTo_CV_32FC1)
+			//TEST_OWNER(L"OwnerName")
+			TEST_PRIORITY(1)
+			TEST_MY_TRAIT(L"basic")
+		END_TEST_METHOD_ATTRIBUTE()
+
+		//-----------------------------------------------------
+		TEST_METHOD(GlsMat_clone_CV_32FC1)
+		{
+			cout << __FUNCTION__ << endl;
+			const int width = 32;
+			const int height = 24;
+			int errNum = test_GlsMat_clone<float>(CV_32FC1);
+			Assert::AreEqual(0, errNum);
+		}
+		BEGIN_TEST_METHOD_ATTRIBUTE(GlsMat_clone_CV_32FC1)
+			//TEST_OWNER(L"OwnerName")
+			TEST_PRIORITY(1)
+			TEST_MY_TRAIT(L"basic")
+		END_TEST_METHOD_ATTRIBUTE()
+
+
 
 	};
+
+
 
 
 }

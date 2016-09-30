@@ -147,7 +147,8 @@ glsShaderBase* selectShader(int type){
 
 
 void minMaxLoc(const GlsMat& src, double* minVal, double* maxVal, Point* minLoc, Point* maxLoc, const GlsMat& mask){
-	GLS_Assert(src.type() == CV_32FC1);
+//	GLS_Assert(src.type() == CV_32FC1);
+	GLS_Assert(src.depth() == CV_32F);
 	GLS_Assert(mask.empty());	// not implement yet
 
 	GlsMat _minvec;

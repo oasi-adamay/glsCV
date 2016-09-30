@@ -129,6 +129,12 @@ public:
 
 	size_t total(void) const;
 
+	//! 行列を別の行列にコピーします．
+	void copyTo(GlsMat& m) const;
+
+	//! 行列とその内部データの完全なコピーを作成します．
+	GlsMat clone(void) const;
+
 	/*!
 	OpenGL　wrapper
 	*/

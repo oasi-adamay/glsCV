@@ -65,7 +65,7 @@ void Canny(const GlsMat& src, GlsMat& dst, double threshold1, double threshold2,
 
 	GlsMat _src;
 	if (src.depth() == CV_8UC1 || src.depth() == CV_16UC1){
-		gls::convert(src,_src);
+		gls::convert(src,_src,CV_32F);
 	}
 	else{
 		_src = src;

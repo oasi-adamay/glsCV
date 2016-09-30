@@ -271,10 +271,11 @@ void main(void)\n
 
 
 
-void convert(const GlsMat& src, GlsMat& dst, const float scl){
+void convert(const GlsMat& src, GlsMat& dst, int rtype,const double scl){
+	GLS_Assert(CV_MAT_DEPTH(rtype) == CV_32F || rtype < 0);
+	if (rtype < 0) rtype = src.depth();
 
-	GlsMat _dst = GlsMat(src.size(), CV_MAKETYPE(CV_32F, CV_MAT_CN(src.type())));
-	GLS_Assert(_dst.glType() == GL_FLOAT);
+	GlsMat _dst = GlsMat(src.size(), CV_MAKETYPE(rtype, src.channels()));
 
 	glsShaderConvertBase* shader = 0;
 
@@ -287,7 +288,7 @@ void convert(const GlsMat& src, GlsMat& dst, const float scl){
 	case(CV_32S) : shader = &ShaderConvertS; break;
 	default: GLS_Assert(0);		//not implement
 	}
-	shader->Execute(src, scl, -1, _dst);
+	shader->Execute(src, (float)scl, -1, _dst);
 	dst = _dst;
 
 }
@@ -338,7 +339,7 @@ void cvtColor(const GlsMat& src, GlsMat& dst, const int code){
 	default: GLS_Assert(0);		//not implement
 	}
 
-	float scl = 1.0f;
+	double scl = 1.0;
 	shader->Execute(src, scl, code, _dst);
 	dst = _dst;
 

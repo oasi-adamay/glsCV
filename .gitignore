@@ -280,3 +280,6 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 *.bin
+/glsCV.VC.db
+/glsCV.VC.VC.opendb
+/image/miku(scale)(x2.000000).png

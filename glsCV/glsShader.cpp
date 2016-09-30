@@ -264,9 +264,16 @@ void main(void)\n
    gl_Position  = vec4(position,0.0,1.0);\n
 }\n
 );
-
 	return vertexShaderCode;
 }
+
+list<string> glsShaderBase::AttribNameList(void){
+	list<string> lst;
+	lst.push_back("position");
+	return lst;
+
+}
+
 
 void glsShaderBase::Init(void){
 	if (name == "") return;
@@ -279,11 +286,23 @@ void glsShaderBase::Init(void){
 			LoadShadersCode(VertexShaderCode(), FragmentShaderCode(), bin_filename);
 		}
 
-		list<string> lst = UniformNameList();
-		uniformLocArray.resize(lst.size());
-		int i = 0;
-		for (auto itr = lst.begin(); itr != lst.end(); ++itr,i++) {
-			uniformLocArray[i] = glGetUniformLocation(program(), (*itr).c_str());
+		{
+			list<string> lst = AttribNameList();
+			attribLocArray.resize(lst.size());
+			int i = 0;
+			for (auto itr = lst.begin(); itr != lst.end(); ++itr, i++) {
+				attribLocArray[i] = glGetAttribLocation(program(), (*itr).c_str());
+			}
+		}
+
+
+		{
+			list<string> lst = UniformNameList();
+			uniformLocArray.resize(lst.size());
+			int i = 0;
+			for (auto itr = lst.begin(); itr != lst.end(); ++itr, i++) {
+				uniformLocArray[i] = glGetUniformLocation(program(), (*itr).c_str());
+			}
 		}
 	}
 }

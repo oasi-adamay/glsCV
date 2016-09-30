@@ -203,6 +203,24 @@ namespace UnitTest_glsCV
 			TEST_MY_TRAIT(L"benchmark")
 		END_TEST_METHOD_ATTRIBUTE()
 
+		TEST_METHOD(glsPhaseCorrelatet_CV_32FC1_512_benchmark)
+		{
+			cout << __FUNCTION__ << endl;
+			int loop = 10;
+			int errNum = 0;
+			Size size(512, 512);
+			for (int i = 0; i < loop; i++){
+				errNum += test_glsPhaseCorrelatet<float>(CV_32FC1, size);
+			}
+			Assert::AreEqual(0, errNum);
+		}
+
+		BEGIN_TEST_METHOD_ATTRIBUTE(glsPhaseCorrelatet_CV_32FC1_512_benchmark)
+			//TEST_OWNER(L"OwnerName")
+			//TEST_PRIORITY(1)
+			TEST_MY_TRAIT(L"benchmark")
+			END_TEST_METHOD_ATTRIBUTE()
+
 		TEST_METHOD(glsPhaseCorrelatet_CV_32FC1_1024_benchmark)
 		{
 			cout << __FUNCTION__ << endl;
@@ -220,6 +238,22 @@ namespace UnitTest_glsCV
 			TEST_MY_TRAIT(L"benchmark")
 		END_TEST_METHOD_ATTRIBUTE()
 
+		TEST_METHOD(glsPhaseCorrelatet_CV_32FC1_2048_benchmark)
+		{
+			cout << __FUNCTION__ << endl;
+			int loop = 10;
+			int errNum = 0;
+			Size size(2048, 2048);
+			for (int i = 0; i < loop; i++){
+				errNum += test_glsPhaseCorrelatet<float>(CV_32FC1, size);
+			}
+			Assert::AreEqual(0, errNum);
+		}
+		BEGIN_TEST_METHOD_ATTRIBUTE(glsPhaseCorrelatet_CV_32FC1_2048_benchmark)
+			//TEST_OWNER(L"OwnerName")
+			//TEST_PRIORITY(1)
+			TEST_MY_TRAIT(L"benchmark")
+		END_TEST_METHOD_ATTRIBUTE()
 
 	};
 
