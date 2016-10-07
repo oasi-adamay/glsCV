@@ -349,6 +349,7 @@ void glsShaderBase::Execute(const First& first, const Rest&... rest)
 
 	//program
 	glUseProgram(program());
+	GL_CHECK_ERROR();
 
 	//vao
 	glsVAO vao(attribLocArray[0]);

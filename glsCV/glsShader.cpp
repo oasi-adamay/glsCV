@@ -232,6 +232,8 @@ bool glsShaderBase::LoadShadersBinary(const std::string& shaderbin_file_path){
 				//		printf("%s\n", &ProgramErrorMessage[0]);
 				cout << &ProgramErrorMessage[0] << endl;
 			}
+
+			return false;
 		}
 		assert(success == GL_TRUE);
 
