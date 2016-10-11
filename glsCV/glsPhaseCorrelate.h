@@ -34,6 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace gls
 {
 
+#if 0
 /*!
 phase only correlat
 
@@ -44,7 +45,7 @@ phase only correlat
 @return src1に対する、src2の位置
 */
 Point2d phaseCorrelateRes(const GlsMat& src1, const GlsMat& src2, GlsMat& window, double* response = 0);
-
+#endif
 
 /*!
 phase only correlat
@@ -54,7 +55,7 @@ phase only correlat
 @param window – 窓関数
 @return src1に対する、src2の位置
 */
-Point2d phaseCorrelate(const GlsMat& src1, const GlsMat& src2, GlsMat& window);
+Point2d phaseCorrelate(const GlsMat& src1, const GlsMat& src2, GlsMat& window, double* response = 0);
 
 }//namespace gls
 

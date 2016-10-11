@@ -139,7 +139,7 @@ static Point2d weightedCentroid(Mat src, cv::Point peakLocation, cv::Size weight
 
 
 
-Point2d phaseCorrelateRes(const GlsMat& src1, const GlsMat& src2, GlsMat& window, double* response){
+static Point2d phaseCorrelateRes(const GlsMat& src1, const GlsMat& src2, GlsMat& window, double* response){
 	_TMR_("gls::phaseCorrelateRes:");
 	CV_Assert(src1.type() == src2.type());
 	CV_Assert(src1.type() == CV_32FC1);
@@ -231,8 +231,8 @@ Point2d phaseCorrelateRes(const GlsMat& src1, const GlsMat& src2, GlsMat& window
 }
 
 
-Point2d phaseCorrelate(const GlsMat& src1, const GlsMat& src2, GlsMat& window){
-	return gls::phaseCorrelateRes(src1,src2,window,0);
+Point2d phaseCorrelate(const GlsMat& src1, const GlsMat& src2, GlsMat& window, double* response){
+	return gls::phaseCorrelateRes(src1,src2,window, response);
 }
 
 

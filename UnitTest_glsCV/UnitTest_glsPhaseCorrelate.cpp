@@ -107,13 +107,13 @@ namespace UnitTest_glsCV
 		Point2d mv_gl;
 		{
 			Timer tmr("cv::phaseCorrelateRes:\t");
-			///@@@ opencv 3.x 
-			//mv_cv = cv::phaseCorrelateRes(imgSrc, imgSft, window, &res_cv);
+			mv_cv = cv::phaseCorrelate(imgSrc, imgSft, window, &res_cv);
+
 		}
 		{
 			Timer tmr("gls::phaseCorrelateRes:\t");
 			//			mv_gl = gls::phaseCorrelateRes((GlsMat)imgSrc, (GlsMat)imgSft, (GlsMat)window, &res_gl);
-			mv_gl = gls::phaseCorrelateRes(_imgSrc, _imgSft, _window, &res_gl);
+			mv_gl = gls::phaseCorrelate(_imgSrc, _imgSft, _window, &res_gl);
 		}
 
 		//cout << "sft:" << shift << endl;
