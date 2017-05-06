@@ -283,3 +283,7 @@ $RECYCLE.BIN/
 /glsCV.VC.db
 /glsCV.VC.VC.opendb
 /image/miku(scale)(x2.000000).png
+
+#dependency
+*.d
+
