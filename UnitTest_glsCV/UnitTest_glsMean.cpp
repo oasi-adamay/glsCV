@@ -116,7 +116,7 @@ namespace UnitTest_glsCV
 
 	template <typename T>
 	int test_glsMeanStdDev(int cvtype, Size size = Size(32, 24)){
-		int ulps = 4;
+		int ulps = 8;
 		Mat imgSrc(size, cvtype);
 		FillRandU<T>(imgSrc);
 

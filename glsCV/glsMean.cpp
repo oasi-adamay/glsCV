@@ -70,7 +70,10 @@ void meanStdDev(const GlsMat& mtx, Scalar& mean, Scalar& stddev){
 	mean = gls::mean(mtx);
 	GlsMat _tmp;
 	gls::add(-1.0*mean, mtx,_tmp);
-	gls::pow(_tmp ,2.0, _tmp);
+
+//	gls::pow(_tmp ,2.0, _tmp);		//nvidiaで、xが負数の時に、NaN となる。
+	gls::multiply(_tmp , _tmp, _tmp);
+
 	Scalar var = gls::mean(_tmp);
 	for (int i = 0; i < 4; i++){
 		stddev[i] = sqrt(var[i]);
