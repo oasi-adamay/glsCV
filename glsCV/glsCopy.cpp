@@ -35,11 +35,19 @@ include
 */
 #include "glsMacro.h"
 #include "GlsMat.h"
-//#include "glsShader.h"
+#include "glsShader.h"
 
 #include "glsCopy.h"
 
-//#define _GLS_COPY_USE_SHADER
+#ifdef _DEBUG
+//#if 1
+#include "Timer.h"
+#define _TMR_(...)  Timer tmr(__VA_ARGS__)
+#else
+#define _TMR_(...)
+#endif
+
+#define _GLS_COPY_USE_SHADER
 
 namespace gls
 {
@@ -47,188 +55,114 @@ namespace gls
 
 #ifdef  _GLS_COPY_USE_SHADER
 
+
+class glsShaderCopyBase : public glsShaderBase
+{
+protected:
+	list<string> UniformNameList(void) {
+		list<string> lst;
+		lst.push_back("texSrc");
+		lst.push_back("ofs");
+		return lst;
+	}
+public:
+	glsShaderCopyBase(const string& _name) :glsShaderBase(_name) {}
+
+};
+
+
 //-----------------------------------------------------------------------------
 // glsShaderCopy
-class glsShaderCopy : public glsShaderBase
+class glsShaderCopy : public glsShaderCopyBase
 {
+protected:
+	string FragmentShaderCode(void) {
+		const char fragmentShaderCode[] = TO_STR(
+			#version 330 core\n
+			precision highp float; \n
+			uniform sampler2D	texSrc; \n
+			uniform vec2 ofs; \n
+			layout(location = 0) out vec4 dst; \n
+			void main(void)\n
+		{ \n
+			dst = texelFetch(texSrc, ivec2(gl_FragCoord.xy + ofs),0); \n
+			\n
+		}\n
+		);
+		return fragmentShaderCode;
+	}
+
 public:
-	glsShaderCopy(void);
+	glsShaderCopy(void) :glsShaderCopyBase(__FUNCTION__) {}
+
 };
 
 //-----------------------------------------------------------------------------
 // glsShaderCopyU unsigned
-class glsShaderCopyU : public glsShaderBase
+class glsShaderCopyU : public glsShaderCopyBase
 {
+protected:
+	string FragmentShaderCode(void) {
+		const char fragmentShaderCode[] = TO_STR(
+			#version 330 core\n
+			precision highp float; \n
+			uniform usampler2D	texSrc; \n
+			uniform vec2 ofs; \n
+			layout(location = 0) out uvec4 dst; \n
+			void main(void)\n
+		{ \n
+			dst = texelFetch(texSrc, ivec2(gl_FragCoord.xy + ofs),0); \n
+		}\n
+		);
+		return fragmentShaderCode;
+	}
+
 public:
-	glsShaderCopyU(void);
+	glsShaderCopyU(void) :glsShaderCopyBase(__FUNCTION__) {}
 };
 
 //-----------------------------------------------------------------------------
-// glsShaderCopyS unsigned
-class glsShaderCopyS : public glsShaderBase
+// glsShaderCopyS signed
+class glsShaderCopyS : public glsShaderCopyBase
 {
+protected:
+	string FragmentShaderCode(void) {
+		const char fragmentShaderCode[] = TO_STR(
+			#version 330 core\n
+			precision highp float; \n
+			uniform isampler2D	texSrc; \n
+			uniform vec2 ofs; \n
+			layout(location = 0) out ivec4 dst; \n
+			void main(void)\n
+		{ \n
+			dst = texelFetch(texSrc, ivec2(gl_FragCoord.xy+ofs),0); \n
+		}\n
+		);
+		return fragmentShaderCode;
+	}
+
 public:
-	glsShaderCopyS(void);
+	glsShaderCopyS(void) :glsShaderCopyBase(__FUNCTION__) {}
 };
 
 
 //-----------------------------------------------------------------------------
 //global 
-glsShaderCopy* shaderCopy = 0;
-glsShaderCopyU* shaderCopyU = 0;
-glsShaderCopyS* shaderCopyS = 0;
+glsShaderCopy ShaderCopy;
+glsShaderCopyU ShaderCopyU;
+glsShaderCopyS ShaderCopyS;
 
-void ShaderCopyInit(void){
-	shaderCopy = new glsShaderCopy();
-	shaderCopyU = new glsShaderCopyU();
-	shaderCopyS = new glsShaderCopyS();
-}
-
-void ShaderCopyTerminate(void){
-	delete shaderCopy;
-	delete shaderCopyU;
-	delete shaderCopyS;
-}
-
-
-static const char vertexShaderCode[] =
-	"#version 330 core\n"
-	"layout (location = 0)in  vec2 position;\n"
-	"void main(void)\n"
-	"{\n"
-	"   gl_Position  = vec4(position,0.0,1.0);\n"
-	"}\n"
-;
-
-
-
-
-//-----------------------------------------------------------------------------
-//glsShaderCopy
-glsShaderCopy::glsShaderCopy(void)
-	:glsShaderBase()
-{
-	const char fragmentShaderCode[] =
-		"#version 330 core\n"
-		"precision highp float;\n"
-		"uniform ivec2	offset;\n"
-		"uniform sampler2D	texSrc;\n"
-		"layout (location = 0) out vec4 dst;\n"
-		"void main(void)\n"
-		"{\n"
-		"	dst = texelFetch(texSrc, ivec2(gl_FragCoord.xy)+offset,0);\n"
-		"\n"
-		"}\n"
-		;
-
-	const string bin_filename = shaderBinName(__FUNCTION__);
-	if (!LoadShadersBinary(bin_filename)){
-		LoadShadersCode(vertexShaderCode, fragmentShaderCode, bin_filename);
-	}
-}
-
-//-----------------------------------------------------------------------------
-//glsShaderCopyU
-glsShaderCopyU::glsShaderCopyU(void)
-	:glsShaderBase()
-{
-	const char fragmentShaderCode[] =
-		"#version 330 core\n"
-		"precision highp float;\n"
-		"uniform ivec2	offset;\n"
-		"uniform usampler2D	texSrc;\n"
-		"layout (location = 0) out uvec4 dst;\n"
-		"void main(void)\n"
-		"{\n"
-		"	dst = texelFetch(texSrc, ivec2(gl_FragCoord.xy)+offset,0);\n"
-		"}\n"
-		;
-	const string bin_filename = shaderBinName(__FUNCTION__);
-	if (!LoadShadersBinary(bin_filename)){
-		LoadShadersCode(vertexShaderCode, fragmentShaderCode, bin_filename);
-	}
-}
-
-//-----------------------------------------------------------------------------
-//glsShaderCopyS
-glsShaderCopyS::glsShaderCopyS(void)
-	:glsShaderBase()
-{
-	const char fragmentShaderCode[] =
-		"#version 330 core\n"
-		"precision highp float;\n"
-		"uniform ivec2	offset;\n"
-		"uniform isampler2D	texSrc;\n"
-		"layout (location = 0) out ivec4 dst;\n"
-		"void main(void)\n"
-		"{\n"
-		"	dst = texelFetch(texSrc, ivec2(gl_FragCoord.xy)+offset,0);\n"
-		"}\n"
-		;
-	const string bin_filename = shaderBinName(__FUNCTION__);
-	if (!LoadShadersBinary(bin_filename)){
-		LoadShadersCode(vertexShaderCode, fragmentShaderCode, bin_filename);
-	}
-}
-
-
-
-//---------------------------------------------------------------------------
-//
-static void glsCopyProcess(
-	const glsShaderBase* shader,	//progmra ID
-	const GLuint& texSrc,			//src texture IDs
-	const Rect& rectSrc,			// copy src rectangel
-	const Rect& rectDst 			// copy dst rectangel
-	)
-{
-	const int offset[2] = { rectSrc.x, rectSrc.y };
-		//program
-	{
-		glUseProgram(shader->program());
-	}
-		//uniform
-	{
-		glUniform2iv(glGetUniformLocation(shader->program(), "offset"), 1, &offset[0]);
-	}
-
-
-	//Bind Texture
-	{
-		int id = 0;
-		glActiveTexture(GL_TEXTURE0 + id);
-		glBindTexture(GL_TEXTURE_2D, texSrc);
-		glUniform1i(glGetUniformLocation(shader->program(), "texSrc"), id);
-	}
-
-	glsVAO vao(glGetAttribLocation(shader->program(), "position"));
-	//Viewport
-	{
-		glViewport(rectDst.x, rectDst.y, rectDst.width, rectDst.height);
-	}
-
-	//Render!!
-	{
-		glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
-		glFlush();
-	}
-
-	GL_CHECK_ERROR();
-
-	//	glFinish();
-
-}
 
 static
-glsShaderBase* selectShader(int type){
+glsShaderBase* selectShader(int type) {
 	glsShaderBase* shader = 0;
-	switch (CV_MAT_DEPTH(type)){
-	case(CV_32F) : shader = shaderCopy; break;
-	case(CV_8U) :
-	case(CV_16U) : shader = shaderCopyU; break;
-	case(CV_8S) :
-	case(CV_16S) :
-	case(CV_32S) : shader = shaderCopyS; break;
+	switch (CV_MAT_DEPTH(type)) {
+	case(CV_32F): shader = &ShaderCopy; break;
+	case(CV_8U):
+	case(CV_16U): shader = &ShaderCopyU; break;
+	case(CV_8S):
+	case(CV_16S):
+	case(CV_32S): shader = &ShaderCopyS; break;
 	default: GLS_Assert(0);		//not implement
 	}
 	return shader;
@@ -236,19 +170,12 @@ glsShaderBase* selectShader(int type){
 
 #endif
 
-
 void copy(const GlsMat& src, GlsMat& dst){
 #ifdef  _GLS_COPY_USE_SHADER
 	GlsMat _dst = GlsMat(src.size(), src.type());
 	glsShaderBase* shader = selectShader(src.type());
-	Rect rectSrc(0, 0, src.cols, src.rows);
-	Rect rectDst = rectSrc;
-	glsFBO fbo(1);
-	//dst texture
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _dst.texid(), 0);
-	GLS_Assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
-
-	glsCopyProcess(shader, src.texid(), rectSrc, rectDst);
+	Vec2f ofs(0.0, 0.0);
+	shader->Execute(src,ofs,_dst);
 	dst = _dst;
 #else
 
@@ -270,8 +197,11 @@ void copy(const GlsMat& src, GlsMat& dst){
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo[DRAW]);
 	glBindTexture(GL_TEXTURE_2D, _dst.texid());
 
-	glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, _dst.cols, _dst.rows);
-	GL_CHECK_ERROR();
+	{
+		_TMR_("glCopyTexSubImage2D:\t");
+		glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, _dst.cols, _dst.rows);
+		GL_CHECK_ERROR();
+	}
 
 	glDeleteFramebuffers(sizeof(fbo) / sizeof(fbo[0]), fbo);
 
@@ -286,18 +216,8 @@ void copyRect(const GlsMat& src, GlsMat& dst, const Rect& rect){
 #ifdef  _GLS_COPY_USE_SHADER
 	GlsMat _dst = GlsMat(rect.size(), src.type());
 	glsShaderBase* shader = selectShader(src.type());
-
-	glsFBO fbo(1);
-
-	Rect rectSrc(rect.x, rect.y, _dst.cols, _dst.rows);
-	Rect rectDst(0, 0, _dst.cols, _dst.rows);
-
-	//dst texture
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _dst.texid(), 0);
-	GLS_Assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
-
-	glsCopyProcess(shader, src.texid(), rectSrc, rectDst);
-
+	Vec2f ofs((float)rect.x, (float)rect.y);
+	shader->Execute(src, ofs, _dst);
 	dst = _dst;
 #else
 	GlsMat _dst = getDstMat(rect.size(),src.type(),dst);
@@ -333,6 +253,8 @@ void copyRect(const GlsMat& src, GlsMat& dst, const Rect& rect){
 
 
 void tiled(const GlsMat& src, vector<vector<GlsMat>>& dst, const Size& blkNum){
+	_TMR_("gls::tiled():\t");
+
 	GLS_Assert(src.isContinuous());
 	GLS_Assert(blkNum.width >= 1);
 	GLS_Assert(blkNum.height >= 1);
@@ -345,20 +267,13 @@ void tiled(const GlsMat& src, vector<vector<GlsMat>>& dst, const Size& blkNum){
 #ifdef  _GLS_COPY_USE_SHADER
 	glsShaderBase* shader = selectShader(src.type());
 
-	glsFBO fbo(1);
-
 	for (int by = 0; by < blkNum.height; by++){
 		for (int bx = 0; bx < blkNum.width; bx++){
 			dst[by][bx] = GlsMat(sizeDst, src.type());
 
-			Rect rectSrc(bx* sizeDst.width, by* sizeDst.height, sizeDst.width, sizeDst.height);
-			Rect rectDst(0, 0, sizeDst.width, sizeDst.height);
-
-			//dst texture
-			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, dst[by][bx].texid(), 0);
-			GLS_Assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
-
-			glsCopyProcess(shader, src.texid(), rectSrc, rectDst);
+			Rect rect(bx* sizeDst.width, by* sizeDst.height, sizeDst.width, sizeDst.height);
+			Vec2f ofs((float)rect.x, (float)rect.y);
+			shader->Execute(src, ofs, dst[by][bx]);
 		}
 	}
 #else
@@ -376,6 +291,7 @@ void tiled(const GlsMat& src, vector<vector<GlsMat>>& dst, const Size& blkNum){
 
 	for (int by = 0; by < blkNum.height; by++){
 		for (int bx = 0; bx < blkNum.width; bx++){
+
 			dst[by][bx] = GlsMat(sizeDst, src.type());
 
 			Rect rectSrc(bx* sizeDst.width, by* sizeDst.height, sizeDst.width, sizeDst.height);
@@ -384,8 +300,11 @@ void tiled(const GlsMat& src, vector<vector<GlsMat>>& dst, const Size& blkNum){
 			glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, src.texid(), 0);
 			glBindTexture(GL_TEXTURE_2D, dst[by][bx].texid());
 
-			glCopyTexSubImage2D(GL_TEXTURE_2D, 0, rectDst.x, rectDst.y, rectSrc.x, rectSrc.y, rectDst.width, rectDst.height);
-			GL_CHECK_ERROR();
+			{
+				_TMR_("glCopyTexSubImage2D:\t");
+				glCopyTexSubImage2D(GL_TEXTURE_2D, 0, rectDst.x, rectDst.y, rectSrc.x, rectSrc.y, rectDst.width, rectDst.height);
+				GL_CHECK_ERROR();
+			}
 
 		}
 	}
@@ -396,6 +315,7 @@ void tiled(const GlsMat& src, vector<vector<GlsMat>>& dst, const Size& blkNum){
 }
 
 void untiled(const vector<vector<GlsMat>>& src, GlsMat& dst){
+	_TMR_("gls::untiled():\t");
 
 	Size blkNum((int)src[0].size(), (int)src.size());
 	Size sizeSrc = Size(src[0][0].cols, src[0][0].rows);
@@ -408,17 +328,13 @@ void untiled(const vector<vector<GlsMat>>& src, GlsMat& dst){
 
 #ifdef  _GLS_COPY_USE_SHADER
 	glsShaderBase* shader = selectShader(src[0][0].type());
-	glsFBO fbo(1);
-
-	//dst texture
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, dst.texid(), 0);
-	GLS_Assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
 
 	for (int by = 0; by < blkNum.height; by++){
 		for (int bx = 0; bx < blkNum.width; bx++){
 			Rect rectSrc(-bx* sizeSrc.width, -by* sizeSrc.height, sizeSrc.width, sizeSrc.height);
 			Rect rectDst(+bx* sizeSrc.width, +by* sizeSrc.height, sizeSrc.width, sizeSrc.height);
-			glsCopyProcess(shader, src[by][bx].texid(), rectSrc, rectDst);
+			Vec2f ofs((float)rectSrc.x, (float)rectSrc.y);
+			shader->Execute(src[by][bx], ofs, dst , rectDst);
 		}
 	}
 #else

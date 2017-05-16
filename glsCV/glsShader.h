@@ -63,6 +63,7 @@ private:
 		Size texSrcSize;	//src textureのsize
 		int texDstNum;		//dst texture数
 		Size texDstSize;	//dst textureのsize
+		Rect rect;			//view point
 		GLuint fbo;			//fbo
 	};
 
@@ -87,6 +88,7 @@ private:
 	template<>	void setup<Matx43f>(SetupInfo* info, const Matx43f& t);	//!< uniform mat3x4(transpose)
 	template<>	void setup<GlsMat>(SetupInfo* info, const GlsMat& t);	//!<
 	template<>	void setup<AtomicCounter>(SetupInfo* info, const AtomicCounter& t);	//!<
+	template<>	void setup<Rect>(SetupInfo* info, const Rect& t);		//!<
 
 	template<class First, class... Rest>
 	void setup(SetupInfo* info, const First& first, const Rest&... rest);

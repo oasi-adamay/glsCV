@@ -333,6 +333,14 @@ void glsShaderBase::setup<AtomicCounter>(SetupInfo* info, const AtomicCounter& t
 }
 
 
+template<>
+void glsShaderBase::setup<Rect>(SetupInfo* info, const Rect& t)
+{
+	const int i = info->argnum++;
+	info->rect = t;
+}
+
+
 
 
 template<class First, class... Rest>
@@ -373,7 +381,12 @@ void glsShaderBase::Execute(const First& first, const Rest&... rest)
 		DrawBuffers(info.texDstNum);
 
 		//Viewport
-		glViewport(0, 0, info.texDstSize.width, info.texDstSize.height);
+		if (info.rect.width!= 0 && info.rect.height != 0) {
+			glViewport(info.rect.x, info.rect.y, info.rect.width, info.rect.height);
+		}
+		else {
+			glViewport(0, 0, info.texDstSize.width, info.texDstSize.height);
+		}
 	}
 	else{
 		//Viewport

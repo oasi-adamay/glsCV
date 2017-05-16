@@ -492,6 +492,8 @@ static void fft_redix2(const GlsMat& src, GlsMat& dst, int flag){
 
 //-----------------------------------------------------------------------------
 static void fft_redix4(const GlsMat& src, GlsMat& dst, int flag){
+	_TMR_("-fft_redix4:\t");
+
 	GLS_Assert(src.channels() == 2);
 	GLS_Assert(src.depth() == CV_32F);
 
@@ -519,7 +521,10 @@ static void fft_redix4(const GlsMat& src, GlsMat& dst, int flag){
 	vector<vector<GlsMat>> _dst0 = vector<vector<GlsMat>>(blkNum.height, vector<GlsMat>(blkNum.width));
 	vector<vector<GlsMat>> _dst1 = vector<vector<GlsMat>>(blkNum.height, vector<GlsMat>(blkNum.width));
 
-	gls::tiled(src, _dst0, blkNum);
+	{
+		_TMR_("-fft_redix4:tiled:\t");
+		gls::tiled(src, _dst0, blkNum);
+	}
 	for (int by = 0; by < blkNum.height; by++){
 		for (int bx = 0; bx < blkNum.width; bx++){
 			_dst1[by][bx] = GlsMat(Size(src.cols / blkNum.width, src.rows / blkNum.height), src.type());
@@ -658,7 +663,11 @@ static void fft_redix4(const GlsMat& src, GlsMat& dst, int flag){
 		bank = bank ^ 1;
 	}
 
-	gls::untiled(*texbuf[bank], dst);
+	{
+		_TMR_("-fft_redix4:untiled:\t");
+		gls::untiled(*texbuf[bank], dst);
+	}
+
 }
 
 
