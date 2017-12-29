@@ -1,4 +1,4 @@
-/*
+﻿/*
 Copyright (c) 2016, oasi-adamay
 All rights reserved.
 
@@ -28,45 +28,27 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#ifndef _GLS_GEMM_H_
+#define _GLS_GEMM_H_
 
-#ifndef _GLS_CV_H_
-#define _GLS_CV_H_
+namespace gls
+{
 
+/*
+行列の乗算を行います
 
-#include "GlsMat.h"
-#include "glsShader.h"
-#include "glsCopy.h"
-#include "glsConvert.h"
-#include "glsDraw.h"
-#include "glsMerge.h"
-#include "glsSplit.h"
-#include "glsFft.h"
-#include "glsBasicOperation.h"
-#include "glsReduce.h"
-#include "glsMinMaxLoc.h"
-#include "glsMean.h"
-#include "glsNorm.h"
-#include "glsNormalize.h"
-#include "glsFilter.h"
-#include "glsBilateralFilter.h"
-#include "glsThreshold.h"
-#include "glsAdaptiveThreshold.h"
-#include "glsFlip.h"
-#include "glsResize.h"
-#include "glsWarpAffine.h"
-#include "glsRemap.h"
-#include "glsCartToPolar.h"
-#include "glsNonmaximaSuppression.h"
-#include "glsEdgeTracer.h"
-#include "glsCanny.h"
-#include "glsAccumulateWeighted.h"
-#include "glsConvolutionalNeuralNetwork.hpp"
-#include "glsPhaseCorrelate.h"
-#include "glsGemm.h"
+パラメタ:
+@param src1 – 操作される1番目の入力行列．型は CV_32FC1
+@param src2 – 操作される2番目の入力行列． src1 と同じ型．
+@param alpha – 行列積の重み．
+@param src3 – オプション．行列積に加算される3番目の行列． src1 や src2 と同じ型．
+@param beta – src3 の重み．
+@param dst – 出力行列．適切なサイズを持ち，入力行列と同じ型．
 
+*/
 
-GLFWwindow* glsCvInit(const int _width = 0, const int _height = 0);
-void glsCvTerminate(void);
+void gemm(const GlsMat& src1, const GlsMat& src2, float alpha, const GlsMat& src3, float beta, GlsMat& dst);
 
+}//namespace gls
 
 #endif

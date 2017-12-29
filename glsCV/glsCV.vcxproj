@@ -155,6 +155,7 @@
     <ClInclude Include="glsFft.h" />
     <ClInclude Include="glsFilter.h" />
     <ClInclude Include="glsFlip.h" />
+    <ClInclude Include="glsGemm.h" />
     <ClInclude Include="glsMacro.h" />
     <ClInclude Include="glsMat.h" />
     <ClInclude Include="glsMean.h" />
@@ -195,6 +196,7 @@
     <ClCompile Include="glsFft.cpp" />
     <ClCompile Include="glsFilter.cpp" />
     <ClCompile Include="glsFlip.cpp" />
+    <ClCompile Include="glsGemm.cpp" />
     <ClCompile Include="glsMat.cpp" />
     <ClCompile Include="glsMean.cpp" />
     <ClCompile Include="glsMerge.cpp" />

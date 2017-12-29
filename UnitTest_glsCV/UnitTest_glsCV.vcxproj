@@ -189,6 +189,7 @@
     <ClCompile Include="unittest_glsFft.cpp" />
     <ClCompile Include="UnitTest_glsFilter.cpp" />
     <ClCompile Include="UnitTest_glsFlip.cpp" />
+    <ClCompile Include="UnitTest_glsGemm.cpp" />
     <ClCompile Include="UnitTest_glsMat.cpp" />
     <ClCompile Include="UnitTest_glsMean.cpp" />
     <ClCompile Include="UnitTest_glsMerge.cpp" />
