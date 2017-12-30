@@ -228,6 +228,10 @@ void add(const Scalar& scalar, const GlsMat& src, GlsMat& dst){
 	dst = _dst;
 }
 
+void add(const GlsMat& src, const Scalar& scalar, GlsMat& dst) {
+	add(scalar, src, dst);	//commutable
+}
+
 void add(const GlsMat& src0, const GlsMat& src1, GlsMat& dst)
 {
 	GLS_Assert(src0.glType() == GL_FLOAT);
@@ -244,6 +248,11 @@ void subtract(const Scalar& scalar, const GlsMat& src, GlsMat& dst){
 	ShaderScalarOperation.Execute(src, OPCODE_SUB, scalar, _dst);
 	dst = _dst;
 }
+
+void subtract(const GlsMat& src, const Scalar& scalar, GlsMat& dst) {
+	add(src, -(scalar), dst);
+}
+
 
 void subtract(const GlsMat& src0, const GlsMat& src1, GlsMat& dst)
 {
@@ -262,6 +271,11 @@ void multiply(const Scalar& scalar, const GlsMat& src, GlsMat& dst){
 	dst = _dst;
 }
 
+void multiply(const GlsMat& src, const Scalar& scalar, GlsMat& dst) {
+	multiply(scalar, src, dst);
+}
+
+
 void multiply(const GlsMat& src0, const GlsMat& src1, GlsMat& dst)
 {
 	GLS_Assert(src0.glType() == GL_FLOAT);
@@ -278,6 +292,9 @@ void divide(const Scalar& scalar, const GlsMat& src, GlsMat& dst){
 	dst = _dst;
 }
 
+void divide(const GlsMat& src, const Scalar& scalar, GlsMat& dst) {
+	multiply(src,1.0/scalar, dst);
+}
 
 void divide(const GlsMat& src0, const GlsMat& src1, GlsMat& dst){
 	GLS_Assert(src0.glType() == GL_FLOAT);
@@ -374,9 +391,5 @@ void pow(const GlsMat& src, const float& power, GlsMat& dst){
 	ShaderScalarOperation.Execute(src, OPCODE_POW, scalar, _dst);
 	dst = _dst;
 }
-
-
-
-
 
 }//namespace gls

@@ -135,6 +135,9 @@
     <ClInclude Include="glsGemm.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
+    <ClInclude Include="glsMatOperator.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="glsFft.cpp">
@@ -240,6 +243,9 @@
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="glsGemm.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="glsMatOperator.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>

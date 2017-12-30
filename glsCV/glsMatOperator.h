@@ -1,4 +1,4 @@
-/*
+﻿/*
 Copyright (c) 2016, oasi-adamay
 All rights reserved.
 
@@ -28,46 +28,34 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-
-#ifndef _GLS_CV_H_
-#define _GLS_CV_H_
-
-
-#include "GlsMat.h"
-#include "glsShader.h"
-#include "glsCopy.h"
-#include "glsConvert.h"
-#include "glsDraw.h"
-#include "glsMerge.h"
-#include "glsSplit.h"
-#include "glsFft.h"
-#include "glsBasicOperation.h"
-#include "glsReduce.h"
-#include "glsMinMaxLoc.h"
-#include "glsMean.h"
-#include "glsNorm.h"
-#include "glsNormalize.h"
-#include "glsFilter.h"
-#include "glsBilateralFilter.h"
-#include "glsThreshold.h"
-#include "glsAdaptiveThreshold.h"
-#include "glsFlip.h"
-#include "glsResize.h"
-#include "glsWarpAffine.h"
-#include "glsRemap.h"
-#include "glsCartToPolar.h"
-#include "glsNonmaximaSuppression.h"
-#include "glsEdgeTracer.h"
-#include "glsCanny.h"
-#include "glsAccumulateWeighted.h"
-#include "glsConvolutionalNeuralNetwork.hpp"
-#include "glsPhaseCorrelate.h"
-#include "glsGemm.h"
-#include "glsMatOperator.h"
+#ifndef _GLS_MAT_OPERATOR_H_
+#define _GLS_MAT_OPERATOR_H_
 
 
-GLFWwindow* glsCvInit(const int _width = 0, const int _height = 0);
-void glsCvTerminate(void);
+namespace gls
+{
+
+//-----------------------------------------------------------------------------
+// operator overload
+
+GlsMat operator + (const GlsMat& lhs, const GlsMat& rhs);
+GlsMat operator + (const Scalar& lhs, const GlsMat& rhs);
+GlsMat operator + (const GlsMat& lhs, const Scalar& rhs);
+
+GlsMat operator - (const Scalar& lhs, const GlsMat& rhs);
+GlsMat operator - (const GlsMat& lhs, const Scalar& rhs);
+GlsMat operator - (const GlsMat& lhs, const GlsMat& rhs);
+
+GlsMat operator * (const Scalar& lhs, const GlsMat& rhs);
+GlsMat operator * (const GlsMat& lhs, const Scalar& rhs);
+GlsMat operator * (const GlsMat& lhs, const GlsMat& rhs);	//matrix multiply
+
+GlsMat operator / (const Scalar& lhs, const GlsMat& rhs);
+GlsMat operator / (const GlsMat& lhs, const Scalar& rhs);
+GlsMat operator / (const GlsMat& lhs, const GlsMat& rhs);
+
+
+}//namespace gls
 
 
 #endif
